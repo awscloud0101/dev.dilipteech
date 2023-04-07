@@ -1,0 +1,499 @@
+﻿@model AsteriskBrowserAL.Models.StaffInterviewsData
+@{
+    ViewBag.Title = "InterviewSchedule";
+    int Sno = 1;
+    string color = string.Empty;
+
+    var ListStaff = ViewBag.StaffData;
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Enrollment
+        </li>
+        <li class="active">Interview Schedule</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+@*<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />*@
+@*<script src="~/script/jquery-2.0.3.js"></script>
+    <script src="~/script/jquery-ui.js"></script>
+    <script src="~/js/jquery-1.10.2.js"></script>
+    <script src="~/js/jquery-ui.js"></script>*@
+
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("InterviewSchedule", "HREnrollment", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true)
+                <label style="color:red;" id="validation"></label>
+                if (null != TempData["Message"])
+                {
+                    <span style="color:green;font-weight:bold;">Interview Is Scheduled</span>
+                }
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Interview Schedule
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <a class="P2" id="ViewData" value="ViewData" name="New" onclick="return Search();"><span class="btn btn-info btn-minier">View Data</span></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Name")</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.SearchInterviewee.IntervieweeName)
+                                            {
+                                            <input type="text" name="Name" id="Name" class="form-control" placeholder="Name" value="@Model.SearchInterviewee.IntervieweeName" />
+                                            }
+                                            else
+                                            {
+                                            <input type="text" name="Name" id="Name" class="form-control" placeholder="Name" />
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label no-padding-right">@Html.Label("Email")</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.SearchInterviewee.Email)
+                                            {
+                                            <input type="text" name="Email" id="Email" class="form-control" placeholder="Email" value="@Model.SearchInterviewee.Email" />
+                                            }
+                                            else
+                                            {
+                                            <input type="text" name="Email" id="Email" class="form-control" placeholder="Email" />
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Qualification")</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.SearchInterviewee.QualificationId)
+                                            {
+                                            @Html.DropDownListFor(model => model.QualificationId, new SelectList(Model.lstQualification, "QualificationsId", "Name", Model.SearchInterviewee.QualificationId), new { @class = "form-control", id = "QualificationId" })
+                                            }
+                                            else
+                                            {
+                                            @Html.DropDownListFor(model => model.QualificationId, new SelectList(Model.lstQualification, "QualificationsId", "Name"), new { @class = "form-control", id = "QualificationId" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label no-padding-right">@Html.Label("Additional Qualification")</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.SearchInterviewee.AdditionalQualificationId)
+                                            {
+                                            @Html.DropDownListFor(model => model.AdditionalQualificationId, new SelectList(Model.lstAdditionalQualification, "QualificationsId", "Name", Model.SearchInterviewee.AdditionalQualificationId), new { @class = "form-control", id = "AdditionalQualificationId" })
+                                            }
+                                            else
+                                            {
+                                            @Html.DropDownListFor(model => model.AdditionalQualificationId, new SelectList(Model.lstAdditionalQualification, "QualificationsId", "Name"), new { @class = "form-control", id = "AdditionalQualificationId" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.SearchInterviewee.Class)
+                                            {
+                                            @Html.DropDownListFor(model => model.ClassId, new SelectList(Model.lstClassesCanHandle, "ClassNumber", "ClassNumberDisplay", Model.SearchInterviewee.Class), "--- Select ---", new { @class = "form-control", id = "ClassId" })
+                                            }
+                                            else
+                                            {
+                                            @Html.DropDownListFor(model => model.ClassId, new SelectList(Model.lstClassesCanHandle, "ClassNumber", "ClassNumberDisplay"), "--- Select ---", new { @class = "form-control", id = "ClassId" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label no-padding-right">@Html.Label("Subjects")</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.SearchInterviewee.SubjectId)
+                                            {
+                                            @Html.DropDownListFor(model => model.SubjectId, new SelectList(Model.lstSubjects, "SubjectId", "SubjectName", Model.SearchInterviewee.SubjectId), "--- Select ---", new { @class = "form-control", id = "SubjectId" })
+                                            }
+                                            else
+                                            {
+                                            @Html.DropDownListFor(model => model.SubjectId, new SelectList(Model.lstSubjects, "SubjectId", "SubjectName"), "--- Select ---", new { @class = "form-control", id = "SubjectId" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Experience")</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.SearchInterviewee.Experience)
+                                            {
+                                            <input type="text" name="Experience" id="Experience" class="form-control" placeholder="Experience" value="@Model.SearchInterviewee.Experience" />
+                                            }
+                                            else
+                                            {
+                                            <input type="text" name="Experience" id="Experience" class="form-control" placeholder="Experience" />
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label no-padding-right">@Html.Label("GMS Branch Interested")</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.SearchInterviewee.BranchInterested)
+                                            {
+                                            @Html.DropDownListFor(model => model.BranchId, new SelectList(Model.lstBranchIntrested, "SubscriptionId", "Institute", Model.SearchInterviewee.BranchInterested), new { @class = "form-control", id = "BranchId" })
+                                            }
+                                            else
+                                            {
+                                            @Html.DropDownListFor(model => model.BranchId, new SelectList(Model.lstBranchIntrested, "SubscriptionId", "Institute"), new { @class = "form-control", id = "BranchId" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Date")</label>
+                                        <div class="col-sm-6">
+                                            <div id="datepicker" class="input-group date">
+                                                @if (null != Model.SearchInterviewee.Date)
+                                                {
+                                                <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" placeholder="Date" value="@Model.SearchInterviewee.Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                }
+                                                else
+                                                {
+                                                <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" placeholder="Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /.widget-main -->
+                    </div><!-- /.widget-body -->
+                </div>
+
+
+
+                <div id="SearchValues"></div>
+
+            }
+        </div>
+    </div>
+
+
+
+        <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+            <p style="position:absolute; top: 50%; left:50%;">
+                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+            </p>
+        </div>
+</section>
+
+<input type="hidden" id="sid" />
+<input type="hidden" id="sEid" />
+
+
+<script type="text/javascript">
+
+    window.onload = RedirectData();
+
+    function RedirectData() {
+
+        if ((Date == "" || Date == undefined) && (Name == "" || Name == undefined) && (Email == "" || Email == undefined) && (QualificationId == "0" || QualificationId == undefined) && (AdditionalQualificationId == "0" || AdditionalQualificationId == undefined) && (Classes == "0" || Classes == undefined) && (Subjects == "0" || Subjects == undefined) && (Branch == "0" || Branch == undefined) && (Expereince == "" || Expereince == undefined)) {
+            $('#imagemodal').hide();
+        }
+        else {
+            Search();
+        }
+    }
+
+    $('#QualificationId').change(function () {
+        document.getElementById("validation").innerHTML = "";
+        $("#Email").val('');
+        $("#Name").val('');
+        document.getElementById("sEid").value = "";
+        document.getElementById("sid").value = "";
+    })
+    $('#AdditionalQualificationId').change(function () {
+        document.getElementById("validation").innerHTML = "";
+        $("#Email").val('');
+        $("#Name").val('');
+        document.getElementById("sEid").value = "";
+        document.getElementById("sid").value = "";
+    })
+    $('#ClassId').change(function () {
+        document.getElementById("validation").innerHTML = "";
+        $("#Email").val('');
+        $("#Name").val('');
+        document.getElementById("sEid").value = "";
+        document.getElementById("sid").value = "";
+    })
+    $('#SubjectId').change(function () {
+        document.getElementById("validation").innerHTML = "";
+        $("#Email").val('');
+        $("#Name").val('');
+        document.getElementById("sEid").value = "";
+        document.getElementById("sid").value = "";
+    })
+    $('#Experience').change(function () {
+        document.getElementById("validation").innerHTML = "";
+        $("#Email").val('');
+        $("#Name").val('');
+        document.getElementById("sEid").value = "";
+        document.getElementById("sid").value = "";
+    })
+    $('#BranchId').change(function () {
+        document.getElementById("validation").innerHTML = "";
+        $("#Email").val('');
+        $("#Name").val('');
+        document.getElementById("sEid").value = "";
+        document.getElementById("sid").value = "";
+    })
+
+    //function GetInterviewees() {
+    //    $('#imagemodal').show();
+    //    $.ajax({
+    //        url: '/HREnrollment/GetInterviwees',
+    //        beforSend: function () {
+    //            $('#imagemodal').show();
+    //        },
+    //        success: function (data) {
+    //            $('#SearchValues').html("");
+    //            $('#SearchValues').html(data);
+    //        },
+    //        error: function () {
+    //            $('#imagemodal').hide();
+    //        }
+    //    }).done(function () {
+    //        $('#imagemodal').hide();
+    //    });
+    //}
+
+
+
+    $('#Name').keyup(function () {
+        document.getElementById("validation").innerHTML = "";
+        $("#QualificationId").val(0);
+        $("#AdditionalQualificationId").val(0);
+        $("#ClassId").val(0);
+        $("#SubjectId").val(0);
+        $("#Experience").val('');
+        $("#BranchId").val(0);
+        $('#Date').val('');
+        $("#sid").val('');
+        if (!this.value) {
+            $("#sid").val('');
+        };
+    });
+
+    $('#Email').keyup(function () {
+        document.getElementById("validation").innerHTML = "";
+        $("#QualificationId").val(0);
+        $("#AdditionalQualificationId").val(0);
+        $("#ClassId").val(0);
+        $("#SubjectId").val(0);
+        $("#Experience").val('');
+        $("#BranchId").val(0);
+        $("#sEid").val('');
+        $('#Date').val('');
+        if (!this.value) {
+            $("#sEid").val('');
+        };
+    })
+
+    $("#Name").autocomplete({
+        source: function (request, response) {
+            if (request.term.length < 3) {
+                return;
+            }
+
+            $("#Email").val('');
+            document.getElementById("sEid").value = "";
+            $('#imagemodal').show();
+            $.ajax({
+                url: "/HREnrollment/GetIntervieweeNames",
+                type: "POST",
+                dataType: "json",
+                data: { strVal: request.term },
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.DisplayName,
+                            value: data.DisplayName,
+                            id: data.StaffInterviewsId,
+                        };
+                    }));
+                    $('#imagemodal').hide();
+
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        },
+        minLength: 1,
+
+        select: function SelectEvent(event, ui) {
+            debugger;
+            Id = ui.item.value;
+            document.getElementById("sid").value = ui.item.id;
+        }
+    });
+
+    $("#Email").autocomplete({
+        source: function (request, response) {
+            if (request.term.length < 3) {
+                return;
+            }
+            $("#Name").val('');
+            document.getElementById("sid").value = "";
+            $('#imagemodal').show();
+            $.ajax({
+                url: "/HREnrollment/GetIntervieweeEmails",
+                type: "POST",
+                dataType: "json",
+                data: { strVal: request.term },
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.EmailId,
+                            value: data.EmailId,
+                            id: data.StaffInterviewsId,
+                        };
+                    }));
+                    $('#imagemodal').hide();
+
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        },
+        minLength: 1,
+
+        select: function SelectEvent(event, ui) {
+            debugger;
+            Id = ui.item.value;
+            document.getElementById("sEid").value = ui.item.id;
+        }
+    });
+
+    function Search() {
+
+        debugger
+        var Name = $('#sid').val();
+        var Email = $('#sEid').val();
+        var QualificationId = $('#QualificationId').val();
+        var AdditionalQualificationId = $('#AdditionalQualificationId').val();
+        var Classes = $('#ClassId').val();
+        var Subjects = $('#SubjectId').val();
+        var Expereince = $('#Experience').val();
+        var Branch = $('#BranchId').val();
+        var Date = $('#Date').val();
+
+        if ((Date == "" || Date == undefined) && (Name == "" || Name == undefined) && (Email == "" || Email == undefined) && (QualificationId == "0" || QualificationId == undefined) && (AdditionalQualificationId == "0" || AdditionalQualificationId == undefined) && (Classes == "0" || Classes == undefined) && (Subjects == "0" || Subjects == undefined) && (Branch == "0" || Branch == undefined) && (Expereince == "" || Expereince == undefined))
+        {
+            $('#SearchValues').html("");
+            document.getElementById("validation").innerHTML = "Select an entity to search";
+            return false;
+        }
+        $('#SearchValues').html("");
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/HREnrollment/SearchInterviewee',
+            data: { Date:Date, Name: Name, Email: Email, QualificationId: QualificationId, AdditionalQualificationId: AdditionalQualificationId, Classes: Classes, Subjects: Subjects, Expereince: Expereince, Branch: Branch },
+            success: function (data) {
+                $('#imagemodal').hide();
+
+                $('#SearchValues').html(data);
+
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+
+        return false;
+    }
+
+</script>
+

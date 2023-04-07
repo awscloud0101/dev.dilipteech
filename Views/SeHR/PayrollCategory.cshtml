@@ -1,0 +1,133 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.PayrollCategoryData>
+
+@{
+    ViewBag.Title = "Payroll Category";
+
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Payroll Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("Add Payroll Category", "PayrollCategoryC")</h3>
+        </div>
+    </div>
+    <br />
+
+    @if (null != TempData["PayrollCategory"])
+    {
+        @Html.Raw(TempData["PayrollCategory"])
+    }
+    @if (null != Model)
+    {
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Payroll Category</h3>
+                    </div><!-- /.box-header -->
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                       S.No.
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Category Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Percentage Value")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("% Value Of")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Status")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Is Deductable")
+                                    </th>
+
+                                    <th></th>
+                                </tr>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.CategoryName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.PercentageValue)
+                                        </td>
+                                        <td>
+                                            @if (item.PercentageOf != 0)
+                                            {
+                                                var result = Model.FirstOrDefault(s => s.PayrollCategoryId == item.PercentageOf);
+                                                if (null != result)
+                                                {
+                                                    @result.CategoryName
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (item.PercentageOf == 0)
+                                                {
+                                                    @Html.DisplayName("Lump Sum")
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Status)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.IsDeductable)
+                                        </td>
+                                        <td>
+                                            @Html.ActionLink("Edit", "PayrollCategoryE", new { id = item.PayrollCategoryId }) |
+
+                                            @Html.ActionLink("Delete", "PayrollCategoryD", new { id = item.PayrollCategoryId })
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <span style="color: red;"><b>Data is not available </b></span>
+    }
+</section>
+

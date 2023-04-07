@@ -1,0 +1,241 @@
+﻿
+@model AsteriskBrowserAL.Models.ExamShedulesData
+
+@{
+    ViewBag.Title = "Exam Schedules";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Exam Schedules</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+
+
+<section class="content">
+
+    @using (Html.BeginForm("ExamSchedules", "AExamination", FormMethod.Post))
+    {
+        @Html.ValidationMessage("ExamSchedules")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="table-header">
+             
+                    Exam Schedules
+           
+          
+                    <div  style="float:right;margin-right:10px;">
+                        <a class="btncustom P2" id="NewExamination" name="New">
+                        Add</a>
+                    </div>
+               
+
+            </div>
+
+            <div class="widget-box">
+           
+
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.lstClassNumbers, "ClassNumber", "ClassNumberDisplay"), "-- Select --", new { @class = "form-control", id = "ClassNumber" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Term")</label>
+
+                                        <div class="col-sm-6">
+
+                                            @Html.DropDownListFor(model => model.TermNumber, new SelectList(Model.lstTerms, "TermNumber", "TermName"), "-- Select --", new { @class = "form-control", @id = "TermNumber" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+        
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.SubscriptionId, new SelectList(Model.lstSubscriptions, "SubscriptionId", "Institute"), "-- Select --", new { @class = "form-control", id = "SubscriptionId" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                              
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div id="SearchData" class="row">
+        </div>
+        
+
+        if (null != Model)
+        {
+            <input style="display:none" id="SelClass" value="@Model.ClassNumber" />
+            <input style="display:none" id="SelTerm" value="@Model.TermNumber" />
+            <input style="display:none" id="SelSubId" value="@Model.SubscriptionId" />
+        }
+        else
+        {
+
+            <input style="display:none" id="SelClass" value="0" />
+            <input style="display:none" id="SelTerm" value="0" />
+            <input style="display:none" id="SelSubId" value="0" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var SelClass = $('#SelClass').val();
+        var SelTerm = $('#SelTerm').val();
+        var SelSubId = $('#SelSubId').val();
+
+        if (SelClass > 0 && SelTerm > 0) {
+            GetExaminationSchedules();
+        }
+    });
+
+    $('#NewExamination').click(function () {
+        debugger
+        var ClassNumber = $('#ClassNumber').val();
+        var TermNumber = $('#TermNumber').val();
+
+        if (ClassNumber < 1 && TermNumber < 1) {
+            document.getElementById("Validation").innerHTML = "Please select both class and term";
+            return false;
+        }
+        else if (ClassNumber < 1) {
+            document.getElementById("Validation").innerHTML = "Please select the class";
+            return false;
+        }
+        else if (TermNumber < 1) {
+            document.getElementById("Validation").innerHTML = "Please select the term";
+            return false;
+        }
+        else {
+            var SubscriptionId = $('#SubscriptionId').val();
+            window.location.href = "/AExamination/ExamSchedulesC?ClassNumber=" + ClassNumber + "&TermNumber=" + TermNumber + "&SubId=" + SubscriptionId;
+        }
+
+    });
+
+    $('#ClassNumber').change(function () {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var TermNumber = $('#TermNumber').val();
+
+        if (ClassNumber > 0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+
+        if (ClassNumber > 0 && TermNumber > 0) {
+            GetExaminationSchedules();
+        }
+    })
+
+    $('#TermNumber').change(function () {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var TermNumber = $('#TermNumber').val();
+
+        if (ClassNumber > 0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+
+        if (ClassNumber > 0 && TermNumber > 0) {
+            GetExaminationSchedules();
+        }
+    })
+
+    $('#SubscriptionId').change(function () {
+        GetExaminationSchedules();
+    });
+
+    function GetExaminationSchedules() {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var TermNumber = $('#TermNumber').val();
+        var SubscriptionId = $('#SubscriptionId').val();
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AExamination/GetExamSchedulesData',
+            data: { ClassNumber: ClassNumber, TermNumber: TermNumber, SubscriptionId: SubscriptionId },           
+            success: function (Data) {
+                $('#imagemodal').hide();
+                $("#SearchData").html(Data);
+            }
+        });
+    }
+
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/AExamination/ValidationForExamSchedulesD',
+                data: { id: Value },
+                success: function (data) {
+                    var url = '/AExamination/ExamSchedulesD?id=' + Value;
+                    var title = "ExamSchedules";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+</script>
+
+
+
+
+
+

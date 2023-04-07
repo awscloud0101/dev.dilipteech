@@ -1,0 +1,226 @@
+﻿@model List<AsteriskBrowserAL.Models.AdmissionTargetViewModel>
+@{
+    ViewBag.Title = "Admission Target";
+
+    int sno = 1;
+
+    List<AsteriskBrowserAL.Models.AdmissionTargetViewModel> lstMonths = new List<AsteriskBrowserAL.Models.AdmissionTargetViewModel>();
+    if (null != Model && Model.Count() > 0)
+    {
+        var data = Model.FirstOrDefault();
+
+        if (null != data)
+        {
+            lstMonths = data.lstTargetAdmissionMonthWise.ToList();
+        }
+    }
+}
+
+<style>
+    .Text160Left {
+        text-align: left;
+        min-width: 160Px;
+    }
+
+    .Text50Center {
+        text-align: center;
+        min-width: 50Px;
+    }
+
+    .Text40Center {
+        text-align: center;
+        min-width: 40Px;
+    }
+</style>
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Admission Target</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<style>
+    .red {
+        color: red;
+    }
+</style>
+
+<!--Main Content-->
+<section class="content">
+
+
+    <div class="row">
+
+        @using (Html.BeginForm("AdmissionTarget", "SeAcademics", FormMethod.Post))
+        {
+            if (Model != null && Model.Count() > 0)
+            {
+
+                <div class="col-sm-12">
+                    @if (Convert.ToString(TempData["SaveMsg"]) == "true")
+                    {
+                      
+
+
+                        <p align="center" id="spnSave">
+                            <span class="savedinfo">
+
+
+
+                                <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                                <br />
+                                Data saved successfully
+                                <br />
+
+                                <spna class="cls1 btncustom">Close</span>
+                                <script>
+
+                                    $(document).ready(function () {
+                                        $(".cls1").click(function () {
+
+                                            $(".savedinfo").css("display", "none")
+                                        });
+
+                                    });
+
+                                </script>
+                          
+                        </p>
+                    }
+                    <div class="table-header">
+                        Admission Target
+                        <div style="float:right;margin-right:15px;">
+                            <button class="btncustom P2" type="submit" name="Save" value="Save">
+                     Save
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <div class="box-body table-responsive no-padding">
+                        <div>
+                            <table class="table tbhover table-striped table-bordered dynamic-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Branch")
+                                        </th>
+                                        @foreach (var m in lstMonths)
+                                        {
+                                            <th>
+                                                @m.MonthName
+                                            </th>
+                                        }
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @for (int i = 0; i < Model.Count(); i++)
+                                    {
+                                        <tr>
+                                            <td align="center">
+                                                @Html.Hidden("lstAdmissionTargets.Index", (@i + 10))
+                                                @Html.Hidden("lstAdmissionTargets[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+
+                                                @(sno++)
+                                            </td>
+
+                                            <td class="Text160Left">
+                                                @Model.ElementAt(i).BranchName
+
+                                            </td>
+                                            @if (Model.ElementAt(i).lstTargetAdmissionMonthWise.Count() > 0)
+                                            {
+
+                                                for (int j = 0; j < Model.ElementAt(i).lstTargetAdmissionMonthWise.Count(); j++)
+                                                {
+                                                    <td>
+                                                        @Html.Hidden("lstAdmissionTargets[" + (@i + 10) + "].lstTargetAdmissionMonthWise[" + j + "].MonthId", Model.ElementAt(i).lstTargetAdmissionMonthWise.ElementAt(j).MonthId)
+
+                                                            @Html.TextBox("lstAdmissionTargets[" + (@i + 10) + "].lstTargetAdmissionMonthWise[" + j + "].TargetCount", Model.ElementAt(i).lstTargetAdmissionMonthWise.ElementAt(j).TargetCount, new { @class = "form-control textlength txttargetclk", @maxlength = "7", @min = "0", onkeypress = "return isNumberKey(event)", @id = "TargetCount", @style = "width:50px" })
+
+                                                    </td>
+                                                }
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+
+    </div>
+
+</section>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+
+
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+    $('.txttargetclk').click(function () {
+        $('#spnSave').hide();
+    })
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

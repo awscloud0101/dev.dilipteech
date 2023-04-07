@@ -1,0 +1,233 @@
+﻿
+@{
+    ViewBag.Title = "Collection Vs Targets";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            DCCR
+        </li>
+        <li class="active">Collection Vs Targets</li>
+    </ul>
+}
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+<section class="content">
+ 
+
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color:red;font-weight:bold" id="Validation"></span>
+            <div class="table-header">
+                <span style="font-family:calibri;">Collection Vs Target</span>
+                <div class="" style="float:right;margin-right:10px;">
+                    <a class="btncustom P2" id="btnViewData">View Data</a>
+           </div>
+
+            </div>
+
+
+
+            <div class="widget-box">
+       
+
+                <div class="widget-body">
+
+                    <div class="widget-main">
+
+
+                        <div class="row">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-4">
+                                            <input type="radio" id="rbYearWise" value="1" name="Type" checked="checked" />
+                                            <b>Year </b>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <input type="radio" id="rbMonthWise" value="2" name="Type" />
+                                            <b>Month </b>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+               
+                            <div class="row" style="padding-top:5px">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6" id="dvMonth">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Select Month</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboMonth" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+       
+    </div>
+        
+
+
+    <div id="dvPartial" class="overflowscroll"></div>
+</section>
+
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    //google.charts.setOnLoadCallback(LoadData);
+
+    window.onload = LoadData();
+
+    function LoadData() {
+        $('#dvMonth').hide();
+        LoadMonthCombo();
+    }
+
+
+    function LoadYearCombo() {
+
+        $.ajax({
+            url: '/DCCR/GetFinacialYears',
+            success: function (data) {
+                var YearItems = $('#CboYear');
+
+                YearItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    YearItems.append($("<option>").val(record.FinancialYearId).text(record.YearValue));
+                });
+
+                $('#CboYear').append(YearItems);
+            },
+            aync: false
+        });
+
+    }
+
+    function LoadMonthCombo() {
+
+        $.ajax({
+            url: '/DCCR/GetMonths',
+            success: function (data) {
+                var Months = $('#CboMonth');
+
+                Months.children().remove();
+
+                $.each(data, function (i, record) {
+                    Months.append($("<option>").val(record.MonthId).text(record.MonthCode));
+                });
+
+                $('#CboMonth').append(Months);
+            },
+            aync: false
+        });
+
+    }
+
+    $("#CboYear").change(function () {
+
+        document.getElementById("Validation").innerHTML = ""
+        $('#dvPartial').html("");
+    });
+
+    $("#CboMonth").change(function () {
+
+        document.getElementById("Validation").innerHTML = ""
+        $('#dvPartial').html("");
+    });
+
+    $('#btnViewData').click(function () {
+
+        $('#dvPartial').html('');
+
+        var Value = 0;
+        var Type = " ";
+
+        var isValid = true;
+
+        if ($('#rbMonthWise').is(':checked')) {
+            Type = "Month Wise";
+            Value = $('#CboMonth').val();
+        }
+        else if ($('#rbYearWise').is(':checked')) {
+            Type = "Year Wise";
+            //Value = 1;
+        }
+
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (Type == "") {
+
+            if (!isValid)
+                Message += "Select Type";
+
+            isValid = false;
+        }
+
+        if (Type == "Month Wise") {
+
+            if (Value < 1) {
+
+                if (!isValid)
+                    Message += ", Month";
+                else
+                    Message += "Select Month";
+
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        $('#imagemodal').show();
+
+        $.ajax
+            ({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#imagemodal').hide();
+                },
+
+                url: '/DCCR/GetCollectionVsTargetsData/',
+                data: { Type: Type, Value: Value },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#dvPartial').html(data);
+                }
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+    });
+
+    $('#rbYearWise').change(function () {
+        $('#dvPartial').html("");
+        $('#dvMonth').hide();
+    });
+
+    $('#rbMonthWise').change(function () {
+        $('#dvPartial').html("");
+        $('#dvMonth').show();
+    });
+
+
+</script>

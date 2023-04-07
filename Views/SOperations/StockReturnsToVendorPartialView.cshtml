@@ -1,0 +1,83 @@
+﻿@model List<AsteriskBrowserAL.Models.ItemModel>
+
+@{
+    int nSno = 1;
+}
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (null != Model)
+{
+    <div class="table-header">
+        Records Found (@Model.Count())
+        <div style="float:right;">
+            <div class="widget-toolbar no-border">
+                <div class="inline action-buttons">
+                    <button type="submit" onclick="return SubmitForm()" class="btn btn-info btn-xs P2">
+                        <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="overflow:auto;height:350px;">
+        <table id="mytab1" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>@("S.No")</th>
+                    <th>
+                        @Html.DisplayName("Item Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("SKU Code")
+                    </th>
+                    <th class="centerAlign">
+                        @Html.DisplayName("Saleable Closing Stock")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Return Qty")
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+                    <tr>
+                        @Html.Hidden("lstItem.Index", (@i))
+                        @Html.Hidden("lstItem[" + @i + "].InventorySubCategoryItemId", Model.ElementAt(i).InventorySubCategoryItemId)
+                        @Html.Hidden("lstItem[" + @i + "].ItemName", Model.ElementAt(i).ItemName)
+                        @Html.Hidden("lstItem[" + @i + "].BalanceStockInStore", Model.ElementAt(i).BalanceStockInStore)
+                        <td>
+                            @(nSno++)
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).ItemName
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).SKUCode
+                            @Html.Hidden("lstItem[" + @i + "].SKUCode", Model.ElementAt(i).SKUCode)
+
+                        </td>
+                        <td class="centerAlign">
+                            @Model.ElementAt(i).BalanceStockInStore
+                            @Html.Hidden("lstItem[" + @i + "].BalanceStockInStore", Model.ElementAt(i).BalanceStockInStore)
+                        </td>
+                        <td>
+                            @Html.TextBox("lstItem[" + @i + "].NewQuantity", Model.ElementAt(i).NewQuantity, new { @class = "form-control textlength txtboxNum", @min = "0", @maxlength = "7", @max = "100000", @style = "width:180px" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+}
+else
+{
+    <span style="color:red">Stock not available</span>
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false})
+

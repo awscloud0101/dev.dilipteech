@@ -1,0 +1,346 @@
+﻿@model  AsteriskBrowserAL.Models.StaffData
+@{
+    ViewBag.Title = "StaffDetails";
+    bool bIsCentral = ViewBag.IsCentral;
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Enrollment
+        </li>
+        <li class="active">Employee Details</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+<!--Main Content-->
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ExcelDT", "HREnrollment", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="ModeldepartmentId" value="@Model.DepartmentId" />
+                                    <input type="hidden" id="ModelCategoryId" value="@Model.CategoryId" />
+                                    <input type="hidden" id="BranchId1" value="@Model.BranchId" />
+                                    <input type="hidden" id="DivisionId1" value="@Model.DivisionId" />
+
+                }
+
+                <input type="hidden" value="@bIsCentral" id="IsCentral" />
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Employee Details</span>
+                    <div class="" style="float:right;margin-right:10px;">
+                        <a class="P2" id="View" value="ViewData" name="View" onclick="return GetStaffData();">
+                        <span class="btncustom">View Data</span></a>
+                    </div>
+
+                </div>
+                <div class="widget-box">
+             
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            @if (bIsCentral)
+                            {
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label no-padding-right">@Html.Label("Division")</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownList("Division", null, "--- Select ---", new { @class = "form-control", @id = "DivisionId" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label no-padding-right">@Html.Label("Branch")</label>
+                                            <div class="col-sm-6">
+                                                <select class="form-control" id="BranchId" name="BranchId"><option value="">--- Select ---</option></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                  
+                            }
+
+                            @*<div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label no-padding-right">@Html.Label("Department")</label>
+                    <div class="col-sm-6">
+                        <select class="form-control" id="DepartmentId" name="DepartmentId"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label no-padding-right">@Html.Label("Category")</label>
+                    <div class="col-sm-6">
+                        <select class="form-control" id="CategoryId" name="CategoryId"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />*@
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Name")</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.StaffId, new SelectList(Model.ListStaff, "StaffId", "DisplayName"), new { @class = "form-control select2", id = "StaffNameDisplay" })
+                                            @*<input class="form-control" type="text" id="Name" name="Name" />*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Access Levels")</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.DesigId, new SelectList(Model.lstDesignation, "EmployeeDesignationId", "DesignationName"), "", new { @class = "form-control select2", @id = "DesignationDisplay" })
+                                            @*<input class="form-control" type="text" id="EmployeeNumber" name="EmployeeNumber" />*@
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                         
+
+
+
+
+                        
+
+                             
+                            </div>
+                            <div id="searchDiv">
+                                @*@Html.Partial("StaffDetailsPartialView", Model)*@
+                            </div>
+                            <input type="hidden" id="StaffId" />
+                            }
+                        </div>
+
+        
+
+                    </div>
+</section>
+
+<script type="text/javascript">
+    $(".select2").select2()
+
+    window.onload = OnLoadData();
+
+    $("#StaffNameDisplay").change(function () {
+        ResetData();
+        nStaffId = $('#StaffNameDisplay').val();
+        $('#DesignationDisplay').select2("val", "");
+        GetAllStaffDetails(nStaffId, 0, 0, 0, 0,0);
+    });
+
+
+    $("#DesignationDisplay").change(function () {
+        ResetData();
+        var DesignationId = $('#DesignationDisplay').val();
+        $('#StaffNameDisplay').select2("val", "");
+        GetAllStaffDetails(0, 0, 0, 0, 0, DesignationId);
+    });
+
+
+    function OnLoadData() {
+        var value = $('#IsCentral').val();
+
+        if (value) {
+
+            var Division = $('#DivisionId1').val();
+            if (Division > 0)
+                LoadBranch(Division);
+            var Branch = $('#BranchId1').val();
+
+            if (Branch > 0)
+                GetDepartmentDrpDwn();
+            var Department = $('#ModeldepartmentId').val();
+
+            if (Department > 0)
+                GetCategoryDrpDwn(Department);
+
+            var Category = $('#ModelCategoryId').val();
+
+            if (Branch >= 0 && Division > 0)
+                GetAllStaffDetails(0,Department, Category, Division, Branch);
+
+        }
+
+
+        else {
+            var Branch = $('#BranchId1').val();
+            GetAllStaffDetails(0, 0, 0, 0, Branch);
+        }
+
+    }
+
+
+    var StaffId = 0;
+
+    function LoadBranch(DivisionId) {
+        $('#BranchId').empty();
+        $('#BranchId').append($("<option>").val("null").text("--- Select ---"));
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId, IsAll :true },
+                success: function (data) {
+                    var BranchItems = $('#BranchId');
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+                    $('#BranchId').append(BranchItems);
+                    var Branch = $('#BranchId1').val();
+                    if (Branch > -1)
+                        $('#BranchId').val(Branch);
+                },
+                aync: false
+            });
+        }
+    }
+
+    $('#DivisionId').change(function () {
+
+        ResetTextBoxex();
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            LoadBranch(DivisionId);
+        }
+    });
+
+    $('#BranchId').change(function () {
+        StaffId = 0;
+        GetDepartmentDrpDwn();
+    });
+
+    function GetDepartmentDrpDwn() {
+        $.ajax({
+            url: '/HREnrollment/GetDepartmentDrp',
+            success: function (Data) {
+                var Department = $('#DepartmentId')
+                Department.children().remove();
+                Department.append($("<option>").val("").text("--- Select ---"))
+                $.each(Data, function (i, record) {
+                    Department.append($("<option>").val(record.DepartmentId).text(record.DepartmentName));
+                });
+                $('#DepartmentId').append(Department);
+                var DeptId = $('#ModeldepartmentId').val();
+                if (DeptId > 0)
+                    $('#DepartmentId').val(DeptId);
+            },
+            async: false
+        })
+    };
+
+    $('#DepartmentId').change(function () {
+        StaffId = 0;
+        var DepartmentId = $('#DepartmentId').val();
+        GetCategoryDrpDwn(DepartmentId);
+    });
+
+    $('#CategoryId').change(function () {
+        StaffId = 0;
+    });
+
+    function GetCategoryDrpDwn(DepartmentId) {
+        $.ajax({
+            url: '/HREnrollment/GetCategoryDrp',
+            success: function (Data) {
+                var CategoryId = $('#CategoryId');
+                CategoryId.children().remove();
+                CategoryId.append($("<option>").val("").text("--- Select ---"))
+                $.each(Data, function (i, record) {
+                    CategoryId.append($("<option>").val(record.EmployeeCategoryId).text(record.CategoryName));
+                });
+                $('#CategoryId').append(CategoryId);
+                var Cat = $('#ModelCategoryId').val();
+                if (Cat > 0)
+                    $('#CategoryId').val(Cat);
+
+            },
+            async: false
+        })
+    };
+
+    function ResetData() {
+        $('#DepartmentId').val(null);
+        $('#CategoryId').val(null);
+        $('#DivisionId').val(null);
+        $('#BranchId').val(null);
+    }
+
+    function ResetTextBoxex() {
+        $('#EmployeeNoDisplay').select2("val", "");
+        $('#StaffNameDisplay').select2("val", "");
+        //StaffId = 0;
+    }
+
+    function GetStaffData() {
+        $('#searchDiv').html("");
+        var DepartmentId = $('#DepartmentId').val();
+        var Category = $('#CategoryId').val();
+        var Division = $('#DivisionId').val();
+        var Branch = $('#BranchId').val();
+        GetAllStaffDetails(0,DepartmentId, Category, Division, Branch);
+
+        return false;
+    };
+
+    function GetAllStaffDetails(StaffId, DepartmentId, Category, Division, Branch, DesignationId) {
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/HREnrollment/GetStaffList',
+            data: { nStaffId: StaffId, nDivisionId: Division, nBranchId: Branch, nDepartment: DepartmentId, nCategoryId: Category, DesignationId: DesignationId },
+            success: function (data) {
+                $('#imagemodal').hide();
+                $('#searchDiv').html(data);
+            }
+        });
+    }
+</script>

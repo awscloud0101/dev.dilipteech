@@ -1,0 +1,180 @@
+﻿@model AsteriskBrowserAL.Models.StudentDetailsData
+
+@{
+    ViewBag.Title = "MessageAlerts";
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-key"></i>
+            Controls
+        </li>
+        <li>
+            <i class=""></i>
+            Others
+        </li>
+        <li class="active">Message Alerts</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("MessageAlerts", "CSMSMail", FormMethod.Post))
+            {
+                <span style="color:forestgreen" id="Validation"></span>
+                <span style="color:red" id="Alert"></span>
+                <span style="font-weight:bold" id="SaveStatus">
+                    @if (TempData["SaveStatus"] != null)
+                    {
+                        if (TempData["SaveStatus"] == "True")
+                        {
+                            <b style="color:green">Message(s) has been sent successfully</b>
+                        }
+                        else
+                        {
+                            <b style="color:red">"Message(s) sending failed"</b>
+                        }
+
+                    }
+                </span>
+
+                if (null != Model)
+                {
+                    <input type="hidden" id="Status" value="@Model.Status" />
+                }
+                else
+                {
+                    <input type="hidden" id="Status" value="false" />
+                }
+
+
+
+                <div class="table-header">
+
+                    Message Alerts
+
+                </div>
+                <div class="widget-box">
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Class</label>
+                                        <div class="col-sm-6">
+                                            <select id="ClassNumber" name="ClassNumber" style="width:200px;" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Message Type</label>
+                                        <div class="col-sm-6">
+                                            <select id="MessageType" name="MessageType" style="width:200px;" class="form-control">
+                                                <option value="">
+                                                    Select
+                                                </option>
+                                                <option value="Congratulations">
+                                                    Congratulations
+                                                </option>
+                                                <option value="Discipline alert">
+                                                    Discipline alert
+                                                </option>
+                                                <option value="Other voilations">
+                                                    Other voilations
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="Students"></div>
+            }
+        </div>
+    </div>
+</section>
+<script>
+    /*const { debug } = require("console");*/
+
+    $(document).ready(function () {
+
+        var Status = $('#Status').val();
+
+        if (Status == "value") {
+            document.getElementById("Validation").innerHTML = "Message(s) has been sent successfully"
+        }
+
+
+        LoadClasses();
+    });
+
+    function LoadClasses() {
+        debugger
+        $.ajax({
+            url: '/Common/GetAllClasses',
+            success: function (data) {
+                var ClassNumberItems = $('#ClassNumber');
+                ClassNumberItems.children().remove();
+                ClassNumberItems.append($("<option>").val("null").text("--- Select ---"));
+                $.each(data, function (i, record) {
+                    ClassNumberItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+                });
+                $('#ClassNumber').append(ClassNumberItems);
+            },
+            aync: false
+        });
+    }
+    $('#MessageType').change(function () {
+        $("#Students").html('');
+        document.getElementById("SaveStatus").innerHTML = "";
+        document.getElementById("Alert").innerHTML = "";
+        GetStudents()
+    });
+
+    $('#ClassNumber').change(function () {
+        $("#Students").html('');
+        document.getElementById("SaveStatus").innerHTML = "";
+        document.getElementById("Alert").innerHTML = "";
+        GetStudents()
+    });
+
+    function GetStudents() {
+        debugger
+
+
+        var ClassNumber = $("#ClassNumber").val();
+
+
+        if (ClassNumber < 0)
+            return;
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/CSMSMail/GetStudentsForMessageAlerts',
+            data: { ClassNumber: ClassNumber },
+            success: function (Data) {
+                $('#imagemodal').hide();
+                $('#Students').html(Data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        })
+            ;
+    }
+</script>

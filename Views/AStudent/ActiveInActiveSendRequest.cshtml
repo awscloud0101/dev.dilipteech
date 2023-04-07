@@ -1,0 +1,138 @@
+﻿@model AsteriskBrowserAL.StudentStatus
+@{
+    ViewBag.Title = "ActiveInactiveRequest";
+}
+
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Active Inactive Request</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content">
+    
+    <br/>
+    <div class="row">
+        <div class="col-xs-12">
+           
+    <!-- form start -->
+    @*@using (Html.BeginForm("ActiveInActiveSendRequest", "AStudent", FormMethod.Post, new { @class = "form-horizontal" }))*@
+    @using (Html.BeginForm("ActiveInActiveSendRequest", "AStudent", FormMethod.Post, new { @class = "form-horizontal", ClassNumber = ViewBag.ClassNumber, SectionId = ViewBag.SectionId })) 
+    {
+        @Html.ValidationSummary(true)
+        <input type="hidden" name="ClassNumber" id="ClassNumber" value="@ViewBag.ClassNumber" />
+        <input type="hidden" name="SectionId" id="SectionId" value="@ViewBag.SectionId" />
+        <span style="color: red;">@Html.ValidationMessage("ActiveInactiveRequest")</span>
+    @*<div class="box">
+        <div class="box-body">
+            <div class="box-header">
+                <h3 class="box-title col-xs-10">Active InActive Request</h3>*@
+    <div class="widget-box">
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">
+                Active InActive Request
+            </h5>
+            @*<button class="btn btn-primary pull-right" type="submit" onclick="return submitForm();">
+                Send Request
+            </button>*@
+            <div class="widget-toolbar no-border">
+                <div class="inline action-buttons">
+                    @*<a ><span class="btn btn-info btn-minier" onclick="return submitForm();"> Send Request</span></a>*@
+                    <button type="submit" onclick="return submitForm();" class="btn btn-info btn-minier P2"> Send Request</button>
+                </div>
+            </div>
+            </div>
+        @*</div>*@
+       
+      @*</div>*@ <!-- /.box-header -->
+        @Html.HiddenFor(model => model.StudentId)
+        @Html.HiddenFor(model => model.RequestStatus)
+        
+        @*<div class="box-body">*@
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">@Html.Label("*Reason", new { @class = "required" })</label>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(model => model.RequestReason, new { @class = "form-control col-sm-5 textlength", placeholder = "Reason", @id = "Reason" })
+
+                    </div>
+
+                    <div class="col-sm-3" style="display:none;" id="ReasonVal">
+                        <label style="color:red;font-weight:bold;"> Enter Reason</label>
+                    </div>
+                </div>
+            </div>
+            </div>
+    
+        </div>
+        }
+
+    </div>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+
+<script type="text/javascript">
+    function validateReason() {
+
+        document.getElementById("count").value = "1";
+        var Reason = document.getElementById("Reason").value;
+        validate = true;
+
+        if (Reason == "") {
+            document.getElementById("ReasonVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ReasonVal").style.display = "none";
+        }
+        return validate;
+    };
+
+    function submitForm() 
+    {
+
+        var validatestatus = validateReason();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    
+
+    $('#Reason').click(function () {
+        document.getElementById('ReasonVal').style.display = "none"
+    })
+
+</script>
+

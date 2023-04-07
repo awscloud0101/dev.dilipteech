@@ -1,0 +1,112 @@
+﻿@model IEnumerable<AsteriskBrowserAL.SlabSettings>
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+@if (null != Model)
+{
+    if (Model.Count() > 0)
+    {
+        int nsno = 1;
+
+        <div class="hr hr-18 dotted hr-double"></div>
+        <div class="table-header">
+            Records Found (@Model.Count())
+            <div style="float:right;">
+                <button type="submit" name="Save" class="btn btn-info btn-xs">
+                    <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                </button>
+            </div>
+
+        </div>
+
+        <div>
+            <table id="dtSlabSettings" class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Fixed Amount")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Min Amount")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Max Amount")
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        @Html.HiddenFor(m => item.SlabSettingsId);
+                        <tr>
+                            <td>
+                                @(nsno++)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FixedAmount)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.MinAmount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.MaxAmount)
+                            </td>
+                            <td>
+                                <div class="hidden-sm hidden-xs action-buttons">
+                                    <a class="green" href="@Url.Action("SlabSettingsE", "SeHR", new { id = item.PayrollCategoryComponentId })">
+                                        <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                    </a>
+                                    @*href="@Url.Action("SlabSettingsD", "SeHR", new { id = item.SlabSettingsId })*@
+                                    <a class="red" onclick="btnConfirm(@item.PayrollCategoryComponentId) ">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                    </a>
+                                </div>
+
+
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    else
+    {
+        <span style="color: red;"><b>No SlabSettings found</b></span>
+    }
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+<script>
+    function btnConfirm(Value) {
+        debugger
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeHR/ValidationSlabSettingD',
+                data: { id: Value },
+                success: function (data) {
+                    var url = '/SeHR/SlabSettingsD?id=' + Value;
+                    var title = " Access Levels";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+</script>
+
+
+
+

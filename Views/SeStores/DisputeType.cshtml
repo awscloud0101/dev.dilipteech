@@ -1,0 +1,142 @@
+﻿@model IEnumerable<AsteriskBrowserAL.DisputeType>
+@{
+    ViewBag.Title = "Dispute Type";
+    int nsno = 1;
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Stores
+        </li>
+        <li class="active">Dispute Type</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+
+
+    @if (Model != null)
+    {
+        <br />
+       
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    Dispute Types
+
+
+                    <a style="float:right" class="view-header-btn  btn btn-info btn-xs P2" href="@Url.Action("DisputeTypeC", "SeStores")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+                   
+                </div>
+
+                @*</div>*@
+
+                <div style="overflow:auto; height:460px;">
+                    <div>
+                        <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                            <thead>
+
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("S.No")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Name")
+                                    </th>
+
+                                    <th></th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+
+                                        <td>
+
+                                            <div class="hidden-sm hidden-xs action-buttons">
+
+                                                <a class="green P2" href="@Url.Action("DisputeTypeE", "SeStores", new { id = item.DisputeTypeId })">
+                                                    <i class="ace-icon fa fa-pencil bigger-130"></i>
+
+                                                </a>
+
+                                                <a class="red P2" onclick="btnConfirm(@item.DisputeTypeId)">
+                                                    <i class="ace-icon fa fa-trash  bigger-130"></i>
+
+                                                </a>
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+
+                @*</div>*@<!-- /.widget-box -->
+                }
+                else
+                {
+                <span style="color: red;"><b>There are no Categories</b></span>
+                }
+    </section>
+@Html.Action("DataTableScripts", "Base")
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeStores/ValidationForDisputeTypeD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SeStores/DisputeTypeD?id=' + Value;
+                    var title = "Dispute Types";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+
+

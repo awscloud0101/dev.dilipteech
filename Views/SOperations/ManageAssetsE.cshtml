@@ -1,0 +1,227 @@
+﻿@model AsteriskBrowserAL.ManageAsset
+@{
+    ViewBag.Title = "ManageAssetsE";
+}
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Manage Assets</li>
+    </ol>
+</section>
+<section class="content">
+    @Html.Action("DatePickerScripts", "Base")
+    <div class="row">
+        <div class=col-xs-12>
+
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color: red;">@Html.ValidationMessage("Manage Asset")</span>
+            @using (Html.BeginForm("ManageAssetsE", "SOperations", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                if (null != TempData["ManageAssetsE"])
+                {
+                    <span style="color:red">
+                        @TempData["ManageAssetsE"]
+                    </span>
+                }
+                <div class="page-header">
+                    <h1>
+                        Manage Assets
+                        <small style="float:right;">
+                            @Html.ActionLink("Back To Details", "ManageAssets", new { AssetCategoryId = ViewBag.AssetCategoryId })
+                        </small>
+                    </h1>
+
+                </div><!-- /.page-header -->
+
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                @Html.HiddenFor(model => model.ManageAssetId)
+                if (null != Model)
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <!-- PAGE CONTENT BEGINS -->
+                            <form class="form-horizontal" role="form">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Asset Name")</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.AssetName, new { @class = "form-control col-sm-5", id = "AssetName", placeholder = "Asset Name", @onchange = "removeError();" })
+                                    </div>
+
+                                    <div class="col-sm-3" style="display:none;" id="vAssetName">
+                                        <label style="color:red;font-weight:bold;"> Required </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Number Of Assets")</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.NoOfAssets, new { @class = "form-control col-sm-5", id = "NoOfAssets", @min = "1", @type = "number", placeholder = "Number Of Assets", @onchange = "removeError();" })
+                                    </div>
+
+                                    <div class="col-sm-3" style="display:none;" id="vNoOfAssets">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Other Details")</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.OtherDetails, new { @class = "form-control col-sm-5", id = "OtherDetails", placeholder = "OtherDetails", @onchange = "removeError();" })
+                                    </div>
+
+                                    <div class="col-sm-3" style="display:none;" id="vOtherDetails">
+                                        <label style="color:red;font-weight:bold;">Required </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Received Date")</label>
+                                    <div class="col-sm-3">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                    <input class="form-control" type="text" id="Date" onchange="removeError();" name="Date" value="@Model.Date.Value.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="vDate">
+                                        <label style="color:red;font-weight:bold;"> Required </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Asset Location")</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.DropDownList("AssetLocationId", null, "---Select---", new { @class = "form-control ", id = "AssetLocation", @onchange = "removeError();" })
+                                    </div>
+
+                                    <div class="col-sm-3" style="display:none;" id="vAssetLocation">
+                                        <label style="color:red;font-weight:bold;">Required</label>
+                                    </div>
+                                </div>
+                                <div class="hr hr-18 dotted hr-double"></div>
+                                <div class="col-md-offset-3 col-md-9">
+                                    <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                        <i class="ace-icon fa fa-check bigger-50"></i>
+                                        Save
+                                    </button>
+
+                                    &nbsp; &nbsp; &nbsp;
+                                    <button class="btn btn-sm" type="reset" onclick="return resetManageAssets();">
+                                        <i class="ace-icon fa fa-undo bigger-50"></i>
+                                        Reset
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+    <input type="hidden" id="OldAssetName" value="@Model.AssetName" />
+    <input type="hidden" id="OldOtherDetails" value="@Model.OtherDetails" />
+    <input type="hidden" id="AssetLocationId" value="@Model.AssetLocationId" />
+    <input type="hidden" id="OldDate" value="@Model.Date.Value.ToShortDateString()" />
+    <input type="hidden" id="OldNoOfAssets" value="@Model.NoOfAssets" />
+    <input type="hidden" id="AssetCategoryId" value="@Model.AssetCategoryId" />
+</section>
+<script>
+
+
+    function validateManageAssets() {
+        debugger
+        var validate = true;
+        var AssetName = $('#AssetName').val();
+        var Date = $('#Date').val();
+        var AssetLocation = $('#AssetLocation').val();
+        var OtherDetails = $('#OtherDetails').val();
+        var NoOfAssets = $('#NoOfAssets').val();
+
+        if (AssetName == "" || AssetName == null || AssetName == undefined) {
+            validate = false;
+            $('#vAssetName').show();
+        }
+        if (Date == "" || Date == null || Date == undefined) {
+            validate = false;
+            $('#vDate').show();
+        }
+        if (AssetLocation == "" || AssetLocation == null || AssetLocation == undefined) {
+            validate = false;
+            $('#vAssetLocation').show();
+        }
+        if (OtherDetails == "" || OtherDetails == null || OtherDetails == undefined) {
+            validate = false;
+            $('#vOtherDetails').show();
+        }
+        if (NoOfAssets == "" || NoOfAssets == null || NoOfAssets == undefined) {
+            validate = false;
+            $('#vNoOfAssets').show();
+        }
+        return validate;
+    }
+
+    function submitForm() {
+        debugger
+        var validatestatus = validateManageAssets();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function resetManageAssets() {
+        debugger
+        document.getElementById("count").value = "0";
+        document.getElementById("vAssetName").style.display = "none";
+        document.getElementById("vDate").style.display = "none";
+        document.getElementById("vOtherDetails").style.display = "none";
+        document.getElementById("vNoOfAssets").style.display = "none";
+        document.getElementById("vAssetLocation").style.display = "none";
+
+        document.getElementById("AssetName").value = document.getElementById("OldAssetName").value;
+        document.getElementById("Date").value = document.getElementById("OldDate").value;
+        document.getElementById("OtherDetails").value = document.getElementById("OldOtherDetails").value;
+        document.getElementById("NoOfAssets").value = document.getElementById("OldNoOfAssets").value;
+        document.getElementById("AssetLocation").value = document.getElementById("AssetLocation").value;
+
+        return false;
+    };
+    $('#AssetName').focus(function () {
+        $('#vAssetName').hide();
+    })
+    $('#OtherDetails').focus(function () {
+        $('#vOtherDetails').hide();
+    })
+    $('#AssetLocation').focus(function () {
+        $('#vAssetLocation').hide();
+    })
+    $('#Date').focus(function () {
+        $('#vDate').hide();
+    })
+    $('#NoOfAssets').focus(function () {
+        $('#vNoOfAssets').hide();
+    })
+
+
+</script>

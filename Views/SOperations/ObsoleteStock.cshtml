@@ -1,0 +1,192 @@
+﻿@model AsteriskBrowserAL.Models.ItemModel
+
+@{
+    ViewBag.Title = "Obsolete Stock";
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Obsolete Stock</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<br />
+<section class="content">
+    @using (Html.BeginForm("ObsoleteStock", "SOperations", FormMethod.Post))
+    {
+
+        if (null != TempData["Status"])
+        {
+            <span is="Status" style="color:forestgreen">@Html.Raw(TempData["Status"])</span>
+        }
+
+
+        if (null != Model)
+        {
+            <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+            <span style="color:red;font-weight:bold" id="Validation"></span>
+            if (Model.IsCentral)
+            {
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            ObSolete Stock
+                        </h5>
+
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4">Division</label>
+                                        <div class="col-xs-6">
+                                            @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4">Branch</label>
+                                        <div class="col-xs-6">
+                                            <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.SubscriptionId" />
+            }
+            <div id="ItemsData"></div>
+
+        }
+
+    }
+
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        debugger
+        if ($('#IsCentral').val() != "value") {
+            GetData();
+        }
+    })
+
+
+    $('#DivisionId').change(function () {
+
+        $('#ItemsData').html("");
+
+        var BranchItems = $('#BranchId');
+
+        BranchItems.children().remove();
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (data) {
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        if (record.IsCentral != true) {
+                            BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                        }
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+        $('#ItemsData').html("");
+        GetData();
+    });
+
+    function GetData() {
+
+        debugger
+
+        $('#ItemsData').html("");
+
+        document.getElementById("Validation").innerHTML = "";
+
+        if ($('#Status').val() != "" && $('#Status').val() != null && $('#Status').val() != "undefined") {
+            document.getElementById("Status").innerHTML = "";
+        }
+
+        $.ajax({
+            url: '/SOperations/GetItemsWithObsoleteStock',
+            data: { BranchId: $('#BranchId').val() },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#imagemodal').hide();
+
+
+                $('#ItemsData').html(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function SubmitForm() {
+        document.getElementById("Validation").innerHTML = "";
+
+
+
+        var valid = true;
+
+        var Quantity = 0;
+
+        // Get table object
+        var myTable = document.getElementById("mytab1");
+
+        // loop for each row
+        for (var r = 1, n = myTable.rows.length; r < n; r++) {
+            var dValue = myTable.rows[r].cells[4].children[0].value;
+            Quantity += dValue;
+        }
+
+        if (Quantity == 0) {
+            valid = false;
+            document.getElementById('Validation').innerHTML = "Please enter quantity";
+        }
+
+        return valid;
+    };
+
+</script>
+
+
+

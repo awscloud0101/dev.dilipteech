@@ -1,0 +1,256 @@
+﻿@model AsteriskBrowserAL.Models.EventsDetails
+@{
+    string role = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+}
+@Html.Action("DatePickerScripts", "Base")
+
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+@if (role != "PT")
+{
+    @section BreadCrumb{
+
+        <ul class="breadcrumb">
+            <li>
+                <i class="menu-icon fa fa-graduation-cap"></i>
+                Acadamics
+            </li>
+            <li>
+                <i class=""></i>
+                Parent Teacher Meeting
+            </li>
+            <li class="active">Events</li>
+        </ul><!-- /.breadcrumb -->
+    }
+
+
+
+    <style>
+        .main-content-inner, footer {
+            background: white;
+        }
+
+        .fc-toolbar h2 {
+            font-size: 22px;
+            color: white;
+            background: #069;
+            font-family: calibri;
+            font-weight: bold;
+            padding: 5px 20px 5px 20px;
+    </style>
+    <div class="overflowscroll" style="height:500px;padding:10px;overflow-x:hidden">
+        <div id='calendar'>  </div>
+
+    </div>
+}
+<!-- Modal -->
+
+
+<div id="myModal" class="modal fade" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">Parent Teacher Meeting(PTM)</h4>
+            </div>
+            <div class="modal-body" id="InnerHtml">
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success" onclick="SaveEvent()">Save</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-backdrop {
+        z-index: -1;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Events/getEvents',
+            contentType: "application/json",
+            dataType: "json",
+            aync: false,
+            success: function (data) {
+                $.each(data, function (i) {
+
+                    calendar.fullCalendar('renderEvent', {
+                        title: data[i].Subject,
+                        start: data[i].SlotStartTime,
+                        //end: data[i].SlotEndTime,
+                        allDay: true,
+                        color: data[i].color,
+                        id: data[i].EventId
+                    }, true);
+                });
+            },
+            aync: false
+        });
+        var calendar = $('#calendar').fullCalendar({
+            editable: true,
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month'// 'month,agendaWeek,agendaDay'
+            },
+            //eventRender: function (event, element, view) {
+            //    if (event.allDay === 'true') {
+            //        event.allDay = true;
+            //    } else {
+            //        event.allDay = false;
+            //    }
+            //},
+            selectable: true,
+            selectHelper: true,
+            droppable: true,
+            select: function (start, end, allDay) {
+                var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+                $.ajax({
+                    url: '/Events/EventsC',
+                    data: { startDate: start, EventId: 0 },
+                    success: function (data) {
+                        debugger
+                        $('#InnerHtml').html(data)
+                        $('#myModal').appendTo("body").modal('show');
+                    }
+                });
+            },
+            eventClick: function (event) {
+                debugger
+                window.location = "/Events/EventRemarks?EventId=" + event.id
+            },
+        });
+    });
+</script>
+
+<script>
+
+    function SaveEvent() {
+        debugger
+        var message = "";
+
+        var Validate = true;
+
+        var Subject = $('#Subject').val()
+        var Description = $('#Description').val()
+        var SlotTime = $('#SlotTime').val()
+        var BreakTime = $('#BreakTime').val()
+        var SlotNumber = $('#SlotNo').val()
+        var StartTime = $('#StartTime').val()
+        var EndTime = $('#EndTime').val()
+        var eventId = $('#eventId').val()
+        var Date = $('#StartDate').val()
+        var CourseId = $('#CourseId').val()
+        var StudentId = $('#StudentId').val()
+
+        if (Subject == "" || Subject == undefined) {
+            Validate = false;
+            message += "Subject, ";
+        }
+
+
+        //if (Description == "" || Description == undefined) {
+        //    Validate = false;
+        //    message += "Description, ";
+        //}
+
+
+        //if (SlotTime == "" || SlotTime == undefined || SlotTime == 0) {
+        //    Validate = false;
+        //    message += "SlotTime, ";
+        //}
+
+
+
+        //if (BreakTime == "" || BreakTime == undefined || BreakTime == 0) {
+        //    Validate = false;
+        //    message += "BreakTime, ";
+        //}
+
+
+        if (StartTime == "" || StartTime == undefined) {
+            Validate = false;
+            message += "StartTime, ";
+        }
+
+
+        if (EndTime == "" || EndTime == undefined) {
+            Validate = false;
+            message += "EndTime, ";
+        }
+
+        if (CourseId == "" || CourseId == undefined) {
+            Validate = false;
+            message += "CourseId, ";
+        }
+
+        if (!Validate)
+            document.getElementById("Validation").innerHTML = " Please complete this mandatory field"
+
+        if (Validate == true) {
+            document.getElementById("Validation").innerHTML = ""
+            $.ajax({
+                url: '/Events/EventsC',
+                type: 'POST',
+                data: { eventId: eventId, Subject: Subject, Description: Description, SlotTime: SlotTime, BreakTime: BreakTime, SlotNumber: SlotNumber, StartTime: StartTime, EndTime: EndTime, Date: Date, CourseId: CourseId, StudentId: StudentId },
+                success: function (data) {
+                    location.reload();
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    //function GetSlotsCount() {
+    //    debugger
+    //    var SlotTime = $('#SlotTime').val()
+    //    var BreakTime = $('#BreakTime').val()
+    //    var StartTime = $('#StartTime').val()
+    //    var EndTime = $('#EndTime').val()
+    //    var eventId = $('#eventId').val()
+    //    var Date = $('#StartDate').val()
+    //    $.ajax({
+    //        url: '/Events/CalculateNumberOfSlots',
+    //        data: { SlotTime: SlotTime, BreakTime: BreakTime, StartTime: StartTime, EndTime: EndTime, Date: Date },
+    //        success: function (data) {
+    //            $('#SlotNo').val(data)
+    //            $('#SlotNumber').val(data)
+    //        },
+    //        aync: false
+    //    });
+
+    //}
+
+
+
+</script>
+
+<script type="text/javascript">
+
+    window.onload = OnLoadata();
+    function OnLoadata() {
+        debugger
+        SetDepositTimePicker();
+    }
+    function SetDepositTimePicker() {
+
+        $('#timepicker').timepicker({
+            showMeridian: false,
+            minuteStep: 1,
+            showSeconds: true,
+        })
+    }
+
+  
+
+</script>

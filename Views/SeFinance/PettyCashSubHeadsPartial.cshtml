@@ -1,0 +1,132 @@
+﻿@model IEnumerable<AsteriskBrowserAL.PettyCashSubHead>
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+    hideScrolling:hover {
+        overflow: auto;
+    }
+</style>
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+@if (null != Model)
+{
+    if (Model.Count() > 0)
+    {
+        int nsno = 1;
+
+        <div class="hr hr-18 dotted hr-double"></div>
+
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+
+        </div>
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Sub Head Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Description")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Is Active")
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SubHeadName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            @if (item.IsActive == true)
+                            {
+                                @Html.CheckBoxFor(model => item.IsActive.HasValue, new { @disabled = "disabled" })
+                            }
+                            else
+                            {
+                                <input id="responsable" disabled="disabled" name="checkResp" value="true" type="checkbox" class="checkbox" />
+                            }
+                        </td>
+
+                        <td>
+                            <div>
+                                <a class="green P2" href="@Url.Action("PettyCashSubHeadE", "SeFinance", new { id = item.PettyCashSubHeadId })">
+                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                </a>
+                                <a class="red P2" onclick="btnConfirm(@item.PettyCashSubHeadId)">
+                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+
+
+    }
+
+    else
+    {
+        <span style="color: red;"><b>Data not available</b></span>
+    }
+
+}
+
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeFinance/ValidationForPettyCashSubHeadD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SeFinance/PettyCashSubHeadD?id=' + Value;
+                    var title = "Petty Cash Sub Heads";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

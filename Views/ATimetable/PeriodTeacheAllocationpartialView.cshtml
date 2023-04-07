@@ -1,0 +1,958 @@
+﻿@model AsteriskBrowserAL.Models.TimeTableViewModel
+@{
+    List<AsteriskBrowserAL.Subjects> Colours = new List<AsteriskBrowserAL.Subjects>();
+
+    Colours.Add(new Subjects { SubjectId = 0, SubjectName = "label-orange" });
+    Colours.Add(new Subjects { SubjectId = 1, SubjectName = "label-blue" });
+    Colours.Add(new Subjects { SubjectId = 2, SubjectName = "label-PaleVioletRed" });
+    Colours.Add(new Subjects { SubjectId = 3, SubjectName = "label-LightSeaGreen" });
+    Colours.Add(new Subjects { SubjectId = 4, SubjectName = "label-success" });
+    Colours.Add(new Subjects { SubjectId = 5, SubjectName = "label-Salmon" });
+    Colours.Add(new Subjects { SubjectId = 6, SubjectName = "label-purple" });
+    Colours.Add(new Subjects { SubjectId = 7, SubjectName = "label-info" });
+
+    int Countn = Colours.Count();
+    int j = 0;
+
+    string tdIdM = "";
+    string tdIdT = "";
+    string tdIdW = "";
+    string tdIdTH = "";
+    string tdIdF = "";
+    string tdIdS = "";
+    string tdIdSU = "";
+
+    string tdcMd = "";
+    string tdcTd = "";
+    string tdcWd = "";
+    string tdcTHd = "";
+    string tdcFd = "";
+    string tdcSd = "";
+    string tdcSUd = "";
+
+    // Saving Formate Ids = 1-1-1:1~(TH) => (SatffId-SubjectId-UniqueId: ClassTimingsId-WeekDay)
+}
+@*<link href="~/assets/css/Tables.css" rel="stylesheet" />*@
+
+<style>
+    .divMyTags {
+        text-align: center;
+    }
+
+        .divMyTags div.existingTag {
+            position: relative;
+            color: #EEE;
+            font-size: 12px;
+            font-family: Times;
+            display: inline-block;
+            border: none;
+            border-radius: 4px;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            padding: 8px;
+            margin: 5px;
+        }
+
+    .closeButton {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 27px;
+        height: 27px;
+        background: url('http://cdn-sg1.pgimgs.com/images/pg/close-button.png') no-repeat center center;
+    }
+
+    warning, .badge-warning {
+        background-color: #428BCA;
+    }
+
+    .IconPosition {
+        position: absolute;
+        top: -12px;
+        right: 54px;
+        width: 25px;
+        height: 17px;
+    }
+
+    .profile-activity:hover {
+        background-color: rgba(0,0,0,.5);
+    }
+
+
+    .profile-activity .tools {
+        position: absolute;
+        right: 1px;
+        bottom: 41px;
+        display: none;
+    }
+</style>
+
+
+
+
+<style type="text/css">
+    /*.left {
+            width: 120px;
+            float: left;
+        }*/
+
+    .left table {
+        background: #069;
+    }
+
+    .left td {
+        background: #eee;
+    }
+
+    /*.right {
+            float: right;
+            width: 570px;
+
+        }*/
+
+    .right table {
+        background: #a82682;
+    }
+
+    .right td {
+        background: #fafafa;
+        color: #069;
+        text-align: center;
+        padding: 2px;
+    }
+
+    .right td {
+        background: #f8f8f8;
+    }
+
+        .right td.drop {
+            background: #fafafa;
+            width: 100px;
+        }
+
+        .right td.over {
+            background: #FBEC88;
+        }
+
+    /*.item {
+            text-align: center;
+            border: 1px solid #499B33;
+            color: #444;
+            width: 200px;
+        }*/
+
+
+    /* some elements used in demo only */
+    .spinner-preview {
+        width: 100px;
+        height: 100px;
+        text-align: center;
+        margin-top: 60px;
+    }
+
+    .dropdown-preview {
+        display: inline-block;
+    }
+
+        .dropdown-preview > .dropdown-menu {
+            display: block;
+            position: center;
+            margin-bottom: 5px;
+        }
+
+
+    .member tr:hover {
+        background-color: rgba(41, 103, 182, 0.89);
+        color: #000;
+    }
+
+    .member tr.selected {
+        background-color: rgba(41, 103, 182, 0.89);
+        color: #000;
+    }
+
+    #SubjectTable tr {
+        cursor: pointer;
+    }
+
+    .right tr {
+        cursor: pointer;
+    }
+</style>
+
+
+<style>
+    .circle {
+        width: 20px;
+        height: 20px;
+        background: red;
+        -moz-border-radius: 70px;
+        -webkit-border-radius: 70px;
+        border-radius: 70px;
+    }
+
+    .table3 thead td {
+        -webkit-box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        box-sizing: content-box;
+        position: relative;
+        min-height: 38px;
+        background: #069;
+
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffeeeeee', GradientType=0);
+        color: #fff;
+        font-size: 12px;
+        border-bottom: 1px solid #DDD;
+        padding-left: 12px;
+    }
+
+    .blue{
+        background:none;
+        font-family:Calibri;font-size:15px;
+        font-weight:bold;
+
+    }
+    
+    .table3 tbody tr .time {
+        -webkit-box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        box-sizing: content-box;
+        position: relative;
+        min-height: 38px;
+        background: #069 background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffeeeeee', GradientType=0);
+        color: #000;
+        font-size: 12px;
+        border-bottom: 1px solid #DDD;
+        padding-left: 12px;
+    }
+
+    .table3 tbody tr .lunch {
+        -webkit-box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        box-sizing: content-box;
+        position: relative;
+        min-height: 38px;
+        background: #E0ECFF;
+        background-image: -webkit-linear-gradient(top,#ECF2F7 0,#d4e2f9 100%);
+        background-image: -o-linear-gradient(top,#ECF2F7 0,#d4e2f9 100%);
+        background-image: linear-gradient(to bottom,#ECF2F7 0,#d4e2f9 100%);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffeeeeee', GradientType=0);
+        color: #000;
+        font-size: 12px;
+        border-bottom: 1px solid #DDD;
+        padding-left: 12px;
+    }
+</style>
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+
+<div class="widget-box">
+    <div class="table-header">
+        Period-Teacher Allocation
+
+        <div style="float:right">
+            <button class="btn btn-info btn-minier" type="submit" onclick="SaveData()">
+                <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+            </button>
+        </div>
+    </div>
+
+
+
+
+    <div class="widget-body">
+        <div class="widget-main">
+
+
+
+
+            <div class="row">
+
+                <div class="col-sm-12">
+                    <div class="alert alert-info">
+
+                        <i class="ace-icon fa fa-hand-o-right"></i>
+                        Icon   &nbsp; &nbsp;
+                        A
+                        &nbsp; &nbsp;represents 'Absent'
+
+
+
+
+                    </div>
+                    <br />
+                </div>
+
+
+                <div class="col-sm-10">
+
+                    <div class="right">
+                        <table style="font-family:'Segoe UI';font-size:12px" class="table tbhover table-striped table-bordered table3" id="Periods">
+                            <thead class="Boxedthead">
+                                <tr>
+                                    <td class="blank"></td>
+
+                                    @if (Model.WeekDays.Count() > 0)
+                                    {
+                                        foreach (var c in Model.WeekDays)
+                                        {
+                                            string Date = c.Date.ToString("dd - MMM - yyyy");
+                                            <td class="title">
+                                                <a class="blue" data-toggle="modal" href="#modal-table">
+                                                    @c.WeekName
+                                                </a>
+                                                <br />
+                                                <span>
+                                                    @c.WeekDay
+                                                </span>
+                                            </td>
+
+                                        }
+                                    }
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                @if (Model.Periods.Count() > 0)
+                                {
+                                    foreach (var s in Model.Periods)
+                                    {
+                                        if (s.IsBreak == false)
+                                        {
+                                            j = 0;
+
+                                            <tr>
+                                                <td class="time">
+                                                    <span>
+                                                        @s.PeriodName
+                                                    </span>
+                                                    <br />
+                                                    <span>
+                                                        @s.PeriodTimings
+                                                    </span>
+                                                </td>
+
+                                                @{
+                                                    // To know in which cell User is Draging up we are maintaiing ClassTiming Id and Week Day
+                                                    tdIdM = s.ClassTimingsId + "~(M)";
+                                                    tdIdT = s.ClassTimingsId + "~(T)";
+                                                    tdIdW = s.ClassTimingsId + "~(W)";
+                                                    tdIdTH = s.ClassTimingsId + "~(TH)";
+                                                    tdIdF = s.ClassTimingsId + "~(F)";
+                                                    tdIdS = s.ClassTimingsId + "~(S)";
+                                                    tdIdSU = s.ClassTimingsId + "~(SU)";
+                                                }
+
+                                                @if (s.MondayDate < DateTime.Today)
+                                                {
+                                                    tdcMd = "";
+                                                }
+                                                else
+                                                {
+                                                    tdcMd = "drop";
+                                                }
+
+
+                                                <td class="@tdcMd divMyTags Cursor" id="@tdIdM">
+
+                                                    @if (null != s.lstMondayTutorsWithSubject && s.lstMondayTutorsWithSubject.Count() > 0)
+                                                    {
+                                                        string name = s.ClassTimingsId + "~(M)";
+
+                                                        foreach (var d in s.lstMondayTutorsWithSubject)
+                                                        {
+                                                            string SaveId = d.TutorId + "-" + d.Subject + "-" + "P";
+                                                            string AId = SaveId + "-a";
+
+                                                            if (j == Countn - 1)
+                                                            {
+                                                                j = 0;
+                                                            }
+
+                                                            string color = Colours.FirstOrDefault(c => c.SubjectId == j).SubjectName;
+
+                                                            //PreviousAssigned Class Is for to know Who are Previously assigned Staff on Saving Part
+                                                            <div class="item  existingTag PreviousAssigned @color inline action-buttons profile-activity" data-class="@color" title="@name" id="@SaveId">
+                                                                @if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                                                {
+                                                                    <div class="circle IconPosition" style="color:white" align="center">A</div>
+                                                                }
+
+                                                                @if (tdcMd != "")
+                                                                {
+                                                                    <div class="tools action-buttons">
+                                                                        <a class="closeButton" id="@AId" onclick="CloseDiv('@SaveId')"> </a>
+                                                                    </div>
+                                                                }
+
+                                                                @d.SubjectDisplay / @d.TutorDisplay
+
+                                                                @{
+                                                                    j++;
+                                                                }
+
+                                                            </div>
+                                                                        }
+                                                                    }
+
+
+
+
+                                                </td>
+
+
+                                                @if (s.TuesdayDate < DateTime.Today)
+                                                {
+                                                    tdcTd = "";
+                                                }
+                                                else
+                                                {
+                                                    tdcTd = "drop";
+                                                }
+
+                                                <td class="@tdcTd divMyTags" id="@tdIdT">
+
+                                                    @if (null != s.lstTuesdayTutorsWithSubject && s.lstTuesdayTutorsWithSubject.Count() > 0)
+                                                    {
+                                                        string name = s.ClassTimingsId + "~(T)";
+
+                                                        foreach (var d in s.lstTuesdayTutorsWithSubject)
+                                                        {
+                                                            string SaveId = d.TutorId + "-" + d.Subject + "-" + "Q";
+                                                            string AId = SaveId + "-a";
+
+                                                            if (j == Countn - 1)
+                                                            {
+                                                                j = 0;
+                                                            }
+
+                                                            string color = Colours.FirstOrDefault(c => c.SubjectId == j).SubjectName;
+
+                                                            <div class="item existingTag PreviousAssigned @color inline action-buttons profile-activity" data-class="@color" title="@name" id="@SaveId">
+                                                                @if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                                                {
+                                                                    <div class="circle IconPosition" style="color:white" align="center">A</div>
+                                                                }
+
+                                                                @if (tdcTd != "")
+                                                                {
+                                                                    <div class="tools action-buttons">
+                                                                        <a class="closeButton" id="@AId" onclick="CloseDiv('@SaveId')"> </a>
+                                                                    </div>
+                                                                }
+
+                                                                @d.SubjectDisplay / @d.TutorDisplay
+
+                                                                @{
+                                                                    j++;
+                                                                }
+
+                                                            </div>
+                                                                        }
+                                                                    }
+
+                                                </td>
+
+                                                @if (s.WednesdayDate < DateTime.Today)
+                                                {
+                                                    tdcWd = "";
+                                                }
+                                                else
+                                                {
+                                                    tdcWd = "drop";
+                                                }
+
+                                                <td class="@tdcWd divMyTags" id="@tdIdW">
+
+                                                    @if (null != s.lstWednesdayTutorsWithSubject && s.lstWednesdayTutorsWithSubject.Count() > 0)
+                                                    {
+                                                        string name = s.ClassTimingsId + "~(W)";
+
+                                                        foreach (var d in s.lstWednesdayTutorsWithSubject)
+                                                        {
+                                                            string SaveId = d.TutorId + "-" + d.Subject + "-" + "R";
+                                                            string AId = SaveId + "-a";
+
+                                                            if (j == Countn - 1)
+                                                            {
+                                                                j = 0;
+                                                            }
+
+                                                            string color = Colours.FirstOrDefault(c => c.SubjectId == j).SubjectName;
+
+                                                            <div class="item existingTag PreviousAssigned @color inline action-buttons profile-activity" data-class="@color" title="@name" id="@SaveId">
+                                                                @if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                                                {
+                                                                    <div class="circle IconPosition" style="color:white" align="center">A</div>
+                                                                }
+
+                                                                @if (tdcWd != "")
+                                                                {
+                                                                    <div class="tools action-buttons">
+                                                                        <a class="closeButton" id="@AId" onclick="CloseDiv('@SaveId')"> </a>
+                                                                    </div>
+                                                                }
+
+                                                                @d.SubjectDisplay / @d.TutorDisplay
+
+                                                                @{
+                                                                    j++;
+                                                                }
+
+                                                            </div>
+                                                                        }
+                                                                    }
+
+                                                </td>
+
+                                                @if (s.ThursdayDate < DateTime.Today)
+                                                {
+                                                    tdcTHd = "";
+                                                }
+                                                else
+                                                {
+                                                    tdcTHd = "drop";
+                                                }
+
+                                                <td class="@tdcTHd divMyTags" id="@tdIdTH">
+
+                                                    @if (null != s.lstThursdayTutorsWithSubject && s.lstThursdayTutorsWithSubject.Count() > 0)
+                                                    {
+                                                        string name = s.ClassTimingsId + "~(TH)";
+
+                                                        foreach (var d in s.lstThursdayTutorsWithSubject)
+                                                        {
+                                                            string SaveId = d.TutorId + "-" + d.Subject + "-" + "S";
+                                                            string AId = SaveId + "-a";
+
+                                                            if (j == Countn - 1)
+                                                            {
+                                                                j = 0;
+                                                            }
+
+                                                            string color = Colours.FirstOrDefault(c => c.SubjectId == j).SubjectName;
+
+                                                            <div class="item existingTag PreviousAssigned @color inline action-buttons profile-activity" data-class="@color" title="@name" id="@SaveId">
+                                                                @if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                                                {
+                                                                    <div class="circle IconPosition" style="color:white" align="center">A</div>
+                                                                }
+
+                                                                @if (tdcTHd != "")
+                                                                {
+                                                                    <div class="tools action-buttons">
+                                                                        <a class="closeButton" id="@AId" onclick="CloseDiv('@SaveId')"> </a>
+                                                                    </div>
+                                                                }
+
+                                                                @d.SubjectDisplay / @d.TutorDisplay
+
+                                                                @{
+                                                                    j++;
+                                                                }
+
+                                                            </div>
+                                                                        }
+                                                                    }
+                                                </td>
+
+                                                @if (s.FridayDate < DateTime.Today)
+                                                {
+                                                    tdcFd = "";
+                                                }
+                                                else
+                                                {
+                                                    tdcFd = "drop";
+                                                }
+
+                                                <td class="@tdcFd divMyTags" id="@tdIdF">
+
+                                                    @if (null != s.lstFridayTutorsWithSubject && s.lstFridayTutorsWithSubject.Count() > 0)
+                                                    {
+                                                        string name = s.ClassTimingsId + "~(F)";
+
+                                                        foreach (var d in s.lstFridayTutorsWithSubject)
+                                                        {
+                                                            string SaveId = d.TutorId + "-" + d.Subject + "-" + "T";
+                                                            string AId = SaveId + "-a";
+
+                                                            if (j == Countn - 1)
+                                                            {
+                                                                j = 0;
+                                                            }
+
+                                                            string color = Colours.FirstOrDefault(c => c.SubjectId == j).SubjectName;
+
+                                                            <div class="item existingTag PreviousAssigned @color inline action-buttons profile-activity" data-class="@color" title="@name" id="@SaveId">
+                                                                @if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                                                {
+                                                                    <div class="circle IconPosition" style="color:white" align="center">A</div>
+                                                                }
+
+                                                                @if (tdcFd != "")
+                                                                {
+                                                                    <div class="tools action-buttons">
+                                                                        <a class="closeButton" id="@AId" onclick="CloseDiv('@SaveId')"> </a>
+                                                                    </div>
+                                                                }
+
+                                                                @d.SubjectDisplay / @d.TutorDisplay
+
+                                                                @{
+                                                                    j++;
+                                                                }
+
+                                                            </div>
+                                                                        }
+                                                                    }
+
+                                                </td>
+
+                                                @if (s.SaturdayDate < DateTime.Today)
+                                                {
+                                                    tdcSd = "";
+                                                }
+                                                else
+                                                {
+                                                    tdcSd = "drop";
+                                                }
+
+                                                <td class="@tdcSd divMyTags " id="@tdIdS">
+
+                                                    @if (null != s.lstSaturdayTutorsWithSubject && s.lstSaturdayTutorsWithSubject.Count() > 0)
+                                                    {
+                                                        string name = s.ClassTimingsId + "~(S)";
+
+                                                        foreach (var d in s.lstSaturdayTutorsWithSubject)
+                                                        {
+                                                            string SaveId = d.TutorId + "-" + d.Subject + "-" + "U";
+                                                            string AId = SaveId + "-a";
+
+                                                            if (j == Countn - 1)
+                                                            {
+                                                                j = 0;
+                                                            }
+
+                                                            string color = Colours.FirstOrDefault(c => c.SubjectId == j).SubjectName;
+
+                                                            <div class="item existingTag PreviousAssigned @color inline action-buttons profile-activity" data-class="@color" title="@name" id="@SaveId">
+                                                                @if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                                                {
+                                                                    <div class="circle IconPosition" style="color:white" align="center">A</div>
+                                                                }
+
+                                                                @if (tdcSd != "")
+                                                                {
+                                                                    <div class="tools action-buttons">
+                                                                        <a class="closeButton" id="@AId" onclick="CloseDiv('@SaveId')"> </a>
+                                                                    </div>
+                                                                }
+
+                                                                @d.SubjectDisplay / @d.TutorDisplay
+
+                                                                @{
+                                                                    j++;
+                                                                }
+
+                                                            </div>
+                                                                        }
+                                                                    }
+                                                </td>
+
+                                                @if (s.SundayDate < DateTime.Today)
+                                                {
+                                                    tdcSUd = "";
+                                                }
+                                                else
+                                                {
+                                                    tdcSUd = "drop";
+                                                }
+
+                                                <td class="@tdcSUd divMyTags" id="@tdIdSU">
+
+                                                    @if (null != s.lstSundayTutorsWithSubject && s.lstSundayTutorsWithSubject.Count() > 0)
+                                                    {
+                                                        string name = s.ClassTimingsId + "~(SU)";
+
+                                                        foreach (var d in s.lstSundayTutorsWithSubject)
+                                                        {
+                                                            string SaveId = d.TutorId + "-" + d.Subject + "-" + "V";
+                                                            string AId = SaveId + "-a";
+
+                                                            if (j == Countn - 1)
+                                                            {
+                                                                j = 0;
+                                                            }
+
+                                                            string color = Colours.FirstOrDefault(c => c.SubjectId == j).SubjectName;
+
+                                                            <div class="item existingTag PreviousAssigned @color inline action-buttons profile-activity" data-class="@color" title="@name" id="@SaveId">
+                                                                @if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                                                {
+                                                                    <div class="circle IconPosition" style="color:white" align="center">A</div>
+                                                                }
+
+                                                                @if (tdcSUd != "")
+                                                                {
+                                                                    <div class="tools action-buttons">
+                                                                        <a class="closeButton" id="@AId" onclick="CloseDiv('@SaveId')"> </a>
+                                                                    </div>
+                                                                }
+
+                                                                @d.SubjectDisplay / @d.TutorDisplay
+
+                                                                @{
+                                                                    j++;
+                                                                }
+
+                                                            </div>
+                                                                        }
+                                                                    }
+
+                                                </td>
+                                            </tr>
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        //If it is break the time class merges all the tds
+                                                                        <tr>
+
+
+                                                                            <td class="time"></td>
+
+                                                                            <td class="lunch" colspan="@Model.WeekDays.Count()">Break</td>
+                                                                        </tr>
+                                                                            }
+                                                                        }
+
+                                                                    }
+                            </tbody>
+
+
+                        </table>
+                    </div>
+                </div>
+
+
+                <div class="col-sm-2">
+                    @*Subjects Part*@
+                    <div class="col-xs-8 col-sm-9 pricing-span-body"  >
+
+                        <div class="pricing-span">
+                            <div class="widget-box pricing-box-small ">
+                                <div class="widget-header">
+                                    <h5 class="widget-title">Subjects</h5>
+                                </div>
+
+                                <div class="widget-body" style="overflow:auto; height:200px;">
+                                    <div class="widget-main no-padding">
+
+
+                                        <table id="SubjectTable" class="table table-bordered table-striped table-hover nowrap">
+                                            <tbody class="member">
+                                                @foreach (var s in Model.Subjects)
+                                                {
+
+
+                                                    <tr id="@s.SubjectId" onclick="GetStaff(@s.SubjectId,@Model.SectionId)">
+                                                        <td>
+                                                            @s.SubjectName
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+
+                                        </table>
+
+
+
+
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+
+                    @*Staff Part*@
+
+                    <div class="col-xs-8 col-sm-9 pricing-span-body"  >
+
+                        <div class="pricing-span">
+                            <div class="widget-box pricing-box-small ">
+                                <div class="widget-header">
+                                    <h5 class="widget-title">Staff</h5>
+                                </div>
+                                <div class="widget-body" style="overflow:auto; height:200px;">
+                                    <div class="widget-main no-padding">
+                                        <div class="left" id="StaffData">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+            </div><!-- /.row -->
+
+        </div>
+    </div>
+
+</div>
+
+<input type="hidden" name="RemoveStaff" id="RemoveStaff" value="1" />
+
+
+
+
+
+<script>
+    $("#SubjectTable tbody tr").click(function () {
+        console.log('clicked');
+        $(this).addClass('selected').siblings().removeClass("selected");
+    });
+
+    function GetStaff(SubjectId, BatchId) {
+        document.getElementById("SaveVal").innerHTML = ""
+
+        $("#imagemodal").show();
+        $.ajax({
+            url: '/ATimetable/GetStaffBySubject',
+            data: { SubjectId: SubjectId, nSectionId: BatchId },
+            success: function (result) {
+                $("#imagemodal").hide();
+
+                $("#StaffData").html(result)
+
+            }
+        })
+    }
+
+
+    $(".right td").on('mouseover', function () {
+        $(this).css('cursor', 'pointer');
+    })
+
+    //for already previous assigned staff
+    function CloseDiv(val) {
+        debugger
+        $("#" + val).remove()
+        var Count = document.getElementById("RemoveStaff").value
+        document.getElementById("SaveVal").innerHTML = ""
+
+        Count = parseInt(Count) + 1
+
+        document.getElementById("RemoveStaff").value = Count
+
+    }
+
+    //for staff assigning on dragging- no need to save
+    function CloseDragDiv(val) {
+        document.getElementById("SaveVal").innerHTML = ""
+
+        val = val.replace("-a", "");
+
+        $("#" + val).remove()
+
+    }
+
+
+
+
+    function SaveData() {
+        debugger
+        var ClassNumber = $("#ClassId").val();
+        var SectionId = $("#SectionId").val();
+        var Data = ""
+        var PreviosStaff = ""
+        var WeekDate = $("#WeekNumberId option:selected").text()
+
+
+        $('.StaffAssigned').each(function () {
+            var SubjectIdNStaffId = this.id;
+            var PeriodNWeek = $("#" + this.id).closest("td").attr('id')
+            Data += this.id + ":" + PeriodNWeek + ",";
+        });
+
+
+
+        $('.PreviousAssigned').each(function () {
+            var SubjectIdNStaffId = this.id;
+            var ClassTimingsNWeek = $(this).attr('title');
+            PreviosStaff += this.id + ":" + ClassTimingsNWeek + ","
+        });
+
+        Data += PreviosStaff;
+
+
+
+        if (Data != "" || PreviosStaff != "") {
+            $("#imagemodal").show();
+            $.ajax({
+                url: '/ATimetable/SaveTimeTable',
+                data: { strSavevalues: Data, nclassId: ClassNumber, nSectionId: SectionId, strWeekDates: WeekDate },
+                success: function (data) {
+                    document.getElementById("SaveVal").innerHTML = data;
+                    GetTimeTableData();
+                    $("#imagemodal").hide();
+                }
+            })
+
+        }
+    }
+
+
+    @*TimeTableToday*@
+
+    function GetTimeTableTodayData(Date) {
+        $("#TimeTableToday").html("")
+
+        $("#modal-table").removeClass("in");
+        $(".modal-backdrop").removeClass("in")
+        var ClassNumber = $("#ClassId").val();
+        var WeekSpan = $("#WeekNumberId option:selected").text();
+
+        $.ajax({
+            url: '/ATimetable/GetTodayTimeTable',
+            data: { ClassNumber: ClassNumber, WeekSpan: WeekSpan, Date: Date },
+            success: function (result) {
+                $("#TimeTableToday").html(result)
+
+            },
+
+        })
+
+        return false
+    }
+
+</script>
+
+
+
+
+
+
+

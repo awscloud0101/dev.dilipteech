@@ -1,0 +1,210 @@
+﻿@model List<AsteriskBrowserAL.Models.t_FeePercentageData>
+@{
+    ViewBag.Title = "Transport Fee Structure";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Transport Fee Structure</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<!--Main Content-->
+<section class="content">
+
+    <div class="row">
+        <div class=col-xs-12>
+
+            @using (Html.BeginForm("TransportFeeStructure", "SeFinance", FormMethod.Post))
+            {
+                <input type="hidden" id="SelAyId" value="@ViewBag.AcademicYearId" />
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Transport % Distribution</span>
+
+                    </div>
+                    <div class="widget-box">
+                   
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 ">Academic Year</label>
+                                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                <select id="CboAcademicYear" name="AcademicYearId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                  
+                        </div>
+                    </div>
+
+                    if (Model != null && Model.Count() > 0)
+                    {
+                    <br />
+                    <div id="divPercentage">
+                        <span id="Validation" style="color:red;font-weight:bold"></span>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="table-header">
+                                    Records Found(@Model.Count())
+                                    <div style="float:right;margin-right:10px;">
+                                        <button type="submit" name="Save" class="btncustom P2" value="Save" onclick="return submitForm()">
+                                          Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table tbhover table-striped table-bordered" id="mytab1">
+                            <tbody>
+                                @for (int i = 0; i < Model.Count(); i++)
+                                {
+
+                                    <tr>
+                                        <td>
+                                            @Model.ElementAt(i).Name
+                                        </td>
+                                        <td>
+                                            @Html.Hidden("TransportFeeList.Index", (@i))
+                                            @Html.Hidden("TransportFeeList[" + @i + "].FeePercentageId", Model.ElementAt(i).FeePercentageId)
+                                            @Html.Hidden("TransportFeeList[" + @i + "].FeePercentageCategoryId", Model.ElementAt(i).FeePercentageCategoryId)
+                                            @Html.Hidden("TransportFeeList[" + @i + "].DataName", Model.ElementAt(i).Name)
+                                            @Html.TextBox("TransportFeeList[" + @i + "].Percentage", Model.ElementAt(i).Percentage, new { id = "percentage", @min = "0", @class = "percentage txtboxNum form-control", @maxlength = "3", style = "width:120px" })
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                    }
+                    else if (ViewBag.AcademicYearId > 0)
+                    {
+                    <br />
+                    <span style="color: red;"><b>Transport installments are not available</b></span>
+                    }
+                    }
+                </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        LoadAcademicYearCombo();
+    });
+
+
+    function LoadAcademicYearCombo() {
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                $('#imagemodal').hide();
+
+                var ObjAyYear = $("#CboAcademicYear")
+                ObjAyYear.children().remove();
+                ObjAyYear.append($("<option>").val(-1).text("--Select--"))
+
+                $.each(result, function (i, elm) {
+                    ObjAyYear.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(ObjAyYear)
+
+                if ($('#SelAyId').val() > 0) {
+                    $('#CboAcademicYear').val($('#SelAyId').val());
+                }
+
+            },
+            async: false
+        })
+
+    }
+
+    $('#CboAcademicYear').change(function () {
+        PopulateData();
+    });
+
+    function PopulateData() {
+        if ($('#CboAcademicYear').val() < 1) {
+
+            if ($('#divPercentage') != "undefined")
+                $('#divPercentage').html('');
+
+            return;
+        }
+
+        window.location.href = '/SeFinance/TransportFeeStructure?AcademicYearId=' + $('#CboAcademicYear').val();
+    }
+
+
+
+    function validatePercentage() {
+
+        var validate = true;
+        var TotalVal = getTotalvalue();
+
+        if (TotalVal != 0) {
+            if (TotalVal == 100) {
+                document.getElementById("Validation").innerHTML = " "
+                validate = true;
+            } else {
+                document.getElementById("Validation").innerHTML = "Percentage value should be 100"
+                validate = false;
+            }
+        } else {
+            document.getElementById("Validation").innerHTML = "Please enter Percentage value"
+            validate = false;
+        }
+
+        return validate;
+    }
+
+    function getTotalvalue() {
+
+        var TotalVal = 0;
+        var myTable = document.getElementById("mytab1");
+        var dValue = null;
+        var n = myTable.rows.length;
+
+        $('#mytab1 tr').each(function (index) {
+            dValue = $(this).find('#percentage').val();
+            TotalVal += parseInt(dValue, 10);
+        })
+
+        return TotalVal;
+    }
+
+    function submitForm() {
+        var validPercentage = validatePercentage();
+        if (validPercentage == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+</script>
+
+
+
+

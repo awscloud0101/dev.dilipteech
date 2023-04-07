@@ -1,0 +1,631 @@
+﻿@model AsteriskBrowserAL.Models.ProgressCard
+@using AsteriskBrowserAL.Helpers
+@{
+    int n = 0;
+    int nCount = 0;
+
+    if (null != Model && null != Model.LstProgressCardData && Model.LstProgressCardData.Count() > 0)
+    {
+        n = Model.LstProgressCardData.Count();
+    }
+
+
+    double dMarksGained = 0;
+    double dT2MarksGained = 0;
+
+    double T2GPA = 0;
+    double dTotGrade = 0;
+
+    string Grade = "";
+    int GradePoint = 0;
+
+    double OverAllGradePointT1 = 0;
+    double OverAllGradePointT2 = 0;
+    
+     double dAvgGPAT1 = 0;
+     double AvgGPAT2 = 0;
+
+    Layout = "";
+
+}
+
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryval")
+
+
+@*<link href="~/assets/css/select2.min.css" rel="stylesheet" />
+    <script src="~/assets/js/select2.full.min.js"></script>*@
+
+@*<link href="../../plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+    <script src="../../plugins/select2/select2.full.min.js" type="text/javascript"></script>*@
+
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+<!-- bootstrap & fontawesome -->
+@*<link rel="stylesheet" href="~/assets/css/bootstrap.min.css" />*@
+<link rel="stylesheet" href="~/assets/font-awesome/4.2.0/css/font-awesome.min.css" />
+
+<!-- page specific plugin styles -->
+<!-- text fonts -->
+<link rel="stylesheet" href="~/assets/fonts/fonts.googleapis.com.css" />
+
+<!-- ace styles -->
+<link rel="stylesheet" href="~/assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+
+<!--[if lte IE 9]>
+    <link rel="stylesheet" href="~/assets/css/ace-part2.min.css" class="ace-main-stylesheet" />
+<![endif]-->
+<!--[if lte IE 9]>
+  <link rel="stylesheet" href="~/assets/css/ace-ie.min.css" />
+<![endif]-->
+<!-- inline styles related to this page -->
+<!-- ace settings handler -->
+<script src="~/assets/js/ace-extra.min.js"></script>
+
+<!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+<!--[if lte IE 8]>
+<script src="~/assets/js/html5shiv.min.js"></script>
+<script src="~/assets/js/respond.min.js"></script>
+<![endif]-->
+
+<link href="~/assets/css/checkbox.css" rel="stylesheet" />
+
+
+
+<input type="hidden" id="SelSectionId" value="@Model.SectionId" />
+<input type="hidden" id="SelExaminationId" value="@Model.ExaminationId" />
+
+@if (null != Model && null != Model.LstProgressCardData && Model.LstProgressCardData.Count() > 0)
+{
+    <div id="Hello">
+
+        @foreach (var result in Model.LstProgressCardData)
+        {
+            if (null != result.lstTest1Results && result.lstTest1Results.Count() > 0)
+            {
+                nCount++;
+
+                <br />
+                <br />
+
+                <table style="font-family:'Segoe UI';table-layout:fixed;margin-top:3.5em;">
+                    <tr>
+                        <td align="left" style="width:500px"><h3><strong>GMS @result.Institute.InstituteName</strong></h3></td>
+                        <td align="center" style="width:1000px;margin-left:-2em;"><h3><strong>PROGRESS REPORT</strong></h3></td>
+                        <td align="left" style="width:500px"><h3><strong>MONTH : @result.MonthAndYear</strong></h3></td>
+                    </tr>
+                </table>
+                <hr style="background-color:black;margin-top:-1em;" />
+
+                <table style="font-family:'Segoe UI';table-layout:fixed">
+                    <tr>
+                        <td align="left" style="width:500px"><strong>NAME : </strong>@result.StudentName</td>
+                        <td align="center" style="width:1000px;margin-left:-2em;"><strong>FATHER NAME : </strong>@result.FatherName</td>
+                        <td align="left" style="width:500px"><strong>&nbsp;CLASS :</strong>@result.ClassName</td>
+                    </tr>
+                    <tr>
+                        <td align="left" style="width:500px"><strong>ADMISSION NO : </strong>@result.AdmissionNumber</td>
+                        <td align="center" style="width:1000px"></td>
+                        <td align="left" style="width:500px"><strong>&nbsp;SECTION : </strong> @result.SectionName</td>
+                    </tr>
+                </table>
+                <br />
+
+                <table style="font:14">
+                    <tr>
+
+
+                        <td>
+                            <table style="border:1px solid black;width:1500px;height:300px;font-family:'Segoe UI';font-size:20px" rules="all">
+
+                                <tbody>
+                                    <tr style="border:1px solid black">
+                                        <th rowspan="2" align="left" valign="bottom">&nbsp;Subjects</th>
+                                        <th colspan="3">Test 1</th>
+                                        <th colspan="3">Test 2</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align:center;">Marks (Max 20)</th>
+                                        <th style="text-align:center;">Grade</th>
+                                        <th style="text-align:center;">Grade Point</th>
+                                        <th style="text-align:center;">Marks (Max 20)</th>
+                                        <th style="text-align:center;">Grade</th>
+                                        <th style="text-align:center;">Grade Point</th>
+                                    </tr>
+
+                                    @foreach (var ModelData in result.lstTest1Results)
+                                    {
+                                        <tr>
+                                            <td>&nbsp;@ModelData.Subject</td>
+                                            <td style="text-align:center">@ModelData.DisplayTestMarks</td>
+
+                                            @{
+
+                                        if (ModelData.DisplayTestMarks != "A" && ModelData.DisplayTestMarks != "")
+                                        {
+                                            dMarksGained = Convert.ToDouble(ModelData.DisplayTestMarks);
+                                        }
+                                        else
+                                        {
+                                            dMarksGained = 0;
+                                        }
+                                            }
+
+
+                                            @if (ModelData.Subject.Replace(" ", "").ToUpper().StartsWith("IILANGUAGE"))
+                                            {
+                                                Utility.GetGradeAndGradePointFor2ndLang(ref Grade, ref GradePoint, dMarksGained);
+
+                                                <td style="text-align:center">
+                                                    @Grade
+                                                </td>
+                                                <td style="text-align:center">
+
+                                                    @if (GradePoint == 0)
+                                                    {
+                                                        @("-")
+                                                    }
+                                                    else
+                                                    {
+                                                        @GradePoint
+                                                    }
+
+                                                    @{
+                                                OverAllGradePointT1 += Math.Round(Convert.ToDouble(GradePoint), 1);
+                                                    }
+
+                                                </td>
+
+                                            }
+                                            else
+                                            {
+                                                Utility.GetGradeAndGradePointForNonLang(ref Grade, ref GradePoint, dMarksGained);
+
+                                                <td style="text-align:center">
+                                                    @Grade
+                                                </td>
+                                                <td style="text-align:center">
+                                                    @if (GradePoint == 0)
+                                                    {
+                                                        @("-")
+                                                    }
+                                                    else
+                                                    {
+                                                        @GradePoint
+                                                    }
+
+
+                                                    @{
+                                                OverAllGradePointT1 += Math.Round(Convert.ToDouble(GradePoint), 1);
+                                                    }
+                                                </td>
+                                            }
+
+                                            <td style="text-align:center">@ModelData.DisplayTestTwoMarks</td>
+                                            @{
+
+                                        if (ModelData.DisplayTestTwoMarks != "A" && ModelData.DisplayTestTwoMarks != "")
+                                        {
+                                            dT2MarksGained = Convert.ToDouble(ModelData.DisplayTestTwoMarks);
+                                        }
+                                        else
+                                        {
+                                            dT2MarksGained = 0;
+                                        }
+                                            }
+
+                                            @if (ModelData.Subject.Replace(" ", "").ToUpper().StartsWith("IILANGUAGE"))
+                                            {
+                                                Utility.GetGradeAndGradePointFor2ndLang(ref Grade, ref GradePoint, dT2MarksGained);
+
+                                                <td style="text-align:center">
+                                                    @Grade
+                                                </td>
+                                                <td style="text-align:center">
+                                                    @if (GradePoint == 0)
+                                                    {
+                                                        @("-")
+                                                    }
+                                                    else
+                                                    {
+                                                        @GradePoint
+                                                    }
+
+
+                                                    @{
+                                                OverAllGradePointT2 += Math.Round(Convert.ToDouble(GradePoint), 1);
+                                                    }
+                                                </td>
+
+                                            }
+                                            else
+                                            {
+                                                Utility.GetGradeAndGradePointForNonLang(ref Grade, ref GradePoint, dT2MarksGained);
+
+                                                <td style="text-align:center">
+                                                    @Grade
+                                                </td>
+                                                <td style="text-align:center">
+                                                    @if (GradePoint == 0)
+                                                    {
+                                                        @("-")
+                                                    }
+                                                    else
+                                                    {
+                                                        @GradePoint
+                                                    }
+
+
+                                                    @{
+                                                OverAllGradePointT2 += Math.Round(Convert.ToDouble(GradePoint), 1);
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+
+                                    <tr>
+                                        <td>&nbsp;Total</td>
+                                        @{
+                                    dAvgGPAT1 = Math.Round((result.TotalTestOne / result.lstTest1Results.Count()), 1);
+                                    AvgGPAT2 = Math.Round((result.TotalTestTwo / result.lstTest1Results.Count()), 1);
+                                        }
+                                        <td align="center">@result.TotalTestOne</td>
+                                        @*@{
+                                                Utility.GetGradeAndGradePointForNonLang(ref Grade, ref GradePoint, dAvgGPAT1);
+                                            }*@
+
+                                        <td style="text-align:center"></td>
+                                        <td style="text-align:center">
+                                            @*@if (GradePoint == 0)
+                                                               {
+                                                                @("-")
+                                                }
+                                                               else
+                                                               {
+                                                                @GradePoint
+                                                               }*@
+                                        </td>
+
+                                        <td align="center">@result.TotalTestTwo</td>
+
+                                        @*@{
+                                                Utility.GetGradeAndGradePointForNonLang(ref Grade, ref GradePoint, AvgGPAT2);
+                                            }*@
+
+                                        <td style="text-align:center"></td>
+                                        <td style="text-align:center">
+                                            @*@if (GradePoint == 0)
+                                                          {
+                                                            @("-")
+                                                }
+                                                          else
+                                                          {
+                                                            @GradePoint
+                                                          }*@
+                                        </td>
+
+
+
+                                    </tr>
+                                    @*<tr>
+                                                <td>&nbsp;Average</td>
+
+                                                <td align="center">@dAvgGPAT1</td>
+
+                                                @{
+                                                    Utility.GetGradeAndGradePointForNonLang(ref Grade, ref GradePoint, dAvgGPAT1);
+                                                }
+
+                                                <td style="text-align:center"></td>
+                                                <td style="text-align:center">
+                                                   @if (GradePoint == 0)
+                                                   {
+                                                    @("-")
+                                        }
+                                                   else
+                                                   {
+                                                    @GradePoint
+                                                   }
+                                                </td>
+
+                                                <td align="center">@AvgGPAT2</td>
+
+
+                                                @{
+                                                    Utility.GetGradeAndGradePointForNonLang(ref Grade, ref GradePoint, AvgGPAT2);
+                                                }
+
+                                                <td style="text-align:center"></td>
+                                                <td style="text-align:center">
+                                                  @if (GradePoint == 0)
+                                                  {
+                                                    @("-")
+                                        }
+                                                  else
+                                                  {
+                                                    @GradePoint
+                                                  }
+                                                </td>
+
+                                            </tr>*@
+
+                                    <tr>
+                                        <td>&nbsp;OVER ALL GPA</td>
+
+
+
+                                        <td style="text-align:center" colspan="3">
+
+                                            @if (Math.Round((OverAllGradePointT1 / result.lstTest1Results.Count()), 1) == 0)
+                                            {
+                                                @("-")
+                                            }
+                                            else
+                                            {
+                                                @(Math.Round((OverAllGradePointT1 / result.lstTest1Results.Count()), 1))
+                                            }
+
+
+                                        </td>
+
+                                        <td style="text-align:center" colspan="3">
+                                            @if (Math.Round((OverAllGradePointT2 / result.lstTest1Results.Count()), 1) == 0)
+                                            {
+                                                @("-")
+                                            }
+                                            else
+                                            {
+                                                @(Math.Round((OverAllGradePointT2 / result.lstTest1Results.Count()), 1))
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <table>
+
+                    <tr>
+                        <td>
+                            <table style="border:1px solid black;width:1500px;height:150px;font-family:'Segoe UI';font-size:20px" rules="all">
+                                <tbody>
+
+                                    <tr>
+                                        <td style="font-size:20px">
+                                            <b style="font-size:20px">&nbsp;Attendance</b>
+                                        </td>
+
+                                        <td style="font-size:20px" align="center">
+                                            June
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            July
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            Aug
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            Sep
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            Oct
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            Nov
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            Dec
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            Jan
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            Feb
+                                        </td>
+
+                                        <td style="font-size:20px" align="center">
+                                            Mar
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            Apr
+                                        </td>
+
+
+
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <b style="font-size:20px;font-family:'Segoe UI'">&nbsp;Working Days</b>
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJuneWorkingDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJulyWorkingDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJAugWorkingDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJSepWorkingDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nOctWorkingDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nNovWorkingDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nDecWorkingDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJanWorkingDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nFebWorkingDays*@
+                                        </td>
+
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nMarWorkingDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nAprilWorkingDays*@
+
+
+                                        </td>
+
+
+
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <b style="font-size:20px">&nbsp;Days present</b>
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJunePresentDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJulyPresentDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJAugPresentDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJSepPresentDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nOctPresentDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nNovPresentDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nDecPresentDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nJanPresentDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nFebPresentDays*@
+                                        </td>
+
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nMarPresentDays*@
+                                        </td>
+                                        <td style="font-size:20px" align="center">
+                                            @*@result.nAprilPresentDays*@
+                                        </td>
+
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+
+
+                        <td>
+                            <br />
+                            <table style="border:1px solid black;width:1500px;height:150px;font-family:'Segoe UI'">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-size:20px;height:20px;font-weight:bold">
+                                            &nbsp;Teacher Remarks
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size:30px"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </td>
+                    </tr>
+                </table>
+
+
+
+
+
+
+
+
+                if (nCount != n)
+                {
+                    <div style="page-break-after:always">
+                    </div>
+                }
+                else
+                {
+                    nCount = 0;
+                }
+            }
+            
+            
+            dMarksGained = 0;
+dT2MarksGained = 0;
+T2GPA = 0;
+dTotGrade = 0;
+Grade = "";
+GradePoint = 0;
+OverAllGradePointT1 = 0;
+OverAllGradePointT2 = 0;
+dAvgGPAT1 = 0;
+AvgGPAT2 = 0;
+        }
+
+    </div>
+
+}
+
+
+
+
+@*<script>
+    function onloadData() {
+        PrintElem('#Hello');
+    }
+
+    window.onload = onloadData();
+
+    function PrintElem(elem) {
+
+        Popup(document.getElementById("Hello").innerHTML)
+        var SectionId = $("#SelSectionId").val();
+        var ExaminationId = $("#SelExaminationId").val();
+
+        window.location.href = '/AReports/ProgressCard?SectionId=' + SectionId + "&ExaminationId=" + ExaminationId
+    }
+
+
+
+
+    function Popup(data) {
+
+        var mywindow = window.open('', 'my div', 'height=400,width=300,size=landscape');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        window.location.href = "/AReports/ProgressCard";
+        return true;
+    }
+</script>*@

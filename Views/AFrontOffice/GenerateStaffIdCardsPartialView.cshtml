@@ -1,0 +1,101 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StaffData>
+
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+    <div class="table-header">
+        Records Found (@Model.Count())
+
+        <div style="float:right;">
+            <button type="submit" class="btn btn-info btn-minier P2" name="button" id="Save" value="Generate">
+                Generate
+            </button>
+        </div>
+    </div>
+    <div>
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Branch Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Department")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Employee Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Staff Name")
+                    </th>
+
+                    <th>
+                        <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                    </th>
+                </tr>
+
+            </thead>
+            <tbody>
+
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+
+                    <tr>
+                        <td>
+                            @Html.Hidden("lstStaffToGenerateIdCards.Index", (@i + 10))
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @Html.Hidden("lstStaffToGenerateIdCards[" + (@i + 10) + "].StaffId", Model.ElementAt(i).StaffId)
+                            @Html.Hidden("lstStaffToGenerateIdCards[" + (@i + 10) + "].StaffName", Model.ElementAt(i).StaffName)
+                            @Html.Hidden("lstStaffToGenerateIdCards[" + (@i + 10) + "].BranchName", Model.ElementAt(i).BranchName)
+                            @Html.Hidden("lstStaffToGenerateIdCards[" + (@i + 10) + "].DepartmentName", Model.ElementAt(i).DepartmentName)
+                            @Html.Hidden("lstStaffToGenerateIdCards[" + (@i + 10) + "].MobileNumber", Model.ElementAt(i).MobileNumber)
+                            @Html.Hidden("lstStaffToGenerateIdCards[" + (@i + 10) + "].EmployeeNumber", Model.ElementAt(i).EmployeeNumber)
+                            @Html.Hidden("lstStaffToGenerateIdCards[" + (@i + 10) + "].BranchAddress", Model.ElementAt(i).BranchAddress)
+                            @Html.Hidden("lstStaffToGenerateIdCards[" + (@i + 10) + "].BranchTelephoneNum", Model.ElementAt(i).BranchTelephoneNum)
+                             @Model.ElementAt(i).BranchName
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).DepartmentName
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).EmployeeNumber
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).StaffName
+                        </td>
+
+                        <td>
+                            @Html.CheckBox("lstStaffToGenerateIdCards[" + (@i + 10) + "].IsChecked", Model.ElementAt(i).IsChecked, new { id = "Check" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+}
+else
+{
+    <span style="color: red;"><b>No staff available to display</b></span>
+}
+
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+</script>

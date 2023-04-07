@@ -1,0 +1,406 @@
+﻿@{
+    ViewBag.Title = "Shift Association";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Biometric
+        </li>
+        <li>
+            <i class=""></i>
+            Staff
+        </li>
+        <li class="active">Shift Association</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+     
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <br />
+            @using (Html.BeginForm("ShiftAssociation", "HRBiometric", FormMethod.Post))
+            {
+                <span id="ErrorId"></span>
+                    <!-- form start -->
+                @Html.AntiForgeryToken()
+                <div class="box">
+                    <br />
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Shift</label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" id="StaffShiftId" onchange="GetCurrentlyAssignedStaff()"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <br />
+                        <div class="col-sm-1">
+                            <input type="button" name="Save" class="btn btn-primary" style="float:right;width:80px" id="Save" value="Save" />
+                        </div>
+                    </div>
+
+
+                    <br />
+                    <br />
+                </div>
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+
+                            <div class="box">
+                                <div class=" box-header">
+                                    <input type="button" name="Remove" class="btn btn-primary" style="float:right" id="Remove" value="Remove" />
+
+                                    <h3 class="box-title col-xs-9">Currently Assigned</h3>
+                                </div><!-- /.box-header -->
+                                <!-- form start -->
+                                <div class="box-body" style="overflow: auto;  height:300px ">
+                                    <table class="table table-hover">
+                                        <tr>
+                                            <th>
+                                                @Html.DisplayName("Check")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Employee No")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Employee Name")
+                                            </th>
+                                        </tr>
+                                        <tbody id="AssignedtbodyId"></tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="box">
+                            <div class="box-header">
+                                <input type="button" name="assign" class="btn btn-primary" style="float:right" id="assign" value="Assign" />
+
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Department</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="departmentId" onchange="GetStaffTobeAssigned();"></select>
+                                </div>
+                            </div>
+                            <div class="box-body" style="overflow: auto;  height:300px ">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayName("Check")
+                                        </th>
+
+                                        <th>
+                                            @Html.DisplayName("Employee No")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Employee Name")
+                                        </th>
+
+                                        <th></th>
+                                    </tr>
+                                    <tbody id="DepartmentStaffId"></tbody>
+                                </table>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div>
+                        <input type="hidden" id="SelectedStaff" />
+                        <input type="hidden" id="StaffToRemove" />
+
+                    </div>
+
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    //LoatShiftDropdown
+    function LoatStaffShiftDropDwn() {
+        $.ajax({
+            url: "/HRBiometric/LoadShiftDropDown",
+            success: function (data) {
+                var StaffShiftItems = $('#StaffShiftId')
+                StaffShiftItems.children().remove();
+                StaffShiftItems.append($("<option>").val("").text("--Select Shift--"))
+                $.each(data, function (i, record) {
+                    StaffShiftItems.append($("<option>").val(record.StaffShiftId).text(record.StaffShiftName));
+                });
+                $('#StaffShiftId').append(StaffShiftItems);
+
+                LoadDepartMentDrpDwn();
+            }
+
+        });
+    }
+
+    window.onload = LoatStaffShiftDropDwn();
+
+
+    //Department Dropdown
+    function LoadDepartMentDrpDwn() {
+        $.ajax({
+            url: "/HRBiometric/LoadDepartmentDropDown",
+            success: function (data) {
+                var DepartmentItems = $('#departmentId')
+                DepartmentItems.children().remove();
+                DepartmentItems.append($("<option>").val("").text("--Select Department--"))
+                DepartmentItems.append($("<option>").val(0).text("All"))
+                $.each(data, function (i, record) {
+                    DepartmentItems.append($("<option>").val(record.DepartmentId).text(record.DepartmentName));
+                });
+                $('#departmentId').append(DepartmentItems);
+            }
+        });
+    }
+
+    //Previous Assigned Staff
+    function GetCurrentlyAssignedStaff() {
+        var ShiftId = $('#StaffShiftId').val();
+        $.ajax({
+            url: "/HRBiometric/GetCurrentStaff",
+            data: { StaffShiftId: ShiftId },
+            success: function (data) {
+                if (ShiftId == "") {
+                    $("#AssignedtbodyId").html("");
+                }
+                else {
+                    AppendAssignedStaffToTable(data)
+                }
+            }
+        })
+    }
+
+    //Add Data to Previous Currently Assigned Table
+    function AppendAssignedStaffToTable(data) {
+        var row = "";
+        $.each(data, function (index, item) {
+            row += "<tr>" +
+              "<td><input type='checkbox' id='Assigned' name='Assigned' value=' " + item.StaffId + "'/></td>" +
+            "<td>" + item.EmployeeNumber + "</td>" +
+            "<td>" + item.StaffName + "</td>" +
+            "</tr>";
+        });
+        $("#AssignedtbodyId").html(row);
+    }
+
+    //Add Data to Previous DepartmentWise Staff  Table
+    function AppendStaffToAssignTable(data) {
+        var row = "";
+        $.each(data, function (index, item) {
+            row += "<tr>" +
+              "<td><input type='checkbox' id='ToAssign'name='ToAssign' value=' " + item.StaffId + "'/></td>" +
+            "<td>" + item.EmployeeNumber + "</td>" +
+            "<td>" + item.StaffName + "</td>" +
+            "</tr>";
+        });
+        $("#DepartmentStaffId").html(row);
+    }
+
+    //Department Wise Staff
+    function GetStaffTobeAssigned() {
+        var DepartmentId = $('#departmentId').val();
+        var Sel_Dep = 0;
+        if (DepartmentId == "") {
+            Sel_Dep = -1;
+        }
+        else {
+            Sel_Dep = DepartmentId;
+        }
+        $.ajax({
+            url: "/HRBiometric/GetStaffByDep",
+            data: { DepartmentId: Sel_Dep },
+            success: function (data) {
+                if (DepartmentId == "") {
+                    $("#DepartmentStaffId").html("");
+                }
+                else {
+                    AppendStaffToAssignTable(data)
+                }
+            }
+        })
+    }
+
+    //on Assign Click
+    $(function () {
+        $('#assign').click(function () {
+            var val = $('#SelectedStaff').val();
+            var selectedStaff = new Array();
+            if (val != "") {
+                var split = val.split(',');
+                $.each(split, function (i, r) {
+                    selectedStaff.push(r);
+                });
+            }
+
+            $('input[name="ToAssign"]:checked').each(function () {
+                selectedStaff.push(this.value);
+            });
+
+            document.getElementById('SelectedStaff').value = selectedStaff;
+            AssignStaff();
+
+
+        });
+
+    });
+
+    //on Remove click
+    $(function () {
+        $('#Remove').click(function () {
+            var val = $('#StaffToRemove').val();
+            var assign = $('#SelectedStaff').val();
+            var SplitPrev = new Array();
+            var selectedStaff = new Array();
+            SplitPrev = assign.split(',');
+            if (val != "") {
+                var split = val.split(',');
+                $.each(split, function (i, r) {
+                    var indexval = SplitPrev.indexOf(r)
+                    if (indexval > -1) {
+                        SplitPrev.splice(indexval, 1)
+                    }
+                    selectedStaff.push(r);
+                });
+            }
+            $('input[name="Assigned"]:checked').each(function () {
+
+                var indexval = SplitPrev.indexOf(this.value)
+                if (indexval > -1) {
+                    SplitPrev.splice(indexval, 1)
+                }
+                selectedStaff.push(this.value);
+            });
+            document.getElementById('StaffToRemove').value = selectedStaff;
+            document.getElementById('SelectedStaff').value = SplitPrev;
+            RemoveStaff();
+
+        });
+
+    });
+
+    //on Save Click
+    $(function () {
+        $('#Save').click(function () {
+            SaveStaff();
+        });
+
+    });
+
+
+    //Assign selected Staff
+    function AssignStaff() {
+        var Sel_ValsA = $('#SelectedStaff').val();
+        var Sel_ValsR = $('#StaffToRemove').val();
+
+        var ShiftId = $('#StaffShiftId').val();
+        var DepartmentId = $('#departmentId').val();
+        if (ShiftId == "") {
+            document.getElementById('ErrorId').innerHTML = "Please Select Shift";
+        }
+        else if (Sel_ValsA == "") {
+            document.getElementById('ErrorId').innerHTML = "Please Select  staff to Assign";
+
+        }
+        else if (DepartmentId == "") {
+            document.getElementById('ErrorId').innerHTML = "Please Select  Department";
+
+        }
+        else {
+            $.ajax({
+                url: "/HRBiometric/ShiftAssociationAR",
+                data: { CheckedValA: Sel_ValsA, button: "Assign", StaffShiftId: ShiftId, DepartmentId: DepartmentId, CheckedValuesR: Sel_ValsR },
+                success: function (data) {
+                    AppendAssignedStaffToTable(data)
+                    GetStaffTobeAssigned();
+
+                }
+            })
+        }
+
+    }
+
+    //Remove Selected Staff
+    function RemoveStaff() {
+        var CheckedValA = $('#SelectedStaff').val();
+        var CheckedValR = $('#StaffToRemove').val();
+        var ShiftId = $('#StaffShiftId').val();
+        var DepartmentId = $('#departmentId').val();
+
+        if (ShiftId == "") {
+            document.getElementById('ErrorId').innerHTML = "Please Select Shift";
+
+        }
+        else if (CheckedValR == "") {
+            document.getElementById('ErrorId').innerHTML = "Please Select staff to Remove";
+
+        }
+        else {
+
+        } $.ajax({
+            url: "/HRBiometric/ShiftAssociationAR",
+            data: { CheckedValA: CheckedValA, button: "Remove", StaffShiftId: ShiftId, DepartmentId: DepartmentId, CheckedValuesR: CheckedValR },
+            success: function (data) {
+                AppendAssignedStaffToTable(data)
+                GetStaffTobeAssigned();
+
+            }
+        })
+
+
+    }
+
+    function SaveStaff() {
+        var Assign_Staff = $('#SelectedStaff').val();
+        var StaffToRemove = $('#StaffToRemove').val();
+        var ShiftId = $('#StaffShiftId').val();
+        var DepartmentId = $('#departmentId').val();
+
+        if (ShiftId == "") {
+            document.getElementById('ErrorId').innerHTML = "Please Select Shift";
+
+        }
+        else {
+            $.ajax({
+                url: "/HRBiometric/ShiftAssociationSave",
+                data: { StaffToRemove: StaffToRemove, StaffShiftId: ShiftId, staffToAssign: Assign_Staff },
+                success: function (data) {
+                    AppendAssignedStaffToTable(data)
+                    GetStaffTobeAssigned();
+
+                }
+            });
+        }
+
+    }
+
+</script>
+
+
+
+

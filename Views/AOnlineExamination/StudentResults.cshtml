@@ -1,0 +1,191 @@
+﻿@model AsteriskBrowserAL.Models.ExamShedulesData
+
+@{
+    ViewBag.Title = "Results";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Online Examinations
+        </li>
+        <li class="active">Student Results Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<section class="content">
+    <br />
+    <span style="font-weight:bold;color:red" id="Validation"></span>
+    @using (Html.BeginForm("ExcelStudentResultReportDT", "AOnlineExamination", FormMethod.Post))
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Online Exam Schedules
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.lstClassNumbers, "ClassNumber", "ClassNumberDisplay"), "-- Select --", new { @class = "form-control", id = "ClassNumber" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.SubscriptionId, new SelectList(Model.lstSubscriptions, "SubscriptionId", "Institute"), "-- Select --", new { @class = "form-control", id = "SubscriptionId" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Select Subject")</label>
+                                            <div class="col-sm-6">
+                                                <select id="Subject" name="SubjectName" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="SearchData" class="row">
+        </div>
+    }
+</section>
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger;
+        var SelClass = $('#SelClass').val();
+        var SelSubId = $('#SelSubId').val();
+
+        if (SelClass > 0) {
+            GetExamandSubject();
+        }
+    });
+    $('#ClassNumber').change(function () {
+        debugger;
+        $("#SearchData").html("");
+        $("#Subject").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var SubscriptionId = $('#SubscriptionId').val();
+        if (ClassNumber > 0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+        if (ClassNumber > 0 && SubscriptionId >= 0 && SubscriptionId != "") {
+            GetExamandSubject();
+        }
+    })
+
+
+    $('#SubscriptionId').change(function () {
+        
+        $("#SearchData").html("");
+        $("#Subject").html("");
+        var SubscriptionId = $('#SubscriptionId').val();
+        if (SubscriptionId >= 0 && SubscriptionId != "") {
+            GetExamandSubject();
+        }
+
+    });
+    function GetExamandSubject() {
+        var SubscriptionId = $('#SubscriptionId').val();
+        var ClassNumber = $('#ClassNumber').val();
+        if (ClassNumber > 0 && SubscriptionId >= 0 && SubscriptionId != "") {
+            $.ajax({
+                url: '/AOnlineExamination/GetExams',
+                data: { ClassNumber: ClassNumber, SubscriptionId: SubscriptionId },
+                success: function (data) {
+                    var SubjectItems = $('#Subject');
+
+                    SubjectItems.children().remove();
+
+                    SubjectItems.append($("<option>").val("null").text("--- Select Subject ---"));
+
+                    $.each(data, function (i, record) {
+                        SubjectItems.append($("<option>").val(record.OnlineQuestionPaper_ExaminerId).text(record.BatchId));
+                    });
+
+                    $('#Subject').append(SubjectItems);
+
+
+                },
+                aync: false
+            });
+        }
+    }
+    //$('#btnViewData').click(function () {
+    //    var validate = true;
+    //    var ClassNumber = $('#ClassNumber').val();
+    //    var SubscriptionId = $('#SubscriptionId').val();
+    //    var Subject = $('#Subject').val();
+    //    if (ClassNumber < 1) {
+    //        document.getElementById("Validation").innerHTML = "Please select the class";
+    //        validate= false;
+    //    }
+    //    if (Subject < 1) {
+    //        document.getElementById("Validation").innerHTML = "Please select the Exam";
+    //        validate = false;
+    //    }
+    //    if (SubscriptionId == null && SubscriptionId=="") {
+    //        document.getElementById("Validation").innerHTML = "Please select the Branch";
+    //        validate = false;
+    //    }
+    //    if (validate == true) {
+    //        GetStudentwisereport();
+    //    }
+    //});
+    $('#Subject').change(function () {
+        debugger;
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var ExamId = $('#Subject').val();
+        var SubscriptionId = $('#SubscriptionId').val();
+        //if (ClassNumber > 0 && SubscriptionId >= 0 && SubscriptionId != "" && Subject>0) {
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AOnlineExamination/GetStudentsReportData',
+            data: { ClassNumber: ClassNumber, SubscriptionId: SubscriptionId, ExamId: ExamId },
+            success: function (Data) {
+                $('#imagemodal').hide();
+                $("#SearchData").html(Data);
+            }
+        });
+        //}
+    });
+</script>

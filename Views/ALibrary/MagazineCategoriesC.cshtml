@@ -1,0 +1,183 @@
+﻿@model AsteriskBrowserAL.BookCategory
+@{
+    ViewBag.Title = "MagazineCategoriesC";
+}
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Magazine Category</li>
+    </ol>
+</section>
+</br>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("MagazineCategoriesC", "ALibrary", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(Model => Model.BookCategoryId)
+                <div class="box">
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("MagazineCategories")</span>
+
+                    <div class="page-header">
+
+                        <h1>
+                            Magazine Category
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "MagazineCategory")
+                            </small>
+                        </h1>
+                    </div><!-- /.page-header -->
+                    <!-- form start -->
+                    <form class="form-horizontal" role="form">
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "Red" , @style="color:red"})
+                        <div class="box-body">
+
+                            @*<div> <span id="required" style="color:red;">Enter Book Name and Description </span></div>*@
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Magazine Category Name")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.BookCategoryName, new { @class = "form-control textlength", placeholder = "Magazine Category Name", @id = "MagazineCategoryName",@maxLength="30", @onchange = "removeError();" })
+                                </div>
+
+                                <div class="col-sm-3" style="display:none;" id="MagazineBookCategoryName">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Magazine Category Description")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.BookCategoryDescription, new { @class = "form-control textlength", placeholder = "Magazine Category Description", @id = "MagazineCategoryDescription",@maxLength="30", @onchange = "removeError();"})
+                                </div>
+
+                                <div class="col-sm-3" style="display:none;" id="MagazineBookCategoryDescription">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" id="submit" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset" id="reset" onclick="return resetBookCategory();">
+                                <i class="ace-icon fa fa-undo bigger-50">
+                                </i>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            }
+        </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script>
+    $("#MagazineCategoryName").keypress(function (e) {
+        debugger
+        var MagazineCategoryName = $('#MagazineCategoryName').val();
+
+        if (e.which == 32) {
+            if (MagazineCategoryName.length == "") {
+                return false;
+            }
+        }
+
+    });
+    $("#MagazineCategoryDescription").keypress(function (e) {
+        debugger
+        var MagazineCategoryDescription = $('#MagazineCategoryDescription').val();
+
+        if (e.which == 32) {
+            if (MagazineCategoryDescription.length == "") {
+                return false;
+            }
+        }
+
+    });
+    $(document).ready(function () {
+
+        $("#submit").click(function () {
+
+            debugger
+            var validate = true;
+            var MagazinCategory = $('#MagazineCategoryName').val();
+            var MagazineDescription = $('#MagazineCategoryDescription').val();
+            if ((MagazinCategory == null || MagazinCategory == "" || MagazinCategory == undefined) && (MagazineDescription == null || MagazineDescription == "" || MagazineDescription == undefined)) {
+                $('#MagazineBookCategoryName').show();
+                $('#MagazineBookCategoryDescription').show();
+                validate = false;
+            }
+            else {
+                if (MagazinCategory == null || MagazinCategory == "" || MagazinCategory == undefined) {
+                    $('#MagazineBookCategoryName').show();
+                    validate = false;
+                }
+                if (MagazineDescription == null || MagazineDescription == "" || MagazineDescription == undefined) {
+                    $('#MagazineBookCategoryDescription').show();
+                    validate = false;
+
+                }
+
+
+            }
+            return validate
+        });
+
+    });
+</script>
+<script>
+    $('#MagazineCategoryName').focus(function () {
+        $('#MagazineBookCategoryName').hide();
+    });
+    $('#MagazineCategoryDescription').focus(function () {
+        $('#MagazineBookCategoryDescription').hide();
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $("#reset").click(function () {
+
+            $('#MagazineBookCategoryName').hide();
+            $('#MagazineBookCategoryDescription').hide();
+        });
+
+    });
+    //function nospaces() {
+    //    debugger
+    //    $('#MagazineCategoryName').on('keypress', function (e) {
+    //        if (e.which == 32)
+    //            return false;
+    //    });
+    //}
+    //function nospaces1() {
+    //    debugger
+    //    $('#MagazineCategoryDescription').on('keypress', function (e) {
+    //        if (e.which == 32)
+    //            return false;
+    //    });
+    //}
+</script>
+
+
+
+

@@ -1,0 +1,197 @@
+﻿
+@model AsteriskBrowserAL.Models.SetEmployeeSalaryModel
+
+@{
+    ViewBag.Title = "SetEmployeeSalaryCollectionView";
+    int eCount = 0;
+    int dcount = 0;
+
+}
+
+@if (null != Model)
+{
+
+    <div class="col-xs-5">
+        @if (null != Model.EarningCollection && null != Model.DeductionCollection)
+        {
+            if (Model.EarningCollection.Count() > 0 && Model.DeductionCollection.Count() > 0)
+            {
+                <div>
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title col-xs-11">Net Salary(Rs):@String.Format("{0:N0}", Model.NetSal) </h3>
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+        }
+
+        @if (null != Model.EarningCollection && Model.EarningCollection.Count() > 0)
+        {
+
+            eCount = Model.EarningCollection.Count();
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title col-xs-11">Earnings</h3>
+                    <input class="btn btn-primary col-xs-1 " type="submit" name="button" onclick="return Validations()"
+                           id="-" value="-" />
+                </div><!-- /.box-header -->
+
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr>
+                                <th>
+
+                                    @Html.DisplayName("select")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Item ")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Amount")
+                                </th>
+                            <tr>
+
+                                @for (int i = 0; i < Model.EarningCollection.Count(); i++)
+                                {
+                                <tr>
+                                    <td>
+
+                                        @Html.Hidden("EarningViewCol.Index", (@i + 10))
+                                        @Html.Hidden("EarningViewCol[" + (@i + 10) + "].ItemId", Model.EarningCollection.ElementAt(i).ItemId)
+                                        @Html.Hidden("EarningViewCol[" + (@i + 10) + "].PayrollId", Model.EarningCollection.ElementAt(i).PayrollId)
+                                        @Html.Hidden("EarningViewCol[" + (@i + 10) + "].PercentValue", Model.EarningCollection.ElementAt(i).PercentValue)
+                                        @Html.Hidden("EarningViewCol[" + (@i + 10) + "].PayrollCategoryDescription", Model.EarningCollection.ElementAt(i).PayrollCategoryDescription)
+
+
+                                        @Html.CheckBox("EarningViewCol[" + (@i + 10) + "].IsChecked", Model.EarningCollection.ElementAt(i).IsChecked)
+                                        @Html.Hidden("EarningViewCol[" + (@i + 10) + "].IsChecked", Model.EarningCollection.ElementAt(i).PayrollId)
+                                    </td>
+                                    <td>
+                                        @Model.EarningCollection.ElementAt(i).PayrollCategoryDescription
+                                    </td>
+                                    <td>
+                                        @if (Model.EarningCollection.ElementAt(i).PercentValue == 0)
+                                        {
+                                            if (Model.EarningCollection.ElementAt(i).Amount == 0)
+                                            {
+                                                Model.EarningCollection.ElementAt(i).Amount = 0;
+                                            }
+                                            @Html.TextBox("EarningViewCol[" + (@i + 10) + "].Amount", Model.EarningCollection.ElementAt(i).Amount, new { @type = "number", @min = "0" })
+
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBox("EarningViewCol[" + (@i + 10) + "].Amount", Model.EarningCollection.ElementAt(i).Amount, new { disabled = "disabled" })
+                                        }
+                                        @Html.Hidden("EarningViewCol[" + (@i + 10) + "].Amount", Model.EarningCollection.ElementAt(i).Amount)
+
+
+                                    </td>
+                                </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        }
+        @if (null != Model.DeductionCollection && Model.DeductionCollection.Count() > 0)
+        {
+            dcount = Model.DeductionCollection.Count();
+
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title col-xs-11">Deductions</h3>
+                    <input class="btn btn-primary col-xs-1 " type="submit" name="button" onclick="return Validations()"
+                           id="-" value="-" />
+                </div><!-- /.box-header -->
+
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr>
+                                <th>
+
+                                    @Html.DisplayName("select")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Item ")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Amount")
+                                </th>
+                            <tr>
+
+                                @for (int i = 0; i < Model.DeductionCollection.Count(); i++)
+                                {
+                                <tr>
+                                    <td>
+
+                                        @Html.Hidden("DeductionViewCol.Index", (@i + 10))
+                                        @Html.Hidden("DeductionViewCol[" + (@i + 10) + "].ItemId", Model.DeductionCollection.ElementAt(i).ItemId)
+                                        @Html.Hidden("DeductionViewCol[" + (@i + 10) + "].PayrollId", Model.DeductionCollection.ElementAt(i).PayrollId)
+                                        @Html.Hidden("DeductionViewCol[" + (@i + 10) + "].PercentValue", Model.DeductionCollection.ElementAt(i).PercentValue)
+                                        @Html.Hidden("DeductionViewCol[" + (@i + 10) + "].PayrollCategoryDescription", Model.DeductionCollection.ElementAt(i).PayrollCategoryDescription)
+
+
+                                        @Html.CheckBox("DeductionViewCol[" + (@i + 10) + "].IsChecked", Model.DeductionCollection.ElementAt(i).IsChecked)
+                                        @Html.Hidden("DeductionViewCol[" + (@i + 10) + "].IsChecked", Model.DeductionCollection.ElementAt(i).PayrollId)
+                                    </td>
+                                    <td>
+                                        @Model.DeductionCollection.ElementAt(i).PayrollCategoryDescription
+                                    </td>
+                                    <td>
+                                        @if (Model.DeductionCollection.ElementAt(i).PercentValue == 0)
+                                        {
+                                            if (Model.DeductionCollection.ElementAt(i).Amount == 0)
+                                            {
+                                                Model.DeductionCollection.ElementAt(i).Amount = 0;
+                                            }
+                                            @Html.TextBox("DeductionViewCol[" + (@i + 10) + "].Amount", Model.DeductionCollection.ElementAt(i).Amount, new { @type = "number", @min = "0" })
+
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBox("DeductionViewCol[" + (@i + 10) + "].Amount", Model.DeductionCollection.ElementAt(i).Amount, new { disabled = "disabled" })
+                                        }
+                                        @Html.Hidden("DeductionViewCol[" + (@i + 10) + "].Amount", Model.DeductionCollection.ElementAt(i).Amount)
+
+
+                                    </td>
+                                </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+        }
+
+
+    </div>
+
+
+}
+<input type="hidden" id="Ecount" value="@eCount" />
+<input type="hidden" id="dcount" value="@dcount" />
+
+<script>
+
+    function onloadData()
+    {
+        var ecount = $("#Ecount").val();
+        var dcount = $("#dcount").val();
+        if (ecount == 0 && dcount == 0) {
+            $("#Earnings").html("")
+        }
+
+
+    }
+    window.onload = onloadData();
+
+</script>

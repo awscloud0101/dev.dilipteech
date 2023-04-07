@@ -1,0 +1,198 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.MicroScheduleData>
+@{
+    ViewBag.Title = "DefineMicroSchedulePartialView";
+
+    int nSNo = 1;
+
+}
+
+<style>
+    @@font-face {
+        font-family: 'ANUPM___';
+        src: url('../../assets/fonts/ANUPM___.TTF') format('truetype');
+    }
+
+    .AnuFont {
+        font-family: ANUPM___;
+        font-size: 20px;
+    }
+
+    @@font-face {
+        font-family: 'NEOGANLI';
+        src: url('../../assets/fonts/NEOGANLI.TTF') format('truetype');
+    }
+
+    .NEOGANLI {
+        font-family: NEOGANLI;
+        font-size: 20px;
+    }
+</style>
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+<script>
+    $("#id-btn-dialog2").on('click', function (e) {
+        e.preventDefault();
+
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            width: '320',
+            modal: true,
+            title: "Sub Category",
+            title_html: true,
+            buttons: [
+                {
+                    html: "<i class='ace-icon fa fa-trash-o bigger-110'></i>&nbsp; Delete",
+                    "class": "btn btn-danger btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+                ,
+                {
+                    html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Cancel",
+                    "class": "btn btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+    });
+</script>
+<div id="dialog-confirm" class="hide">
+    @*<div id="message" class="alert alert-info bigger-110">
+        </div>*@
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+@if (null != Model && Model.Count() > 0)
+{
+
+
+    <div class="col-xs-12">
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+        <!-- /.box-header -->
+        <!-- div.table-responsive -->
+        <!-- div.dataTables_borderWrap -->
+        <div class="overflowscroll">
+
+
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                            S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Topic")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Date")
+                        </th>
+
+
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                {
+                        <tr>
+                            <td>
+                                @(nSNo++)
+                            </td>
+                            <td>
+                                @if (item.SubjectName.ToUpper().Contains("TELUGU"))
+                                {
+                                    <span class="AnuFont">@item.Topic</span>
+                                }
+                                else if (item.SubjectName.ToUpper().Contains("HINDI"))
+                                {
+                                    <span class="NEOGANLI">@item.Topic</span>
+                                }
+                                else
+                                {
+                                    @item.Topic
+                                }
+
+                            </td>
+                            <td>
+                                @if (item.SyllabusDate.HasValue)
+                                {
+                                    @item.SyllabusDate.Value.ToString("dd-MMM-yyyy")
+                                }
+                            </td>
+                            <td>
+                                <div class="hidden-sm hidden-xs action-buttons">
+                                    <a class="green P2" href="@Url.Action("MicroScheduleE", "AMicroSchedule", new { id = item.SyllabusId })">
+                                        <i class="ace-icon fa fa-pencil bigger-130"></i>
+                                    </a>
+
+
+                                    <a class="red P2" onclick="btnConfirm(@item.SyllabusId)">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    <div class="col-xs-12">
+        <span style="font-weight:bold;color:red">No records found</span>
+    </div>
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<script>
+
+
+    function btnConfirm(Value) {
+
+        if (Value > 0) {
+            $.ajax({
+
+                url: '/AMicroSchedule/ValidationForMicroSchedulesD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/AMicroSchedule/MicroScheduleD?id=' + Value;
+                    var title = "Micro Schedule";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+
+    }
+</script>

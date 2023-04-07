@@ -1,0 +1,143 @@
+﻿@model AsteriskBrowserAL.Models.StaffData
+@{
+    int sno = 1;
+}
+
+
+
+@if (null != Model)
+{
+
+    if (null != Model.StaffprofileData && Model.StaffprofileData.Count() > 0)
+    {
+
+        <div class="table-header">
+            Records Found (@Model.StaffprofileData.Count)
+            <div style="float:right;margin-right:10px;">
+                <button class="btncustom P2">
+                    Download
+                </button>
+            </div>
+        </div>
+
+
+            <div class="overflowscroll">
+
+                <table class="table tbhover table-striped table-bordered dynamic-table" id="tbl">
+                    <thead>
+                        <tr>
+                            <th>
+                                S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Employee Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Employee Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Access Level")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Designation")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Department")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Category")
+                            </th>
+                            <th>
+                                @Html.DisplayName("MobileNumber")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Aadhar Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Status")
+                            </th>
+                            <th></th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model.StaffprofileData)
+                        {
+
+                            <tr>
+                                <td>
+                                    @(sno++)
+                                </td>
+                                <td>
+                                    @item.BranchName
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DisplayName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.EmployeeNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DesignationName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Position)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Department)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Category)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.MobileNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AadharCardNumber)
+                                </td>
+                                <td>
+                                    @if (item.Status == 2)
+                                    {
+                                        <span class="label label-danger">In-Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label label-success">Active</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="blue P2" href="@Url.Action("StaffDetailsD", "HREnrollment", new { id = item.StaffId, DepartmentId = Model.SearchDepartment, CategoryId = Model.SearchCategory, nDivisionId = Model.DivisionId, nBranchId = Model.BranchId }))">
+                                            <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                                        </a>
+
+                                        <a class="green P2" href="@Url.Action("StaffDetailsE", "HREnrollment", new { id = item.StaffId, nDivisionId = Model.DivisionId, nBranchId = Model.BranchId }))">
+                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+    }
+    else
+    {
+        <label style="color:red;">Data not available for selected search</label>
+    }
+}
+else
+{
+    <label style="color:red;">Data not available for selected search</label>
+}
+
+@Html.Action("DataTableScripts", "Base")
+

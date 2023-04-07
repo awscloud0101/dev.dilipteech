@@ -1,0 +1,132 @@
+﻿@model AsteriskBrowserAL.Models.AdvanceSalaryData
+@{
+    ViewBag.Title = "Advance";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Payrolls
+        </li>
+        <li class="active">Advance Salary</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            @if (null != Model)
+            {
+                <h3>@Html.ActionLink("<< Advance Salary Details", "AdvanceSalary", new { nDivisionId = Model.DivisionId, nBranchId = Model.BranchId })</h3>
+            }
+            else
+            {
+                <h3>@Html.ActionLink("<< Advance Salary Details", "AdvanceSalary")</h3>
+            }
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Advance", "HRPayroll", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                <div class="box">
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("Advance")</span>
+                    <input type="hidden" value="@Model.StaffId" name="StaffId" />
+                    <div class="box-header">
+                        <h3 class="box-title">Advance Salary</h3>
+
+                        <div>
+                            <button class="btn btn-primary pull-right P2" type="submit" style="width:80px;" onclick="return ValidateForm();">
+                                Advance
+                            </button>
+                        </div>
+
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+                    <input type="hidden" value="@Model.DivisionId" name="DivisionId" />
+                    <input type="hidden" value="@Model.BranchId" name="BranchId" />
+                    <div class="box-body">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding required" for="form-field-1">*Amount</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control" })
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="vAmount">
+                                <label style="color:red;font-weight:bold;">Enter Amount</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding required" for="form-field-1">*Advance Date</label>
+                            <div class="col-sm-3">
+                                <div id="datepicker1" class="input-group date">
+                                    <input class="form-control" type="text" id="AdvanceDate" name="AdvanceDate" autocomplete="off" placeholder="Advance Date" />
+                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="vDate">
+                                <label style="color:red;font-weight:bold;"> Please select Date</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+    $('#datepicker1').datepicker(
+                    'setEndDate', new Date()
+                    );
+
+
+    function ValidateForm() {
+        var bValid = true;
+
+        var Amount = $('#Amount').val();
+        var Date = $('#AdvanceDate').val();
+
+        if (Amount.length < 1) {
+            bValid = false;
+            $('#vAmount').show();
+        }
+
+        if (Date == null || Date == undefined || Date.length < 1) {
+            bValid = false;
+            $('#vDate').show();
+        }
+
+        return bValid;
+    }
+
+    $('#Amount').focus(function () {
+        $('#vAmount').hide();
+    });
+
+    $('#AdvanceDate').focus(function () {
+        $('#vDate').hide();
+    });
+</script>

@@ -1,0 +1,266 @@
+﻿@model AsteriskBrowserAL.Models.StockReportData
+
+@if (null != Model)
+{
+    if (null != Model.lstStockReportData && Model.lstStockReportData.Count() > 0)
+    {
+        int nsno = 1;
+        <div class="hr hr-18 dotted hr-double"></div>
+
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="table-header">
+                    Records Found (@Model.lstStockReportData.Count) 
+
+                    <div style="float:right">
+                        <button onclick="PrintElem('#mydiv')" class="btn btn-info  btn-xs P2">
+
+                            <i class="ace-icon fa fa-print bigger-180"></i>
+
+                        </button>
+
+                        <button class="btn btn-info btn-xs P2">
+                            <i class="ace-icon fa fa-share bigger-180"></i>
+
+                        </button>
+                    </div>
+
+                   
+                </div>
+                                                      
+                <table id="tblData" class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Sub Category")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Item Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("SKU Code")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Received Qty")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Transaction Id")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Received Date")
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.lstStockReportData)
+                        {
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @item.SubCategoryName
+                                </td>
+                                <td>
+                                    @item.ItemName
+                                </td>
+                                <td>
+                                    @item.SKUCode
+                                </td>
+                                <td>
+                                    @item.ReceivedQty
+                                </td>
+                                <td>
+                                    @if (item.LastUpdated.HasValue)
+                                    {
+                                        @item.ReceivedDate.Value.ToString("yyyyMMddHHmmssfff")
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.ReceivedDate.HasValue)
+                                    {
+                                        @item.ReceivedDate.Value.ToString("dd-MMM-yyyy")
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                            </div>
+                        </div>
+
+
+    }
+    else
+    {
+        <div class="hr hr-18 dotted hr-double"></div>
+        <span style="color: red;"><b>No Records Found</b></span>
+    }
+}
+
+<body>
+    <div id="mydiv" style="display:none">
+
+        @if (null != Model)
+        {
+            if (null != Model.InstituteDetails)
+            {
+                <div class="row">
+                    <div class="col-xs-12">
+                        <img class=" col-xs-11" id="avatar" width="50" height="43" src="@Model.InstituteDetails.InstituteLogo" style="margin-bottom:-1.5em;" />
+                        <b style="font-weight:bold; margin-left:0.3em; font-size:20px; font-family:'Segoe UI'">@Model.InstituteDetails.InstituteName</b>
+                    </div>
+                    <div style="margin-left:3.7em; font-family:'Segoe UI'"><b>@Model.InstituteDetails.InstituteAddress</b></div>
+                    <br />
+
+                    <hr style="width:100%; margin-bottom:-0.5em" />
+                    <hr style="width:100%;" />
+                    <div align="center" style="font:12%; font-family:'Segoe UI'"><b>Stock Report - Lot Wise (<span id="Lot"></span>) </b></div>
+                    <hr style="width:100%;" />
+                    <hr style="width:100%; margin-top:-0.5em" />
+
+                    <div class="col-xs-12 box-body table-responsive">
+                        <table class="table table-hover" rules="rows" cellpadding="5" style="width:675px; font-size:12px;">
+
+
+                            <tr style="font-size:13px; font-family:'Segoe UI'; font-weight:bold; text-align:left;">
+                                <th>
+                                   S.No.
+                                </th> 
+                                <th>
+                                    @Html.DisplayName("Sub Category")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Item Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("SKU Code")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Received Qty")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Transaction Id")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Received Date")
+                                </th>
+                            </tr>
+
+                            <tbody id="PrintDetails"></tbody>
+                        </table>
+                    </div>
+
+                </div>
+            }
+        }
+
+
+    </div>
+</body>
+@Html.Action("DataTableScripts", "Base")
+
+
+<script>
+    var tablerow = "";
+
+    function PrintElem(elem) {
+
+        if (tablerow == "") {
+            var table = $('#tblData');
+
+            table.find('tr').each(function (index, row) {
+
+                var rowcells = $(row).find('td');
+
+                if (rowcells.length != 0) {
+                    tablerow += "<tr style='font-family:'''Segoe UI''';'>";
+
+                    rowcells.each(function (index, td) {
+                        tablerow += "<td>" + $(td).text() + "</td>"
+                    });
+
+                    tablerow += "</tr>"
+                }
+            });
+            $('#PrintDetails').html(tablerow);
+        }
+        else {
+            $('#PrintDetails').html(tablerow);
+        }
+
+        document.getElementById('Lot').innerHTML = $('#LotNumber').val();
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+
+    $('#Search').keyup(function () {
+        searchTable($(this).val());
+    });
+
+    function searchTable(inputVal) {
+        var i = 1;
+        var table = $('#tblData');
+        tablerow = "";
+        table.find('tr').each(function (index, row) {
+            var allCells = $(row).find('td');
+
+            if (allCells.length != 0) {
+                var found = false;
+                allCells.each(function (index, td) {
+                    var regExp = new RegExp(inputVal, 'i');
+                    if (regExp.test($(td).text())) {
+                        found = true;
+                        return false;
+                    }
+                });
+                if (found == true) {
+                    $(row).show();
+                    $(row).find("td:first").html(parseInt(i));
+                    i = i + 1;
+
+                    var rowcells = $(row).find('td');
+
+                    tablerow += "<tr style='font-family:'''Segoe UI''';'>";
+
+                    rowcells.each(function (index, td) {
+                        tablerow += "<td>" + $(td).text() + "</td>"
+                    });
+                    tablerow += "</tr>"
+                }
+                else $(row).hide(row);
+            }
+        });
+
+    }
+
+
+
+
+</script>
+
+
+
+
+
+

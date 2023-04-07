@@ -1,0 +1,245 @@
+﻿
+@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    ViewBag.Title = "Exam Schedules";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Subject Content Index</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm("SubjectContentIndex", "AExamination", FormMethod.Post))
+    {
+        @Html.ValidationMessage("ExamSchedules")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Subject Content Index
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <a class="blue P2" id="NewExamination" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.BatchId, new SelectList(Model.lstSubscriptions, "SubscriptionId", "Institute"), "-- Select --", new { @class = "form-control", id = "SubscriptionId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Class</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.lstClassNumbers, "ClassNumber", "ClassNumberDisplay"), new { @class = "form-control", id = "ClassNumber" })
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                }
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Subject</label>
+                                            <div class="col-sm-6">
+                                                <select id="SubjectIdValue" name="SubjectId" class="form-control"></select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div id="SearchData" class="row">
+        </div>
+
+
+        if (null != Model)
+        {
+            <input style="display:none" id="SelClass" value="@Model.ClassNumber" />
+            <input style="display:none" id="SelSubjectId" value="@Model.SubjectId" />
+            <input style="display:none" id="SelSubId" value="@Model.SubscriptionId" />
+        }
+        else
+        {
+
+            <input style="display:none" id="SelClass" value="0" />
+            <input style="display:none" id="SelSubjectId" value="0" />
+            <input style="display:none" id="SelSubId" value="0" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+    var SubjectItems = $('#SubjectIdValue');
+
+    $(document).ready(function () {
+        debugger
+        var SelClass = $('#SelClass').val();
+        var SelTerm = $('#SelSubjectId').val();
+        var SelSubId = $('#SelSubId').val();
+
+        if (SelClass > 0 && SelTerm > 0 && SelSubId >= 0) {
+            GetSubjects();
+        }
+    });
+
+    $('#NewExamination').click(function () {
+
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        var SubjectId = $('#SubjectIdValue').val();
+
+        if (ClassNumber < 1 && BranchId < 0) {
+            document.getElementById("Validation").innerHTML = "Please select both class and branch";
+            return false;
+        }
+        else if (ClassNumber < 1) {
+            document.getElementById("Validation").innerHTML = "Please select the class";
+            return false;
+        }
+        else if (BranchId < 0 || BranchId == "") {
+            document.getElementById("Validation").innerHTML = "Please select the branch";
+            return false;
+        }
+        else if (SubjectId < 1 || SubjectId == "null") {
+            document.getElementById("Validation").innerHTML = "Please select the subject";
+            return false;
+        }
+        else {
+            window.location.href = "/AExamination/SubjectContentIndexC?ClassNumber=" + ClassNumber + "&SubjectId=" + SubjectId + "&BranchId=" + BranchId;
+        }
+
+    });
+
+    $('#SubscriptionId').change(function () {
+        debugger
+        $("#SearchData").html("");
+        document.getElementById('ClassNumber').value = "0";
+        document.getElementById('SubjectIdValue').value = "0";
+        var BranchId = $('#SubscriptionId').val();
+        if (BranchId >= 0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+    })
+
+    $('#ClassNumber').change(function () {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        if (ClassNumber > 0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+        if (ClassNumber > 0 ) {
+            GetSubjects();
+        }
+    });
+
+    function GetSubjects() {
+        var SelClassNumberId = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        $.ajax({
+            url: '/AExamination/GetSelectedClassSubject',
+            data: { ClassNumber: SelClassNumberId, BranchId: BranchId },
+            success: function (data) {
+
+                SubjectItems.children().remove();
+
+                SubjectItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+
+                    SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+                });
+
+                $('#SubjectIdValue').append(SubjectItems);
+            },
+            aync: false
+        });
+    }
+
+    $('#SubjectIdValue').change(function () {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        var SubjectId = $('#SubjectIdValue').val();
+        if (SubjectId > 1) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+        if (ClassNumber > 0 &&  SubjectId > 0) {
+            GetSchedules();
+        }
+    });
+
+    function GetSchedules() {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        var SubjectId = $('#SubjectIdValue').val();
+        $('#imagemodal').show();
+        if (ClassNumber > 0 && SubjectId > 0) {
+            $.ajax({
+                url: '/AExamination/ContentIndexReport',
+                data: { ClassNumber: ClassNumber, BranchId: BranchId, SubjectId: SubjectId },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchData").html(Data);
+                }
+            });
+        }
+    }
+
+</script>
+
+
+
+
+
+

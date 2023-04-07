@@ -1,0 +1,412 @@
+﻿
+@model AsteriskBrowserAL.Models.FeeComponentsViewModel
+@{
+    ViewBag.Title = "Fee Components";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Fee Components</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+@if (Model != null)
+{
+    
+}
+
+<!-- #dialog-confirm -->
+<div id="dialog-confirm" class="hide">
+
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<!--Main Content-->
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- /.page-header -->
+            <div class="table-header">
+                Fee Components
+                    <small style="float:right;" class="textheader">
+                        @Html.ActionLink("Back to settings", "FeeComponentAmountSettings")
+                    </small>
+              
+            </div>
+
+
+
+            @using (Html.BeginForm())
+            {
+                int nsno = 1;
+
+                <input type="hidden" id="SelAyId" value="@ViewBag.AcademicYearId" />
+
+                <div class="widget-box">
+                 
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 ">Academic Year</label>
+                                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                            <select id="CboAcademicYear" name="AcademicYearId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                    </div>
+                </div>
+
+
+                if (Model != null)
+                {
+
+                    <br />
+                    <div id="divFeeCompoents" class="row">
+                        <div class="col-xs-12">
+                            <div class="table-header">
+                                Fee Components
+                                <!-- /.box-header -->
+                                <div style="float:right;margin-right:10px;">
+                                  
+                                        <a Class="  btncustom" onclick="NavigateToCreate();" class="" role="button" id="New" name="New">
+                                            Add
+                                        </a>
+
+                                
+                                </div>
+                            </div>
+                            <table class="table tbhover table-striped table-bordered dynamic-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Name")
+                                        </th>
+
+                                        <th>
+                                            @Html.DisplayName("Display Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Fee Type")
+                                        </th>
+                                        <th></th>
+
+                                    </tr>
+                                </thead>
+
+                                @foreach (var item in Model.LstFeeComponents)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td style="max-width:200Px">
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+
+                                        <td style="max-width:200Px">
+                                            @Html.DisplayFor(modelItem => item.TypeName)
+                                        </td>
+
+                                        @if (item.IsSpecial == true)
+                                        {
+                                            if (item.IsQuantity == true)
+                                            {
+                                                <td>
+                                                    Special - Quantity
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+                                                    Special - Amount
+                                                </td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                Regular
+                                            </td>
+                                        }
+
+                                        <td>
+                                            <div class="hidden-sm hidden-xs action-buttons">
+                                                <a class="red" href="@Url.Action("FeeComponentDetails", "SeFinance", new { nFeeComponetId = item.FeeComponentId })">
+                                                    <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                                                </a>
+                                                <a class="green" href="@Url.Action("FeeComponentsE", "SeFinance", new { nId = item.FeeComponentId })">
+                                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                                </a>
+                                                <a class="red" onclick="btnConfirm(@item.FeeComponentId)">
+                                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                }
+                            </table>
+
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+</section>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        LoadAcademicYearCombo();
+    });
+
+    function NavigateToCreate() {
+
+        if ($('#CboAcademicYear').val() < 1) {
+            return;
+        }
+
+        window.location.href = '/SeFinance/FeeComponentsC?AcademicYearId=' + $('#CboAcademicYear').val();
+    }
+
+    function LoadAcademicYearCombo() {
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                $('#imagemodal').hide();
+
+                var ObjAyYear = $("#CboAcademicYear")
+                ObjAyYear.children().remove();
+                ObjAyYear.append($("<option>").val(-1).text("--Select--"))
+
+                $.each(result, function (i, elm) {
+                    ObjAyYear.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(ObjAyYear)
+
+                if ($('#SelAyId').val() > 0) {
+                    $('#CboAcademicYear').val($('#SelAyId').val());
+                }
+
+            },
+            async: false
+        })
+
+    }
+
+    $('#CboAcademicYear').change(function () {
+        ReloadAcademicyearWise();
+    });
+
+    function ReloadAcademicyearWise() {
+
+        if ($('#CboAcademicYear').val() < 1) {
+
+            if ($('#divFeeCompoents') != "undefined")
+                $('#divFeeCompoents').html('');
+
+            return;
+        }
+
+        window.location.href = '/SeFinance/FeeComponents?AcademicYearId=' + $('#CboAcademicYear').val();
+    }
+
+
+    $('#CboFeeComponent').change(function () {
+        PopulateData();
+    });
+
+
+    function Validate() {
+
+        $('#Validation').html('');
+        var ComponentId = $('#CboFeeComponent').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (ComponentId == "undefined" || ComponentId <= 0) {
+            Message += "Fee Component";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+        }
+
+        return isValid;
+    }
+
+
+    function ValidateControls() {
+
+        var Amount = $('#txtComponentAmount').val();
+        var ComponentDate = $('#ComponentDate').val();
+
+        alert(Amount);
+
+        alert(ComponentDate);
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (Amount == "" || Amount <= 0) {
+            Message += "Amount";
+            isValid = false;
+        }
+
+        if (ComponentDate == "" || ComponentDate <= 0) {
+
+            if (!isValid)
+                Message += ",";
+
+            Message += "Date";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("ValidationControls").innerHTML = Message;
+        }
+
+        return isValid;
+    }
+
+    function PopulateData() {
+
+        var isValid = Validate();
+
+        if (!isValid) {
+            return false;
+        }
+
+        GetComponetHistory();
+        $('#divAddAmount').show();
+    }
+
+    function GetComponetHistory() {
+        var value = $('#CboFeeComponent').val();
+
+        $.ajax
+            ({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    $('#imagemodal').hide();
+                },
+
+                url: '/SeFinance/FeeComponentHistoryById',
+                data: { nFeeComponentId: value },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#PVFeeCompoentHistory').html(data);
+                }, async: false
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+    }
+
+    function SaveAmount() {
+
+        var isValid = ValidateControls();
+
+        if (!isValid) {
+            return false;
+        }
+
+        var Amount = $('#txtComponentAmount').val();
+        var ComponentDate = $('#ComponentDate').val();
+        var ComponentId = $('#CboFeeComponent').val();
+
+        $.ajax
+            ({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    alert("An unexpected error occurred.Please try again later");
+                    $('#imagemodal').hide();
+                },
+                url: '/SeFinance/AddFeeComponentAmount',
+                data: { nFeeComponentId: ComponentId, Amount: Amount, dtDate: ComponentDate },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    PopulateData();
+                }, async: false
+
+            }).done(function () {
+                $('#imagemodal').hide();
+                $('#txtComponentAmount').val() = "";
+                $('#ComponentDate').val() = ""
+            });
+    }
+
+
+    function RedirectToNew() {
+        window.location.href = '/SeFinance/FeeComponentsC';
+    }
+
+    function RedirectToEdit() {
+        window.location.href = '/SeFinance/FeeComponentsE?nId=' + id;
+    }
+
+    
+    function btnConfirm(Value) {
+
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeFinance/ValidationForComponentD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SeFinance/FeeComponentsD?FeeComponentId=' + Value;
+                    var title = "Fee Component";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+
+
+</script>

@@ -1,0 +1,412 @@
+﻿@model AsteriskBrowserAL.Models.SetEmployeeSalaryModel
+@{
+    ViewBag.Title = "SetEmployeeSalary";
+    double dBasicSalary = 0;
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Payroll
+        </li>
+        <li class="active">Set Salary</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+<!--Main Content-->
+<section class="content">
+
+    @if (TempData["dataSaved"] != null)
+    {
+        <span style="color:green;font-weight:bold" id="DemoValidation">@TempData["dataSaved"]</span>
+    }
+    @using (Html.BeginForm("SetEmployeeSalary", "HRPayroll", FormMethod.Post))
+    {
+        <div class="row">
+            <div class="col-xs-12">
+
+                <span id="error" style="color: red;"></span>
+
+                <div class="widget-box">
+                    <div class="table-header">
+                        <span>Set Salary</span>
+                        <div class="" style="float:right;margin-right:10px;">
+                            <button type="button" id="Set" name="Set" value="Set" onclick="Set()" class="btncustom P2">
+                                Set
+                            </button>
+
+                        </div>
+
+                    </div>
+                    <input type="hidden" id="Isappointed" name="Isappointed" value="@Model.IsAppointed">
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <br />
+                                <div class="form-group">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right"><span style="color:red">* </span>  @Html.Label("Division")</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.ListDivisions, "DivisionId", "DivisionName"), "--- Select ---", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right"><span style="color:red">* </span> @Html.Label("Branch")</label>
+                                        <div class="col-sm-6">
+                                            <select id="BranchId" name="BranchId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                                <br />
+
+                                <div class="form-group">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right"><span style="color:red">* </span> @Html.Label("Employee")</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.SelStaffId, new SelectList(Model.ListStaff, "EmployeeId", "EmployeeName"), "--- Select ---", new { @class = "form-control", @id = "StaffId" })
+                                            @* <select id="StaffId" name="StaffId" class="form-control"></select>*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right"><span style="color:red">* </span> @Html.Label("Specify Gross Salary")</label>
+                                            <div class="col-sm-6">
+                                                <input type="text" name="Gross" id="Gross" class="form-control" onfocus="hidePartialView()" />
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                    </div>
+                </div>
+
+                <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+                    <p style="position:absolute; top: 50%; left:50%;">
+                        <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+                    </p>
+                </div>
+
+
+                <div class="row">
+                    <div id="SalaryViewData" class="col-xs-12"></div>
+                    @*<div id="btnUpdate" style="float:left">
+                            <button type="button" id="test" name="test" value="Update" class="btn btn-info btn-sm pull-right">
+                                Update
+                            </button>
+                        </div>*@
+                </div>
+
+
+            </div>
+
+
+        </div>
+    }
+</section>
+<script>
+
+    $(document).ready(function () {
+        $('#btnUpdate').hide();
+    })
+
+    $(document).on('click', '#btnUpdate', function () {
+
+    });
+
+    $('#DivisionId').change(function () {
+        $('#StaffId').val(0);
+        $('#SalaryViewData').html("");
+        //$('#PayrollCodeId').val('');
+        $('#Gross').val('');
+
+        $('#BranchId').empty();
+        $('#BranchId').append($("<option>").val("null").text("--- Select ---"));
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#BranchId');
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+        debugger
+        $('#SalaryViewData').html("");
+        //$('#PayrollCodeId').val('');
+        $('#Gross').val('');
+
+        $('#StaffId').empty();
+        $('#StaffId').append($("<option>").val("null").text("--- Select ---"));
+        var BranchId = $('#BranchId').val();
+        if (DivisionId != 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/HRPayroll/GetStaffDataByBranch',
+                data: { nSubscriptionId: BranchId },
+                success: function (data) {
+                    var Staff = $('#StaffId');
+                    $.each(data, function (i, record) {
+                        Staff.append($("<option>").val(record.EmployeeId).text(record.EmployeeName));
+                    });
+                    $('#StaffId').append(Staff);
+                },
+                aync: false
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    });
+
+    $('#StaffId').change(function () {
+        debugger
+        document.getElementById('SalaryViewData').hidden = false;
+        $('#SalaryViewData').html("");
+        $('#imagemodal').show();
+        GetGrossSalary();
+        GetSalariesCollection();
+        //GetDeductionCollection();
+    })
+
+    function GetGrossSalary() {
+        debugger
+        var nStaffId = $('#StaffId').val();
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/HRPayroll/GetGrossSalary',
+            data: { nStaffId: nStaffId },
+            success: function (data) {
+                $('#Gross').val(data.dGross);
+                //$('#PayrollCodeId').val(data.nPayrollCode)
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+    }
+
+    $('#Set').click(function () {
+        debugger
+        document.getElementById("SalaryViewData").innerHTML = "";
+
+        document.getElementById("error").innerHTML = "";
+
+        //var nPayrollCode = $('#PayrollCodeId').val();
+        var nStaffId = $('#StaffId').val();
+        var dCTCValue = $('#Gross').val();
+
+        if (nStaffId == "" || parseInt(nStaffId) < 1 || dCTCValue == "" || parseInt(dCTCValue) < 1) {
+            document.getElementById("error").innerHTML = "Fields contains * are mandatory";
+        }
+        else {
+            SetSalaryWithPayrollCode();
+        }
+
+        //GetSalariesCollection();
+        ////GetDeductionCollection();
+        return false;
+    });
+
+    function SetSalaryWithPayrollCode() {
+        //var nPayrollCode = $('#PayrollCodeId').val();
+        document.getElementById('SalaryViewData').hidden = false;
+        var nStaffId = $('#StaffId').val();
+        var dCTCValue = $('#Gross').val();
+        var nSubcriptionId = $('#BranchId').val();
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/HRPayroll/SetSalary',
+            data: { nStaffId: nStaffId, dCTCValue: dCTCValue, nSubcriptionId: nSubcriptionId },
+            success: function (data) {
+                $('#SalaryViewData').html("");
+                $('#SalaryViewData').html(data);
+            }, error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+
+    }
+
+    function GetSalariesCollection() {
+        debugger
+        var StaffId = $('#StaffId').val();
+        var nSubcriptionId = $('#BranchId').val();
+
+
+        if (StaffId > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/HRPayroll/GetSalaryCollection',
+                data: { nStaffId: StaffId, nSubcriptionId: nSubcriptionId },
+                success: function (data) {
+                    $('#btnUpdate').show();
+                    $('#SalaryViewData').html(data);
+                }, error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+
+        return false;
+    }
+
+    //$('#test').click(function () {
+    $(document).on('click', '#test', function () {
+        debugger
+
+        var dCTCValue = $('#Gross').val();
+        var nSubcriptionId = $('#BranchId').val();
+        var nStaffId = $('#StaffId').val();
+        var dBasic = $('#txtBasicSalary').val();
+        var dOriginalBasic = $('#dBasicSalary').val();
+        var EEESI = $('#txtEEESI').val();
+        var ERESI = $('#txtERESI').val();
+
+        var EEPF = $('#txtEEPF').val();
+        var ERPF = $('#txtERPF').val();
+        //if (dBasic == dOriginalBasic) {
+        //    return;
+        //}
+        //else
+        {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/HRPayroll/UpdateSalaryWithBasic',
+                data: { nStaffId: nStaffId, dCTCValue: dCTCValue, dBasic: dBasic, nSubcriptionId: nSubcriptionId, EEESI: EEESI, ERESI: ERESI, EEPF: EEPF, ERPF: ERPF },
+                success: function (data) {
+                    $('#SalaryViewData').html("");
+                    $('#SalaryViewData').html(data);
+                }, error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+    })
+    window.onload = Appointmentstaff();
+    function Appointmentstaff() {
+        debugger
+        var isAppointed = '@Model.IsAppointed';
+        if (isAppointed === "True") {
+            OnloadData();
+        }
+    }
+
+
+    function OnloadData() {
+        debugger
+        DivisionId = $('#DivisionId').val();
+        var selBranchId = parseInt(@Model.BranchId);
+        var selStaffid = parseInt(@Model.SelStaffId);
+        $('#BranchId').empty();
+        $('#StaffId').empty();
+        $('#BranchId').append($("<option>").val("null").text("--- Select ---"));
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#BranchId');
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+                    $('#BranchId').append(BranchItems);
+                    if (selBranchId > 0)
+                        debugger
+                    $('#BranchId').val(selBranchId);
+                },
+                aync: false
+            });
+
+            $.ajax({
+                url: '/HRPayroll/GetStaffDataByBranch',
+                data: { nSubscriptionId: selBranchId },
+                success: function (data) {
+                    debugger
+                    var Staff = $('#StaffId');
+                    $.each(data, function (i, record) {
+                        Staff.append($("<option>").val(record.EmployeeId).text(record.EmployeeName));
+                    });
+                    $('#StaffId').append(Staff);
+
+                    $('#StaffId').val(selStaffid);
+                },
+
+                aync: false
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+
+        }
+
+
+        GetGrossSalary();
+
+        if (selStaffid > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/HRPayroll/GetSalaryCollection',
+                data: { nStaffId: selStaffid, nSubcriptionId: selBranchId },
+                success: function (data) {
+                    $('#btnUpdate').show();
+                    $('#SalaryViewData').html(data);
+                }, error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+
+        return false;
+        // GetSalariesCollection();
+
+    }
+
+    function hidePartialView() {
+        debugger
+        document.getElementById('SalaryViewData').hidden = true;
+    }
+</script>

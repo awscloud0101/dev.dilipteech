@@ -1,0 +1,141 @@
+﻿
+@model AsteriskBrowserAL.Banks
+
+@{
+    ViewBag.Title = "Edit Banks";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Banks</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+ 
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("BanksE", "SeFinance", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <div class="table-header">
+                    &nbsp;
+                        <small style="float:right;" class="textheader">
+                            @Html.ActionLink("Back to details", "Banks")
+                        </small>
+                
+                </div><!-- /.page-header -->
+
+                @Html.HiddenFor(model => model.BankId)
+                <div class="row widget-box" style="padding:10px;">
+               
+                        <form class="form-horizontal" role="form">
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Bank Name")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.BankName, new { autocomplete = "off", @class = "form-control col-sm-5 textlength", placeholder = "Bank Name", @id = "BankName", @onchange = "removeError();" })
+                                </div>
+
+                                <div class="col-sm-3" style="display:none;" id="bankName">
+                                    <label style="color:red;font-weight:bold;"> Please Enter  Bank Name </label>
+                                </div>
+
+                            </div>
+
+                           
+
+                            <div class="col-md-9">
+                                <div class="hr hr-18 dotted hr-double"></div>
+                                <button class="btn btn-success btn-sm" name="Save" onclick="return submitForm();" type="submit">
+                                    <i class="ace-icon fa fa-check bigger-50"></i>
+                                    Update
+                                </button>
+
+                                &nbsp; &nbsp; &nbsp;
+                                <button class="btn btn-sm" type="reset">
+                                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                                    Reset
+                                </button>
+                            </div>
+
+                        </form>
+
+                  
+                    </div>
+                        }
+                    </div>
+                    <input type="hidden" id="count" name="count" value="0" />
+                </div>
+</section>
+<script type="text/javascript">
+    function validateBank() {
+
+        document.getElementById("count").value = "1";
+        var BankName = document.getElementById("BankName").value;
+
+
+        validate = true;
+
+        if (BankName == "") {
+            document.getElementById("bankName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("bankName").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateBank();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var BankName = document.getElementById("BankName").value;
+
+        if (count != 0) {
+            if (BankName != "") {
+                document.getElementById("bankName").style.display = "none";
+            } else {
+                document.getElementById("bankName").style.display = "inline";
+            }
+        }
+    };
+    $('#BankName').click(function () {
+        document.getElementById('bankName').style.display = "none"
+    })
+
+</script>
+
+
+
+
+
+

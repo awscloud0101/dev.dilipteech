@@ -1,0 +1,343 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffData>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Time Table
+        </li>
+        <li class="active">Subject Association</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("AssignExecutives", "SeHelpDesk", FormMethod.Post))
+            {
+                    <!-- form start -->
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(true)
+                <span id="SaveVal" style="color:green;font-weight:bold"></span>
+
+                <span id="ErrorId" style="color:red;font-weight:bold"></span>
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Subject Association</span>
+
+
+                    <div class="widget-toolbar no-border">
+                        <div title="Save" class="inline action-buttons">
+                            <a id="Save" class="btn btn-info btn-minier P2">
+                                <i class="ace-icon fa fa-floppy-o"> | Save</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-box">
+                   
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 ">Class</label>
+                                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                            <select id="ClassId" name="ClassId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 ">Subject</label>
+                                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                            <select id="SubjectId" name="SubjectId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <br />
+                    </div>
+                </div>
+
+
+    <div class="hr hr-18 dotted hr-double"></div>
+
+
+                <div id="AssignedStaff" class="col-sm-6">
+                    @Html.Partial("SubjectAssociationAssignedStaff", Model)
+                </div>
+
+                <div class="col-sm-6">
+
+                    <div class="table-header">
+                        Category
+                        <select disabled="disabled" id="CategoryId" name="CategoryId"></select>
+
+
+                        <div style="float:right;">
+                            <a id="Assign" class="btn btn-info btn-minier">
+                                <i class="ace-icon fa fa-plus-square bigger-160"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div><!-- /.box-header -->
+
+                    <div style="overflow: auto;  height:300px " id="unassignedstaff">
+                        @Html.Partial("SubjectAssociationStaffPV", Model)
+                    </div>
+
+                </div>
+
+            }
+
+        </div>
+        <input type="hidden" id="AssStaff" />
+        <input type="hidden" id="RemStaff" />
+
+
+    </div>
+
+
+</section>
+<script type="text/javascript">
+
+
+    function onloadData() {
+        LoadCourseDropdown();
+        LoadCategoryDrpDwn()
+    }
+
+
+    function LoadCourseDropdown() {
+        $.ajax({
+            url: '/ATimetable/LoadSections',
+            success: function (result) {
+                CourseList = $("#ClassId")
+                CourseList.children().remove();
+                CourseList.append($("<option>").val("").text("--select--"))
+                $.each(result, function (e, record) {
+                    CourseList.append($("<option>").val(record.SectionId).text(record.SectionCode))
+                })
+                $("#ClassId").append(CourseList)
+
+            }
+        })
+    }
+
+
+
+    $("#ClassId").change(function () {
+        document.getElementById("SaveVal").innerHTML = "";
+
+        document.getElementById("AssStaff").value = "";
+        document.getElementById("RemStaff").value = "";
+
+        $("#AssignedStaff").html("")
+        $("#unassignedstaff").html("")
+
+
+        LoadSubjects()
+    })
+
+
+    //Load Subject DropDown
+    function LoadSubjects() {
+        var ClassNumber = $('#ClassId').val();
+        if (ClassNumber > 0) {
+            $.ajax({
+                url: "/ATimetable/LoadSubjects",
+                data: { SectionId: ClassNumber },
+                success: function (data) {
+                    var SubjectItems = $('#SubjectId')
+                    SubjectItems.children().remove();
+                    SubjectItems.append($("<option>").val("").text("--Select--"))
+                    $.each(data, function (i, record) {
+                        SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+                    });
+                    $('#SubjectId').append(SubjectItems);
+
+
+                }
+            });
+        }
+    }
+
+    function LoadCategoryDrpDwn() {
+        $.ajax({
+            url: "/ATimetable/LoadEmployeeCategories",
+            success: function (data) {
+                var CategoryItems = $('#CategoryId')
+                CategoryItems.children().remove();
+                CategoryItems.append($("<option>").val("null").text("--Select--"))
+                //CategoryItems.append($("<option>").val(0).text("All"))
+                $.each(data, function (i, record) {
+                    CategoryItems.append($("<option>").val(record.EmployeeCategoryId).text(record.CategoryName));
+                });
+                $('#CategoryId').append(CategoryItems);
+                if ($("#SelCategory").val() > 0) {
+                    document.getElementById("CategoryId").value = $("#SelCategory").val()
+                }
+
+            }
+        });
+    }
+
+    $("#SubjectId").change(function () {
+
+        var Subject = $('#SubjectId').val();
+        $('#CategoryId').val("null");
+        $("#unassignedstaff").html("");
+
+        if (Subject > 0) {
+            $('#CategoryId').prop("disabled", false);
+        }
+        else {
+            $('#CategoryId').prop("disabled", true);
+        }
+
+        document.getElementById("SaveVal").innerHTML = "";
+        $("#AssignedStaff").html("")
+        $("#unassignedstaff").html("")
+        document.getElementById("AssStaff").value = "";
+        document.getElementById("RemStaff").value = "";
+        $("#AssignedStaff").html("")
+        GeAssignedStaff();
+    })
+
+
+
+
+
+    function GeAssignedStaff() {
+
+        var ClassNumber = $('#ClassId').val();
+        var SubjectId = $('#SubjectId').val();
+
+        $.ajax({
+            url: '/ATimetable/GetSubjectAssociationData',
+            data: { ClassNumber: ClassNumber, SubjectId: SubjectId },
+            success: function (result) {
+                $('#AssignedStaff').html(result);
+            }
+        })
+
+    }
+
+    $("#CategoryId").change(function () {
+
+        var CategoryId = $(this).val()
+        if (CategoryId > 0) {
+            GetStaffTobeAssigned()
+        }
+        else {
+            document.getElementById("SaveVal").innerHTML = "";
+            $("#unassignedstaff").html("")
+        }
+
+    })
+
+    function GetStaffTobeAssigned() {
+        var CategoryId = $('#CategoryId').val();
+        if (CategoryId > 0) {
+            $.ajax({
+                url: "/ATimetable/GetCategoryWiseStaff",
+                data: { CategoryId: CategoryId, ClassNumber: $('#ClassId').val(), SubjectId: $('#SubjectId').val() },
+                success: function (data) {
+                    $("#unassignedstaff").html(data);
+                },
+                async: false
+            });
+        }
+        else {
+            $("#unassignedstaff").html("")
+        }
+    }
+
+    $("#Assign").click(function () {
+        debugger
+        var result = $('#CheckA:checked');
+        var Ids = "";
+        var RemoveStaff = $("#RemStaff").val()
+        var Value = "";
+
+
+        $.each(result, function (i, result) {
+            Value = result.value + ","
+            Ids += Value;
+            RemoveStaff = RemoveStaff.replace(Value + ",")
+
+
+        });
+        document.getElementById("AssStaff").value += Ids;
+        document.getElementById("RemStaff").value = RemoveStaff;
+        AssignStaffToSubject()
+
+    })
+
+
+    function AssignStaffToSubject() {
+        var SubjectId = $("#SubjectId").val()
+        var AssignStaff = $("#AssStaff").val()
+        var RemoveStaff = $("#RemStaff").val()
+        var ClassNumber = $("#ClassId").val()
+
+        $.ajax({
+            url: "/ATimetable/AssignStaffToSubject",
+            data: { ClassNumber: ClassNumber, SubjectId: SubjectId, AStaffIds: AssignStaff, RemoveStaff: RemoveStaff },
+            success: function (data) {
+
+                $("#AssignedStaff").html(data);
+
+                GetStaffTobeAssigned()
+            },
+            asynch: false
+        });
+    }
+
+
+    $("#Save").click(function () {
+
+        var SubjectId = $("#SubjectId").val()
+        var AssignStaff = $("#AssStaff").val()
+        var RemoveStaff = $("#RemStaff").val()
+        var ClassNumber = $("#ClassId").val()
+
+        var result = $('#CheckR:not(:checked)');
+        var Ids = " ";
+
+
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+            RemoveStaff.replace(result.value + ",")
+
+
+        });
+
+        $.ajax({
+            url: "/ATimetable/SaveAssignStaffToSubject",
+            data: { ClassNumber: ClassNumber, SubjectId: SubjectId, AStaffIds: Ids },
+            success: function (data) {
+                document.getElementById("SaveVal").innerHTML = data;
+
+            },
+            asynch: false
+        });
+    })
+    window.onload = onloadData();
+
+
+</script>

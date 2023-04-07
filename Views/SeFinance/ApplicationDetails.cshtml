@@ -1,0 +1,105 @@
+﻿@model AsteriskBrowserAL.Models.PROApplicationStatusViewModel
+@{
+    ViewBag.Title = "Appliction Range Report";
+    string BranchName = string.Empty;
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Registration Range Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+</style>
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="table-header">
+                Registration Details
+                    <small style="float:right;" class="textheader">
+                        @Html.ActionLink("Back To Details", "ApplicationRange")
+                    </small>
+               
+            </div>
+            @using (Html.BeginForm("ApplicationDetails", "SeFinance", FormMethod.Post))
+            {
+                if (Model != null)
+                {
+                    <input type="hidden" id="SubscriptionId" value="@Model.SubscriptionId" />
+
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="widget-box">
+                   
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <d`iv class="col-xs-6">
+                                            <label class="col-xs-4">Select Range</label>
+                                            <div class="col-xs-6">
+                                                @Html.DropDownListFor(model => model.RangesList, new SelectList(Model.RangesList, "RangeId", "ApplicationName"), "--- Select ---", new { @class = "form-control", @id = "rangeId", onchange = "GetRangersList();" })
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="SearchData">
+                    </div>
+
+                }
+                else
+                {
+                    <div style="color:red;font-weight:bold">please set registration ranges</div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+    function GetRangersList() {
+        var range = $('#rangeId').val();
+        var nSubscriptionId = $('#SubscriptionId').val();
+        if (range > 0) {
+            if (range != null)
+                $.ajax({
+                    url: '/SeFinance/GetApplicationStatusList',
+                    data: { range: range, nSubscriptionId: nSubscriptionId },
+                    beforeSend: function () {
+                        //$('#imagemodal').show();
+                    },
+                    success: function (data) {
+                        $('#SearchData').html(data);
+                        $('#imagemodal').show();
+                    }
+                }).done(function () {
+                    $('#imagemodal').hide();
+                });
+        }
+        else {
+            $('#SearchData').html("");
+        }
+    }
+</script>

@@ -1,0 +1,148 @@
+﻿@model List<AsteriskBrowserAL.Models.ConcessionUploadModel>
+@{
+    Layout = null;
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialogueupload" style="display:none"> </div>
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("SaveData", "SPromotions", FormMethod.Post, new { id = "FrmSaveConcession" }))
+            {
+                <input type="hidden" name="UploadTypeName" />
+
+                <span id="Validation" style="color:red;font-weight:bold;"></span>
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    int sno = 1;
+
+                    <div class="row">
+                        <div class="col-xs-12">
+
+                            <div class="table-header">
+                                Records Found (@Model.Count())
+                                <div style="float:right;">
+                                    <div class="inline dropdown-hover">
+                                        <button type="submit" class="btn btn-info btn-xs" onclick="return Submit();">
+                                            <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayName("SNo")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Branch Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Admission Number")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Update data")
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Count(); i++)
+                                    {
+                                        <tr>
+                                            @Html.Hidden("LstData.Index", (@i))
+                                            @Html.Hidden("LstData[" + (@i) + "].BranchName", Model.ElementAt(i).BranchName)
+                                            @Html.Hidden("LstData[" + (@i) + "].AdmissionNumber", Model.ElementAt(i).AdmissionNumber)
+                                            @Html.Hidden("LstData[" + (@i) + "].Class", Model.ElementAt(i).Class)
+
+                                            <td>
+                                                @(sno++)
+                                            </td>
+                                            <td>
+                                                @Model.ElementAt(i).BranchName
+                                            </td>
+                                            
+                                            <td>
+                                                @Model.ElementAt(i).AdmissionNumber
+                                            </td>
+                                            <td>
+                                                @Model.ElementAt(i).Class
+                                            </td>
+
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+
+                            @Html.Action("DataTableScripts", "Base")
+
+                        </div>
+                    </div>
+
+                }
+            }
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    function Submit() {
+
+        debugger
+        ConcessionUploadConfirmation();
+        return false;
+    }
+
+    function ConcessionUploadConfirmation() {
+
+        var TypeName = $("#CboUploadType option:selected").text();
+        $('[name=UploadTypeName]').val(TypeName);
+
+        $('#dialogueupload').html(' <div class="space-6"></div> <p> <b> Are you sure to update the ' + TypeName + ' ? <b> </p>');
+
+        var $dialog = $('#dialogueupload')
+          .dialog({
+              resizable: false,
+              draggable: false,
+              width: '400',
+              modal: true,
+              title: 'Confirmation',
+              open: function (event, ui) {
+                  $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+              },
+              title_html: true,
+              buttons: [
+                  {
+                      html: "Yes",
+                      "class": "btn btn-danger btn-minier",
+                      click: function () {
+                          $(this).dialog('close');
+                          $('#imagemodal').show();
+                          $('#FrmSaveConcession').submit();
+                      }
+                  },
+                  {
+                      html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; No ",
+                      "class": "btn btn-minier",
+                      click: function () {
+                          $(this).dialog('close');
+                      }
+                  }
+              ]
+          });
+    }
+
+
+</script>

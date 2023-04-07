@@ -1,0 +1,268 @@
+﻿@model AsteriskBrowserAL.Models.StudentTransferHistoryData
+@{
+    ViewBag.Title = "ApproveCertificates";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-database"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Budget
+        </li>
+        <li class="active">Approval Budget</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <br />
+
+    <div class="row">
+        <div class=col-xs-12>
+            @if (null != Model)
+            {
+                <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                Approve Budget
+                            </h5>
+
+                            <div class="widget-toolbar no-border">
+                                <div class="inline-dropdown hover">
+                                    <div class="inline action-buttons">
+                                        <a class="P2" id="btnViewData2" name="ViewData" onclick="return GetData();"><span class="btn btn-info btn-minier">View Data</span></a>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- /.box-header -->
+                        <!-- form start -->
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                @if (null != Model)
+                                {
+                                    if (Model.IsCentral == true)
+                                    {
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                                <div class="col-sm-6">
+                                                    <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="BranchId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                            <br />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" id="DivisionId" />
+                                        <input type="hidden" id="BranchId" />
+                                    }
+                                }
+                                <br />
+                                <div class="row">
+
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Status</label>
+                                            <div class="col-sm-6">
+                                                <select id="CboStatus" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Month")</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.MonthYear, new SelectList(Model.ListMonths, "MonthValue", "MonthName"), "--- Select ---", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+            }
+            <br />
+          
+            <div id="PartialDivision">
+
+            </div>
+
+        </div>
+    </div>
+    <input type="hidden" id="isCentral" name="isCentral" value="@Model.IsCentral.ToString()" />
+
+</section>
+
+
+<script>
+
+    window.onload = function () {
+        debugger
+        $('#PartialDivision').html('')
+        var SelDivision = $('#SelDivision').val()
+        var SelBarnch = $('#SelBarnch').val()
+
+        var IsCentral = $('#isCentral').val()
+
+            if (IsCentral == "True") {
+                LoadDivisionDropdown();
+                LoadStatusCombo();
+            }
+            
+    }
+
+    function LoadDivisionDropdown() {
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+                var SelDivisionId = $('#SelDivision').val()
+                if (parseInt(SelDivisionId) >= 0) {
+                    document.getElementById("DivisionId").value = SelDivisionId;
+                }
+            },
+            async: false
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        $('#PartialDivision').html('')
+        BranchId = $("#BranchId")
+        BranchId.children().remove();
+
+        var Division = $("#DivisionId").val();
+        if (Division >= 0) {
+            LoadBranchDropdown(Division);
+        }
+    })
+
+    function LoadBranchDropdown(DivisionId) {
+        $.ajax({
+            url: '/Common/GetBranchesByDivision',
+            data: { DivisionId: DivisionId, IsAll: true },
+            success: function (result) {
+                Branch = $("#BranchId")
+                Branch.children().remove();
+                $.each(result, function (i, elm) {
+                	//if (elm.SubscriptionId != 0)
+                    Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                })
+                $("#BranchId").append(Branch)
+                var SelBranchid = $("#SelBranchId").val();
+                if (parseInt(SelBranchid) >= 0) {
+                    document.getElementById("BranchId").value = SelBranchid
+                }
+            },
+            async: false
+        })
+    }
+
+    $("#BranchId").change(function () {
+        $('#PartialDivision').html('')
+    })
+
+    $("#CboStatus").change(function ()
+    {
+        $('#PartialDivision').html('')
+        //GetData();
+    })
+    $("MonthYear").change(function()
+    {
+        $('#PartialDivision').html('')
+    })
+    function GetData() {
+        debugger
+        var DivisionId = $('#DivisionId').val();
+        var branchSubscriptionId = $('#BranchId').val();
+        var Status = $('#CboStatus').val();
+        var Month = $('#MonthYear').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (DivisionId < 0) {
+            Message += "Division";
+            isValid = false;
+        }
+
+        if (branchSubscriptionId == "null" || branchSubscriptionId < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Branch";
+            isValid = false;
+        }
+
+        if (Status < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Status";
+            isValid = false;
+        }
+
+        if (Month == "null" || Month == "") {
+            if (!isValid)
+                Message += ",";
+            Message += "Month";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        document.getElementById("Validation").innerHTML = "";
+        $.ajax({
+            url: '/FBudgets/GetApprovePartialView',
+            data: { DivisionId: DivisionId, BranchId: branchSubscriptionId, CboStatus: Status, Month: Month },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (result) {
+                $('#imagemodal').hide();
+                $('#PartialDivision').html(result)
+            },
+            //async: false
+        });
+    }
+
+    function LoadStatusCombo() {
+
+        var StatusItems = $('#CboStatus');
+
+        StatusItems.children().remove();
+        StatusItems.append($("<option>").val("-1").text("--- Select ---"));
+        StatusItems.append($("<option>").val("1").text("Pending"));
+        StatusItems.append($("<option>").val("0").text("Accepted"));
+        StatusItems.append($("<option>").val("2").text("Rejected"));
+        //StatusItems.append($("<option>").val("3").text("All"));
+
+        $('#CboStatus').append(StatusItems);
+    }
+
+</script>
+

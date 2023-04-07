@@ -1,0 +1,180 @@
+﻿@model AsteriskBrowserAL.StaffHolidays
+
+@{
+    ViewBag.Title = "Create Holidays";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Leave Management
+        </li>
+        <li class="active">Staff Holidays</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("StaffHolidaysC", "HRLeaveManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(model => model.SubscriptionId)
+
+                <input type="hidden" id="SubscriptionId" value="@Model.SubscriptionId" />
+                
+                <div class="page-header">
+                    <br />
+                    <h1>
+                        Holidays
+                        <small style="float:right;">
+                            @Html.ActionLink("Back to Holidays", "StaffHolidays")
+                        </small>
+                    </h1>
+                </div><!-- /.page-header -->
+            <!-- form start -->
+                <form class="form-horizontal" role="form">
+                    <div class="box">
+                        <span style="color:red;font-weight:bold;">@Html.ValidationMessage("Holidays")</span>
+
+                        <br />
+
+                    </div>
+
+                    <div style="padding-left:270px;">
+                        @if (ViewBag.BranchName != null)
+                        {
+
+                            <h4>
+                                <span style="color: blue;">
+                                    @Html.Raw(ViewBag.BranchName)
+                                </span>
+                            </h4>
+                        }
+                    </div>
+
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Holiday Date")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div id="datepicker" class="input-group date">
+                                            <input class="form-control" type="text" id="HolidayDate" name="HolidayDate" autocomplete="off" placeholder="Select Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="dateHoliday">
+                                <label style="color:red;font-weight:bold;"> Required</label>
+                            </div>
+                            @*<div class="col-sm-3">
+                                    <span style="color: red;font-weight: bold;">@Html.ValidationMessage("HolidayDate")</span>
+                                </div>*@
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Description, new { @class = "form-control textlength", @id = "Desc", placeholder = "Description" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="descrHoliday">
+                                <label style="color:red;font-weight:bold;"> Required</label>
+                            </div>
+
+
+                        </div>
+                        <br />
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+
+            }
+        </div>
+        <input type="hidden" id="count" name="count" value="0" />
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    function validateHolidays() {
+
+        document.getElementById("count").value = "1";
+        var HolidayDate = document.getElementById("HolidayDate").value;
+        var Desc = document.getElementById("Desc").value;
+
+        validate = true;
+
+        if (HolidayDate == "") {
+            document.getElementById("dateHoliday").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("dateHoliday").style.display = "none";
+        }
+
+        if (Desc == "") {
+            document.getElementById("descrHoliday").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("descrHoliday").style.display = "none";
+        }
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateHolidays();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#HolidayDate').focus(function () {
+        $('#dateHoliday').hide();
+    });
+    $('#Desc').focus(function () {
+        $('#descrHoliday').hide();
+    });
+</script>
+

@@ -1,0 +1,214 @@
+﻿@model AsteriskBrowserAL.Models.StaffLeavesData
+
+@{
+    ViewBag.Title = "LeaveApproval";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Leave Management
+        </li>
+        <li class="active">Leave Approval</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+<style type="text/css">
+    .nowrap {
+        white-space: nowrap;
+    }
+
+    th {
+        text-align: center;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 400px;
+    }
+
+    div:hover {
+        overflow: auto;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        @*<div class=col-xs-3>
+                <h3>@Html.ActionLink("<< Leave Approval", "LeaveApproval", new { reportToStaffId = ViewBag.Selected_reportToStaffId })</h3>
+            </div>*@
+    </div>
+    @using (Html.BeginForm("LeaveApprovalDet", "HRLeaveManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        @Html.ValidationSummary(true)
+        <span style="color: red;">@Html.ValidationMessage("LeaveApprovalDet")</span>
+        <div class="page-header">
+            <br />
+            <h1>
+                Leave Details
+                <small style="float:right;">
+                    @Html.ActionLink("Back to details", "LeaveApproval")
+                </small>
+            </h1>
+        </div>
+        if (null != Model)
+        {      
+
+    if (null != Model.IsApprovedData && Model.IsApprovedData.Count() > 0)
+    {
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="table-header">
+                    Leave Details
+                </div><!-- /.box-header -->
+                <div class="box-body table-responsive no-padding">
+                    <div class="hideScrolling">
+                        <table class="table table-bordered table-striped table-hover nowrap">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("Staff Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Leave Date")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Is Half Day")
+                                    </th>
+
+
+
+                                </tr>
+                                @if (null != Model.IsApprovedData && Model.IsApprovedData.Count() > 0)
+                                            {
+                                                foreach (var item in Model.IsApprovedData)
+                                                {
+
+                                <tr>
+                                    <td>
+                                        @item.FirstName
+                                    <td>
+                                        @item.LeaveDate.Value.ToString("dd - MMM - yyyy")
+
+                                    </td>
+                                    <td>
+                                        @if (item.IsHalfDay == true)
+                                                            {
+                                                            <text>Yes</text>
+                                                            }
+                                                            else
+                                                            {
+                                                            <text>No</text>
+                                                            }
+                                    </td>
+
+
+                                </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+
+                                <tr>
+
+                                    <td>
+                                        <p style="color: red;text-indent:5em;" class="glyphicon-indent-right"><b>No staff leaves to Approve</b></p>
+
+                                    </td>
+
+                                </tr>
+                                            }
+                            <tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+            <p style="color: red;"><b>No staff leaves to Approve</b></p>
+
+            }
+            @*</div>*@
+       
+
+
+
+
+                    if (null != Model.IsNotApprovedData && Model.IsNotApprovedData.Count() > 0)
+                    {
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div class="table-header">
+                                History
+                            </div><!-- /.box-header -->
+                            <div class="box-body table-responsive no-padding">
+                                <div class="hideScrolling">
+                                    <table class="table table-bordered table-striped table-hover nowrap">
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    @Html.DisplayName("Staff Name")
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayName("Leave Date")
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayName("Is Half Day")
+                                                </th>
+
+
+                                            </tr>
+
+                                            @foreach (var item in Model.IsNotApprovedData)
+                                        {
+
+                                                <tr>
+                                                    <td align="center">
+                                                        @item.FirstName  @item.LastName
+                                                    </td>
+                                                    <td align="center">
+                                                        @item.LeaveDate.Value.ToString("dd - MMM - yyyy")
+
+                                                    </td>
+
+                                                    <td align="center">
+                                                        @if (item.IsHalfDay == true)
+                                                    {
+                                                            <text>Yes</text>
+                                                    }
+                                                    else
+                                                    {
+                                                            <text>No</text>
+                                                    }
+                                                    </td>
+
+
+                                                </tr>
+                                        }
+                                        <tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    }
+                    else
+                    {
+                    <span style="color: red;"><b>Data is not available</b></span>
+                    }
+                    }
+
+
+                    }
+        </section>

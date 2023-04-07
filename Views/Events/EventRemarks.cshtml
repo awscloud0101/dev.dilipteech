@@ -1,0 +1,219 @@
+﻿@model List<AsteriskBrowserAL.Models.EventsDetails>
+
+@{
+    ViewBag.Title = "EventRemarks";
+}
+<br />
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Acadamics
+        </li>
+        <li>
+            <i class=""></i>
+            Parent Teacher Meeting
+        </li>
+        <li class="active">Events</li>
+    </ul><!-- /.breadcrumb -->
+}
+<div style="float:right">
+    <a href="/Events/Events" class="h5"><strong>Back to Calendar</strong></a>
+</div>
+<br />
+@if (Model != null && Model.Count >= 1)
+{
+    <div class="row">
+        <div class=col-xs-12>
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        @ViewBag.EventName
+                    </h5>
+                </div>
+                <!-- form start -->
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @foreach (var i in Model)
+                                {
+                                    string color = "";
+                                    if (i.SlotStatus == 1)
+                                    {
+                                        color = "lightgreen";
+                                    }
+                                    else if (i.SlotStatus == 2)
+                                    {
+                                        color = "lightcoral";
+                                    }
+                                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4" style="min-height:75px;border-style: solid;border-width: thin;text-align:center;background-color:@color">
+                                        <strong>
+                                            @if (i.Student != null)
+                                            {
+                                                @i.Slottimings<br />
+                                                <span>@i.Student<span>( @i.AdmissionNo )</span></span><br />
+                                                <a onclick="OpenModel(@i.SlotId)">
+                                                    <b style="color:navy">Remarks</b>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                //<span>@i.Student<span>( @i.AdmissionNo )</span></span><br />
+                                                <a onclick="OpenModel1(@i.SlotId)">
+                                                    @i.Slottimings
+                                                    @*<b style="color:navy">SelectStudent</b>*@
+                                                </a>
+                                            }
+                                        </strong>
+                                    </div>
+                                }
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+
+    <div class="row" style="color:red"><strong>No Data Available</strong></div>
+}
+
+
+<div id="myModal" class="modal fade" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">Remark</h4>
+            </div>
+            <div class="modal-body" id="InnerHtml">
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success" onclick="SaveFeedback()">Save</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModal11" class="modal fade" data-keyboard="false" data-backdrop="static"> 
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">SelectStudent</h4>
+            </div>
+            <div class="modal-body" id="InnerHtml11">
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success" onclick="SelectStudent()">Save</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function OpenModel(SlotId) {
+        debugger
+        $.ajax({
+            url: '/Events/SavefeedbackView',
+            data: { SlotId: SlotId },
+            success: function (data) {
+                $('#InnerHtml').html(data)
+                $('#myModal').appendTo("body").modal('show');
+            },
+            aync: false
+        });
+    }
+
+     function OpenModel1(SlotId) {
+        debugger
+        $.ajax({
+            url: '/Events/SaveSelectStudent',
+            data: { SlotId: SlotId },
+            success: function (data) {
+                $('#InnerHtml11').html(data)
+                $('#myModal11').appendTo("body").modal('show');
+            },
+            aync: false
+        });
+    }
+    function SaveFeedback() {
+        debugger
+        var Status = true;
+        var Validation = " Please complete this mandatory field "
+        var Remark = $('#Remark').val()
+        var SlotStatus = $('#SlotStatus').val()
+        var SlotId = $('#SlotId').val()
+        if (Remark == "") {
+            Status = false;
+        }
+        if (SlotStatus == "") {
+            Status = false;
+        }
+        if (SlotId == "") {
+            Status = false;
+        }
+
+        document.getElementById('Validation').innerHTML = Validation
+        if (Status == true) {
+            document.getElementById('Validation').innerHTML = ""
+
+            $.ajax({
+                url: '/Events/Savefeedback',
+                type: 'POST',
+                data: { SlotId: SlotId, Remark: Remark, SlotStatus: SlotStatus },
+                success: function (data) {
+                    location.reload();
+                },
+                aync: false
+            });
+        }
+    }
+
+      function SelectStudent() {
+        debugger
+        var Status = true;
+        var Validation = " Please complete this mandatory field "
+          var StudentId = $('#StudentId').val()
+          var SlotId = $('#SlotId').val()
+        if (StudentId == "") {
+            Status = false;
+        }
+        if (StudentId < 1 ) {
+            Status = false;
+        }
+        if (SlotId == "") {
+            Status = false;
+        }
+
+        document.getElementById('Validation').innerHTML = Validation
+        if (Status == true) {
+            document.getElementById('Validation').innerHTML = ""
+
+            $.ajax({
+                url: '/Events/SelectStudent',
+                type: 'POST',
+                data: { StudentId: StudentId, SlotId: SlotId},
+                success: function (data) {
+                    location.reload();
+                },
+                aync: false
+            });
+        }
+     }
+</script>
+
+<style>
+    .modal-backdrop {
+        z-index: -1;
+    }
+</style>

@@ -1,0 +1,148 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StudentDetailsData>
+@{
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+    ViewBag.Title = "Feedback";
+}
+
+
+<ul class="breadcrumb">
+</ul><!-- /.breadcrumb -->
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <div class="space-6"></div>
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+        </div>
+    </div>
+    @if (null != TempData["Feedback"])
+    {
+        @Html.Raw(TempData["Feedback"])
+    }
+
+    @if (Model.Count() > 0)
+    {
+        int nsno = 1;
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                @using (Html.BeginForm("Feedback", "Parent", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    if (null != TempData["Feedback"])
+                    {
+                        <input type="hidden" id="Status" value="@TempData["Feedback"]" />
+                    }
+
+
+                    <div class="table-header">
+                        Feedback
+                        <div style="float:right" class="inline action-buttons">
+                            <button type="submit" class="btn btn-info btn-minier P2" id="Save" name="Save">Save</button>
+
+                        </div>
+
+                    </div><!-- /.box-header -->
+
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Description")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Rating")
+                                </th>
+
+
+
+                                @*<th></th>*@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Count(); i++)
+                            {
+
+                                <tr>
+                                    <td>
+                                        @Html.Hidden("lstStudents.Index", (@i + 10))
+                                        @Html.Hidden("lstStudents[" + (@i + 10) + "].CategoryId", Model.ElementAt(i).CategoryId)
+                                        @Html.Hidden("lstStudents[" + (@i + 10) + "].DisplayName", Model.ElementAt(i).DisplayName)
+                                        @(nsno++)
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).DisplayName
+                                    </td>
+
+                                    <td>
+                                        @if (Model.ElementAt(i).IsChecked == true)
+                                        {
+                                            @Html.TextBox("lstStudents[" + (@i + 10) + "].SportsRank", Model.ElementAt(i).SportsRank, new { @id = "Rating", @type = "number", @min = "0", @max = "10", @title = "Please enter proper rating" })
+                                        }
+                                        else
+                                        {
+                                          @Model.ElementAt(i).SportsRank
+                                        }
+                                    </td>
+
+
+
+                                </tr>
+
+                            }
+                        </tbody>
+
+                    </table>
+                }
+
+            </div>
+        </div>
+
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+    }
+    else
+    {
+        <h2>data is not available</h2>
+    }
+
+
+
+
+
+</section>
+<script>
+    $(document).ready(function () {
+        Rating();
+    });
+    function Rating() {
+        $.ajax({
+            url: '/Parent/Feedback',
+            success: function (data) {
+                var starttime = data.FirstInserted;
+                var endtime = data.LastUpdated;
+                var d = new Date();
+                var today = d.getDate();
+                debugger;
+
+                if (model.IsChecked >= LastUpdated) {
+                    document.getElementById("Rating").style.display = "disable";
+                }
+            },
+            async: false
+        });
+    };
+</script>

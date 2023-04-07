@@ -1,0 +1,63 @@
+﻿@model List<AsteriskBrowserAL.Models.PettyCashScheduleData>
+@{
+    ViewBag.Title = "Petty Cash Schedule";
+    int sno = 1;
+}
+
+@if (Model != null && Model.Count() > 0)
+{
+<br/>
+  
+    <div class="table-header">
+        Records Found (@Model.Count)
+    </div>
+
+       
+            <table class="table tbhover table-striped table-bordered dynamic-table" id="mytab1">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayName("SNo.")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Branch")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Regular")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Special")
+                        </th>
+                    </tr>
+                </thead>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        <tbody>
+                            <tr>
+                                <td>
+
+                                    @(sno++)
+                                </td>
+                                <td>
+                                    @Model.ElementAt(i).Branch
+                                </td>
+                                <td>
+                                    @Html.Hidden("IstPettyCashList.Index", (@i + 10))
+                                    @Html.Hidden("IstPettyCashList[" + (@i + 10) + "].PettyCashScheduleId", Model.ElementAt(i).PettyCashScheduleId)
+                                    @Html.Hidden("IstPettyCashList[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                    @Html.TextBox("IstPettyCashList[" + (@i + 10) + "].Regular", Model.ElementAt(i).Regular, new { @class = "form-control textlength txtboxNum", @readonly = "readonly", id = "regulardays", @style = "width:120px", value = "Readonly field" })
+                                </td>
+                                <td id="special">
+                                    @Html.TextBox("IstPettyCashList[" + (@i + 10) + "].Special", Model.ElementAt(i).Special, new { id = @Model.ElementAt(i).SubscriptionId, @class = "form-control textlength txtboxNum", name = "special", @min = "0", @Maxlength = "3", @style = "width:120px" })
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    }
+</table>
+     
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+<script type="text/javascript">
+    document.getElementById("regulardays").readOnly = true;
+</script>

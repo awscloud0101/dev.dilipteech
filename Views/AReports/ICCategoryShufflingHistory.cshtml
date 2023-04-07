@@ -1,0 +1,208 @@
+﻿@model AsteriskBrowserAL.Models.StudentDetailsData
+
+@{
+    ViewBag.Title = "IC Category Shuffling History";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">IC Category Shuffling History</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ExportICCategoryShufflingHistory", "AReports", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                <div class="widget-box">
+
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            IC Category Shuffling History
+                        </h5>
+
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <a class="btn btn-info btn-minier P2" id="ViewData" onclick="return submitForm();">View Data</a>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            @if (Model.IsCentral)
+                            {
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Division</label>
+                                            <div class="col-xs-6">
+                                                @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Branch</label>
+                                            <div class="col-xs-6">
+                                                <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+
+                            }
+                            else
+                            {
+                                <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.SubscriptionId" />
+                            }
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4">Date Range</label>
+                                        <div class="col-xs-6">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control pull-right" id="daterange" name="DateRange" autocomplete="off" />
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <br />
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="StudentsData">
+                </div>
+            }
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    var DisplayValidation = "";
+
+    $('#BranchId').change(function () {
+        $('#StudentsData').html("");
+    });
+
+    $('#DivisionId').change(function () {
+        $('#StudentsData').html("");
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    function submitForm() {
+
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        $('#StudentsData').html("");
+
+        var Validation = ValidateReport();
+
+        if (Validation == false) {
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+            $('#imagemodal').show();
+
+            $.ajax({
+
+                url: '/AReports/GetICcategoryStudentShufflingHistory',
+                data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), Date: $('#daterange').val() },
+
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#StudentsData').html(data);
+                }
+            })
+        }
+    }
+
+    function ValidateReport() {
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+        var DateRange = $("#daterange").val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+
+        if (DateRange == null || DateRange == undefined || DateRange == "") {
+            DisplayValidation += "Date Range,"
+            valid = false
+        }
+
+        if (valid == false) {
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+
+        return valid;
+    };
+
+    $('#daterange').click(function () {
+        document.getElementById("Validation").innerHTML = "";
+        $('#StudentsData').html("");
+    })
+</script>
+

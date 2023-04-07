@@ -1,0 +1,79 @@
+﻿
+
+@model AsteriskBrowserAL.Models.Mail
+
+<span style="color:red;font-weight:bold" id="Validation" class="col-xs-12"></span><br />
+@using (Html.BeginForm("ComposeMailPost", "Parent", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    <form class="form-horizontal" role="form">
+        <div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label no-padding-right" for="form-field-subject"><span style="color:red;font-weight:bold">*S</span>taff: &nbsp;</label>
+                <div class="col-sm-10">
+                    <div class="input-icon block col-xs-10 no-padding">
+                        @Html.DropDownList("StaffId", null, "--Select--", new { @class = "form-control select2", @id = "StaffId" })
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:2em">
+                <label class="col-sm-2 control-label no-padding-right" for="form-field-subject"><span style="color:red;font-weight:bold">*S</span>ubject: &nbsp;</label>
+                <div class="col-sm-10">
+                    <div class="input-icon block col-xs-10 no-padding">
+                        <input maxlength="100" type="text" class="col-xs-12" name="subject" id="subject" placeholder="Subject" />
+                        <i class="ace-icon fa fa-comment-o"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:2em">
+                <label class="col-sm-2 control-label no-padding-right" for="form-field-subject"><span style="color:red;font-weight:bold">*C</span>ontent: &nbsp;</label>
+                <div class="col-sm-10">
+                    <div class="input-icon block col-xs-12 no-padding">
+                        <textarea class="form-control col-sm-5 textlength" placeholder="Content" id="Content" name="Content"></textarea>
+                        <script type="text/javascript">
+                            CKEDITOR.replace('Content');
+                        </script>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-6 control-label no-padding-right" for="form-field-subject"></label>
+                <div class="col-sm-6 right">
+                    <br />
+                    <button class="btn btn-success btn-minier" type="submit" onclick="return Validation()">
+                        <i class='ace-icon bigger-110'></i>Send
+                    </button>
+                    <button class="btn btn-minier" onclick="return CloseWindow()" type="button">
+                        <i class='ace-icon bigger-110'></i>Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+
+
+<script>
+    function Validation() {
+        debugger
+        var validation = true
+        var Content = CKEDITOR.instances.Content.getData();
+        var subject = $('#subject').val();
+        var StaffId = $('#StaffId').val();
+
+        if (StaffId == "" || StaffId == null || StaffId == "0") {
+            validation = false
+        } if (Content == "" || Content == null) {
+            validation = false
+        } if (subject == "" || subject == null) {
+            validation = false
+        } if (validation == false) {
+            document.getElementById('Validation').innerHTML = "* Enter all required feilds";
+        }
+
+        return validation;
+    }
+    function CloseWindow() {
+        debugger
+        $("#dialog-confirm").dialog('close')
+    }
+</script>

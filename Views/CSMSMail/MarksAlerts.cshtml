@@ -1,0 +1,207 @@
+﻿
+@model AsteriskBrowserAL.Models.StudentDetailsData
+@{
+    ViewBag.Title = "Progress Card";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-key"></i>
+            Controls
+        </li>
+        <li>
+            <i class=""></i>
+            SMS & Mail
+        </li>
+        <li class="active">Marks Alerts</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+
+    <div class="row">
+		<div class="col-xs-12">
+			@using (Html.BeginForm("MarksAlerts", "CSMSMail", FormMethod.Post))
+	{
+		<span style="color:forestgreen" id="Validation"></span>
+		<span style="color:red" id="Alert"></span>
+		<span style="font-weight:bold" id="SaveStatus">
+			@if (TempData["SaveStatus"] != null)
+	{
+		if (TempData["SaveStatus"] == "True")
+{
+			<b style="color:green">Message(s) has been sent successfully</b>
+}
+else
+{
+		<b style="color:red">"Message(s) sending failed"</b>
+}
+
+}
+		</span>
+
+if (null != Model)
+{
+		<input type="hidden" id="Status" value="@Model.Status" />
+}
+else
+{
+		<input type="hidden" id="Status" value="false" />
+}
+
+
+
+		<div class="table-header">
+
+			Marks Alerts
+
+		</div>
+		<div class="widget-box">
+
+			<div class="widget-body">
+				<div class="widget-main">
+
+
+
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="col-sm-6">
+								<label class="col-sm-4 control-label no-padding-right" for="form-field-1">Class</label>
+								<div class="col-sm-6">
+									<select id="ClassNumber" name="ClassNumber" style="width:200px;" class="form-control"></select>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<label class="col-sm-5 control-label no-padding-right" for="form-field-1">Examination</label>
+								<div class="col-sm-6">
+									<select id="ExaminationId" name="ExaminationId" style="width:200px;" class="form-control"></select>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="Students"></div>
+}
+		</div>
+    </div>
+</section>
+
+
+<script>
+
+    var StudentId = "";
+
+
+    $(document).ready(function () {
+
+        var Status = $('#Status').val();
+
+        if (Status == "value") {
+            document.getElementById("Validation").innerHTML = "Message(s) has been sent successfully"
+        }
+       
+
+        LoadClasses();
+    });
+
+    function LoadClasses() {
+        $.ajax({
+            url: '/Common/GetAllClasses',
+            success: function (data) {
+                var ClassNumberItems = $('#ClassNumber');
+                ClassNumberItems.children().remove();
+                ClassNumberItems.append($("<option>").val("null").text("--- Select ---"));
+                $.each(data, function (i, record) {
+                    ClassNumberItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+                });
+                $('#ClassNumber').append(ClassNumberItems);
+            },
+            aync: false
+        });
+    }
+
+    $('#ClassNumber').change(function () {
+
+
+        document.getElementById("SaveStatus").innerHTML = "";
+		document.getElementById("Validation").innerHTML = "";
+		document.getElementById("Alert").innerHTML = "";
+        $('#ExaminationId').empty();
+
+        var ClassNumber = $('#ClassNumber').val();
+
+        if (ClassNumber == "" || ClassNumber < 1) {
+
+            $('#Students').html("");
+        }
+        else {
+            GetExaminations();
+            $('#Students').html("");
+        }
+    });
+
+    function GetExaminations() {
+        var ClassNumber = $('#ClassNumber').val();
+
+        if (ClassNumber > 0) {
+            $.ajax({
+                url: '/CSMSMail/GetExaminationsByClassNumber',
+                data: { ClassNumber: ClassNumber },
+                success: function (data) {
+                    var ExaminationItems = $('#ExaminationId');
+                    ExaminationItems.children().remove();
+                    ExaminationItems.append($("<option>").val("null").text("--- Select ---"));
+                    $.each(data, function (i, record) {
+                        if (record.IsUnitTest == 1) {
+                            ExaminationItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+                        }
+                    });
+                    $('#ExaminationId').append(ExaminationItems);
+                },
+                aync: false
+            });
+        }
+    }
+
+	$('#ExaminationId').change(function () {
+		document.getElementById("SaveStatus").innerHTML = "";
+		document.getElementById("Alert").innerHTML = "";
+        GetStudents()
+    });
+
+    function GetStudents() {
+
+        var ExamId = $("#ExaminationId").val();
+        var ClassNumber = $("#ClassNumber").val();
+
+
+        if (ExamId < 0 || ClassNumber < 0)
+            return;
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/CSMSMail/GetStudentsForMarksAlerts',
+            data: { ClassNumber: ClassNumber },
+            success: function (Data) {
+                $('#imagemodal').hide();
+                $('#Students').html(Data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        })
+        ;
+    }
+</script>
+
+
+

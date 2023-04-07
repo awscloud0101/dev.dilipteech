@@ -1,0 +1,251 @@
+﻿@model AsteriskBrowserAL.Models.MicroScheduleData
+
+@{
+    ViewBag.Title = "Micro-Schedule Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Micro Schedule
+        </li>
+        <li class="active">Define Micro Plan</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true }
+)
+
+<section class="content">
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <span style="color:red;" id="Validation"></span>
+            @using (Html.BeginForm("MicroScheduleE", "AMicroSchedule", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+              
+            <input type="hidden" id="SyllabusId" name="SyllabusId" value="@Model.SyllabusId" />
+    @*<input type="hidden" id="ClassNumber" name="ClassNumber" value="@Model.ClassNumber" />
+    <input type="hidden" id="Batch" name="Batch" value="@Model.SubscriptionId" />
+            <input type="hidden" id="Exam" name="Exam" value="@Model.ExamId" />
+    <input type="hidden" id="Subject" name="Subject" value="@Model.SubjectId" />
+            @Html.HiddenFor(model => model.ClassNumber)
+            @Html.HiddenFor(model => model.SubscriptionId)
+            @Html.HiddenFor(model => model.ExamId)
+    @Html.HiddenFor(model => model.SubjectId)*@
+
+    @Html.HiddenFor(model => model.SubscriptionId)
+    @Html.HiddenFor(model => model.ClassNumber)
+    @Html.HiddenFor(model => model.ExamId)
+    @Html.HiddenFor(model => model.SubjectId)
+
+    <input type="hidden" id="SelSubId" value="@Model.SubscriptionId" />
+    <input type="hidden" id="SelClass" value="@Model.ClassNumber" />
+    <input type="hidden" id="SelExamId" name="ExamId" value="@Model.ExamId" />
+    <input type="hidden" id="SelSubject" value="@Model.SubjectId" />
+
+
+                <div class="table-header">
+            
+                        Micro Plan
+                        <small style="float:right;" class="textheader">
+                            @Html.ActionLink("Back to details", "DefineMicroSchedule", new { Batch = Model.SubscriptionId, ClassNumber = Model.ClassNumber, Exam = Model.ExamId, Subject = Model.SubjectId })
+                        </small>
+             
+                </div><!-- /.page-header -->
+
+
+                <!-- form start -->
+                <div class="widget-box row" style="padding:10px;">
+                    <form class="form-horizontal" role="form">
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Topic Name")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.Topic, new { @class = "form-control textlength", placeholder = "Topic Name", @id = "Topic" })
+
+                                    <span class="" style="color:red;font-weight:bold;" id="Topic">
+                                    </span>
+                                
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+
+                                <div class="col-sm-6">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                @if (Model.SyllabusDate.HasValue)
+                                                {
+                                                    <input class="form-control" value="@Model.SyllabusDate.Value.ToShortDateString()" type="text" name="Date" id="Date" autocomplete="off" placeholder="Select Date" />
+                                                }
+                                                else
+                                                {
+                                                    <input class="form-control" type="text" name="Date" id="Date" autocomplete="off" placeholder="Select Date" />
+                                                }
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="" id="Date" style="color:red;font-weight:bold;">
+                                    </span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        
+
+
+
+                        
+
+
+
+                        <div class="col-md-9">
+
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" name="Save" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            }
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    function submitForm() {
+        var validatestatus = validateES();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function validateES() {
+
+        var validate = true;
+        var Topic = document.getElementById("Topic").value;
+       
+        //alert(ExamName);
+        var Date = document.getElementById("Date").value;
+        //alert(StartDate);
+        
+
+        if (Topic == "") {
+            document.getElementById("Topic").innerHTML = "Please enter Topic";
+            validate = false;
+        }
+
+        if (Date == "") {
+            document.getElementById("Date").innerHTML = "Please select Date";
+            validate = false;
+        }
+              
+
+        if (validate == true) {
+            var status = IsMicroScheduleExisted();
+            validate = status;
+        }
+
+        return validate;
+    };
+
+    function IsMicroScheduleExisted() {
+        var Status = true;
+
+        var CCEExam = $('#CCEExamId').val();
+
+        $.ajax({
+
+            url: '/AMicroSchedule/IsSyllabusExisted',
+            data: { type: "New", id: 0, Tpoic: $('#TopicName').val(), Date: $('#Date').val(), Branch: $('#SelSubId').val(), ClassNumber: $('#SelClass').val(), Exam: $('#SelExamId').val(), Subject: $('#SelSubject') },
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                    document.getElementById("Validation").innerHTML = Data;
+                }
+            },
+            async: false
+        });
+
+        return Status;
+    }
+
+    //function IsExaminationExisted() {
+    //    var Status = true;
+
+    //    SubjectId = $('#SubjectId').val();
+
+    //    $.ajax({
+
+    //        url: '/AMicroSchedule/IsSyllabusExisted',
+    //        data: { type: "Edit", id: $('#SyllabusId').val(), Topic: $('#Topic').val(), Branch: $('#Batch').val(), ClassNumber: $('#ClassNumber').val(), Exam: $('#Exam'), Subject: $(Subject) },
+    //        success: function (Data) {
+
+    //            if (Data != "") {
+    //                Status = false;
+    //                document.getElementById("Validation").innerHTML = Data;
+    //            }
+
+    //        },
+    //        async: false
+    //    });
+
+    //    return Status;
+    //}
+
+    $('#Topic').focus(function () {
+        document.getElementById("Topic").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    $('#Date').change(function () {
+        document.getElementById("Date").innerHTML = "";
+    });
+   
+
+</script>
+
+
+

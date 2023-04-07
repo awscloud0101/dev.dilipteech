@@ -1,0 +1,306 @@
+﻿
+@{
+    ViewBag.Title = "IssuedBookReport";
+}
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Book Returned Report</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        Book Returned Report
+                    </h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="form-group" id="UserCategoryDiv">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">User Category</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("UserCategoryId", null, "--Select--", new { @class = "form-control", @id = "UserCategoryId" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-6" id="StudentUser" style="display:none">
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Class & Section</label>
+                                    <div class="col-sm-6">
+                                        <select id="SectionId" name="SectionId" class="form-control select2"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6" id="StaffUser" style="display:none">
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Dept</label>
+                                    <div class="col-sm-6">
+                                        <select id="DeptId" name="DeptId" class="form-control select2"></select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <div class="row" id="AuthorDiv">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Author</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("AuthorId", null, "--Select--", new
+                                   {
+                                       @class = "form-control select2",
+                                       @id = "AuthorId"
+                                   })
+                                    </div>
+                                </div>
+                                <div class="col-xs-6" id="PublisherDiv">
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Publisher</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("PublicationId", null, "--Select--", new
+                                   {
+                                       @class = "form-control select2",
+                                       @id = "PublicationId"
+                                   })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="hr hr-18 dotted hr-double"></div>
+</section>
+
+<div id="SearchViewDiv">
+</div>
+
+<script>
+    $(".select2").select2()
+
+
+    function getDepartment() {
+        $.ajax({
+            url: '/ALibrary/GetDepartments',
+            success: function (Data) {
+                var DeptDRP = $('#DeptId')
+                DeptDRP.children().remove();
+                DeptDRP.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    DeptDRP.append($("<option>").val(record.DepartmentId).text(record.DepartmentName));
+                });
+                $('#DeptId').append(DeptDRP);
+            },
+            async: false,
+        })
+    }
+
+    function getSection() {
+        $.ajax({
+            url: '/ALibrary/GetSections',
+            success: function (Data) {
+                var SectionDRP = $('#SectionId')
+                SectionDRP.children().remove();
+                SectionDRP.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+                $('#SectionId').append(SectionDRP);
+            },
+            async: false,
+        })
+    }
+
+    $('#UserCategoryId').change(function () {
+        debugger
+        $('#SearchViewDiv').hide()
+        $('#PublicationId').val('').trigger('change.select2');
+        $('#AuthorId').val('').trigger('change.select2');
+        $('#DeptId').val('');
+        $('#SectionId').val('');
+        var UserCategoryVal = $('#UserCategoryId').val();
+        if (UserCategoryVal == 2 && UserCategoryVal != "") {
+            $('#StaffUser').show();
+            $('#StudentUser').hide();
+            getDepartment();
+        }
+        else if (UserCategoryVal == 1 && UserCategoryVal != "") {
+            $('#StudentUser').show();
+            $('#StaffUser').hide();
+            getSection();
+        }
+        else if (UserCategoryVal == 0 && UserCategoryVal != "") {
+            $('#StaffUser').val('');
+            $('#StudentUser').val('');
+            $('#StaffUser').hide();
+            $('#StudentUser').hide();
+            var userCategory = $('#UserCategoryId').val();
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/RetunBookReportData',
+                type: 'POST',
+                data: {   PublicationId: 0, UserCategoryId: userCategory, SectionId: 0, DeptId: 0, AuthorId: 0 },
+                success: function (data) {
+                    $('#SearchViewDiv').show()
+                    $('#SearchViewDiv').html(data);
+                    $('#imagemodal').hide();
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+    })
+
+    $('#SectionId').change(function () {
+        $('#SearchViewDiv').hide()
+        $('#PublicationId').val('').trigger('change.select2');
+        $('#AuthorId').val('').trigger('change.select2');
+        $('#DeptId').val('');
+        var SectionVal = $('#SectionId').val();
+        var userCategory = $('#UserCategoryId').val()
+        if (SectionVal == null || SectionVal == "" || SectionVal == undefined) {
+        }
+        else {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/RetunBookReportData',
+                type: 'POST',
+                data: {  PublicationId: 0, UserCategoryId: userCategory, SectionId: SectionVal, DeptId: 0, AuthorId: 0 },
+                success: function (data) {
+                    $('#SearchViewDiv').show()
+                    $('#SearchViewDiv').html(data);
+                    $('#imagemodal').hide();
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+    })
+
+    $('#DeptId').change(function () {
+        $('#SearchViewDiv').hide()
+        $('#PublicationId').val('').trigger('change.select2');
+        $('#AuthorId').val('').trigger('change.select2');
+        $('#SectionId').val('');
+        var DeptVal = $('#DeptId').val();
+        var userCategory = $('#UserCategoryId').val()
+        if (DeptVal == null || DeptVal == "" || DeptVal == undefined) {
+        }
+        else {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/RetunBookReportData',
+                type: 'POST',
+                data: {  PublicationId: 0, UserCategoryId: userCategory, SectionId: 0, DeptId: DeptVal, AuthorId: 0 },
+                success: function (data) {
+                    $('')
+                    $('#SearchViewDiv').show()
+                    $('#SearchViewDiv').html(data);
+                    $('#imagemodal').hide();
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+    })
+
+    $('#AuthorId').change(function () {
+        $('#SearchViewDiv').hide()
+        $('#StudentUser').hide()
+        $('#StaffUser').hide()
+        $('#PublicationId').val('').trigger('change.select2');
+        $('#DeptId').val('');
+        $('#SectionId').val('');
+        $('#UserCategoryId').val('');
+
+        var AuthorId = $('#AuthorId').val();
+
+        if (AuthorId == null || AuthorId == "" || AuthorId == undefined) {
+        }
+        else {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/RetunBookReportData',
+                type: 'POST',
+                data: {  PublicationId: 0, UserCategoryId: 0, SectionId: 0, DeptId: 0, AuthorId: AuthorId },
+                success: function (data) {
+                    $('#SearchViewDiv').show()
+                    $('#SearchViewDiv').html(data);
+                    $('#imagemodal').hide();
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+    })
+
+    $('#PublicationId').change(function () {
+        debugger
+        $('#Student').val('')
+        $('#StudentUser').hide()
+        $('#StaffUser').hide()
+        $('#SearchViewDiv').hide()
+        $('#AuthorId').val('').trigger('change.select2');
+        $('#DeptId').val('');
+        $('#SectionId').val('');
+        $('#UserCategoryId').val('');
+
+        var PublicationId = $('#PublicationId').val();
+        if (PublicationId == null || PublicationId == "" || PublicationId == undefined) {
+
+        }
+        else {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/RetunBookReportData',
+                type: 'POST',
+                data: {  PublicationId: PublicationId, UserCategoryId: 0, SectionId: 0, DeptId: 0, AuthorId: 0 },
+                success: function (data) {
+                    $('#SearchViewDiv').show()
+                    $('#SearchViewDiv').html(data);
+                    $('#imagemodal').hide();
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+    })
+</script>

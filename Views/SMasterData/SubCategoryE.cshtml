@@ -1,0 +1,237 @@
+﻿@model AsteriskBrowserAL.InventorySubCategory
+
+@{
+    ViewBag.Title = "Create Sub Category";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Master Data
+        </li>
+        <li class="active">Sub Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <br/>
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("SubCategoryE", "SMasterData", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" value="@Model.InventorySubCategoryId" id="SelSubCategoryId" />
+                <input type="hidden" value="@Model.InventoryCategoryId" id="SelCategoryId" />
+                @Html.HiddenFor(model => model.InventoryCategoryId)
+                @Html.HiddenFor(model => model.InventorySubCategoryId)
+
+                <span style="color:red;font-weight:bold;" id="Validation"></span>
+
+
+    <div class="page-header">
+        <h1>
+            Sub Category
+            <small style="float:right;">
+                @Html.ActionLink("Back to details", "SubCategory", new { CategoryId = (null != Model) ? (Model.InventoryCategoryId.HasValue ? Model.InventoryCategoryId.Value : 0) : 0 })
+            </small>
+        </h1>
+    </div><!-- /.page-header -->
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <form class="form-horizontal" role="form">
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Code")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.Description, new { @class = "form-control textlength", @maxlength = "2", @id = "Code", placeholder = "Code" })
+                                </div>
+
+                                <span class="col-sm-3" style="color:red;font-weight:bold;" id="CodeVal">
+                                </span>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Sub Category Name")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.SubCategoryName, new { @class = "form-control textlength", @maxlength = "40", @id = "SubCategoryName", placeholder = "Sub Category Name" })
+                                </div>
+
+                                <span class="col-sm-3" style="color:red;font-weight:bold;" id="SubCategoryNameVal">
+                                </span>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Max Stock")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.MaxStock, new { @class = "form-control textlength txtboxNum", @id = "MaxStock", @maxlength = "7", placeholder = "Max Stock" })
+                                </div>
+
+                                <span class="col-sm-3" style="color:red;font-weight:bold;" id="MaxStockVal">
+                                </span>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Min Stock")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.MinStock, new { @class = "form-control textlength txtboxNum", @id = "MinStock", @maxlength = "4", placeholder = "Min Stock" })
+                                </div>
+
+                                <span class="col-sm-3" style="color:red;font-weight:bold;" id="MinStockVal">
+                                </span>
+
+                            </div>
+
+                            <div class="hr hr-18 dotted hr-double"></div>
+
+                            @*<div class="clearfix form-actions">*@
+                                <div class="col-md-offset-3 col-md-9">
+                                    <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                        <i class="ace-icon fa fa-check bigger-50"></i>
+                                        Save
+                                    </button>
+
+                                    &nbsp; &nbsp; &nbsp;
+                                    <button class="btn btn-sm" type="reset">
+                                        <i class="ace-icon fa fa-undo bigger-50"></i>
+                                        Reset
+                                    </button>
+                                </div>
+                            @*</div>*@
+
+
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+
+
+</section>
+
+<script type="text/javascript">
+    function validateSubCategory() {
+
+        var SubCategoryName = document.getElementById("SubCategoryName").value;
+        var Code = document.getElementById("Code").value;
+        var MaxStock = document.getElementById("MaxStock").value;
+        var MinStock = document.getElementById("MinStock").value;
+
+        validate = true;
+
+        if (SubCategoryName == "") {
+            document.getElementById("SubCategoryNameVal").innerHTML = "Please enter name";
+            validate = false;
+        }
+
+        if (Code == "") {
+            document.getElementById("CodeVal").innerHTML = "Please enter code";
+            validate = false;
+        }
+
+        if (MaxStock == "" || MaxStock < 1) {
+            document.getElementById("MaxStockVal").innerHTML = "Please enter max stock";
+            validate = false;
+        }
+
+        if (MinStock == "" || MinStock < 1) {
+            document.getElementById("MinStockVal").innerHTML = "Please min stock";
+            validate = false;
+        }
+
+        if (MaxStock > 0 && MinStock > 0)
+        {
+            if(parseInt(MaxStock,10) < parseInt(MinStock,10))
+            {
+                document.getElementById("MinStockVal").innerHTML = "Min stock should be less than max stock";
+                validate = false;
+            }
+        }
+
+        if (validate == true) {
+            validate = IsNameExists();
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateSubCategory();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#SubCategoryName').focus(function () {
+        document.getElementById("SubCategoryNameVal").innerHTML = "";
+    });
+
+    $('#Code').focus(function () {
+        document.getElementById("CodeVal").innerHTML = "";
+    });
+
+    $('#MaxStock').focus(function () {
+        document.getElementById("MaxStockVal").innerHTML = "";
+    });
+
+    $('#MinStock').focus(function () {
+        document.getElementById("MinStockVal").innerHTML = "";
+    });
+
+    function IsNameExists() {
+        var val = true;
+        $.ajax({
+
+            url: '/SMasterData/IsSubCategoryExists/',
+            data: { Type: "Edit", Id: $('#SelSubCategoryId').val(), Code: $('#Code').val(), SubCategoryName: document.getElementById("SubCategoryName").value, CategoryId: $('#SelCategoryId').val() },
+            success: function (data) {
+
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            },
+            async: false
+        });
+
+        return val;
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+

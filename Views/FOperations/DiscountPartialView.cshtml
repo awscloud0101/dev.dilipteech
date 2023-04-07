@@ -1,0 +1,323 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.DiscountViewModel>
+@{
+    ViewBag.Title = "Discount";
+    List<AsteriskBrowserAL.Models.FeeParticularViewModel> Particulars = new List<AsteriskBrowserAL.Models.FeeParticularViewModel>();
+    if (null != Model && Model.Count() > 0)
+    {
+        var Feeparticulars = Model.FirstOrDefault();
+
+        if (null != Feeparticulars)
+        {
+            Particulars = Feeparticulars.FeeparticularsData.ToList();
+        }
+
+    }
+
+    int sno = 1;
+}
+
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+
+
+
+@if (Model != null)
+{
+    if (Model.Count() > 0)
+    {
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+            <div style="float:right;">
+                <button class="btncustom P2" type="submit">
+                    save
+                </button>
+            </div>
+        </div>
+
+        <div class="overflowscroll">
+            <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                <thead>
+					<tr>
+						<th colspan="4" style="text-align:center"> Student Details </th>
+						<th colspan="4" style="text-align:center">Tution Fee</th>
+						<th colspan="4" style="text-align:center">Hostel Fee</th>
+						<th colspan="4" style="text-align:center">Admission Fee</th>
+						<th colspan="4" style="text-align:center">Old Fee</th>
+
+					</tr>
+					<tr>
+						<th>
+							S.No.
+						</th>
+						<th>
+							@Html.DisplayName("Student")
+						</th>
+						<th>
+							@Html.DisplayName("Admission Number")
+						</th>
+						<th>
+							@Html.DisplayName("Section")
+						</th>
+						<th>
+							@Html.DisplayName("Amount")
+						</th>
+
+						<th>
+							@Html.DisplayName("Due")
+						</th>
+						<th>
+							@Html.DisplayName("Total Concession")
+						</th>
+
+						<th>
+							@Html.DisplayName("Concession")
+						</th>
+						
+						<th>
+							@Html.DisplayName("Amount")
+						</th>
+
+						<th>
+							@Html.DisplayName("Due")
+						</th>
+						<th>
+							@Html.DisplayName("Total Concession")
+						</th>
+
+						<th>
+							@Html.DisplayName("Concession")
+						</th>
+						<th>
+							@Html.DisplayName("Amount")
+						</th>
+
+						<th>
+							@Html.DisplayName("Due")
+						</th>
+						<th>
+							@Html.DisplayName("Total Concession")
+						</th>
+
+						<th>
+							@Html.DisplayName("Concession")
+						</th>
+
+						<th>
+							@Html.DisplayName("Amount")
+						</th>
+
+						<th>
+							@Html.DisplayName("Due")
+						</th>
+						<th>
+							@Html.DisplayName("Total Concession")
+						</th>
+						<th>
+							@Html.DisplayName("Concession")
+						</th>
+
+
+					</tr>
+                </thead>
+                <tbody>
+
+                    @for (int i = 0; i < Model.Count(); i++)
+					{
+
+						double TotalSum = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 0).Sum(s => s.InstallmentAmount);
+						double TotalBalance = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 0).Sum(s => s.BalanceAmount);
+						double valTotalBalance = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 0).Sum(s => s.ValBalanceAmount);
+
+						double TotalDiscount = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 0).Sum(s => s.DiscountAmount);
+
+						double HostelTotalSum = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "Hostel Fee").Sum(s => s.InstallmentAmount);
+						double HostelTotalBalance = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "Hostel Fee").Sum(s => s.BalanceAmount);
+						double valHostelTotalBalance = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "Hostel Fee").Sum(s => s.ValBalanceAmount);
+
+						double HostelTotalDiscount = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "Hostel Fee").Sum(s => s.DiscountAmount);
+
+						double AdmissionTotalSum = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "Admission Fee").Sum(s => s.InstallmentAmount);
+						double AdmissionTotalBalance = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "Admission Fee").Sum(s => s.BalanceAmount);
+						double valAdmissionTotalBalance = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "Admission Fee").Sum(s => s.ValBalanceAmount);
+
+						double AdmissionTotalDiscount = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "Admission Fee").Sum(s => s.DiscountAmount);
+
+						double OldTotalSum = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "OLD DUE").Sum(s => s.InstallmentAmount);
+						double OldTotalBalance = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "OLD DUE").Sum(s => s.BalanceAmount);
+						double valOldTotalBalance = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "OLD DUE").Sum(s => s.ValBalanceAmount);
+
+						double OldTotalDiscount = Model.ElementAt(i).FeeparticularsData.Where(s => s.TransactionTypeId == 2 && s.ParticularName == "OLD DUE").Sum(s => s.DiscountAmount);
+
+						//if (TotalBalance > 0 || AdmissionTotalBalance > 0 || OldTotalBalance > 0)
+						//{
+					<tr>
+						<td>
+							@Html.Hidden("StudentData.Index", (@i + 10))
+							@Html.Hidden("StudentData[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+							@Html.Hidden("StudentData[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).StudentName)
+							@Html.Hidden("StudentData[" + (@i + 10) + "].BranchName", Model.ElementAt(i).SectionName)
+							@Html.Hidden("StudentData[" + (@i + 10) + "].AcademicYearId", Model.ElementAt(i).AcademicYearId)
+							@for (int j = 0; j < Model.ElementAt(i).FeeparticularsData.Count(); j++)
+		{
+					@Html.Hidden("StudentData[" + (@i + 10) + "].FeeparticularsData.Index", (@j + 10))
+					@Html.Hidden("StudentData[" + (@i + 10) + "].FeeparticularsData[" + (@j + 10) + "].Sno", Model.ElementAt(i).FeeparticularsData.ElementAt(j).Sno)
+					@Html.Hidden("StudentData[" + (@i + 10) + "].FeeparticularsData[" + (@j + 10) + "].InstallmentAmount", Model.ElementAt(i).FeeparticularsData.ElementAt(j).InstallmentAmount)
+					@Html.Hidden("StudentData[" + (@i + 10) + "].FeeparticularsData[" + (@j + 10) + "].ParticularName", Model.ElementAt(i).FeeparticularsData.ElementAt(j).ParticularName)
+					@Html.Hidden("StudentData[" + (@i + 10) + "].FeeparticularsData[" + (@j + 10) + "].ValBalanceAmount", Model.ElementAt(i).FeeparticularsData.ElementAt(j).ValBalanceAmount)
+
+					@Html.Hidden("StudentData[" + (@i + 10) + "].FeeparticularsData[" + (@j + 10) + "].BalanceAmount", Model.ElementAt(i).FeeparticularsData.ElementAt(j).BalanceAmount)
+					@Html.Hidden("StudentData[" + (@i + 10) + "].FeeparticularsData[" + (@j + 10) + "].FeeparticularId", Model.ElementAt(i).FeeparticularsData.ElementAt(j).FeeparticularId)
+					@Html.Hidden("StudentData[" + (@i + 10) + "].FeeparticularsData[" + (@j + 10) + "].FeeAmountId", Model.ElementAt(i).FeeparticularsData.ElementAt(j).FeeAmountId)
+					@Html.Hidden("StudentData[" + (@i + 10) + "].FeeparticularsData[" + (@j + 10) + "].TransactionTypeId", Model.ElementAt(i).FeeparticularsData.ElementAt(j).TransactionTypeId)
+}
+							@sno
+						</td>
+						<td>
+							@Model.ElementAt(i).StudentName
+						</td>
+
+						<td>
+							@Model.ElementAt(i).AdmissionNo
+
+						</td>
+						<td>
+							@Model.ElementAt(i).SectionName
+						</td>
+
+						@if (Model.ElementAt(i).IsHostel == false)
+	{
+					<td>
+						@TotalSum
+					</td>
+					<td>
+						@TotalBalance
+					</td>
+					<td>@TotalDiscount</td>
+					if (valTotalBalance > 0)
+{
+
+					<td>
+						@Html.TextBox("StudentData[" + (@i + 10) + "].DiscountAmount", @Model.ElementAt(i).DiscountAmount, new { @Class = "form-control", @type = "number", @min = "0", @max = @valTotalBalance, @title = "Please enter proper amount", @Style = "width:100px" })
+					</td>
+}
+else
+{
+					<td></td>
+}
+
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+
+}
+else
+{
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>
+						@HostelTotalSum
+					</td>
+					<td>
+						@HostelTotalBalance
+					</td>
+					<td>@HostelTotalDiscount</td>
+if (valHostelTotalBalance > 0)
+{
+					<td>
+						@Html.TextBox("StudentData[" + (@i + 10) + "].HostelDiscount", @Model.ElementAt(i).HostelDiscount, new { @Class = "form-control", @type = "number", @min = "0", @max = @valHostelTotalBalance, @title = "Please enter proper amount", @Style = "width:100px" })
+					</td>
+}
+else
+{
+					<td></td>
+}
+
+
+}
+
+						@if (Model.ElementAt(i).Isnew == true)
+	{
+					<td>
+						@AdmissionTotalSum
+					</td>
+					<td>
+						@AdmissionTotalBalance
+					</td>
+					<td>@AdmissionTotalDiscount</td>
+if (valAdmissionTotalBalance > 0)
+{
+					<td>
+						@Html.TextBox("StudentData[" + (@i + 10) + "].AdmissionDiscount", @Model.ElementAt(i).AdmissionDiscount, new { @Class = "form-control", @type = "number", @min = "0", @max = @valAdmissionTotalBalance, @title = "Please enter proper amount", @Style = "width:100px" })
+					</td>
+}
+else
+{
+					<td></td>
+}
+
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+}
+else
+{
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+
+					<td>
+						@OldTotalSum
+					</td>
+					<td>
+						@OldTotalBalance
+					</td>
+					<td>@OldTotalDiscount</td>
+if (valOldTotalBalance > 0)
+{
+
+					<td>
+						@Html.TextBox("StudentData[" + (@i + 10) + "].OldDiscount", @Model.ElementAt(i).OldDiscount, new { @Class = "form-control", @type = "number", @min = "0", @max = @valOldTotalBalance, @title = "Please enter proper amount", @Style = "width:100px" })
+					</td>
+}
+else
+{
+					<td></td>
+}
+
+
+}
+
+
+					</tr>
+                        sno++;
+                        @*}*@
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold">Data not available</span>
+    }
+
+
+}
+else
+{
+    <span style="color:red;font-weight:bold">Data not available</span>
+
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })

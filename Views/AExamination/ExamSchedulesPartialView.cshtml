@@ -1,0 +1,136 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ExamShedulesData>
+@{
+    ViewBag.Title = "ExamSchedulesPartialView";
+
+    int nSNo = 1;
+
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    @*<div id="message" class="alert alert-info bigger-110">
+        </div>*@
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+@if (null != Model && Model.Count() > 0)
+{
+
+
+    <div class="col-xs-12">
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+        <!-- /.box-header -->
+        <!-- div.table-responsive -->
+        <!-- div.dataTables_borderWrap -->
+        <div class="overflowscroll">
+
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayName("Sno")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Exam Code")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Exam Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Start Date")
+                        </th>
+                        <th>
+                            @Html.DisplayName("End Date")
+                        </th>
+
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                {
+                        <tr>
+                            <td>
+                                @(nSNo++)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ExamCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ExamName)
+                            </td>
+                            <td>
+                                @if (item.StartDate.HasValue)
+                                {
+                                    @item.StartDate.Value.ToString("dd-MMM-yyyy")
+                                }
+                            </td>
+                            <td>
+                                @if (item.EndDate.HasValue)
+                                {
+                                    @item.EndDate.Value.ToString("dd-MMM-yyyy")
+                                }
+                            </td>
+
+                            <td>
+                                <div>
+                                    <a class="green P2" href="@Url.Action("ExamSchedulesE", "AExamination", new { id = item.ExamId })">
+                                        <i class="ace-icon fa fa-pencil bigger-130"></i>
+                                    </a>
+                                    <a class="red P2" onclick="btnConfirm(@item.ExamId)">
+                                        <i class="ace-icon fa fa-trash bigger-130"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    <div class="col-xs-12">
+        <span style="font-weight:bold;color:red">No records found</span>
+    </div>
+}
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/AExamination/ValidationForExamSchedulesD',
+                data: { id: Value },
+                success: function (data) {
+                    var url = '/AExamination/ExamSchedulesD?id=' + Value;
+                    var title = "Exam Schedules";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+
+

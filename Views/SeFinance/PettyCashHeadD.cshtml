@@ -1,0 +1,112 @@
+﻿@model AsteriskBrowserAL.PettyCashHead
+
+@{
+    ViewBag.Title = "Delete Pettycash Head";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Petty Cash Head</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>@Html.ActionLink("<< Pettycash Head Details", "PettyCashHead")</h3>
+            @*<button class="btn btn-primary" style="width:80px" type="button" onclick="location.href='@Url.Action("PettyCashHead", "SePettyCash")'">New</button>*@
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("PettyCashHeadD", "SeFinance", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" name="id" id="id" value="@Model.PettyCashHeadId" />
+                <div>
+                    <span style="color: red;">
+                        <b>Are you sure you want to delete this?</b>
+                    </span>
+                </div>
+
+                <div class="box">
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="box-header">
+                        <h3 class="box-title">Pettycash Head</h3>
+                        <br />
+                        <br />
+                        <button class="btn btn-primary" type="submit" style="float:right;width:80px" onclick="return submitForm()">
+                            Delete
+                        </button>
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+
+                    <div class="box-body">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Description")
+                                    </th>
+
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(model => model.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(model => model.Description)
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+
+<script>
+    function submitForm() {
+        var valid = true;
+
+        var Id = $('#id').val();
+        if (Id > 0) {
+            $.ajax({
+
+                url: '/SeFinance/ValidationForPettyCashHeadD',
+                data: { Id: Id },
+                success: function (data) {
+                    if (data != "") {
+                        document.getElementById('Validation').innerHTML = data;
+                        valid = false;
+                    }
+                },
+                async: false
+            })
+        }
+        return valid;
+    }
+</script>
+

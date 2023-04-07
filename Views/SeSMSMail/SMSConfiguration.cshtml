@@ -1,0 +1,287 @@
+﻿@model AsteriskBrowserAL.Models.SMSnMailSettingsViewModel
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            SMS&Mail
+        </li>
+        <li class="active">Mail Configuration</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<!--Main Content-->
+
+
+@*<section class="content">
+
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                @using (Html.BeginForm("SMSConfiguration", "SeSMSMail", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <span style="color:green;font-weight:bold">@Html.ValidationMessage("SMSSettings")</span>
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="box-header">
+                        <h3 class="box-title col-sm-11">SMS</h3>
+                        <button class="btn btn-primary pull-right" type="submit" style="width:80px;" onclick="return submitForm();">
+                            Save
+                        </button>
+
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+    <div class="box-body">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-6">
+                    <label class="col-sm-4" for="form-field-1">@Html.Label("Port Name")</label>
+                    <input type="hidden" name="SMSSettingsId" value="@Model.SMSSettingsId" />
+                    <div class="col-xs-6">
+                      @Html.TextBoxFor(model => model.PortName, new { @class = "form-control textlength", style = "width:210px", placeholder = "Port Name", @id = "PortName"})*@
+                        @*@if (null != Model)
+                        {
+                            if (null != Model.lstPorts)
+                            {
+                        @Html.DropDownListFor(model => model.PortName, new SelectList(Model.lstPorts, "PortName"), new { @class = "form-control", id = "PortName" })
+                            }
+                            else
+                            {
+                        <select id="PortName" class="form-control"></select>
+                            }
+                        }
+                    </div>
+                </div>
+
+
+                <div class="col-xs-6">
+                    <label class="col-sm-5" style="width:210px" for="form-field-1">@Html.Label("Send SMS On")</label>
+
+                </div>
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-6">
+                    <label class="col-sm-4" for="form-field-1">@Html.Label("Sender Name")</label>
+                    <div class="col-xs-6">
+                        @Html.TextBoxFor(model => model.SenderName, new { @class = "form-control textlength", style = "width:210px", placeholder = "Sender Name", @id = "SenderName", @onchange = "removeError();" })
+                    </div>
+                </div>
+
+
+                <div class="col-xs-6">
+                    <label class="col-sm-4" style="width:210px" for="form-field-1">@Html.Label("Student Admissions")</label>
+                    <input type="hidden" name="Exam Schedule/Result" value="@Model.StudentAdmission" />
+                    <div class="col-xs-6">
+                        @Html.CheckBoxFor(model => model.StudentAdmission.HasValue, new { Name = "StudentAdmission" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-6">
+                    <label class="col-sm-4" for="form-field-1">@Html.Label("SMSGateway")</label>
+                    <div class="col-xs-6">
+                        @Html.TextBoxFor(model => model.SMSGateway, new { @class = "form-control textlength", style = "width:210px", placeholder = "SMSGateway", @id = "SMSGateway", @onchange = "removeError();" })
+                    </div>
+                </div>
+
+                <div class="col-xs-6">
+                    <label class="col-sm-4" style="width:210px" for="form-field-1">@Html.Label("Exam Schedule/Result")</label>
+                    <input type="hidden" name="Exam Schedule/Result" value="@Model.ExamSchedule" />
+                    <div class="col-xs-6">
+                        @Html.CheckBoxFor(model => model.ExamSchedule.HasValue, new { Name = "ExamSchedule" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-6">
+                    <label class="col-sm-4" for="form-field-1">@Html.Label("User Name")</label>
+                    <div class="col-xs-6">
+                        @Html.TextBoxFor(model => model.UserName, new { @class = "form-control textlength", style = "width:210px", placeholder = "UserName", @id = "UserName", @onchange = "removeError();" })
+                    </div>
+                </div>
+
+                <div class="col-xs-6">
+                    <label class="col-sm-4" style="width:210px" for="form-field-1">@Html.Label("Attendance")</label>
+                    <input type="hidden" name="Exam Schedule/Result" value="@Model.Attendance" />
+                    <div class="col-xs-6">
+                        @Html.CheckBoxFor(model => model.Attendance.HasValue, new { Name = "Attendance" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-6">
+                    <label class="col-sm-4" for="form-field-1">@Html.Label("Password")</label>
+                    <div class="col-xs-6">
+                        @Html.PasswordFor(model => model.SettingsPassword, new { @class = "form-control textlength", style = "width:210px", placeholder = "Password", @id = "SettingsPassword", @onchange = "removeError();" })
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="col-sm-4" style="width:210px" for="form-field-1">@Html.Label("Events")</label>
+                    <input type="hidden" name="Exam Schedule/Result" value="@Model.Events" />
+                    <div class="col-xs-6">
+                        @Html.CheckBoxFor(model => model.Events.HasValue, new { Name = "Events" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-6">
+                    <div class="col-xs-6">
+                        @Html.RadioButtonFor(m => m.SendSMSUsingInternet, 0, new { @checked = "checked" }) Send SMS Using Internet
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <br />
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-6">
+                    <div class="col-xs-6">
+                        @Html.RadioButtonFor(m => m.SendSMSUsingInternet, 1) Send SMS Using Modem
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</section>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}*@
+
+
+
+@*<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#SettingsPassword').val('@Model.SettingsPassword');
+    });
+
+    function submitForm() {
+        var PortName = $('#PortName').val();
+        var SenderName = $('#SenderName').val();
+        var SMSGateway = $('#SMSGateway').val();
+        var UserName = $('#UserName').val();
+        var SettingsPassword = $('#SettingsPassword').val();
+       
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+
+        if (PortName == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Port Name";
+            isValid = false;
+        }
+
+
+        if (SenderName == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Sender Name";
+            isValid = false;
+        }
+
+
+        if (SMSGateway == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "SMSGateway";
+            isValid = false;
+        }
+
+
+        if (UserName == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "UserName";
+            isValid = false;
+        }
+
+
+        if (SettingsPassword == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "SettingsPassword";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+        }
+
+        return isValid;
+    }
+
+
+    $('#PortName').click(function () {
+        document.getElementById("Validation").innerHTML = "";
+
+    })
+
+    $('#SenderName').click(function () {
+        document.getElementById("Validation").innerHTML = "";
+
+    })
+    $('#SMSGateway').click(function () {
+        document.getElementById("Validation").innerHTML = "";
+
+    })
+    $('#UserName').click(function () {
+        document.getElementById("Validation").innerHTML = "";
+
+    })
+    $('#SettingsPassword').click(function () {
+        document.getElementById("Validation").innerHTML = "";
+
+    })*@
+
+    
+@*</script>*@
+
+
+
+
+
+
+

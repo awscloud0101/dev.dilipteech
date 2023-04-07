@@ -1,0 +1,118 @@
+﻿@model AsteriskBrowserAL.Models.Cast_AgeReportViewModel
+
+
+<script type="text/javascript">
+    function PrintElem() {
+        Popup($('#mydiv').html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+    window.onload = PrintElem();
+</script>
+
+
+<body>
+    <div id="mydiv" style="display:none">
+        @if (null != Model)
+        {
+            if (null != Model.AgeReport && Model.AgeReport.Count() > 0)
+            {
+                <div class="row">
+                    @if (null != Model.InstituteDetails)
+                    {
+                        <div class="col-xs-12">
+                           <img class=" col-xs-11" id="avatar" width="50" height="43" src="@Model.InstituteDetails.InstituteLogo" style="margin-bottom:-1.5em;" />
+                            <b style="font-weight:bold; margin-left:0.3em; font-size:20px; font-family:'Segoe UI'">@Model.InstituteDetails.InstituteName</b>
+                        </div>
+                        <div style="margin-left:3.7em; font-family:'Segoe UI'"><b>@Model.InstituteDetails.InstituteAddress</b></div>
+                    }<br />
+                    <hr />
+                    @*<div align="center" style="font:12%"><b>AGE WISE REPORT(@Model.InstituteDetails.FiscalStartDate.Value.Year - @Model.InstituteDetails.FiscalEndDate.Value.Year)</b></div>*@
+                    <hr />
+                </div>
+
+                foreach (var dd in Model.AgeReport)
+                {
+                    <b style="width:430px;font-size:13px;">Age  : @dd.Key</b>
+                    <hr />
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th>
+                                </th>
+                                @foreach (var c in dd)
+                                {
+                                    if (c.Age != 0)
+                                    {
+                                        <th>
+
+                                            @c.Age
+                                        </th>
+                                    }
+                                    
+
+                                }
+                            </tr>
+                            <tr>
+                                <td>
+                                    <b>Boys:</b>
+                                </td>
+
+                                @foreach (var c in dd)
+                                {
+
+                                    if (c.BoysCount != 0)
+                                    {
+
+                                        <td>
+                                            @c.BoysCount
+                                        </td>
+                                    }
+                                }
+                            </tr>
+                            <tr>
+                                <td>
+                                    <b>Girls:</b>
+                                </td>
+
+                                @foreach (var c in dd)
+                                {
+                                    if (c.GirlsCount != 0)
+                                    {
+                                        <td>
+                                            @c.GirlsCount
+                                        </td>
+                                    }
+
+                                }
+                            </tr>
+
+
+
+                        </tbody>
+                    </table>
+
+                    <br />
+                    <br />
+                    <br />
+                }
+            }
+        }
+
+    </div>
+</body>
+
+
+

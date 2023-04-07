@@ -1,0 +1,103 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentAdmissionData>
+@{
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+@if (Model != null && Model.Count() > 0)
+{
+    int nSno = 1;
+            <table id="TableTwo" class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            <input type="checkbox" id="SelectRemoveall" />   @Html.DisplayName("Select")
+                        </th>
+
+                        @if (bIsCoastal)
+                        {
+                            <th>
+                                @Html.DisplayName("Registration Number")
+                            </th>
+                        }
+
+                        <th>
+                            @Html.DisplayName("Student Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Roll Number")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Section")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+
+                        <tr>
+                            <td>
+                                @(nSno++)
+                            </td>
+                            <td>
+
+                                @Html.Hidden("Student.Index", (@i + 10))
+                                @Html.Hidden("Student[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                                @Html.Hidden("Student[" + (@i + 10) + "].FirstName", Model.ElementAt(i).FirstName)
+                                @Html.Hidden("Student[" + (@i + 10) + "].SectionId", Model.ElementAt(i).SectionId)
+                                @Html.Hidden("Student[" + (@i + 10) + "].SectionName", Model.ElementAt(i).SectionName)
+
+                                @if (Model.ElementAt(i).VehicleRoutePointId > 0)
+                                {
+                                    <input id="CheckR" name="CheckR" type="checkbox" checked="checked" />
+                                }
+                                else
+                                {
+                                    @Html.CheckBox("Student[" + (@i + 10) + "].isChecked", Model.ElementAt(i).isChecked, new { @id = "CheckR", @name = "CheckR", @Value = Model.ElementAt(i).StudentId, @onclick = "AssingRoutePoint()" })
+                                    @Html.Hidden("Student[" + (@i + 10) + "].isChecked", Model.ElementAt(i).isChecked)
+                                }
+                            </td>
+
+                            @if (bIsCoastal)
+                            {
+                                <td>
+                                    @Model.ElementAt(i).OMRNumber
+                                </td>
+                            }
+                            <td>
+                                @Model.ElementAt(i).FirstName
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).RollNumber
+                            </td>
+
+                            <td>
+                                @Model.ElementAt(i).SectionName
+                                @Html.Hidden("Student[" + (@i + 10) + "].SectionName", Model.ElementAt(i).SectionName)
+                            </td>
+
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+
+}
+
+        <script>
+
+            $('#SelectRemoveall').change(function () {
+                if ($(this).prop('checked')) {
+                    $('tbody tr td #CheckR').each(function () {
+                        $(this).prop('checked', true);
+                    });
+                } else {
+                    $('tbody tr td #CheckR').each(function () {
+                        $(this).prop('checked', false);
+                    });
+                }
+            });
+        </script>

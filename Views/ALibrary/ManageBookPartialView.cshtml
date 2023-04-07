@@ -1,0 +1,181 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ManageBooksViewData>
+
+@if (Model != null)
+{
+    if (Model.Count() > 0)
+    {
+
+        <div class="hr hr-18 dotted hr-double"></div>
+        int nsno = 1;
+        <div class="table-header">
+            Records Found (@Model.Count())
+            <button id="Generate" class="btn btn-info btn-xs" style="float:right">
+                <i class="ace-icon fa fa-print bigger-180"></i>
+            </button>
+        </div>
+
+        <table id="mytab1" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("SNo")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Book Category")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Book Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Author")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Publication")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Remarks")
+                    </th>
+                    <th>
+                            @Html.DisplayName("ISBN")
+                        </th>
+                    <th>
+                        @Html.DisplayName("Edition")
+                    </th>
+                    <th>
+                        @Html.DisplayName("No of Copies")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Book Location")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Bar Code Print")
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td style="display:none">
+                            @item.ManageBookId
+                        </td>
+                        <td>
+                            @item.BookCategoryName
+                        </td>
+                        <td>
+                            @item.MasterBookName
+                        </td>
+                        <td>
+                            @item.Author
+                        </td>
+                        <td>
+                            @item.Publication
+                        </td>
+                        <td>
+                            @item.Remark
+                        </td>
+                        <td>
+                                @item.ISBN
+                            </td>
+                        <td>
+                            @item.Edition
+                        </td>
+                        <td>
+                            @item.NumOfCopies
+                        </td>
+                        <td>
+                            @item.BookLocationName
+                        </td>
+                        <td>
+                            @*@if (item.BarCodeNoIsPrinted == 1)
+                            {*@
+                                <a href="@Url.Action("ManageBooksP", "ALibrary", new { id = item.ManageBookId })">Print</a>
+                            @*}*@
+                        </td>
+                        <td>
+                            <a class="blue" href="@Url.Action("ManageBooksDet", "ALibrary", new {  MasterBookId = item.MasterBookId  ,ManageBookId = item.ManageBookId})">
+                                <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                            </a>
+
+                            <a class="green" href="@Url.Action("ManageBooksE", "ALibrary", new { MasterBookDataId = item.MasterBookId, BookCategoryId = item.BookCategoryId, ManageBookId = item.ManageBookId, BookLocationId = item.BookLocationId })">
+                                <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                            </a>
+
+                            <a class="red" onclick="btnConfirm(@item.ManageBookId)">
+                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <span style="color:red">Data not available to display</span>
+    }
+}
+<script>
+    function btnConfirm(Value,BookId) {
+        debugger
+        if (Value > 0) {
+            $.ajax({
+                url: '/ALibrary/ValidationForManageBooksD',
+                data: {
+                    Id: Value,
+                    BookId:BookId
+                },
+                success: function (data) {
+
+                    var url = '/ALibrary/ManageBooksD?id=' + Value;
+                    var title = "Book Category";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+
+</script>
+<script>
+    $('#Generate').click(function () {
+        debugger
+        var BookCategoryId = $('#hiddenBookCategoryId').val();
+        var BookName=$('#hiddenBookId').val();
+        debugger
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/ALibrary/ManageBookOverallPrint?BookCategoryId=' + BookCategoryId + '&MasterBookId=' + BookName,
+            success: function (data) {
+                $('#table').html(data);
+                PrintData(data);
+            }
+        }).done(function (data) {
+            $('#imagemodal').hide();
+        });
+    })
+    function PrintElem(elem) {
+        debugger
+        Popup($(elem).html());
+    }
+    function PrintData(data) {
+        debugger
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>

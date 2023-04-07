@@ -1,0 +1,163 @@
+﻿@model AsteriskBrowserAL.MasterMagazineDetails
+@{
+    ViewBag.Title = "MagazineDetails";
+}
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Magazine Details</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+<br />
+<br />
+<div class="row">
+    <div class="col-xs-12">
+        <div class="widget-box">
+            <div class="widget-header header-small header-title">
+                <h5 class="widget-title">Magazine Details</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Magazine Category</label>
+                            <div class="col-sm-6">
+                                <select id="CategoryId" name="CategoryName" class="form-control" ></select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Magazine Name</label>
+                            <div class="col-sm-6">
+                                <select id="MagazineId" name="MagazineName" class="form-control"></select>
+                            </div>
+                        </div>
+                        <input  type="hidden" id="nMasterMagazineDetailsId"  value="@Model.MasterMagazineDetailsId"/>
+                        <input type="hidden" id="nMagazineCategoryId" value="@Model.MagazineCategoryId"/>
+                        <br />
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="SearchData"></div>
+
+<script>
+
+    function OnloadFunction() {
+        debugger
+        var magazineid = $('#nMasterMagazineDetailsId').val();
+        var categoryid = $('#nMagazineCategoryId').val();
+
+        LoadCategoryDropDown();
+        if (categoryid > 0)
+            $("#CategoryId").val(categoryid);
+
+        if (magazineid > 0) {
+            LoadMagzineDropDown(categoryid);
+            $("#MagazineId").val(magazineid);
+            GetMagazineData(magazineid);
+        }
+       
+    }
+
+    function LoadCategoryDropDown() {
+        debugger
+        $.ajax({
+            url: '/ALibrary/GetCategories',
+            success: function (result) {
+                catergory = $("#CategoryId")
+                catergory.children().remove();
+                catergory.append($("<option>").val(-1).text("--- Select ---"))
+                catergory.append($("<option>").val(0).text("All"))
+                $.each(result, function (e, record) {
+                    catergory.append($("<option>").val(record.BookCategoryId).text(record.BookCategoryName))
+                })
+                $("#CategoryId").append(catergory);
+
+                //var selVal = $('#nMagazineCategoryId').val();
+                //if (selVal != null && selVal != "" && selVal > -1) {
+                //    document.getElementById("CategoryId").value = selVal;
+                //}
+            },
+            async: false
+        });
+    }
+
+    $('#CategoryId').change(function () {
+        $("#SearchData").html("");
+        var category = $('#CategoryId').val();
+        //GetMagazineData(0, category);
+        LoadMagzineDropDown(category);
+        
+    });
+
+    function LoadMagzineDropDown(category) {
+        debugger
+        if (category > 0)
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/GetMagzines',
+                data: { MasterCategoryId: category },
+                success: function (data) {
+                    debugger
+                    var Magzine = $('#MagazineId')
+                    Magzine.children().remove();
+                    Magzine.append($("<option>").val(-1).text("---Select---"))
+                    Magzine.append($("<option>").val(0).text("All"))
+                    $.each(data, function (e, record) {
+                        Magzine.append($("<option>").val(record.MasterMagazineDetailsId).text(record.Name))
+                    })
+                    $("#MagazineId").append(Magzine);
+                    $('#imagemodal').hide();
+                    //var selVal = $('#nMasterMagazineDetailsId').val();
+                    //if (selVal != null && selVal != "" && selVal > -1) {
+                    //    document.getElementById("MagazineId").value = selVal;
+                    //}
+                },
+                async: false
+            });
+    }
+
+
+    $('#MagazineId').change(function () {
+        debugger
+        $("#SearchData").html("");
+        var magazine = $('#MagazineId').val();
+        var MagazineCategoryId = $('#CategoryId').val();
+       
+        GetMagazineData(magazine, MagazineCategoryId);
+    });
+
+    function GetMagazineData(magazine, MagazineCategoryId) {
+        debugger
+        $('#imagemodal').show();
+        $("#SearchData").hide()
+        $.ajax({
+            url: '/ALibrary/GetMagazineDetailsData',
+            data: { MasterMagazineId: magazine, MagazineCategoryId: MagazineCategoryId },
+            success: function (data) {
+                $('#imagemodal').hide();
+                $("#SearchData").show()
+                $("#SearchData").html(data)
+                
+            }
+        })
+    }
+
+  
+
+    window.onload = OnloadFunction();
+   
+</script>

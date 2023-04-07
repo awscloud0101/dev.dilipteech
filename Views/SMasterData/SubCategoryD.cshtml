@@ -1,0 +1,124 @@
+﻿@model AsteriskBrowserAL.InventorySubCategory
+
+@{
+    ViewBag.Title = "Delete Sub Category";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Master Data
+        </li>
+        <li class="active">Sub Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Sub Category Details", "SubCategory", new { CategoryId = (null != Model) ? (Model.InventoryCategoryId.HasValue ? Model.InventoryCategoryId.Value : 0) : 0 })</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("SubCategoryD", "SMasterData", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" name="id" id="id" value="@Model.InventorySubCategoryId" />
+                <div>
+                    <span style="color: red;">
+                        <b>Are you sure you want to delete this?</b>
+                    </span>
+                </div>
+
+                <div class="box">
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="box-header">
+                        <h3 class="box-title">Sub Category</h3>
+                        <button class="btn btn-primary pull-right" type="submit" style="width:80px;" onclick="return submitForm()" >
+                            Delete
+                        </button>
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+
+                    <div class="box-body">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("Code")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Sub Category Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Max Stock")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Min Stock")
+                                    </th>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(model => model.Description)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(model => model.SubCategoryName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(model => model.MaxStock)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(model => model.MinStock)
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+
+
+
+<script>
+    function submitForm()
+    {
+        var valid = true;
+
+        var Id = $('#id').val();
+
+        if(Id > 0)
+        {
+            $.ajax({
+                url: '/SMasterData/ValidationForSubCategoryD',
+                data: {Id: Id },
+                success : function(data)
+                {
+                    if(data != "")
+                    {
+                        document.getElementById('Validation').innerHTML = data;
+                        valid = false;
+                    }
+                },
+                async : false
+            })
+        }
+
+        return valid;
+    }
+</script>

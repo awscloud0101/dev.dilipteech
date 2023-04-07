@@ -1,0 +1,145 @@
+﻿@model IEnumerable<AsteriskBrowserAL.PettyCashHead>
+@{
+    ViewBag.Title = "Pettycash Head";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Petty Cash Department</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+    hideScrolling:hover {
+        overflow: auto;
+    }
+    .red{
+        margin-left:10px;
+    }
+</style>
+
+<section class="content">
+
+    @if (Model != null)
+    {
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                    <div class="table-header">
+                        Petty Cash Department
+                      <div style="margin-right:10px;float:right;">
+
+                          <a href="@Url.Action("PettyCashHeadC", "SeFinance")" class="btncustom P2"  role="button" id="New" name="New">
+                              Add
+                          </a>
+                      </div>
+                    </div><!-- /.box-header -->
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Head")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Description")
+                            </th>
+
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </td>
+                                <td>
+                                    <div>
+                                        <a class="green P2" href="@Url.Action("PettyCashHeadE", "SeFinance", new { id = item.PettyCashHeadId })">
+                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                        </a>
+
+                                        <a class="red P2" onclick="btnConfirm(@item.PettyCashHeadId)">
+                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+
+                </table>
+
+                </div>
+            </div>
+    }
+    else
+    {
+        <span style="color: red;"><b>There are no records to display</b></span>
+    }
+
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+</section>
+<script>
+ function btnConfirm(Value) {
+
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeFinance/ValidationForPettyCashHeadD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SeFinance/PettyCashHeadD?Id=' + Value; 
+                    var title = "Petty Cash Department";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+ </script>

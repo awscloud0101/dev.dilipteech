@@ -1,0 +1,169 @@
+﻿@model List<AsteriskBrowserAL.Models.FeePaymentsData>
+@{
+    int sno = 1;
+    ViewBag.Title = "FeePayment";
+}
+
+<section class="content">
+    @if (null != Model && Model.Count() > 0)
+    {
+        using (Html.BeginForm("SaveFeeTransfer", "FOperations", FormMethod.Post, new { id = "frmFeeTransfer" }))
+        {
+            <input type="hidden" name="SubscriptionId" value="@ViewBag.SubscriptionId" />
+            <input type="hidden" name="FromParticularId" value="@ViewBag.FromParticularId" />
+            <input type="hidden" name="TransactionType" value="@ViewBag.TransactionType" />
+            <input type="hidden" name="Type" value="@ViewBag.Type" />
+            <input type="hidden" name="ApprovalRemarks" value="@ViewBag.ApprovalRemarks" />
+            <input type="hidden" name="FeeTransferId" value="@ViewBag.FeeTransferId" />
+
+            <span style="color:red;">Are you sure want to transfer amount(s) as shown below ?</span>
+            <div class="box">
+                <div class="box-header">
+                </div>
+
+                <div class="box-body">
+                    <div style="overflow:auto; max-height:350px;">
+                        <table class="table table-hover">
+                            <thead style="text-align:center;">
+                                <tr>
+                                    <th>
+                                        SNo
+                                    </th>
+                                    <th>
+                                        Particular Name
+                                    </th>
+                                    <th class="centerAlign">
+                                        Fee Amount
+                                    </th>
+                                    <th class="centerAlign">
+                                        Discount Amount
+                                    </th>
+                                    <th class="centerAlign">
+                                        Net Amount
+                                    </th>
+                                    <th class="centerAlign">
+                                        Credit Amount
+                                    </th>
+                                    <th class="centerAlign">
+                                        Paid Amount
+                                    </th>
+                                    <th class="centerAlign">
+                                        Due Amount
+                                    </th>
+                                    @if (Model.FirstOrDefault().IsRegular == false)
+                                    {
+                                        <th class="centerAlign">
+                                            Quantity
+                                        </th>
+                                    }
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @for (int i = 0; i < Model.Count(); i++)
+                                {
+                                    string color = "";
+                                    color = (Model.ElementAt(i).DueAmount == 0) ? "gray" : string.Empty;
+
+                                    if (sno == Model.Count())
+                                    {
+                                        color = "lightyellow;";
+                                    }
+
+                                    <tr style="background-color:@color">
+                                        <td>
+                                            @(sno++)
+                                        </td>
+                                        <td style="text-align:left;">
+                                            @Html.Hidden("lstFeePaymentsData.Index", (@i))
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].FeeParticular", Model.ElementAt(i).FeeParticular)
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].OnlineReceiptNo", Model.ElementAt(i).OnlineReceiptNo)
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].StudentId", Model.ElementAt(i).StudentId)
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].ReceiptNo", Model.ElementAt(i).ReceiptNo)
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].FeeParticularName", Model.ElementAt(i).FeeParticularName)
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].TemplateNumner", Model.ElementAt(i).TemplateNumner)
+
+
+                                            @Model[i].FeeParticularName
+                                        </td>
+                                        <td style="text-align:right;">
+                                            @Model[i].FeeAmount.ToString()
+                                        </td>
+                                        <td style="text-align:right;">
+                                            @Model[i].DiscountAmount.ToString()
+                                        </td>
+                                        <td style="text-align:right;">
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].NetAmount", Model.ElementAt(i).NetAmount)
+                                            @Model[i].NetAmount.ToString()
+
+                                        <td style="text-align:right;">
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].DebitAmount", Model.ElementAt(i).DebitAmount)
+                                            @Model[i].DebitAmount.ToString()
+                                        </td>
+                                        <td style="text-align:right;">
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].PaidAmount", Model.ElementAt(i).PaidAmount)
+                                            @Model[i].PaidAmount.ToString()
+                                        </td>
+                                        <td style="text-align:right;">
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].DueAmount", Model.ElementAt(i).DueAmount)
+                                            @Html.Hidden("lstFeePaymentsData[" + (@i) + "].TransacationType", Model.ElementAt(i).TransacationType)
+                                            @Model[i].DueAmount.ToString()
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+
+                        </table>
+                        @*@if (Model.FirstOrDefault().DebitAmount > 0 && Model.FirstOrDefault().IsRegular == true)
+                        {
+
+
+
+                            <div class="row">
+                                <div class="form-search">
+                                    <div class="col-xs-6 col-sm-3" style="float:right; ">
+
+                                        <div class="input-group">
+                                            <input class="form-control search-query" id="DebitAmount" value="@Model.Sum(t => t.DebitAmount)" placeholder="Enter Amount" name="DebitAmount" required="required" />
+                                            <span class="input-group-btn">
+
+                                                <button type="button" id="DebitAmountSetClick" name="DebitAmountSet" value="Set" onclick="SetDebitAmount()" class="btn btn-info btn-sm">
+                                                    Set
+                                                </button>
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" class="form-control" id="DebitAmount" value="0" placeholder="Enter Amount" name="DebitAmount" />
+                        }*@
+                    </div>
+                </div>
+
+            </div>
+            <br />
+        }
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold;">Payment heads are not available </span>
+    }
+</section>
+
+<script>
+    function SaveFeeTransfer() {
+
+        $('#frmFeeTransfer').submit();
+    }
+</script>

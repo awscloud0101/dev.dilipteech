@@ -1,0 +1,188 @@
+﻿@model List<AsteriskBrowserAL.Models.PlayersData>
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+@{
+    int sno = 1;
+}
+<!-- CSS -->
+<style>
+    .ui-widget-header, .ui-state-default, ui-button {
+        background: #3c8dbc;
+        border: 1px solid #3c8dbc;
+        color: #3c8dbc;
+        font-weight: bold;
+    }
+
+
+    .table-fixed thead {
+        width: 97%;
+    }
+
+    .table-fixed tbody {
+        height: 230px;
+        overflow-y: auto;
+        width: 100%;
+    }
+
+    .table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
+        display: block;
+    }
+
+        .table-fixed tbody td, .table-fixed thead > tr > th {
+            float: left;
+            border-bottom-width: 0;
+        }
+</style>
+   
+@if ((null != Model))
+{
+   
+
+    if (Model.Count() > 0)
+    {
+    
+        <div class="hr hr-18 dotted hr-double"></div>
+
+    <span style="color:red;">@Html.ValidationMessage("Error")</span>
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+            <div style="float:right;">
+                <div class="widget-toolbar no-border">
+                    <div class="inline action-buttons">
+                        <div style="float:right;">
+                            @*<input class="btn btn-primary pull-right" style="width:80px;" type="button" name="Save" id="Save" value="Remove" />*@
+                            <button name="Save" id="Save" value="Remove" class="btn btn-info btn-xs">
+                                <i class="ace-icon fa fa-minus-square bigger-160"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <table id="PlayerTable" class="table table-striped table-bordered table-hover" style="font-size:14px;">
+    
+            <tr>
+                <th>
+                    <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                </th>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Employee Number")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Name")
+                </th>
+                @*<th>
+                    @Html.DisplayName("Branch")
+                </th>*@
+            </tr>
+      
+        <tbody>
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                <tr>
+                    <td>
+                        @Html.Hidden("PlayerData.Index", (@i + 10))
+                        @Html.Hidden("PlayerData[" + (@i + 10) + "].EmployeeNumber", Model.ElementAt(i).EmployeeNumber)
+                        @Html.Hidden("PlayerData[" + (@i + 10) + "].EmployeeName", Model.ElementAt(i).EmployeeName)
+                        @Html.Hidden("PlayerData[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                        @Html.Hidden("PlayerData[" + (@i + 10) + "].StaffId", Model.ElementAt(i).StaffId)
+                        @Html.Hidden("PlayerData[" + (@i + 10) + "].PlayerId", Model.ElementAt(i).PlayerId)
+
+
+
+
+                        @Html.CheckBox("PlayerData[" + (@i + 10) + "].isCheck", Model.ElementAt(i).isCheck, new { @id = "CheckA", @name = "Check", @Value = Model.ElementAt(i).PlayerId })
+                        @Html.Hidden("PlayerData[" + (@i + 10) + "].isCheck", Model.ElementAt(i).isCheck)
+                    </td>
+                    <td>
+                        @(sno++)
+                    </td>
+                    <td>
+                        @Model.ElementAt(i).EmployeeNumber
+                    </td>
+
+                    <td>
+                        @Model.ElementAt(i).EmployeeName
+                    </td>
+
+                    @*<td>
+                        @Model.ElementAt(i).EmployeeNumber
+                        @Html.Hidden("PlayerData[" + (@i + 10) + "].BranchName", Model.ElementAt(i).BranchName)
+                    </td>*@
+
+                </tr>
+          
+            }
+        </tbody>
+    </table>
+
+
+
+
+
+
+
+    }
+    else
+    {
+        <span style="color: red;"><b>Data not available</b></span>
+    }
+
+
+}
+<div id="dialogRemarks" title="Remarks" style="display:none"> <p>Save<input type="text" name="Remarks" id="remarks" class="form-control" /></p> </div>
+
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+    $("#Save").click(function () {
+
+        var Ids = " ";
+        var result = $('#CheckA:checked');
+
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+
+        });
+        if (Ids != "") {
+            SaveData(Ids)
+        }
+        else {
+
+        }
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+

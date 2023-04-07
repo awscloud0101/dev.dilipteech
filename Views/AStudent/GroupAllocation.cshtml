@@ -1,0 +1,246 @@
+﻿
+@{
+    ViewBag.Title = "GroupAllocation";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Group Allocation</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <br />
+            @using (Html.BeginForm("GroupAllocation", "AStudent", FormMethod.Post))
+            {
+                <span id="ErrorId"></span>
+                    <!-- form start -->
+                @Html.AntiForgeryToken()
+                <div class="box">
+                    <br />
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Select Group</label>
+                                <div class="col-sm-5">
+                                        <select class="form-control" id="GroupId" onchange="GetCurrentlyAssignedStudents()"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                        <div class="col-xs-12">
+                            <input type="button" name="Save" class="btn btn-primary" style="float:right;" id="Save" value="Save" />
+                        </div>
+                        </div>
+                    </div>
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+
+                            <div class="box">
+                                <div class=" box-header">
+                                    <input type="button" name="Remove" class="btn btn-primary" style="float:right" id="Remove" value="Remove" />
+
+                                    <h3 class="box-title col-xs-9">Allocated Students</h3>
+                                </div><!-- /.box-header -->
+                                <!-- form start -->
+                                <div class="box-body">
+                                    <table class="table table-hover">
+                                        <tr>
+                                            <th>
+                                                @Html.DisplayName("Check")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Student Name")
+                                            </th>   
+                                            <th>
+                                                @Html.DisplayName("Class")
+                                                </th>                                         
+                                        </tr>
+                                        <tbody id="AssignedtbodyId"></tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="box">
+                            <div class="box-header">
+                                <input type="button" name="assign" class="btn btn-primary" style="float:right" id="assign" value="Assign" />
+
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Class</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="ClassNumbersId" onchange="GetStudentsToAllocate();"></select>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayName("Check")
+                                        </th>
+
+                                        <th>
+                                            @Html.DisplayName("Student Name")
+                                        </th>                                                                              
+                                        <th>
+                                            @Html.DisplayName("Class")
+                                            </th>
+                                    </tr>     
+                                    <tbody id="ClassStudentId">
+                                        
+                                         
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div>
+                        <input type="hidden" id="SelectedStudent" />
+                        <input type="hidden" id="StudentToRemove" />
+
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function LoadGroupDropDwn() {
+        ClassStudentId
+        $.ajax({
+            url: "/AStudent/LoadGroupDropDown",
+            success: function (data) {          
+                var obj = $('#GroupId')
+                obj.children().remove();
+                obj.append($("<option>").val("").text("--Select Group--"))
+                $.each(data, function (i, record) {
+                    obj.append($("<option>").val(record.GroupId).text(record.GroupName));
+                });
+                $('#GroupId').append(obj);
+
+                LoadClassDrpDwn();
+            }
+
+        });
+    }
+
+    window.onload = LoadGroupDropDwn();
+
+   //ClassDroupDown
+    function LoadClassDrpDwn() {
+        $.ajax({
+            url: "/AStudent/LoadClassDropDown",
+            success: function (data) {
+                var Class = $('#ClassNumbersId')
+                Class.children().remove();
+                Class.append($("<option>").val("").text("--Select Class--"))
+                Class.append($("<option>").val(0).text("All"))
+                $.each(data, function (i, record) {
+                    Class.append($("<option>").val(record.ClassNumbersId).text(record.ClassNumberDisplay));
+                });
+                $('#ClassNumbersId').append(Class);
+            }
+        });
+    }
+
+    function GetCurrentlyAssignedStudents() {
+        var groupId = $('#GroupId').val();
+        $.ajax({
+            url: "/AStudent/GetCurrentStudents",
+            data: { GroupId: groupId },
+            success: function (data) {
+                if (GroupId == "") {
+                    $("#AssignedtbodyId").html("");
+                }
+                else {
+                   AppendAssignedStudentsToTable(data)
+                }
+            }
+        })
+    }
+    function GetStudentsToAllocate() {
+        var ClassNumbersId = $('#ClassNumbersId').val();
+        $.ajax({
+            url: "/AStudent/GetStudentsToAllocate",
+            data: { ClassNumberId: ClassNumbersId },
+            success: function (data) {
+                if (ClassNumbersId == "") {
+                    $("#ClassStudentId").html("");
+                }
+                else {
+                    AppendStudentsToAssignTable(data)
+                }
+            }
+        })
+    }
+
+    function AppendAssignedStudentsToTable(data) {
+        var row = "";
+        $.each(data, function (index, item) {
+            row += "<tr>" +
+              "<td><input type='checkbox' id='Assigned' name='Assigned' value=' " + item.GroupId + "'/></td>" +
+            //"<td>" + item.StudentId + "</td>" +
+            "<td>" + item.Name + "</td>" +
+            "</tr>";
+        });
+        $("#AssignedtbodyId").html(row);
+    }
+
+    function AppendStudentsToAssignTable(data) {
+        var row = "";
+        $.each(data, function (index, item) {
+            row += "<tr>" +
+              "<td><input type='checkbox' id='ToAssign'name='ToAssign' value=' " + item.GroupId + "'/></td>" +
+            "<td>" + item.StudentName + "</td>" +
+             "<td>" + item.ClassnumberDisplay + "</td>" +
+            "</tr>";
+        });
+        $("#ClassStudentId").html(row);
+    }
+
+    //function GetStudentTobeAssigned() {
+    //    var ClassNumbersId = $('#ClassNumbersId').val();
+    //    var Sel_cls = 0;
+    //    if (ClassNumbersId == "") {
+    //        Sel_cls = -1;
+    //    }
+    //    else {
+    //        Sel_cls = ClassNumbersId;
+    //    }
+    //    $.ajax({
+    //        url: "/AStudent/",
+    //        data: { ClassNumbersId: Sel_cls },
+    //        success: function (data) {
+    //            if (ClassNumbersId == "") {
+    //                $("#ClassStudentId").html("");
+    //            }
+    //            else {
+    //                AppendStudentsToAssignTable(data)
+    //            }
+    //        }
+    //    })
+    //}
+</script>

@@ -1,0 +1,405 @@
+﻿
+@model AsteriskBrowserAL.Models.StockEntryData
+@{
+    DateTime TodayDate = DateTime.Today;
+}
+
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-shopping-cart"></i>
+            Inventory&Assests
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Requisition Form</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+<section class="content">
+  
+    @if (null != TempData["Msg"])
+    {
+        <div>
+            <span style="color:green"> @TempData["Msg"].ToString();</span>
+        </div>
+    }
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("RequisitionFormC", "SOperations", FormMethod.Post))
+            {
+
+                <input type="hidden" id="Staffids" name="Staffids" value="@Model.RequestedStaffId">
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Requisition Form</span>
+                    <div class="" style="float:right;margin-right:10px;">
+                        <button type="submit" onclick="return submitForm();" name="pay" value="Save" class="btncustom">
+                          Save
+                        </button>
+                    </div>
+
+                </div>
+
+
+
+                <div class="widget-box" style="padding:10px">
+               
+           <div class="row">
+
+               <div class="col-sm-6">
+                   <div class="form-group">
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Requested Date")</label>
+                               <div class="col-sm-6">
+                                   <div id="datepicker" class="input-group date">
+                                       <input class="form-control" type="text" value="@TodayDate.ToShortDateString()" name="TransactionDate" id="TransactionDate" autocomplete="off" placeholder="Select Date" readonly="true" />
+                                       <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                   </div>
+                               </div>
+                               <span class="col-sm-2" style="color:red" id="TransactionDateVal"></span>
+                           </div>
+                       </div>
+                   </div>
+
+
+               </div>
+
+               <div class="col-sm-6">
+                   <div class="form-group">
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Staff")</label>
+                               <div class="col-sm-6">
+                                   <select id="Staffid" name="Staffid" class="form-control"></select>
+                               </div>
+                               <span class="col-sm-2" style="color:red" id="StaffVal"></span>
+                           </div>
+                       </div>
+                   </div>
+
+
+               </div>
+           </div>
+
+
+                    <div class="row">
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Items Name")</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.RequiredItems, new { @class = "form-control textlength", @id = "RequiredItems", @maxlength = "35", placeholder = "Required Items", type = "text;" })
+                                        </div>
+                                        <span class="col-sm-2" style="color:red" id="RequiredItemsVal"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Head")</label>
+
+                                        <div class="col-sm-6">
+                                            @*@Html.TextBoxFor(model => model.RequiredItems, new { @class = "form-control textlength", @id = "RequiredItems", @maxlength = "35", placeholder = "Required Items",type = "text;" })*@
+                                            @Html.DropDownList("Head", null, "--Select--", new { @class = "form-control", @id = "RequiredItems " })
+                                        </div>
+                                        <span class="col-sm-2" style="color:red" id="RequiredItemsVal"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Quantity")</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.Quantity, new { @class = "form-control textlength", @id = "Quantity", @maxlength = "35", placeholder = "Quantity", onkeypress = "return isNumberKey(event);" })
+                                        </div>
+                                        <span class="col-sm-2" style="color:red" id="QuantityVal"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Purpose")</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.Purpose, new { @class = "form-control textlength", @id = "Purpose", @maxlength = "35", placeholder = "Purpose" })
+                                        </div>
+                                        <span class="col-sm-2" style="color:red" id="PurposeVal"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Report To")</label>
+                                        <div class="col-sm-6">
+                                            <select id="RStaffid" name="RStaffid" class="form-control"></select>
+                                        </div>
+                                        <span class="col-sm-2" style="color:red" id="RStaffidVal"></span>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="row">
+
+                        <input type="hidden" id="IsPrincipal" name="IsPrincipal" value="@Model.IsPrincipal.ToString()" />
+                        <input type="hidden" id="IsHOD" name="IsHOD" value="@Model.IsHOD.ToString()" />
+                        <input type="hidden" id="IsManager" name="IsManager" value="@Model.IsManager.ToString()" />
+                        <input type="hidden" id="IsStaff" name="IsStaff" value="@Model.IsStaff.ToString()" />
+
+
+                    </div>
+
+                    
+
+                </div>
+                <div id="RequisitionData"></div>
+                <div id="ListRequisitionData"></div>
+            }
+        </div>
+    </div>
+
+
+</section>
+
+<script type="text/javascript">
+
+    $(document).on('focus', '#TransactionDate', function () {
+       
+
+        $(this).datepicker({
+            startDate: "1/1/1900",
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode
+        return !(charCode > 31 && (charCode < 48 || charCode > 57));
+    }
+
+    function onloadeddata() {
+        var nStaffid = $('#Staffids').val();
+
+        if (nStaffid > 0) {
+            LoadStaff();
+            GetData();
+            LoadRStaff();
+        }
+
+    }
+    $(document).ready(function () {
+        $('#RequiredItems').keypress(function (event) {
+            var inputValue = event.charCode;
+            if (!(inputValue >= 65 && inputValue <= 120) && (inputValue != 32 && inputValue != 0)) {
+                event.preventDefault();
+            }
+        });
+    });
+
+
+    function LoadStaff() {
+  
+        var nStaffid = $('#Staffids').val();
+        $.ajax({
+            url: '/SOperations/GetStaff',
+            data: { StaffId: nStaffid },
+            success: function (data) {
+
+                var Staff = $('#Staffid');
+
+                Staff.children().remove();
+                $.each(data, function (i, record) {
+
+                    Staff.append($("<option>").val(record.StaffId).text(record.DisplayName));
+
+                });
+
+                $('#Staffid').append(Staff);
+            },
+            aync: false
+        });
+
+
+    }
+    window.onload = onloadeddata();
+
+    function LoadRStaff() {
+        debugger
+        var nIsPrincipal = $('#IsPrincipal').val();
+        var nIsHOD = document.getElementById('IsHOD').value;
+        var nIsManager = document.getElementById('IsManager').value;
+        var nIsStaff = document.getElementById('IsStaff').value;
+        $.ajax({
+            url: '/SOperations/GetRStaff',
+            data: { IsPrincipal: nIsPrincipal, IsHOD: nIsHOD, IsManager: nIsManager, IsStaff: nIsStaff },
+            success: function (data) {
+                var staffData = $('#RStaffid');
+                staffData.children().remove();
+
+                staffData.append($("<option>").val("null").text("---select---"));
+
+                $.each(data, function (i, record) {
+                    staffData.append($("<option>").val(record.StaffId).text(record.DisplayName));
+                });
+                $('#RStaffid').append(staffData);
+            },
+            aync: false
+        });
+    }
+    function submitForm() {
+        var validatestatus = validateRequisitionForm();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+    function validateRequisitionForm() {
+        var nRequestDate = $('#TransactionDate').val();
+        var nStaffid = $('#Staffid').val();
+        var nRStaffid = $('#RStaffid').val();
+        var nRequiredItems = $('#RequiredItems').val();
+        var nQuantity = $('#Quantity').val();
+        var nPurpose = $('#Purpose').val();
+        var validate = true;
+        if (nRequestDate == "") {
+            document.getElementById("TransactionDateVal").innerHTML = "required";
+            validate = false;
+        }
+        if (nStaffid == "null" || nStaffid == "") {
+            document.getElementById("StaffVal").innerHTML = "required";
+            validate = false;
+        }
+        if (nRStaffid == null || nRStaffid == "null") {
+            document.getElementById("RStaffidVal").innerHTML = "required";
+            validate = false;
+        }
+
+        if (nRequiredItems == "") {
+            document.getElementById("RequiredItemsVal").innerHTML = "required";
+            validate = false;
+        }
+        if (nQuantity == "") {
+            document.getElementById("QuantityVal").innerHTML = "required";
+            validate = false;
+        }
+        if (nPurpose == "") {
+            document.getElementById("PurposeVal").innerHTML = "required";
+            validate = false;
+        }
+        return validate;
+    }
+    $('#TransactionDate').focus(function () {
+        document.getElementById("TransactionDateVal").innerHTML = "";
+    });
+    $('#Staffid').focus(function () {
+        document.getElementById("StaffVal").innerHTML = "";
+    });
+    $('#RequiredItems').focus(function () {
+        document.getElementById("RequiredItemsVal").innerHTML = "";
+    });
+    $('#Quantity').focus(function () {
+        document.getElementById("QuantityVal").innerHTML = "";
+    });
+    $('#Purpose').focus(function () {
+        document.getElementById("PurposeVal").innerHTML = "";
+    });
+    $('#RStaffid').focus(function () {
+        document.getElementById("RStaffidVal").innerHTML = "";
+    });
+
+
+
+    function GetData() {
+        var nStaffid = $('#Staffids').val();
+        $.ajax({
+            url: '/SOperations/GetRequestData',
+            data: { Staffid: $('#Staffids').val() },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#ListRequisitionData').html(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+</script>

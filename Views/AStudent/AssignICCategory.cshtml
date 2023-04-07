@@ -1,0 +1,108 @@
+﻿@model AsteriskBrowserAL.Models.StudentDetailsData
+
+@{
+
+    ViewBag.Title = "Assign IC Category";
+
+}
+
+@section BreadCrumb{
+
+<ul class="breadcrumb">
+    <li>
+        <i class="menu-icon fa fa-database"></i>
+        <a href="#">Academics</a>
+    </li>
+    <li>
+        <i class=""></i>
+        Student
+    </li>
+    <li class="active"> Assign IC Category</li>
+</ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("AssignICCategory", "AStudent", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">Assign IC Category</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">IC Category</label>
+                                <div class="col-sm-6">
+
+                                    @if (null != Model)
+                                    {
+                                    @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.lstICCategory, "CategoryId", "CategoryName"), "-- Select --", new { @class = "form-control", id = "CategoryId" })
+                                    }
+                                    else
+                                    {
+                                    <select id="CategoryId" name="CategoryId" class="form-control"></select>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <div id="StudentsData"></div>
+            }
+        </div>
+    </div>
+
+</section>
+
+
+<script>
+    function OnloadData() {
+        var CategoryId = $('#CategoryId').val();
+        if (CategoryId > 0) {
+            GetStudents(CategoryId);
+        }
+    }
+
+
+    $('#CategoryId').change(function () {
+        var CategoryId = $('#CategoryId').val();
+        $('#StudentsData').html("");
+        if (CategoryId > 0) {
+            GetStudents(CategoryId);
+        }
+    });
+
+
+
+    function GetStudents(CategoryId) {
+        if (CategoryId < 1)
+         return; 
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AStudent/GetStudentsForICCategory',
+            data: { CategoryId: CategoryId },
+            success: function (Data) {
+                $('#StudentsData').html(Data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+    window.onload = OnloadData();
+</script>

@@ -1,0 +1,259 @@
+﻿@model AsteriskBrowserAL.Models.ItemModel
+@{
+    ViewBag.Title = "StockValuationReport";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Stock Valuation Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("StockValuationReport", "SReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                Stock Valuation Report
+                            </h5>
+
+                            <div class="widget-toolbar no-border">
+                                <div class="inline dropdown-hover">
+                                    <div class="inline action-buttons">
+                                        <a class="P2" id="View" name="View" onclick="return submitForm();"><span class="btn btn-info btn-minier">View Data</span></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">Division</label>
+                                                <div class="col-xs-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">Branch</label>
+                                                <div class="col-xs-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.SubscriptionId" />
+                                }
+
+                                <br />
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">SubCategory</label>
+                                            <div class="col-xs-6">
+                                                @Html.DropDownListFor(model => model.SubCategoryId, new SelectList(Model.lstSubCategory, "InventorySubCategoryId", "SubCategoryName"),"--- Select ---", new { @class = "form-control", id = "SubCategoryId" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Item</label>
+                                            <div class="col-xs-6">
+                                                <select id="ItemId" name="ItemId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="ItemsData"></div>
+
+                }
+
+
+            }
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    $('#DivisionId').change(function () {
+
+        $('#ItemsData').html("");
+
+        var BranchItems = $('#BranchId');
+
+        BranchItems.children().remove();
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        if (record.IsCentral != true)
+                        {
+                            BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                        }
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+        $('#ItemsData').html("");
+    });
+
+    $('#SubCategoryId').change(function () {
+
+        $('#ItemsData').html("");
+
+        var ItemItems = $('#ItemId');
+
+        ItemItems.children().remove();
+
+        var SubCategoryId = $('#SubCategoryId').val();
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/SReports/GetItemsBySubCategoryIdForValuation',
+                data: { SubCategoryId: SubCategoryId },
+                success: function (data) {
+
+                    ItemItems.append($("<option>").val("0").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        ItemItems.append($("<option>").val(record.InventorySubCategoryItemId).text(record.ItemName));
+                    });
+
+                    $('#ItemId').append(ItemItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    function submitForm() {
+
+        debugger
+
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fields : ";
+
+        $('#ItemsData').html("");
+
+        var Validation = ValidateValuationReport();
+
+        if (Validation == false) {
+
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+            $.ajax({
+                url: '/SReports/GetStockValuationReportData',
+                data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), SubCategoryId: $('#SubCategoryId').val(), ItemId: $('#ItemId').val() },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+
+
+                    $('#ItemsData').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+    function ValidateValuationReport() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+
+        var SubCategoryId = $('#SubCategoryId').val();
+        if (SubCategoryId == null || SubCategoryId == "null" || SubCategoryId == 0) {
+            valid = false;
+            DisplayValidation += "Sub Category, ";
+        }
+
+        var ItemId = $('#ItemId').val();
+        if (ItemId == null || ItemId == "null" || ItemId == 0) {
+            valid = false;
+            DisplayValidation += "Item, ";
+        }
+
+        return valid;
+    };
+
+</script>

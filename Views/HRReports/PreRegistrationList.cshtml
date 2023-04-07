@@ -1,0 +1,135 @@
+﻿@model AsteriskBrowserAL.Models.StaffInterviewsData
+
+@{
+    ViewBag.Title = "Range Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Pre Registration Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <br />
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ExportPreRegistrationList", "HRReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="widget-box">
+
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                Pre Registration Report
+                            </h5>
+
+                        </div>
+                        <!-- /.box-header -->
+                        <!-- form start -->
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+                                                <div class="col-sm-6">
+                                                    @if (null != Model.lstBranchIntrested)
+                                                    {
+                                                        @Html.DropDownListFor(model => model.lstBranchIntrested, new SelectList(Model.lstBranchIntrested, "SubscriptionId", "Institute"), "--- Select Branch ---", new { @class = "form-control", @id = "SubscriptionId", @name = "SubscriptionId" })
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+                <div id="SatffDetails"></div>
+
+
+            }
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+    var DisplayValidation = "";
+
+    $('#SubscriptionId').change(function () {
+        GetStaffData();
+    })
+
+    function GetStaffData() {
+        var BranchId = $('#SubscriptionId').val();
+        
+        var valid = Validations();
+        if (valid == true) {
+            $.ajax({
+                url: '/HRReports/GetPreRegistrationStaffData',
+                data: { nBranchId: BranchId},
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#SatffDetails').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+            $('#SatffDetails').html("");
+        }
+    }
+
+    function Validations() {
+        var branchId = $('#SubscriptionId').val();
+        var isvalid = true;
+
+        var ValidationString = "Please Select ";
+        if (branchId < 0) {
+            ValidationString += "Branch,"
+            isvalid = false
+        }
+
+        if (isvalid == false) {
+            document.getElementById("Validation").innerHTML = ValidationString;
+        }
+        return isvalid;
+    }
+
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+</script>
+
+
+

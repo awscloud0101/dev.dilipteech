@@ -1,0 +1,96 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ManageAssetModelData>
+@{
+    ViewBag.Title = "ManageAssetsDet";
+    int SNo = 1;
+}
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Manage Assets</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+
+        </div>
+    </div>
+    <br />
+    @using (Html.BeginForm("ManageAssetsDet", "SOperations", FormMethod.Post))
+    {
+
+        <div class="page-header">
+            <h1>
+                <small style="float:right;">
+                    @Html.ActionLink("Back To Details", "ManageAssets", new { AssetCategoryId = ViewBag.AssetCategoryId })
+                </small>
+            </h1>
+        </div><!-- /.page-header -->
+        @Html.ValidationMessage("Manage Assets")
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                @Html.ValidationMessage("Asset Details")
+                <div class="table-header">
+                    Asset Details
+                </div>
+                <br />
+                <div style="overflow:auto">
+                    <table id="dynamic-table" class="table table-hover table-bordered table-striped nowrap dynamic-table" style="font-size:14px;">
+                        <tbody>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Asset Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Asset Code")
+                                </th>
+
+                            </tr>
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @(SNo++)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.AssetName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.AssetCode)
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+@Html.Action("DataTableScripts", "Base")
+<script>
+    $(document).ready(function () {
+        var $table = $('#dynamic-table').dataTable({
+            destroy: true,
+            "aaData": response.data,
+        });
+    });
+</script>

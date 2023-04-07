@@ -1,0 +1,107 @@
+﻿@model AsteriskBrowserAL.Models.ItemModel
+
+@if (null != Model)
+{
+    if (null != Model.lstItems && Model.lstItems.Count() > 0)
+    {
+        int nsno = 1;
+        <div class="hr hr-18 dotted hr-double"></div>
+        @*<div class="row">
+            <div class="col-xs-12">
+                <button class="btn btn-sm btn-primary pull-right" type="button" disabled="disabled" name="Assign" value="+" id="btnAssign" >+</button>
+            </div>
+            </div>*@
+        <div class="table-header">
+            Group Items
+
+            <div style="float:right;">
+
+                <button type="button" disabled="disabled" id="btnAssign" name="Assign" class="btn btn-info btn-xs">
+                    <i class="ace-icon fa fa-plus-square bigger-160"></i>
+                </button>
+            </div>
+
+        </div>
+
+        <div style="overflow:auto;height:290px">
+            <table id="Tab1" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                <tbody>
+
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Sub Category")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Item")
+                        </th>
+                        <th>
+                            @Html.DisplayName("SKU Code")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Qty")
+                        </th>
+
+
+                    </tr>
+
+
+                    @for (int i = 0; i < Model.lstItems.Count(); i++)
+                    {
+                        <tr>
+                            @Html.Hidden("lstItem.Index", (@i))
+                            @Html.Hidden("lstItem[" + @i + "].InventorySubCategoryItemId", Model.lstItems.ElementAt(i).InventorySubCategoryItemId, new { id = "HiddenId" })
+                            @Html.Hidden("lstItem[" + @i + "].ItemName", Model.lstItems.ElementAt(i).ItemName, new { id = "HiddenItemName" })
+                            @Html.Hidden("lstItem[" + @i + "].SKUCode", Model.lstItems.ElementAt(i).SKUCode, new { id = "HiddenItemCode" })
+                            <td>
+                                @(nsno++)
+                            </td>
+                            <td>
+                                @Model.lstItems.ElementAt(i).SubCatgeoryName
+                            </td>
+                            <td>
+                                @Model.lstItems.ElementAt(i).ItemName
+                            </td>
+                            <td>
+                                @Model.lstItems.ElementAt(i).SKUCode
+                            </td>
+                            <td>
+                                @if (Model.IsNew)
+                        {
+                                    @Html.TextBox("lstItem[" + @i + "].Quantity", Model.lstItems.ElementAt(i).Quantity, new { @class = "form-control textlength", onkeypress = "return isNumberKey(event)", @min = "0", @maxlength = "2", @max = "100000", @style = "width:80px", @id = "GroupItemValue" })
+                                }
+                                else
+                                {
+                                    @Model.lstItems.ElementAt(i).Quantity
+                                }
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+    }
+    else
+    {
+        <span style="color: red;"><b>No records found</b></span>
+    }
+
+}
+else
+{
+    <span style="color: red;"><b>No records found</b></span>
+}
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+</script>

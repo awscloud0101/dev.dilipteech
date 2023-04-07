@@ -1,0 +1,227 @@
+﻿
+@model  AsteriskBrowserAL.Models.AddTemplateData
+@{
+    Layout = null;
+}
+
+<section>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box">
+                <div class="box-body table-responsive">
+
+                    <input type="hidden" id="IsValidTemplateNumber" />
+
+                    <div class="col-sm-12">
+                        @if (Model.StartRange > 0 && Model.EndRange > 0)
+                        {
+                            <label class="control-label no-padding-right" for="form-field-1">@Html.Label("Range : " + Model.StartRange + " - " + Model.EndRange)</label>
+                        }
+                         
+                        <div id="divSave" style="display:none">
+                            <a id="SaveTemplateNumbers" class="btn btn-info btn-sm pull-right action-buttons" onclick="SaveMissingTemplates()">Save</a>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <span style="color:red;font-weight:bold;">@Html.ValidationMessage("RangeValidation")</span>
+                        <span style="color:red;" id="TemplateValidate"></span><br />
+                    </div>
+
+                    <div class="col-sm-12">
+                        <label class="col-sm-5" for="form-field-1">@Html.Label("Template Number")</label>
+                        <input type="hidden" id="expectedTemplate" value="@Model.TemplateNo" />
+                        <input type="hidden" id="TStartRange" value="@Model.StartRange" />
+                        <input type="hidden" id="TEndRange" value="@Model.EndRange" />
+
+                        <div class="col-sm-6">
+                            <input class="form-control textlength txtboxNum" id="RequiredTemplateNum" name="TemplateNo" value="@Model.TemplateNo" required="required" />
+                        </div>
+                    </div>
+
+                    <br />
+                    <br />
+
+                    <div id="MissingTemplate">
+                    </div>
+
+                 
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+    $("#RequiredTemplateNum").autocomplete({
+        source: function (request, response) {
+            debugger
+
+            $("#MissingTemplate").html('');
+            document.getElementById("divSave").style.display = "none";
+
+            var No = request.term;
+
+            
+            var StartRange = $("#TStartRange").val();
+            var EndRange = $("#TEndRange").val();
+            var Enteredno = No; //$("#Template").val();
+            var expectedno = $("#expectedTemplate").val();
+
+            var IsValidNo = true;
+
+            $("#IsValidTemplateNumber").val(IsValidNo);
+
+            document.getElementById('TemplateValidate').innerHTML = "";
+
+
+            if (parseInt(Enteredno) < parseInt(StartRange)) {
+
+                document.getElementById('TemplateValidate').innerHTML = "Template number not in a range";
+                IsValidNo = false;
+                $("#IsValidTemplateNumber").val(IsValidNo);
+                return;
+            }
+
+            if (parseInt(Enteredno) < parseInt(expectedno)) {
+                document.getElementById('TemplateValidate').innerHTML = "Template number already in use";
+                IsValidNo = false;
+                $("#IsValidTemplateNumber").val(IsValidNo);
+                return;
+            }
+
+            if (parseInt(Enteredno) > parseInt(EndRange)) {
+
+                document.getElementById('TemplateValidate').innerHTML = "Template number not in a range";
+                IsValidNo = false;
+                $("#IsValidTemplateNumber").val(IsValidNo);
+                return;
+            }
+
+            if (parseInt(expectedno) < parseInt(request.term)) {
+                $.ajax({
+                    url: "/AFrontOffice/GetTemplatesData",
+                    data: { term: request.term, LastReciept: expectedno },
+                    success: function (result) {
+
+                        IsValidNo = false;
+                        $("#IsValidTemplateNumber").val(IsValidNo);
+                        $("#MissingTemplate").html(result);
+                        document.getElementById("divSave").style.display = "inline";
+                    },
+                })
+            }
+            else if (expectedno >= request.term) {
+                document.getElementById("divSave").style.display = "none";
+            }
+        },
+    });
+
+
+    function ValidateTemplateNumberControls() {
+
+        var validate = true;
+        var ValidateMessage = "";
+
+        var StartRange = $("#TStartRange").val();
+        var EndRange = $("#TEndRange").val();
+        var Enteredno = $("#RequiredTemplateNum").val();
+        var expectedno = $("#expectedTemplate").val();
+
+        document.getElementById('TemplateValidate').innerHTML = "";
+
+        if (Enteredno == "") {
+            validate = false;
+            ValidateMessage += "Enter template number,";
+        }
+        else if (parseInt(Enteredno) < parseInt(StartRange)) {
+            validate = false;
+            ValidateMessage += "Template number already in use";
+        }
+
+        else if (parseInt(Enteredno) > parseInt(EndRange)) {
+            validate = false;
+            ValidateMessage += "Template number not in a range";
+        }
+
+        else if (Enteredno < expectedno) {
+            validate = false;
+            ValidateMessage += "Template number already in use";
+        }
+
+        if (!validate) {
+            $('#Validate').show();
+            document.getElementById('TemplateValidate').innerHTML = "Please fill the fields : " + ValidateMessage;
+
+        } else {
+            document.getElementById('TemplateValidate').innerHTML = "";
+        }
+
+        return validate;
+    }
+
+    function ValidateMissingReceiptData() {
+        var valid = "";
+        $("#tbTemplateReceipt tr").each(function (index) {
+
+            var Remarks = $(this).find("#Remarks").val();
+
+            if (Remarks == "") {
+                document.getElementById("RemarksValidation").innerHTML = "Remarks are required";
+                valid = "false";
+            }
+        });
+
+        return valid;
+    }
+
+    function SaveMissingTemplates() {
+        debugger
+
+        var MissingData = GetListOfMissingReceips(); //Getting the data from  template partial view
+
+        var bValidate = ValidateMissingReceiptData();
+
+        if (bValidate == "") {
+
+            $("#tbTemplateReceipt tr").each(function (index) {
+
+                var Remarks = $(this).find("#Remarks").val();
+                MissingData[index].Remarks = Remarks;
+
+            });
+
+            if (null != MissingData) {
+
+                $.ajax
+                  ({
+                      error: function (jqXHR, textStatus, errorThrown) {
+                          alert(errorThrown);
+                          $('#imagemodal').hide();
+                      },
+
+                      url: '/FOperations/TemplateNumber/',
+                      data: { AdmissionMissingTemplats: MissingData },
+                      type: "POST",
+                      success: function (data) {
+                          document.getElementById("divSave").style.display = "none";
+                          $('#MissingTemplate').html('');
+                          $('#divTemplateNo').html('');
+                          $('#divTemplateNo').html(data);
+                          var IsValidNo = true;
+                          $("#IsValidTemplateNumber").val(IsValidNo);
+                      }
+
+                  }).done(function () {
+                      $('#imagemodal').hide();
+                  });
+
+                return val;
+            }
+        }
+    }
+
+</script>

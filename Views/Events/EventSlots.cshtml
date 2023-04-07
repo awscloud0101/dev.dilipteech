@@ -1,0 +1,167 @@
+﻿@model List<AsteriskBrowserAL.Models.EventsDetails>
+@{
+    ViewBag.Title = "EventSlots";
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+
+}
+
+
+<section class="content">
+    <input type="hidden" id="EventId" value="@ViewBag.EventId" />
+    <div id="Eventdata">
+        @if (Model != null && Model.Count > 1)
+        {
+            <div class="row">
+                <div class=col-xs-12>
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                @ViewBag.EventName
+                            </h5>
+                        </div>
+                        <!-- form start -->
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        @foreach (var i in Model)
+                                        {
+                                            <input type="hidden" value="@i.Remark" id="@i.SlotId" />
+                                            string color = "lightcoral";
+                                            if (i.SlotStatus == 1)
+                                            {
+                                                color = "lightgreen";
+                                            }
+                                            else if (i.SlotStatus == 2 && i.StudentId == @ViewBag.StudentId)
+                                            {
+                                                color = "";
+                                            }
+                                            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4" style="min-height:75px;border-style: solid;border-width: thin;text-align:center;background-color:@color">
+
+                                                @if (i.SlotStatus == 1 && @ViewBag.BookedStatus == false && @ViewBag.DateStatus == true)
+                                                {
+                                                    <strong>
+                                                        @i.Slottimings <br />
+                                                        <a href='~/Events/SaveSlot?SlotId=@i.SlotId&&Type=1'>
+                                                            Book Slot
+                                                        </a>
+                                                    </strong>
+                                                }
+                                                else if (i.SlotStatus == 2 && i.StudentId == @ViewBag.StudentId && @ViewBag.DateStatus == true && i.EventStatus == 0)
+                                                {
+                                                    <strong>
+                                                        @i.Slottimings<br />
+                                                        @i.Student<span>( @i.AdmissionNo )</span><br />
+                                                        <a href='~/Events/SaveSlot?SlotId=@i.SlotId&&Type=2'>
+                                                            <b style="color:red">Cancel Slot</b>
+                                                        </a>
+                                                    </strong>
+                                                }
+                                                else if (i.SlotStatus == 2 && i.StudentId == @ViewBag.StudentId && @ViewBag.DateStatus == true && i.EventStatus > 0)
+                                                {
+                                                    <strong>
+                                                        @i.Slottimings<br />
+                                                        @i.Student<span>( @i.AdmissionNo )</span><br />
+                                                        <a onclick="ShowRemark(@i.SlotId)">
+                                                            <b style="color:navy">View Remarks</b>
+                                                        </a>
+                                                    </strong>
+                                                }
+                                                else if (i.SlotStatus == 2 && i.StudentId == @ViewBag.StudentId && @ViewBag.DateStatus == false)
+                                                {
+                                                    <strong>
+                                                        @i.Slottimings<br />
+                                                        @i.Student<span>( @i.AdmissionNo )</span><br />
+                                                    </strong>
+                                                }
+                                                else
+                                                {
+                                                    <strong>@i.Slottimings</strong>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                    <br />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row" style="color:red"><strong>No Data Available</strong></div>
+        }
+    </div>
+    <input type="hidden" value="@ViewBag.DateStatus" id="DateStatus" />
+</section>
+
+
+<div id="myModal" class="modal fade" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">Remarks</h4>
+            </div>
+            <div class="modal-body">
+                <div class="col-xs-12">
+                    <h5>Remark :</h5>
+                </div>
+                <br />
+                <div class="col-xs-12" style="margin-left:2em;max-height:100px" id="InnerRemark">
+                </div>
+                <br />
+                <br />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .modal-backdrop {
+        z-index: -1;
+    }
+</style>
+
+<script type="text/javascript">
+
+    function ShowRemark(SlotId) {
+        debugger
+        var Remark = $('#' + SlotId + '').val()
+        $('#InnerRemark').html(Remark)
+        $('#myModal').appendTo("body").modal('show');
+    }
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger
+        var DateStatus = $('#DateStatus').val()
+        if (DateStatus != "") {
+            setTimeout('GetSlots()', 5000);
+        }
+    });
+
+    function GetSlots() {
+        $('#Eventdata').html('');
+        var EventId = $('#EventId').val();
+        $.ajax({
+            url: '/Events/EventSlotsPartial',
+            data: { EventId: EventId },
+            success: function (data) {
+                debugger
+                $('#Eventdata').html(data);
+            },
+            complete: function (data) {
+                setTimeout(GetSlots, 5000);
+            }
+        });
+    }
+</script>

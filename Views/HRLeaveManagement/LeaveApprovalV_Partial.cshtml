@@ -1,0 +1,131 @@
+﻿
+
+
+
+<section>
+    <div class="hr hr-18 dotted hr-double"></div>
+    @if (null != Model)
+    {
+        <div class="table-header">
+            Staff Leave Action
+            @*<div style="float:right">
+                <input class="btn btn-sm btn-info P2" style="width:80px;" type="button" name="Save" value="Save" id="Save" onclick="validateischecked()" />*@
+            @*<button class="btn btn-info btn-xs" id="btnExport">
+                    <i class="ace-icon fa fa-share bigger-180"></i>
+                </button>*@
+            @*</div>*@
+        </div>
+        <div style="overflow:auto; height:500px;">
+            <table class="table table-hover table-striped table-bordered nowrap" style="font-size:14px;" id="tbSalaryData">
+                <thead>
+                    <tr>
+                        @foreach (System.Data.DataColumn col in Model.Columns)
+                        {
+                            if (@col.Caption.ToString() == "LeaveType") { }
+                            else if (@col.Caption.ToString() != "StaffId" && @col.Caption.ToString() != "LeaveBatchId")
+                            {
+                                <th>@col.Caption </th>
+                            }
+
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (System.Data.DataRow row in Model.Rows)
+                    {
+                        Int32 sno = 0;
+                        Int32 Staffid = 0;
+                        Int32 LeaveBatchId = 0;
+                        Int32 LeaveTypeId = 0;
+                    <tr>
+                        @foreach (var cell in row.ItemArray)
+                        {
+                            if (sno == 2)
+                            {
+                                Staffid = Convert.ToInt16(cell.ToString());
+                            }
+                            if (sno == 5)
+                            {
+                                LeaveBatchId = Convert.ToInt16(cell.ToString());
+                            }
+                            if (sno == 10) { LeaveTypeId = Convert.ToInt16(cell.ToString()); }
+
+                            if (sno == 12)
+                            {
+                                <td>
+                                    <a id="1_@Staffid.ToString()_@LeaveBatchId.ToString()_@LeaveTypeId.ToString()" href="" class="red" onclick="btnConfirm(this.id)">
+                                        Accept
+                                    </a>&nbsp;&nbsp;
+                                    <a id="2_@Staffid.ToString()_@LeaveBatchId.ToString()_@LeaveTypeId.ToString()" href="" class="red" onclick="btnConfirm(this.id)">
+                                        Reject
+                                    </a>
+
+                                </td>
+                            }
+                            else if (sno == 7 || sno == 8 || sno == 11)
+                            {
+                                <td>
+                                    @Convert.ToDateTime(cell.ToString()).ToString("dd/MM/yyyy")
+                                </td>
+                            }
+                            else if (sno == 10)
+                            {
+
+                            }
+                            else if (sno != 2 && sno != 5)
+                            {
+                                <td>
+                                    @cell.ToString()
+                                </td>
+                            }
+                            sno += 1;
+                        }
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <span style="color: red;"><b>Data not available</b></span>
+    }
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+    <div style="display:none">
+        <input type="hidden" id="hd_onchangelist" value="" />
+    </div>
+</section>
+<script>
+
+    $(document)
+        .ajaxStart(function () {
+
+            var $loading = $('#imagemodal');
+            $loading.show();
+        })
+        .ajaxStop(function () {
+            var $loading = $('#imagemodal');
+            $loading.hide();
+        });
+
+    function btnConfirm(idno) {
+        debugger
+
+        $.ajax({
+            url: '/HRLeaveManagement/UpdateLeaveStatus',
+            data: { Staffid: idno },
+            success: function (data) {
+
+
+            }
+        });
+    }
+
+</script>

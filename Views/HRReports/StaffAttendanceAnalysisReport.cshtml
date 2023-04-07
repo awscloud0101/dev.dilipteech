@@ -1,0 +1,283 @@
+﻿@model AsteriskBrowserAL.Models.StaffBiomtricAttendanceReportData
+
+@{
+    ViewBag.Title = "StaffAttendanceAnalysisReport";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Staff Attendance Analysis</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("StaffAttendanceAnalysisReport", "HRReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                    <input type="hidden" id="SelSubId" value="@Model.SubscriptionId" />               
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Staff Attendance Analysis</span>
+                    </div>
+
+                        <div class="widget-box">
+                    
+                            <div class="widget-body">
+                                <div class="widget-main">
+
+
+
+                                    @if (Model.IsCentral)
+                                    {
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-4">Division</label>
+                                                    <div class="col-sm-6">
+                                                        @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-4">Branch</label>
+                                                    <div class="col-sm-6">
+                                                        <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    }
+                               
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right">@Html.Label("Date")</label>
+                                                <div class="col-sm-6">
+                                                    <div id="datepicker" class="input-group date">
+                                                        @if (Model.ADate != null)
+                                                        {
+                                                            <input class="form-control" type="text" id="AttendanceDate" name="AttendanceDate" autocomplete="off" value="@Model.ADate.Value.ToString("MM/dd/yyyy")" placeholder="Select Date" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-control" type="text" id="AttendanceDate" name="AttendanceDate" autocomplete="off" placeholder="Select Date" />
+                                                        }
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        }
+
+                        <div id="SearchData"></div>
+
+
+                        }
+                    </div>
+    </div>
+
+</section>
+@Html.Action("DatePickerScripts", "Base")
+
+<script type="text/javascript">
+
+    var DisplayValidation = "";
+    var lastJQueryTS = 0;
+    $(document).ready(function () {
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0)
+        {
+            LoadBranches();
+        }
+
+
+
+
+    });
+
+    $('#BranchId').change(function () {
+        $('#SearchData').html("");
+    });
+    
+
+    $('#DivisionId').change(function () {
+        $('#SearchData').html("");
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            LoadBranches()
+        }
+    });
+
+    function LoadBranches()
+    {
+        var DivisionId = $('#DivisionId').val();
+
+        $.ajax({
+
+            url: '/Common/GetBranchesByDivisionId',
+            data: { DivisionId: DivisionId },
+            success: function (data) {
+
+                var BranchItems = $('#BranchId');
+
+                BranchItems.children().remove();
+
+                BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                });
+
+                $('#BranchId').append(BranchItems);
+
+
+                var SelSubId = $('#SelSubId').val();
+
+                if(SelSubId > 0)
+                {
+                    $('#BranchId').val(SelSubId);
+                    if($('#AttendanceDate').val()!=null)
+                    GetData()
+                }
+
+            },
+            aync: false
+        });
+    }
+
+
+    $('#AttendanceDate').change(function () {
+        debugger
+        $('#SearchData').html("");
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+        var send = true;
+        if (typeof (event) == 'object') {
+
+            if (event.timeStamp - lastJQueryTS < 300) {
+                send = false;
+            }
+
+            lastJQueryTS = event.timeStamp;
+        }
+
+        if (send) {
+            var Validation = ValidatePettyCashDaySheet();
+
+            if (Validation == false) {
+
+                document.getElementById("Validation").innerHTML = DisplayValidation;
+            }
+            else {
+                document.getElementById("Validation").innerHTML = "";
+
+                GetData();
+            }
+            
+        }
+
+       
+    });
+
+    function GetData()
+    {
+        debugger
+        var IsCentral = $('#IsCentral').val();
+        if (IsCentral == "value")
+            IsCentral = "true";
+        $.ajax({
+            url: '/HRReports/GetStaffAttendanceAnalysisReport',
+            data: { Date: $('#AttendanceDate').val(), DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), IsCentral: IsCentral },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                debugger
+                $('#SearchData').html(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function ValidatePettyCashDaySheet() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+        var CurentMonth = $('#AttendanceDate').val();
+        if (CurentMonth == "") {
+            valid = false;
+            DisplayValidation += "Date, ";
+        }
+
+        return valid;
+
+    };
+
+
+    //function PrintElem(elem) {
+
+    //    Popup($(elem).html());
+    //}
+
+    //function Popup(data) {
+    //    var mywindow = window.open('', 'my div', 'height=300,width=600');
+    //    mywindow.document.write('<p></p>');
+    //    mywindow.document.write(data);
+    //    mywindow.document.write('<p></p>');
+
+    //    mywindow.document.close();
+    //    mywindow.focus();
+
+    //    mywindow.print();
+    //    mywindow.close();
+    //    return true;
+    //}
+
+</script>
+
+

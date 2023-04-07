@@ -1,0 +1,102 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Events>
+
+    @{
+        ViewBag.Title = "SchoolEvents";
+        Layout = "~/Views/Shared/Parent_Layout.cshtml";
+    }
+
+
+    <section class="content">
+        @if (null != Model)
+        {
+            int nsno = 1;
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="table-header">
+                        <div class="txtTableHeader">
+                            Events
+                        </div>
+                    </div>
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Start Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("End Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Event")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Subject")
+                                </th>
+                                @*<th>
+                                    @Html.DisplayName("Send SMS To")
+                                </th>*@
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @(nsno++)
+                                    </td>
+                                    <td>
+                                        @if (item.StartDate.HasValue)
+                                        {
+                                            @item.StartDate.Value.ToString("dd-MMM-yyyy")
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (item.EndDate.HasValue)
+                                        {
+                                            @item.EndDate.Value.ToString("dd-MMM-yyyy")
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Event)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Subject)
+                                    </td>
+                                    @*<td>
+                                        @if (item.SendSMSTo == 1)
+                                        {
+                                            @Html.DisplayName("Class");
+                                        }
+                                        @if (item.SendSMSTo == 2)
+                                        {
+                                            @Html.DisplayName("Employee Departments")
+                                        }
+                                        @if (item.SendSMSTo == 6)
+                                        {
+                                            @Html.DisplayName("Employee Designation")
+                                        }
+                                    </td>*@
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+        }
+        else
+        {
+            <div class="table-header">
+                Events
+            </div>
+            <br />
+            <span style="color: red;"><b>There are no Events to Display</b></span>
+        }
+    </section>
+

@@ -1,0 +1,107 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    ViewBag.Title = "ExamAnalysis";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Transactions
+        </li>
+        <li>
+            <i class=""></i>
+            Parent
+        </li>
+        <li class="active">Subject Wise Average</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+</script>
+
+<section class="content">
+
+    <br />
+    @using (Html.BeginForm("TutorPerformance", "AReports", FormMethod.Post))
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header"></div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Staff")</label>
+                                <div class="col-sm-6">
+                                    <select id="StaffId" name="StaffId" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div id="ResultsData"></div>
+            </div>
+        </div>
+    }
+
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        GetStaff();
+    });
+
+    function GetStaff() {
+        $.ajax({
+            url: '/AReports/GetStaff',
+            success: function (result) {
+                var Staff = $('#StaffId')
+                Staff.children().remove();
+                Staff.append($("<option>").val("null").text("--select--"))
+
+                $.each(result, function (i, record) {
+                    Staff.append($("<option>").val(record.EmployeeNumber).text(record.FirstName))
+                });
+
+                $('#StaffId').append(Exam);
+            },
+            async: false
+        })
+    }
+
+    $('#StaffId').change(function () {
+        GetResults();
+    });
+
+    function GetResults() {
+
+        $.ajax({
+            url: '/AReports/GetExamResultsForTutorPerformance',
+            data: { strEmpNumber: $('#StaffId').val() },
+            success: function (result) {
+                $('#ResultsData').html(result);
+            },
+            async: false
+        })
+
+    }
+
+</script>
+
+
+
+
+

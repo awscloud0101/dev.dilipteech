@@ -1,0 +1,721 @@
+﻿
+
+@using AsteriskBrowserAL.Helpers
+@{
+
+    AsteriskBrowserAL.sp_GetUserInformation_Result Userinfo = new AsteriskBrowserAL.sp_GetUserInformation_Result();
+    List<AsteriskBrowserAL.sp_LayoutLinks_Result> UserLayout = new List<AsteriskBrowserAL.sp_LayoutLinks_Result>();
+
+    UserLayout = Utility.LayoutLinks();
+    Userinfo = Utility.GetUserDetails();
+    int StaffId = Userinfo.StaffId.HasValue ? Userinfo.StaffId.Value : 0;
+    string Controllers = string.Empty;
+    string SelSkin = "";
+    int nUserId = Utility.GetUserProfileId();
+    SelSkin = Utility.GetLastSelSkinForUser();
+    string strAY = Utility.GetAcademicYear();
+}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="~/Content/images/campuswhizlogo.png">
+
+    <title>
+        CampusWhiz | App
+    </title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+    <!-- bootstrap & fontawesome -->
+    <link rel="stylesheet" href="~/assets/font-awesome/4.2.0/css/font-awesome.min.css" />
+
+    <!-- page specific plugin styles -->
+    <!-- text fonts -->
+    <link rel="stylesheet" href="~/assets/fonts/fonts.googleapis.com.css" />
+
+
+    <!-- ace styles -->
+    <link rel="stylesheet" href="~/assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+
+    <script src="~/assets/js/ace-extra.min.js"></script>
+    <link href="~/assets/css/checkbox.css" rel="stylesheet" />
+    @*<link href="~/assets/BTS Styles/AdminCustomStyles.css" rel="stylesheet" />*@
+
+    <script>
+
+
+        //$('.nav li > .sub-menu').parent().hover(function () {
+        //    var submenu = $(this).children('.sub-menu');
+        //    if ($(submenu).is(':hidden')) {
+        //        $(submenu).slideDown(200);
+        //    } else {
+        //        $(submenu).slideUp(200);
+        //    }
+        //});
+
+
+
+
+
+    </script>
+</head>
+
+<body>
+    <div id="navbar" class="navbar navbar-default ace-save-state">
+        @Html.Action("NavigatorBar", "Base")
+
+    </div>
+
+    <input type="hidden" id="UserId" value="@nUserId" />
+    <input type="hidden" id="SelSkin" value="@SelSkin" />
+
+    <div class="main-container" id="main-container">
+        @*<script type="text/javascript">
+                try { ace.settings.check('main-container', 'fixed') } catch (e) { }
+            </script>*@
+
+        <div id="sidebar" class="sidebar responsive sidebar-scroll">
+            @*<script type="text/javascript">
+                    try { ace.settings.check('sidebar', 'fixed') } catch (e) { }
+                </script>*@
+
+            @if (Userinfo != null && Userinfo.DesignationName != null && Userinfo.DesignationName.ToUpper().Contains("PARENT"))
+            {
+                <ul class="nav nav-list">
+                    <li class="@Html.ActivePage("Parent", "StudentDetails")">
+                        <a href="/Parent/StudentDetails/"><i class="menu-icon fa fa-caret-right"></i>Student Details</a>
+                        <b class="arrow"></b>
+                    </li>
+
+                    <li class="@Html.ActivePage("Parent","OnlinePayment")">
+                        <a href="/Parent/OnlinePayment/"><i class="menu-icon fa fa-caret-right"></i>Online Payment</a>
+                        <b class="arrow"></b>
+                    </li>
+
+                    <li class="@Html.ActivePage("Parent", "Holidays")">
+                        <a href="/Parent/Holidays/"><i class="menu-icon fa fa-caret-right"></i>Holidays</a>
+                        <b class="arrow"></b>
+                    </li>
+                    <li class="@Html.ActivePage("Parent", "ExamSchedules")">
+                        <a href="/Parent/ExamSchedules/"><i class="menu-icon fa fa-caret-right"></i>Exam Schedules</a>
+                        <b class="arrow"></b>
+                    </li>
+
+                    <li class="@Html.ActivePage("Parent","StudentProgressCard")">
+                        <a href="/Parent/StudentProgressCard/"><i class="menu-icon fa fa-caret-right"></i>Progress Card</a>
+                        <b class="arrow"></b>
+                    </li>
+                    <li class="@Html.ActivePage("Parent","StudentAttendance")">
+                        <a href="/Parent/StudentAttendance/"><i class="menu-icon fa fa-caret-right"></i>Attendance</a>
+                        <b class="arrow"></b>
+                    </li>
+                    <li class="@Html.ActivePage("Parent","Feedback")">
+                        <a href="/Parent/StudentAttendance/"><i class="menu-icon fa fa-caret-right"></i>Feedback</a>
+                        <b class="arrow"></b>
+                    </li>
+
+                </ul>
+            }
+            else
+            {
+                <div class="sidebar-shortcuts" id="sidebar-shortcuts">
+                    <div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
+                        <button title="Dash Board" class="btn btn-info" id="DashBoard" onclick="DashBoardfunction()">
+                            <i class="ace-icon fa fa-home"></i>
+                        </button>
+                        <button title="Fee Payments" class="btn btn-success" id="FeePayments" onclick="FeePayments()">
+                            <i class="ace-icon fa fa-inr"></i>
+                        </button>
+                        <button title="Fee Due List" class="btn btn-purple" id="duelistClick" onclick="duelistfunction()">
+                            <i class="ace-icon fa fa-signal"></i>
+                        </button>
+                        <button title="Student Details" class="btn btn-warning" id="Studentdetails" onclick="Studentdetailsfunction()">
+                            <i class="ace-icon fa fa-users"></i>
+                        </button>
+                        @*<button title="Staff Details" class="btn btn-info" id="StaffDetails" onclick="StaffDetailsfunction()">
+                                <i class="ace-icon fa fa-pencil"></i>
+                            </button>*@
+
+                        <button title="Switch Institute" class="btn btn-danger" onclick="SwitchInstitute()">
+                            <i class="ace-icon fa fa-cogs"> </i>
+                        </button>
+                    </div>
+
+                    <div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
+                        <span class="btn btn-success"></span>
+
+                        <span class="btn btn-info"></span>
+
+                        <span class="btn btn-warning"></span>
+
+                        <span class="btn btn-danger"></span>
+                    </div>
+                </div><!-- /.sidebar-shortcuts -->
+
+                <ul class="nav nav-list ">
+
+                    @if (null != UserLayout && UserLayout.Count() > 0)
+                    {
+                        int Count = UserLayout.Where(u => u.PermissionType == 1 || u.PermissionType == 2).Count();
+                        if (Count > 0)
+                        {
+                            var ModuleGroupData = UserLayout.GroupBy(s => s.ModuleId).ToList();
+                            if (ModuleGroupData.Count() > 0)
+                            {
+                                foreach (var s in ModuleGroupData)
+                                {
+
+                                    if (s.FirstOrDefault().ModuleName != "Dashboard")
+                                    {
+                                        Controllers = string.Empty;
+                                        int CountPage = s.Where(u => u.PermissionType == 1 || u.PermissionType == 2).Count();
+                                        var pageGroup = s.GroupBy(p => p.PBURL);
+
+                                        foreach (var p in pageGroup)
+                                        {
+                                            if (!string.IsNullOrEmpty(p.Key))
+                                            {
+                                                Controllers += p.Key + ",";
+                                            }
+                                        }
+
+
+                                        <li class="@Html.ActiveMainHead(Controllers)">
+                                            <a href="#" class="dropdown-toggle">
+
+                                                <i class="menu-icon @s.FirstOrDefault().MIcon"></i>
+
+                                                <span class="menu-text">
+                                                    @s.FirstOrDefault().ModuleName
+                                                </span>
+
+                                                <b class="arrow fa fa-angle-down"></b>
+                                            </a>
+
+                                            <b class="arrow"></b>
+
+
+                                            @{
+                                                var PageGroupData = s.GroupBy(p => p.PageId).ToList();
+                                            }
+                                            @if (null != PageGroupData && PageGroupData.Count() > 0)
+                                            {
+                                                foreach (var p in PageGroupData)
+                                                {
+                                                    int pageCount = p.Where(u => u.PermissionType == 1 || u.PermissionType == 2).Count();
+                                                    if (pageCount > 0)
+                                                    {
+
+                                                        <ul class="submenu dummy">
+                                                            <li class="@Html.ActiveHead(@p.FirstOrDefault().PBURL)" id="@p.FirstOrDefault().PBURL">
+
+                                                                <a href="#" class="dropdown-toggle">
+                                                                    <i class="menu-icon @p.FirstOrDefault().PIcon"></i>
+
+                                                                    @p.FirstOrDefault().PageName
+                                                                    <b class="arrow fa fa-angle-down"></b>
+                                                                </a>
+
+                                                                <ul class="submenu">
+                                                                    @foreach (var Sp in p)
+                                                                    {
+
+                                                                        if (Sp.PermissionType != 0)
+                                                                        {
+                                                                            if (!(strAY == "2016-2017" && (Sp.ContentName.Trim() == "Inquiry" || Sp.ContentName.Trim() == "Confirm Admission" || Sp.ContentName.Trim() == "Registration Fill Up" || Sp.ContentName.Trim() == "Student Sales" || Sp.ContentName.Trim() == "Fee Payment")))
+                                                                            {
+                                                                                <li class="@Html.ActivePage(p.FirstOrDefault().PBURL, Sp.CBURL)">
+                                                                                    <a href='/@p.FirstOrDefault().PBURL/@Sp.CBURL/'>
+                                                                                        <i class="menu-icon fa fa-caret-right"></i>
+                                                                                        @Sp.ContentName
+                                                                                    </a>
+
+                                                                                    <b class="arrow"></b>
+                                                                                </li>
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                </ul>
+                                                            </li>
+
+
+
+                                                        </ul>
+                                                    }
+                                                }
+                                            }
+                                        </li>
+
+                                    }
+
+
+
+
+                                }
+                            }
+                        }
+
+                    }
+
+
+
+
+                </ul>
+                <!-- Navigation Bar List -->
+                <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+                    <i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
+                </div>
+
+                <script type="text/javascript">
+                    try { ace.settings.check('sidebar', 'collapsed') } catch (e) { }
+                </script>
+            }
+
+        </div>
+        <div class="main-content">
+            <div class="main-content-inner">
+
+                <div class="breadcrumbs" id="breadcrumbs">
+                    @*<script type="text/javascript">
+                            try { ace.settings.check('breadcrumbs', 'fixed') } catch (e) { }
+                        </script>*@
+                    @RenderSection("BreadCrumb", false)
+                </div>
+
+                <div class="page-content">
+
+                    <div class="">
+                        <div class="col-xs-12">
+                            <!-- PAGE CONTENT BEGINS -->
+                            @RenderBody()
+                            <!-- PAGE CONTENT ENDS -->
+                        </div><!-- /.col -->
+                    </div><!-- /.row -->
+
+                </div><!-- /.page-content -->
+
+            </div>
+
+
+
+
+        </div><!-- /.main-content -->
+
+        @Html.Action("Footer", "Base")
+        <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+            <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+        </a>
+
+
+
+
+
+        <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+            <p style="position:absolute; top: 50%; left:50%;">
+                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+            </p>
+        </div>
+
+    </div>
+
+
+
+
+
+    <!--[if !IE]> -->
+    <script type="text/javascript">
+        window.jQuery || document.write("<script src='/assets/js/jquery.min.js'>" + "<" + "/script>");
+    </script>
+    <!-- <![endif]-->
+    <!--[if IE]>
+    <script type="text/javascript">
+     window.jQuery || document.write("<script src='/assets/js/jquery1x.min.js'>"+"<"+"/script>");
+    </script>
+    <![endif]-->
+    <script type="text/javascript">
+        if ('ontouchstart' in document.documentElement) document.write("<script src='/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+    </script>
+    <script src="~/assets/js/bootstrap.min.js"></script>
+    <!-- page specific plugin scripts -->
+    @RenderSection("PagePluginScripts", required: false)
+    <!-- ace scripts -->
+    <script src="~/assets/js/ace-elements.min.js"></script>
+    <script src="~/assets/js/ace.min.js"></script>
+    <!-- inline scripts related to this page -->
+    @RenderSection("PageInlineScripts", required: false)
+
+
+    <input type="hidden" id="ActionName" value="@ViewContext.RouteData.GetRequiredString("action")" />
+
+    <script type="text/javascript">
+
+        $(document).ajaxComplete(function (event, xhr, settings) {
+            if (settings.url.includes("/Common/DontAllowEdits") == false) {
+                DontAllowEdits();
+            }
+        });
+
+        //$(document).ready(function () {
+
+        //    dontGoBack();
+
+        //    DontAllowEdits();
+
+        //    var skinType = $('#SelSkin').val();
+
+        //    var current = "";
+
+        //    if (skinType == "skin-1") {
+        //        current = "#222A2D";
+        //        $('.btn-colorpicker').css('background-color', 'rgb(34, 42, 45)');
+        //    }
+        //    else if (skinType == "skin-2") {
+        //        current = "#C6487E";
+        //        $('.btn-colorpicker').css('background-color', 'rgb(198, 72, 126)');
+        //    }
+        //    else if (skinType == "skin-3") {
+        //        current = "#D0D0D0";
+        //        $('.btn-colorpicker').css('background-color', 'rgb(208, 208, 208)');
+        //    }
+        //    else {
+        //        current = "#438EB9";
+        //        $('.btn-colorpicker').css('background-color', 'rgb(67, 142, 185)');
+        //    }
+
+        //    $('.colorpick-btn[data-color="#222A2D"]').removeClass('selected');
+        //    $('.colorpick-btn[data-color="#C6487E"]').removeClass('selected');
+        //    $('.colorpick-btn[data-color="#D0D0D0"]').removeClass('selected');
+        //    $('.colorpick-btn[data-color="#438EB9"]').removeClass('selected');
+
+        //    $(".colorpick-btn[data-color='" + current + "']").addClass('selected');
+
+        //    $('.skin-colorpicker[data-skin="no-skin"]').removeClass('selected');
+        //    $('.skin-colorpicker[data-skin="skin-1"]').removeClass('selected');
+        //    $('.skin-colorpicker[data-skin="skin-2"]').removeClass('selected');
+        //    $('.skin-colorpicker[data-skin="skin-3"]').removeClass('selected');
+
+        //    SkinChange(skinType);
+
+        //    var c = skinType;
+        //    if (0 == $("#ace-skins-stylesheet").length) {
+        //        var d = $("head").find("link.ace-main-stylesheet");
+        //        0 == d.length && (d = $("head").find('link[href*="/ace.min.css"],link[href*="/ace-part2.min.css"]'),
+        //            0 == d.length && (d = $("head").find('link[href*="/ace.css"],link[href*="/ace-part2.css"]')));
+        //        var e = d.first().attr("href").replace(/(\.min)?\.css$/i, "-skins$1.css");
+        //        $.ajax({ url: e }).done(function () {
+        //            var a = jQuery("<link />", { type: "text/css", rel: "stylesheet", id: "ace-skins-stylesheet" });
+        //            d.length > 0 ? a.insertAfter(d.last()) : a.appendTo("head");
+        //            a.attr("href", e);
+        //            SkinChange(c);
+        //            window.Pace && Pace.running && Pace.stop();
+        //        })
+        //    }
+        //});
+
+        //function SkinChange(b) {
+
+        //    var c = $(document.body);
+        //    c.removeClass("no-skin skin-1 skin-2 skin-3");
+        //    c.addClass(b);
+        //    $(".skin-colorpicker[data-skin='" + b + "']").addClass('selected');
+        //    //ace.data.set("skin", b);
+        //    var d = ["red", "blue", "green", "pink"];
+        //    $('.ace-nav > li.grey').removeClass('dark');
+        //    $(".ace-nav > li").removeClass("no-border margin-1");
+        //    $(".ace-nav > li:not(:last-child)").removeClass("light-pink").find("> a > " + ".ace-icon").removeClass("pink").end().eq(0).find(".badge").removeClass("badge-warning");
+        //    $(".sidebar-shortcuts .btn").removeClass("btn-pink btn-white").find(".ace-icon").removeClass("white");
+        //    $(".ace-nav > li.grey").removeClass("red").find(".badge").removeClass("badge-yellow");
+        //    $(".sidebar-shortcuts .btn").removeClass("btn-primary btn-white");
+        //    var e = 0;
+        //    $(".sidebar-shortcuts .btn").each(function () {
+        //        $('.skin-colorpicker').find(".ace-icon").removeClass(d[e++])
+        //    });
+        //    var f = ["btn-success", "btn-info", "btn-warning", "btn-danger"];
+        //    if ("no-skin" == b) {
+        //        var e = 0;
+        //        $(".sidebar-shortcuts .btn").each(function () {
+        //            $('.skin-colorpicker').attr("class", "btn " + f[e++ % 4])
+        //        });
+        //        $(".sidebar[data-sidebar-scroll=true]").ace_sidebar_scroll("updateStyle", "");
+        //        $(".sidebar[data-sidebar-hover=true]").ace_sidebar_hover("updateStyle", "no-track scroll-thin");
+        //    } else if ("skin-1" == b) {
+        //        $('.table-header').css('background-color', '#2C6AA0');
+        //        $(".ace-nav > li.grey").addClass("dark");
+        //        var e = 0;
+        //        $(".sidebar-shortcuts").find(".btn").each(function () {
+        //            $('.skin-colorpicker').attr("class", "btn " + f[e++ % 4])
+        //        });
+        //        $(".sidebar[data-sidebar-scroll=true]").ace_sidebar_scroll("updateStyle", "scroll-white no-track");
+        //        $(".sidebar[data-sidebar-hover=true]").ace_sidebar_hover("updateStyle", "no-track scroll-thin scroll-white");
+        //    } else if ("skin-2" == b) {
+        //        $('.table-header').css('background-color', 'light-pink');
+        //        $(".ace-nav > li").addClass("no-border margin-1");
+        //        $(".ace-nav > li:not(:last-child)").addClass("light-pink").find("> a > " + ".ace-icon").addClass("pink").end().eq(0).find(".badge").addClass("badge-warning");
+        //        $(".sidebar-shortcuts .btn").attr("class", "btn btn-white btn-pink").find(".ace-icon").addClass("white");
+        //        $(".sidebar[data-sidebar-scroll=true]").ace_sidebar_scroll("updateStyle", "scroll-white no-track");
+        //        $(".sidebar[data-sidebar-hover=true]").ace_sidebar_hover("updateStyle", "no-track scroll-thin scroll-white");
+        //    }
+        //    else if ("skin-3" == b) {
+        //        c.addClass("no-skin"), $(".ace-nav > li.grey").addClass("red").find(".badge").addClass("badge-yellow");
+        //        var e = 0;
+        //        $(".sidebar-shortcuts .btn").each(function () {
+        //            $('.skin-colorpicker').attr("class", "btn btn-primary btn-white");
+        //            $('.skin-colorpicker').find(".ace-icon").addClass(d[e++])
+        //        });
+        //        $(".sidebar[data-sidebar-scroll=true]").ace_sidebar_scroll("updateStyle", "scroll-dark no-track");
+        //        $(".sidebar[data-sidebar-hover=true]").ace_sidebar_hover("updateStyle", "no-track scroll-thin");
+        //    }
+
+        //    $(".sidebar[data-sidebar-scroll=true]").ace_sidebar_scroll("reset");
+        //}
+
+
+
+        function OpenDialog(Validation, url, title) {
+
+            if (Validation != "") {
+
+                $('#dValidation').html(" <i class='ace-icon fa fa-hand-o-right  bigger-120'></i>&nbsp;  " + Validation);
+
+                $("#dialog-confirm").removeClass('hide').dialog({
+                    resizable: false,
+                    draggable: false,
+                    width: '320',
+                    modal: true,
+                    title: title,
+                    title_html: true,
+                    open: function (event, ui) {
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    },
+                    buttons: [
+                        {
+                            html: "&nbsp; &nbsp; OK &nbsp; &nbsp; ",
+                            "class": "btn btn-info btn-minier",
+                            click: function () {
+                                $(this).dialog("close");
+                            }
+                        }
+                    ]
+                });
+            }
+            else {
+
+                $('#dValidation').html("<i class='ace-icon fa fa-hand-o-right bigger-120'></i>&nbsp; Are you sure?");
+                $("#dialog-confirm").removeClass('hide').dialog({
+                    resizable: false,
+                    draggable: false,
+                    width: '320',
+                    modal: true,
+                    title: title,
+                    title_html: true,
+                    open: function (event, ui) {
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    },
+                    buttons: [
+                        {
+                            html: "<i class='ace-icon fa fa-trash-o bigger-110'></i>&nbsp; Delete",
+                            "class": "btn btn-danger btn-minier",
+                            click: function () {
+                                window.location.href = url;
+                            }
+                        }
+                        ,
+                        {
+                            html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Cancel",
+                            "class": "btn btn-minier",
+                            click: function () {
+                                $(this).dialog("close");
+                            }
+                        }
+                    ]
+                });
+            }
+        }
+
+        $('.textlength').focusout(function () {
+            $(this).val($(this).val().trim())
+        });
+
+        function dontGoBack() {
+            debugger
+            var str = window.location.href;
+            var IsPDF = str.includes("AReports/ProgressCard");
+
+            var IsICPDF = str.includes("AReports/ICProgressCard");
+
+            var IsPDFFromStudentLogin = str.includes("Parent/StudentProgressCard");
+
+            if (IsPDF != true && IsICPDF != true && IsPDFFromStudentLogin != true) {
+                window.history.forward()
+            }
+        }
+
+        window.onpageshow = function (evt) { if (evt.persisted) dontGoBack() }
+        window.onunload = function () { void (0) }
+
+        function DontAllowEdits() {
+            if ($('.P2').length > 0) {
+                var ActionName = $('#ActionName').val();
+
+                if (ActionName != "" && ActionName != "undefined") {
+                    $.ajax({
+                        url: '/Common/DontAllowEdits',
+                        data: { strActionName: ActionName },
+                        success: function (data) {
+                            if (data == true) {
+                                $('.P2').attr("disabled", true);
+
+                                //if ($('.P2 > a').length > 0) {
+                                $('.P2').removeAttr('href');
+
+                                $('.P2').removeAttr('onclick');
+                                $('.P2').each(function () {
+                                    var val = this.id;
+                                    $('#' + val).off()
+
+                                })
+
+                                // }
+
+                            }
+                        },
+                        async: false
+                    });
+                }
+            }
+        }
+
+    </script>
+    <script>
+        $(".txtboxNum").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+                // Allow: Ctrl+A
+                (e.keyCode == 65 && e.ctrlKey === true) ||
+                // Allow: Ctrl+C
+                (e.keyCode == 67 && e.ctrlKey === true) ||
+                // Allow: Ctrl+X
+                (e.keyCode == 88 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        function ExportToExcel(tableid) {
+
+            var tab_text = "<table border='2px'><tr bgcolor='#87AFC6'>";
+            var textRange; var j = 0;
+            tab = document.getElementById(tableid); // id of table
+
+            for (j = 0; j < tab.rows.length; j++) {
+                tab_text = tab_text + tab.rows[j].innerHTML + "</tr>";
+                //tab_text=tab_text+"</tr>";
+            }
+
+            tab_text = tab_text + "</table>";
+            tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
+            tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // remove if u want images in your table
+            tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // reomves input params
+
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf("MSIE ");
+
+            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+            {
+                document.getElementById('txtArea1').contentWindow;
+                txtArea1.document.open("txt/html", "replace");
+                txtArea1.document.write(tab_text);
+                txtArea1.document.close();
+                txtArea1.focus();
+                sa = txtArea1.document.execCommand("SaveAs", true, "Fee Due Report.xls");
+            }
+            sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
+
+            return (sa);
+        }
+
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+            return true;
+        }
+
+
+        function duelistfunction() {
+            window.location.href = "/FReports/FeeDueReport"
+        }
+
+
+        function FeePayments() {
+            window.location.href = "/FOperations/FeePayments"
+        }
+        function DashBoardfunction() {
+            window.location.href = "/Dashboard/Dashboard"
+        }
+        //function StaffDetailsfunction() {
+        //    window.location.href = "/HREnrollment/StaffDetails"
+        //}
+
+
+        function Studentdetailsfunction() {
+            window.location.href = "/AStudent/StudentDetails"
+        }
+
+        function SwitchInstitute() {
+            window.location.href = "/Settings/Index"
+        }
+
+        $('#btnStudentSales').click(function () {
+            window.location.href = "/FOperations/StudentSales"
+        })
+
+        $('#btnFCR').click(function () {
+            window.location.href = "/FReports/FeeCollectionReport"
+        })
+
+        $('#btnKitDetails').click(function () {
+            window.location.href = "/SMasterData/KitDetails"
+        })
+
+        $('#btnDaySheet').click(function () {
+            window.location.href = "/FOperations/DaySheet"
+        })
+
+        function CallDataTableScripts(IsPaging) {
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+                url: '/Base/DataTableScripts',
+                data: { IsPaging: IsPaging },
+                success: function (Data) {
+                    $('#DataTableScripts').html(Data);
+                }
+            });
+        }
+
+    </script>
+
+</body>
+</html>

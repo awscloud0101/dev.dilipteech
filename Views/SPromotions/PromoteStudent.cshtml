@@ -1,0 +1,225 @@
+﻿@model AsteriskBrowserAL.Models.StudentModel
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Student
+        </li>
+        <li>
+            <i class=""></i>
+            Promotion
+        </li>
+        <li class="active">Student Attendance</li>
+    </ul><!-- /.breadcrumb -->
+}
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("PromoteStudent", "SPromotions", FormMethod.Post))
+            {
+                if (null != TempData["Message"])
+                {
+                    <input type="hidden" id="Status" value="@TempData["Message"]" />
+                }
+
+                <input type="hidden" id="SelStudent" />
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Student Promotion
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                    <div class="col-sm-6">
+                                        <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                    <div class="col-sm-6">
+                                        <select id="BranchId" name="BranchId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <input type="hidden" id="DivisionId" />
+                            <input type="hidden" id="BranchId" />
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Class</label>
+                                    <div class="col-sm-6">
+                                        <select name="ClassId" id="ClassId" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                    <div class="col-sm-6">
+                                        <select name="Section" id="SectionId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="SearchViewDiv">
+                </div>
+            }
+        </div>
+    </div>
+</section>
+<script>
+
+    debugger
+    function OnloadData() {
+        LoadDivisionDropdown()
+    }
+
+    function LoadDivisionDropdown() {
+        debugger
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: false },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+                LoadBranchDropdown();
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        var Division = $("#DivisionId").val();
+        var Status = $("#Status").val();
+        $('#Status').html("");
+        LoadBranchDropdown();
+    })
+
+
+    function LoadBranchDropdown() {
+        var DivisionId = $("#DivisionId").val()
+        var isall = true;
+        if (DivisionId > 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                },
+                async: false
+            })
+        }
+        else {
+            document.getElementById("BranchId").value = ""
+            $("#BranchId").html("")
+            $("#ClassId").html("")
+            $("#SectionId").html("")
+        }
+    }
+
+    $("#BranchId").change(function () {
+        debugger
+        var BranchId = document.getElementById("BranchId").value;
+        LoadCourseDropdown()
+    })
+
+    function LoadCourseDropdown() {
+        var SelClassNumber = $("#SelCourseId").val();
+        $.ajax({
+            url: '/AFrontOffice/GetClassData',
+            success: function (result) {
+                CourseList = $("#ClassId")
+                CourseList.children().remove();
+                CourseList.append($("<option>").val("").text("--Select--"))
+                $.each(result, function (e, record) {
+                    CourseList.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(CourseList)
+            }
+        })
+    }
+    $("#ClassId").change(function () {
+        debugger
+        var ClassId = $("#ClassId").val();
+        var BranchId = document.getElementById("BranchId").value;
+        if (ClassId > 0 && BranchId > 0) {
+            GetSectionDropDown();
+        }
+        else {
+            $("#SelStudent").val("");
+            $("#SectionId").val("")
+            $("#SectionId").html("")
+        }
+    })
+
+    function GetSectionDropDown() {
+        var BranchId = document.getElementById("BranchId").value;
+        var ClassNumber = $("#ClassId").val();
+        $.ajax({
+            url: '/SPromotions/GetSectionDropDownByBranchWise',
+            data: { nClassNumber: ClassNumber, BranchId: BranchId },
+            success: function (Data) {
+                var SectionDRP = $('#SectionId')
+                SectionDRP.children().remove();
+                SectionDRP.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+                $('#SectionId').append(SectionDRP);
+            }
+        })
+    }
+
+
+    $('#SectionId').change(function () {
+        debugger
+        var BranchId = document.getElementById("BranchId").value;
+        var SectionId = $("#SectionId").val();
+        if (SectionId > 0 && BranchId > 0) {
+            GetStudentData();
+
+        }
+        else {
+            $("#SelStudent").val("");
+        }
+
+    });
+
+    function GetStudentData() {
+        debugger
+        var BranchId = document.getElementById("BranchId").value;
+        var SectionId = $("#SectionId").val();
+        $("#imagemodal").show();
+        $.ajax({
+            url: "/SPromotions/GetStudentsToPromote",
+            data: { BranchId: BranchId, nSectionId: SectionId },
+            success: function (Data) {
+                $("#imagemodal").hide();
+                $("#SearchViewDiv").html(Data);
+            }
+        })
+
+    }
+
+    window.onload = OnloadData();
+</script>

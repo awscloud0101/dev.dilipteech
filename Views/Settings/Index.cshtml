@@ -1,0 +1,181 @@
+﻿<!-- #section:basics/content.breadcrumbs -->
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            Settings
+        </li>
+        <li>
+            <i class=""></i>
+            Switch Institute
+        </li>
+        <li class="active">  Switch Institute</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Index", "Settings", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <span id="ErrorID" style="color:red; font-weight:bold;"></span>
+
+
+
+                <div class="table-header">
+                 
+                        Switch Institute
+                
+                  
+                        <div  style="float:right;margin-right:10px">
+                            <input class="btncustom" type="button" name="Switch" value="Switch" onclick="SetdbDropDown();" />
+                        </div>
+                   
+
+                </div><!-- /.box-header -->
+                <div class="widget-box">
+                   
+                    <!-- form start -->
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group has-feedback">
+                                        <label class="col-sm-3">Select Year</label>
+                                        <div class="col-sm-6">
+                                            <select id="year" name="year" class="form-control" required="required"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group has-feedback">
+                                        <label class="col-sm-3">Select Institute</label>
+                                        <div class="col-sm-6">
+                                            <select id="DataBasePath" name="DataBasePath" class="form-control" required="required"></select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                            
+
+                            
+
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<script>
+    function SetdbDropDown() {
+
+        var DropdownId = $("#DataBasePath").val();
+        var year = $("#year").val();
+        if (year != "" && year != null && year != "null") {
+            if (DropdownId != "" && DropdownId != null && DropdownId != "null") {
+                window.location.href = '/Settings/ChangeDatabase?DataBasePath=' + DropdownId;
+
+            }
+            else {
+                document.getElementById("ErrorID").innerHTML = "Please select Institute"
+            }
+        }
+        else {
+            document.getElementById("ErrorID").innerHTML = "Please select year"
+        }
+
+    }
+
+
+    function GetYearDropDown() {
+        $.ajax({
+            url: "/Account/GetYearDrpDwn",
+            success: function (data) {
+                var yearItems = $('#year')
+                yearItems.children().remove();
+                yearItems.append($("<option>").val("null").text("--Select Year--"))
+                $.each(data.Year, function (i, record) {
+                    yearItems.append($("<option>").val(record).text(record));
+                });
+                $('#year').append(yearItems);
+                $.ajax({
+                    url: "/Account/GetUserSubscriptionData",
+                    success: function (data) {
+
+                        document.getElementById('year').value = data.AcademicYear
+                        GetSubscriptionDropDown()
+
+                    },
+                    async: false
+
+                });
+                $.ajax({
+                    url: "/Account/GetActiveUserSubscriptionId",
+                    success: function (data) {
+
+                        document.getElementById('DataBasePath').value = data
+                    },
+                    async: false
+                });
+            }
+        });
+    }
+
+
+    $('#year').change(function () {
+        document.getElementById("ErrorID").innerHTML = ""
+        GetSubscriptionDropDown()
+    })
+
+    function GetSubscriptionDropDown() {
+        debugger
+        var year = $('#year').val();
+        if (year != "" && year != null && year != "null") {
+            $.ajax({
+                url: "/Account/GetSubscription",
+                data: { year: year },
+                success: function (data) {
+                    if (data != "") {
+                        var SubItems = $('#DataBasePath')
+                        SubItems.children().remove();
+                        SubItems.append($("<option>").val("null").text("--Select--"))
+                        $.each(data.Subscriptions, function (i, record) {
+                            SubItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                        });
+                        $('#DataBasePath').append(SubItems);
+
+                    }
+
+                },
+                async: false
+
+            });
+        }
+        else {
+            $('#DataBasePath').html("")
+        }
+
+    }
+    $('#DataBasePath').change(function () {
+        document.getElementById("ErrorID").innerHTML = ""
+    })
+    window.onload = GetYearDropDown();
+
+</script>
+
+

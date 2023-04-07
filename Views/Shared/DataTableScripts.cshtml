@@ -1,0 +1,118 @@
+﻿@model bool
+
+<input type="hidden" id="IsPaging" value="@Model" />
+<input type="hidden" id="AllowScroll" value="@ViewBag.AllowScroll" />
+<input type="hidden" id="Height" value="@ViewBag.Height" />
+
+<script src="~/assets/js/jquery.dataTables.min.js"></script>
+<script src="~/assets/js/jquery.dataTables.bootstrap.min.js"></script>
+<script src="~/assets/js/dataTables.tableTools.min.js"></script>
+<script src="~/assets/js/dataTables.colVis.min.js"></script>
+
+<style>
+
+
+    /*div.dataTables_borderWrap{
+          white-space:nowrap;
+    }*/
+
+    /*.dynamic-table{
+        white-space:nowrap;
+    }*/
+
+    /*table thead tr th{
+         white-space:nowrap;
+    }*/
+
+</style>
+
+<script type="text/javascript">
+
+    jQuery(function ($) {
+       
+            var IsPaging = $('#IsPaging').val();
+            var allowScroll = $('#AllowScroll').val();
+            var Height = $('#Height').val();
+
+            var sccrollY = "100%";
+            var scrollCollapse = false;
+            
+            if (IsPaging != "value")
+                IsPaging = false;
+            else
+                IsPaging = true;
+
+            if (allowScroll === "value") {
+                sccrollY = Height;
+                scrollCollapse = true;
+            }
+            
+            //initiate dataTables plugin
+            var oTable1 =
+            $('.dynamic-table')
+            .wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+            .dataTable({
+                bAutoWidth: false,
+                //"aoColumns": [
+                //  { "bSortable": false },
+                //  null, null, null, null, null,
+                //  { "bSortable": false }
+                //],
+                "aaSorting": [],
+
+                //,
+                //"sScrollY": "351px",
+                "bPaginate": IsPaging,
+
+                "sScrollX": "100%",
+                "sScrollXInner": "100%",
+                "bScrollCollapse": true,
+                //Note: if you are applying horizontal scrolling (sScrollX) on a ".table-bordered"
+                //you may want to wrap the table inside a "div.dataTables_borderWrap" element
+
+                //"iDisplayLength": 50
+
+                "scrollY": sccrollY,
+                "scrollCollapse": scrollCollapse,
+                
+            });
+
+            oTable1.fnAdjustColumnSizing();
+
+            //ColVis extension
+            var colvis = new $.fn.dataTable.ColVis(oTable1, {
+                "buttonText": "<i class='fa fa-search'></i>",
+                "aiExclude": [0, 6],
+                "bShowAll": true,
+                //"bRestore": true,
+                "sAlign": "right",
+                "fnLabel": function (i, title, th) {
+                    return $(th).text();//remove icons, etc
+                }
+
+            });
+
+            //style it
+            $(colvis.button()).addClass('btn-group').find('button').addClass('btn btn-white btn-info btn-bold')
+
+            //and append it to our table tools btn-group, also add tooltip
+            $(colvis.button())
+            .prependTo('.tableTools-container .btn-group')
+            .attr('title', 'Show/hide columns').tooltip({ container: 'body' });
+
+            //and make the list, buttons and checkboxed Ace-like
+            $(colvis.dom.collection)
+            .addClass('dropdown-menu dropdown-light dropdown-caret dropdown-caret-right')
+            .find('li').wrapInner('<a href="javascript:void(0)" />') //'A' tag is required for better styling
+            .find('input[type=checkbox]').addClass('ace').next().addClass('lbl padding-8');
+
+
+            $(document).on('click', '.dynamic-table .dropdown-toggle', function (e) {
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                e.preventDefault();
+            });
+
+
+        })
+</script>

@@ -1,0 +1,339 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ShiftWiseAttendanceData>
+
+@{
+    ViewBag.Title = "Shift Wise Attendance";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Reports
+        </li>
+        <li>
+            <i class=""></i>
+            Biometric
+        </li>
+        <li class="active">Shift Wise Attendance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+      
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <br />
+
+    
+            <div class="row">
+                <div class=col-xs-12>
+                    
+                    @using (Html.BeginForm("ShiftWiseAttendance", "HRBiometric", FormMethod.Post))
+                    {
+                        
+
+                        <div class="box">
+
+                            <div class="box-header">
+
+                                <h3 class="box-title">Shift-Wise Attendance</h3>
+                                <input type="submit" name="viewData" style="width:80px;" class="btn btn-primary pull-right" onclick="return btn_ViewDataClick();" id="viewData" value=" ViewData" />
+
+                            </div>
+
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Branch</label>
+                                            <div class="col-sm-4">
+                                                @Html.DropDownList("Branch", null, "--- Select ---", new { @class = "form-control", @onchange = "GetShiftsDropdown();" })
+                                            </div>
+                                            <div class="col-sm-3" style="display:none;" id="Branch">
+                                                <label style="color:red;font-weight:bold;"> Please  Select Branch Name</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-3 ">Select Shift</label>
+                                            <div class="col-sm-4">
+                                                <select id="ShiftId" name="ShiftId" class="form-control" title="--Select--" onchange="ddShiftSelectionChanged();"><option value=0>--- Select ---</option></select>
+                                            </div>
+                                            <div class="col-sm-2" style="display:none;" id="fshift">
+                                                <label style="color:red;font-weight:bold;font-size:12px;">Select Shifts</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+                                            <div class="col-sm-4">
+                                                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                    @if (null != ViewBag.Date)
+                                                    {
+                                                        <input class="form-control" type="text" name="Date" id="Date" value="@ViewBag.Date.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input class="form-control" type="text" name="Date" id="Date" autocomplete="off" placeholder="Select Date" />
+
+                                                    }
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2" style="display:none;" id="date">
+                                                <label style="color:red;font-weight:bold;font-size:12px;">Select Date</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <br />
+                                    
+                                    <div id="shiftIn" style="display:none;">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Shift In-Time : <b id="sIn"></b></label>
+                                    </div>
+                                    <div id="shiftOut" style="display:none;">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Shift Out-Time : <b id="sOut"></b></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="table">
+
+                        </div>
+
+                    }
+                </div>
+            </div>
+</section>
+
+<script type="text/javascript">
+    var SelStaffShiftId = $("#SelStaffShiftId").val();
+
+    function GetShiftsDropdown() {
+        var branchName = document.getElementById("Branch").value;
+        $.ajax({
+            url: '/HRBiometric/GetInstituteShifts',
+            data: { branchName: branchName },
+            success: function (data) {
+                items = "<option value='" + 0 + "'>--- Select ---</option>";
+                $.each(data, function (i, data) {
+                    items += "<option value='" + data.StaffShiftId + "'>" + data.StaffShiftName + "</option>";
+                });
+                $("#ShiftId").html(items);
+                shiftData = data;
+            }
+        });
+    };
+
+    function ddShiftSelectionChanged() {
+        var shftNo = document.getElementById("ShiftId").value;
+        var result = $.grep(shiftData, function (e) { return e.StaffShiftId == shftNo; });
+
+        if (shftNo == "" || shftNo < 1) {
+            document.getElementById("shiftIn").style.display = "none";
+            document.getElementById("shiftOut").style.display = "none";
+        } else {
+            var shftIn = result[0].InTime;
+            var shftOut = result[0].OutTime;
+            document.getElementById("shiftIn").style.display = "inline";
+            document.getElementById("shiftOut").style.display = "inline";
+            document.getElementById("sIn").innerHTML = shftIn;
+            document.getElementById("sOut").innerHTML = shftOut;
+
+        };
+
+    };
+
+    function btn_ViewDataClick() {
+        var shiftId = document.getElementById("ShiftId").value;
+        var date = document.getElementById("Date").value;
+        var branchName = document.getElementById("Branch").value;
+
+        $.ajax({
+            url: '/HRBiometric/GetStaffByUsingShiftBranchData',
+            data: { branchName: branchName, shiftId: shiftId, date: date },
+            success: function (data) {
+                $('#table').show();
+                $('#table').html(data);
+             
+            }
+
+        });
+        return false;
+    };
+
+  
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

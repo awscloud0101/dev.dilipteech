@@ -1,0 +1,149 @@
+﻿
+@model AsteriskBrowserAL.Models.VehicleRoutePointViewModel
+
+@{
+    ViewBag.Title = "Route Point";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Route Point</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+
+
+    @using (Html.BeginForm("RoutePointC", "SeFinance", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+
+        <div class="row">
+            <div class="col-xs-12">
+                <input type="hidden" name="VehicleRouteId" value="@Model.VehicleRouteId" id="SelTransportId" />
+                <input type="hidden" name="BranchId" value="@Model.BranchId" id="SelBranchId" />
+                <span style="color:red;font-weight:bold;" id="Validation"></span>
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Route Point</span>
+                    <small style="float:right;font-weight:bold;">
+                        @Html.ActionLink("Back to details", "RoutePoint", new { TransportPlanId = (null != Model) ? (Model.VehicleRouteId) : 0 })
+                    </small>
+                    </div>
+                <br/>
+            
+                    <form class="form-horizontal" role="form">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Route Point Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.RoutePoint, new { @class = "form-control textlength", @id = "RoutepointName", placeholder = "Route point Name" })
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="RoutepointNameVal">
+                            </span>
+
+                        </div>
+
+
+
+
+                        <div class="hr hr-18 dotted hr-double"></div>
+
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+        </div>
+    }
+
+</section>
+
+<script type="text/javascript">
+    debugger
+    function validateRoutePoint() {
+
+        var RoutePointName = document.getElementById("RoutepointName").value;
+
+        validate = true;
+
+        if (RoutePointName == "") {
+            document.getElementById("RoutepointNameVal").innerHTML = "Please enter name";
+            validate = false;
+        }
+
+        if (validate == true) {
+            validate = IsNameExists();
+        }
+
+        return validate;
+    };
+
+    debugger
+    function submitForm() {
+
+        var validatestatus = validateRoutePoint();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#RoutepointName').focus(function () {
+        document.getElementById("RoutepointNameVal").innerHTML = "";
+    });
+
+    debugger
+    function IsNameExists() {
+        var val = true;
+        $.ajax({
+
+            url: '/SeFinance/IsRoutePointName/',
+            data: { Type: "New", Id: $('#SelVehicleRoutePointId').val(), RoutepointName: document.getElementById("RoutepointName").value, TransportPlanId: $('#SelTransportId').val(), BranchId: $('#SelBranchId') },
+            success: function (data) {
+                $('#imagemodal').show();
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            },
+            async: false
+            $('#imagemodal').hide();
+    });
+
+    return val;
+    }
+
+</script>
+
+
+
+
+
+
+
+
+

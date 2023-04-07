@@ -1,0 +1,339 @@
+﻿@model AsteriskBrowserAL.Models.MicroScheduleData
+
+@{
+    ViewBag.Title = "Micro-Schedule Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Micro-Schedule Report
+        </li>
+        <li class="active">Micro-Schedule Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<style>
+
+    .input-group .form-control:first-child, .input-group-addon:first-child, .input-group-btn:first-child > .btn, .input-group-btn:first-child > .btn-group > .btn, .input-group-btn:first-child > .dropdown-toggle, .input-group-btn:last-child > .btn-group:not(:last-child) > .btn, .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle) {
+        border-radius: 5px;
+        width: 100%;
+    }
+
+
+</style>
+
+
+
+<section class="content">
+
+
+    <div class="row">
+        <div class=col-sm-12>
+            @using (Html.BeginForm("ExcelMicroScheduleReportDT", "AMicroSchedule", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral.ToString()" name="IsCentral" />
+
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Micro Plan Report</span>
+
+
+                    </div>
+                    <div class="widget-box">
+
+                
+                        <!-- /.box-header -->
+                        <!-- form start -->
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-3">Division</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-3">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.SubscriptionId" />
+                                           }
+                              
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                                <div class="col-sm-6">
+                                                    <select class="form-control" id="ClassNumberId"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-3">Date Range</label>
+                                            <div class="col-sm-6">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control pull-right" id="daterange" name="DateRange" autocomplete="off"  style="position:absolute;left:0px;"/>
+                                                    <div class="input-group-addon" style="z-index:4;position:relative;">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                             </div>
+                
+                            </div>
+                        </div>
+                    </div>
+                    <div id="MicroScheduleReportDetails"></div>
+
+                }
+
+            }
+        </div>
+    </div>
+
+</section>
+@Html.Action("DatePickerScripts","Base", new { IsPaging = false, AllowScroll = true })
+<script type="text/javascript">
+    var status = 0;
+    var DisplayValidation = "";
+
+    $(document).ready(function () {
+        $('#MicroScheduleReportDetails').html("");
+        var IsCentral = $('#IsCentral').val();
+        
+        
+        if (IsCentral == "False") {
+            LoadClassDropdown();
+        }
+
+    });
+
+    $('#DivisionId').change(function () {
+        $('#MicroScheduleReportDetails').html("");
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        if (record.IsCentral != true)
+                        {
+                            BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+
+                        }
+
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    $('#BranchId').change(function () {
+        var BranchId = $("#BranchId").val();
+        $("#ClassNumberId").html("")          
+        $('#daterange').html("");
+        $('#MicroScheduleReportDetails').html("");
+
+        if (BranchId > -2) {
+            LoadClassDropdown()
+        }
+        else {
+            var BranchItems = $('#SelClassId');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    })
+
+
+    function LoadClassDropdown() {
+        var SelClassId = $("#SelClassId").val();
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                Section = $("#ClassNumberId")
+                Section.children().remove();
+                Section.append($("<option>").val("-1").text("--- Select ---"))
+                Section.append($("<option>").val("0").text("All"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassNumberId").append(Section)
+                //if (SelClassId > 0) {
+                //    document.getElementById("ClassNumberId").value = SelClassId;
+                //    GetStudentData();
+                //}
+
+            },
+            async: false
+        })
+    }
+    $('#ClassNumberId').change(function () {
+        $('#daterange').html("");
+        $('#MicroScheduleReportDetails').html("");
+        if ($("#ClassNumberId").val() > 0) {
+           
+        }
+
+    });
+
+
+
+    $('#daterange').change(function () {
+        $('#MicroScheduleReportDetails').html("");
+        GetMicroScheduleData();
+    })
+
+    function GetMicroScheduleData() {
+     
+        $('#MicroScheduleReportDetails').html("");
+        var BranchId = $('#BranchId').val();
+        var Divisionid = $('#DivisionId').val();
+        var Dates = $("#daterange").val();
+        var IsCentral = $('#IsCentral').val();
+        var ClassNumber = $('#ClassNumberId').val();
+        
+
+        if (IsCentral == "True")
+        {
+            IsCentral = true;
+
+        }
+        else
+        {
+            IsCentral = false;
+             Divisionid = 0;
+
+
+        }
+
+
+
+
+        var valid = Validations();
+        if (valid == true) {
+            $.ajax({
+                url: '/AMicroSchedule/GetMicroScheduleReportData',
+                data: { nDivisionId: Divisionid, nBranchId: BranchId, IsCentral: IsCentral, Date: Dates, ClassuNumber: ClassNumber },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                    
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#MicroScheduleReportDetails').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+            $('#MicroScheduleReportDetails').html("");
+        }
+    }
+
+    function Validations() {
+        var Divisionid = $('#DivisionId').val();
+        var branchId = $('#BranchId').val();
+        var Dates = $("#daterange").val();
+        var Iscentral = $('#IsCentral').val();
+        var isvalid = true;
+
+        var ValidationString = "Please Select ";
+        if (Iscentral == "true") {
+            if (Divisionid != 0) {
+                ValidationString += "Division,"
+                isvalid = false
+            }
+            if (branchId != 0) {
+                ValidationString += "Branch,"
+                isvalid = false
+            }
+        }
+        if (ClassNumberId > -1) {
+            ValidationString += "Class"
+            isvalid = false
+        }
+        if (Dates == "" || Dates == undefined) {
+            ValidationString += "Date Range,"
+            isvalid = false
+        }
+
+        if (isvalid == false) {
+            document.getElementById("Validation").innerHTML = ValidationString;
+        }
+        return isvalid;
+    }
+
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+
+
+

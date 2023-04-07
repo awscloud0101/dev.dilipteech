@@ -1,0 +1,77 @@
+﻿@model List<AsteriskBrowserAL.Models.MarksEntryPermissionData>
+@{
+    ViewBag.Title = "Marks Entry PermissionData";
+    int sno = 1;
+}
+
+<div class="hr hr-18 dotted hr-double"></div>
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="table-header">
+        Records Found (@Model.Count())
+        @*<div style="float:right;">
+                <button type="submit" name="Save" class="btn btn-info btn-xs">
+                    <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                </button>
+            </div>*@
+
+    </div>
+
+    <div>
+        <table class="table tbhover table-striped table-bordered dynamic-table" id="mytab1">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Branch")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Regular")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Special")
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+
+                    <tr>
+                        <td>
+
+                            @(sno++)
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).Branch
+                        </td>
+                        <td>
+                            @Html.Hidden("MarksEntryPermissionList.Index", (@i + 10))
+                            @Html.Hidden("MarksEntryPermissionList[" + (@i + 10) + "].MarksEntryScheduleId", Model.ElementAt(i).MarksEntryScheduleId)
+                            @Html.Hidden("MarksEntryPermissionList[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                            @Html.TextBox("MarksEntryPermissionList[" + (@i + 10) + "].Regular", Model.ElementAt(i).Regular, new { @class = "form-control textlength txtboxNum", @readonly = "readonly", id = "regulardays", @style = "width:120px", value = "Readonly field" })
+                        </td>
+                        <td id="special">
+                            @Html.TextBox("MarksEntryPermissionList[" + (@i + 10) + "].Special", Model.ElementAt(i).Special, new { id = @Model.ElementAt(i).SubscriptionId, @class = "form-control textlength txtboxNum", name = "special", @min = "0", @Maxlength = "3", @style = "width:120px" })
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+    </div>
+
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+<script type="text/javascript">
+
+    document.getElementById("regulardays").readOnly = true;
+</script>

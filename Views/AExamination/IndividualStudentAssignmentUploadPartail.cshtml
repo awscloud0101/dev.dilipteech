@@ -1,0 +1,104 @@
+﻿
+@model IEnumerable<AsteriskBrowserAL.Models.AssignmentUploadData>
+@{
+    ViewBag.Title = "StudentAssignmentPartialView";
+
+    int nSNo = 1;
+
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    @*<div id="message" class="alert alert-info bigger-110">
+        </div>*@
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+@if (null != Model && Model.Count() > 0)
+{
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    <div class="col-xs-12">
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+        <!-- /.box-header -->
+        <!-- div.table-responsive -->
+        <!-- div.dataTables_borderWrap -->
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("Sno")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Admission No")
+                    </th>
+                    
+                    <th>
+                        @Html.DisplayName("Download Assignment")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Upload Assignment")
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>
+                        @(nSNo++)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StudentName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AdmissionNumber)
+                    </td>
+                    <td>
+                        <a href="@item.StudentAssignmentUploadUrl" target="_blank">Download</a>
+                    </td>
+                    <td>
+                        <a class="green" href="@Url.Action("TeacherAssignmentE", "AExamination", new { AssignmentUploadId = item.AssignmentUploadId, StudentId = item.StudentId})">
+                            Upload
+                        </a>
+                    </td>
+                    
+
+                </tr>
+
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+}
+else
+{
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    <div class="col-xs-12">
+        <span style="font-weight:bold;color:red">No records found</span>
+    </div>
+}
+@Html.Action("DataTableScripts", "Base")
+
+
+
+
+

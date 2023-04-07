@@ -1,0 +1,453 @@
+﻿@model AsteriskBrowserAL.Models.StudentDetailsData
+@{
+    ViewBag.Title = "Progress Card";
+
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Front Office
+        </li>
+        <li class="active">Capture Student</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+        box-sizing: border-box;
+        list-style: none;
+        margin: 0;
+        padding: 0 5px;
+        width: 100%;
+    }
+
+    .select2-container .select2-selection--multiple .select2-selection__rendered {
+        display: inline-block;
+        overflow: hidden;
+        padding-left: 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .form-control.select2-container {
+        height: auto !important;
+        padding: 0;
+        max-width: 228px;
+        width: 228px;
+    }
+
+</style>
+
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("CaptureStudent", "AFrontOffice", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    if (null != TempData["Status"])
+                    {
+
+                        <p align="center">
+                            <span class="savedinfo">
+
+
+
+                                <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                                <br />
+                                <span id="Validation" style="font-weight:bold">@Html.Raw(TempData["Status"])</span>
+
+
+                                <br />
+
+                                <a href="" class="cls1 btncustom">Close</a>
+                                <script>
+
+                                    $(document).ready(function () {
+                                        $(".cls1").click(function () {
+
+                                            $(".savedinfo").css("display", "none")
+                                        });
+
+
+
+                                </script>
+                            </span>
+                        </p>
+
+
+
+                                }
+                    else if (null != TempData["Error"])
+                    {
+                        <span id="Validation" style="color:red;font-weight:bold">@Html.Raw(TempData["Error"])</span>
+                    }
+                    else
+                    {
+                        <span id="Validation"></span>
+                    }
+
+                    <marquee> <span style="color:orangered;font-weight:bold;font-size:14px" >Please use mozilla firefox for capturing photos.</span> </marquee>
+
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Capture Photo</span>
+                      
+
+
+
+                    </div>
+                    
+
+
+                    <div class="widget-box">
+
+                      
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                @if (Model.IsCentral)
+                                {
+
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Division</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="BranchId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                               
+
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Staff</label>
+                                                <div class="col-sm-8">
+                                                    <select id="StaffId" name="StaffId" class="form-control select2" ></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="BranchId" name="BranchId" value="@Model.BranchId" />
+
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Section</label>
+                                                <div class="col-sm-6">
+                                                    <select id="SectionId" name="SectionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Student</label>
+                                                <div class="col-sm-6">
+                                                    <select id="StudentId" name="StudentId" class="form-control select2"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Capturing for</label>
+                                                <div class="col-xs-6">
+                                                    <input type="radio" checked="checked" value="1" name="rbType" /> Student &nbsp;&nbsp;
+                                                    <input type="radio" value="2" name="rbType" /> Father&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <input type="radio" value="3" name="rbType" /> Mother&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <input type="radio" value="4" name="rbType" /> Gaurdian&nbsp;&nbsp;
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div id="Capture"></div>
+                }
+
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+
+    var StudentId = "";
+
+    $(document).ready(function () {
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral != "value") {
+            LoadSections();
+        }
+    });
+
+    $('input:radio').change(function () {
+        $('#Capture').html("");
+        CapturePhoto()
+    });
+
+    $('#DivisionId').change(function () {
+        $('#BranchId').val("");
+        $('#BranchId').html("");
+
+        $('#StaffId').val("");
+        $('#StaffId').html("");
+
+        $('#Capture').html("");
+
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll : false },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+
+        $('#StaffId').select2("val", "")
+
+        $('#StaffId').children().remove();
+
+        $('#StaffId').val("");
+        $('#StaffId').html("");
+
+        $('#Capture').html("");
+
+        LoadStaff();
+    });
+
+    function LoadStaff() {
+        var BranchId = $('#BranchId').val();
+
+        if (BranchId > 0) {
+            $.ajax({
+
+                url: '/AFrontOffice/GetStaffBySubId',
+                data: { nSubId: BranchId },
+                success: function (data) {
+
+                    var StaffItems = $('#StaffId');
+
+                    StaffItems.children().remove();
+
+                    StaffItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        StaffItems.append($("<option>").val(record.StaffId).text(record.DisplayName));
+                    });
+
+                    $('#StaffId').append(StaffItems);
+
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    function LoadSections() {
+        var BranchId = $('#BranchId').val();
+
+        if (BranchId > 0) {
+            $.ajax({
+
+                url: '/AReports/GetSectionsBySubId',
+                data: { BranchId: BranchId },
+                success: function (data) {
+
+                    var SectionItems = $('#SectionId');
+
+                    SectionItems.children().remove();
+
+                    SectionItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        SectionItems.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                    });
+
+                    $('#SectionId').append(SectionItems);
+
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    $('#SectionId').change(function () {
+        debugger
+        document.getElementById("Validation").value = "";
+
+        $('#StudentId').select2("val", "")
+
+        $('#StudentId').children().remove();
+
+        $('#Capture').html("");
+        $('#StudentId').html("");
+        $('#StudentId').val("0");
+
+        var SectionId = $('#SectionId').val();
+
+        if (parseInt(SectionId) > 0) {
+            GetStudents();
+        }
+    });
+
+
+    function GetStudents() {
+
+        var SectionId = $("#SectionId").val();
+        var BranchId = $('#BranchId').val();
+
+        if (SectionId < 1 || BranchId < 1)
+            return;
+
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AReports/GetStudentsBySectionAndBranch',
+            data: { nSectionId: SectionId, nSubId: BranchId },
+            success: function (data) {
+
+                var StudentItems = $('#StudentId');
+
+                StudentItems.children().remove();
+
+                StudentItems.append($("<option>").val("0").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    StudentItems.append($("<option>").val(record.StudentId).text(record.Name));
+                });
+
+                $('#StudentId').append(StudentItems);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    $('#StudentId').change(function () {
+
+        $('#Capture').html("");
+
+        if (parseInt($('#StudentId').val()) > 0) {
+            CapturePhoto()
+        }
+    })
+
+    $('#StaffId').change(function () {
+
+        $('#Capture').html("");
+
+        if (parseInt($('#StaffId').val()) > 0) {
+            CapturePhoto()
+        }
+    })
+
+    function CapturePhoto() {
+        debugger
+        var StudentId = $('#StudentId').val();
+        var StaffId = $('#StaffId').val();
+        var Type = $("input[name='rbType']:checked").val();
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/AFrontOffice/GetPhotoIfCaptured',
+            data: { StudentId: StudentId, StaffId: StaffId, Type: Type },
+            success: function (data) {
+                $('#imagemodal').hide();
+
+                $('#Capture').html(data);
+
+                var src = $('#show').attr("src");
+
+                canvas = null;
+                image = new Image();
+                image.onload = validateImage;
+                image.src = src;
+
+                document.getElementById('resetdata').value = src;
+            },
+            async: false,
+        });
+    }
+
+    $(".select2").select2()
+
+</script>

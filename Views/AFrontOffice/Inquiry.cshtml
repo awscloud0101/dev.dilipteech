@@ -1,0 +1,648 @@
+﻿@model AsteriskBrowserAL.Models.InquiryViewModel
+@{
+    ViewBag.Title = "Inquiry";
+
+}
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Front Office
+        </li>
+        <li class="active">Inquiry</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+</style>
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <div class="space-6"></div>
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<!--Main Content-->
+<section class="content">
+    <div class="row">
+
+    </div>
+    @using (Html.BeginForm("Inquiry", "AFrontOffice", FormMethod.Post, new { @class = "form-horizontal", id = "InquiryForm" }))
+    {
+        <input type="hidden" name="ReferenceRelationName" id="ReferenceRelationName" />
+        <div class="row">
+            <div class="col-xs-12">
+                <span id="Validation" style="color:red;font-weight:bold"></span>
+
+                <span style="color:red;font-weight:bold;" id="Error"> @Html.ValidationMessage("Error")</span>
+                <div id="divAcademicYear" style="display:none"> </div>
+
+                @if (null != Model && !string.IsNullOrWhiteSpace(Model.InquiryNumber))
+                {
+                <p id="Status" style="display:none" class="bigger-120 bolder center grey">Data saved <br /> Inquiry number is : @Model.InquiryNumber</p>
+                }
+
+       
+
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Inquiry</span>
+                    <div class="widget-toolbar no-border">
+                        <div class="inline action-buttons">
+                            <button class="btn btn-info btn-xs P2" style="margin-top:2px" type="submit" onclick="return SubmitForm()">
+                                <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div><!-- /.box-header -->
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+
+        <div class="space-4"></div>
+
+        //Academic Year
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h5 class="widget-title">Academic Year</h5>
+                        <div class="widget-toolbar">
+                            <a href="#" data-action="collapse">
+                                <i class="ace-icon fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4">@Html.Label("Academic Year")</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.AcademicYearId, new SelectList(Model.lstAcademicYear, "AcademicYearId", "Name"), new { @class = "form-control textlength" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-4"></div>
+
+        <!--Personal Information-->
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h5 class="widget-title">
+                            Personal Information
+                        </h5>
+                        <div class="widget-toolbar">
+                            <a href="#" data-action="collapse">
+                                <i class="ace-icon fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4"><span style="color:red;">*F</span>irst Name</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.FirstName, new { @id = "FirstName", @class = "form-control textlength limited", placeholder = "First Name", maxlength = "50" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">@Html.Label("Last Name")</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.LastName, new { @id = "LastName", @class = "form-control textlength limited", placeholder = "Last Name", maxlength = "25" })
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">@Html.Label("Gender")</label>
+                                        <div class="col-sm-3">
+                                            @Html.RadioButtonFor(m => m.Gender, 0, new { @checked = "checked" }) Male
+                                        </div>
+                                        <div class="col-sm-3">
+                                            @Html.RadioButtonFor(m => m.Gender, 1) Female
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4"><span style="color:red;">*M</span>obile Number</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.MobileNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "10", placeholder = "Mobile Number" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4"><span style="color:red;">*F</span>ather's Name</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.FatherName, new { @id = "FatherName", @class = "form-control textlength", placeholder = "Father's Name", maxlength = "40" })
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">@Html.Label("Mother's Name")</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.MotherName, new { @class = "form-control textlength", placeholder = "Mother's Name", maxlength = "40" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">@Html.Label("Address")</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.Address, new { @class = "form-control textlength", placeholder = "Address", maxlength = "254" })
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">@Html.Label("E-Mail")</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.FatherEmail, new { @class = "form-control textlength", @id = "Email", @maxlength = "50", placeholder = "jsmith@example.com" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 "><span style="color:red;">*C</span>lass</label>
+                                        <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.ListClassNumber, "ClassNumber", "ClassNumberDisplay"), new { @id = "ClassNumber", @class = "form-control" })
+                                            @*@Html.DropDownList("CourseId", null, "-- Select --", new { @class = "form-control" })*@
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">@Html.Label("Other Details")</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.Description, new { @class = "form-control textlength", placeholder = "Other Details", maxlength = "254" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-4"></div>
+
+        <!--Parent Information-->
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+
+                    <div class="widget-header">
+
+                        <h5 class="widget-title">
+                            Source of Inquiry (Staff / Others)
+                        </h5>
+
+                        <div class="widget-toolbar">
+                            <a href="#" data-action="collapse">
+                                <i class="ace-icon fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <div class="widget-body">
+
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">@Html.Label("Reference Source")</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.DepartmentId, new SelectList(Model.lstDepartment, "DepartmentId", "DepartmentName"), new { @id = "DepartmentId", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6" id="ReferenceDropdown">
+                                        <label class="col-sm-4" id="Employee">Employee</label>
+                                        <div class="col-sm-6">
+                                            <select id="StaffId" name="StaffId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6" id="ReferenceText" style="display:none">
+                                        <label class="col-sm-4" id="Name">Name</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.ReferenceName, new { @class = "form-control textlength", placeholder = "Reference Name", @id = "ReferenceName", maxlength = "100" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4" id="EmpMob">Mobile Number</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.EmpMobileNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "10", placeholder = "Mobile Number", @id = "EmpMobileNumber" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</section>
+
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var Status = $('#Status').val();
+
+        if (Status != undefined) {
+
+            var url = '/AFrontOffice/Inquiry';
+            var title = "Inquiry";
+            var Data = $('#Status').html();
+
+            OpenSuccessDialogue(Data, url, title);
+        }
+    });
+
+    function OpenSuccessDialogue(Validation, url, title) {
+
+        $('#dValidation').html(" <i class='ace-icon fa fa-hand-o-right blue bigger-120'></i>&nbsp; " + Validation);
+
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            draggable: false,
+            width: '400',
+            modal: true,
+            title: title,
+            title_html: true,
+            buttons: [
+                {
+                    html: "OK",
+                    "class": "btn btn-info btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+
+                        if (url != "") {
+                            window.location.href = url;
+                        }
+                    }
+                }
+            ]
+        });
+    }
+
+    function AcademicYearupPopup() {
+
+        var Value = $("#AcademicYearId option:selected").text();
+
+        $('#divAcademicYear').html(' <div class="space-6"></div> <p> <b> Student is willing to join in ' + Value + ' academic year.<br/> Do you wish to continue ? <b> </p>');
+
+        var $dialog = $('#divAcademicYear')
+          .dialog({
+              resizable: false,
+              draggable: false,
+              width: '400',
+              modal: true,
+              title: 'Academic Year Confirmation',
+              open: function (event, ui) {
+                  $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+              },
+              title_html: true,
+              buttons: [
+                  {
+                      html: "Yes",
+                      "class": "btn btn-danger btn-minier",
+                      click: function () {
+                          $("#divAcademicYear").dialog('close');
+                          $('#InquiryForm').submit();
+                      }
+                  },
+                  {
+                      html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; No ",
+                      "class": "btn btn-minier",
+                      click: function () {
+                          $("#divAcademicYear").dialog('close');
+                      }
+                  }
+              ]
+          });
+    }
+
+    $('#DepartmentId').change(function () {
+        $('#EmpMobileNumber').val("");
+        var Selected = document.getElementById("DepartmentId");
+        var selectedText = Selected.options[Selected.selectedIndex].text;
+
+        document.getElementById("ReferenceRelationName").value = selectedText;
+
+        var DepartmentId = $('#DepartmentId').val();
+
+        if (DepartmentId > 0) {
+            if (DepartmentId == 253) {
+                $('#ReferenceName').val("");
+                document.getElementById("ReferenceDropdown").style.display = "none";
+                document.getElementById("ReferenceText").style.display = "inline";
+                $('#EmpMobileNumber').prop('readonly', true);
+                $('#ReferenceName').prop('readonly', true);
+            }
+            else if ((DepartmentId > 253 && DepartmentId <= 255) || DepartmentId == 252) {
+                $('#ReferenceName').val("");
+                document.getElementById("ReferenceDropdown").style.display = "none";
+                document.getElementById("ReferenceText").style.display = "inline";
+                $('#EmpMobileNumber').prop('readonly', false)
+                $('#ReferenceName').prop('readonly', false);
+            }
+            else {
+
+                document.getElementById("ReferenceText").style.display = "none";
+                document.getElementById("ReferenceDropdown").style.display = "inline";
+
+                $.ajax({
+                    url: '/AFrontOffice/GetEmployeesByDepartmentId',
+                    data: { DepartmentId: DepartmentId },
+                    success: function SuccessFun(data) {
+
+                        var Staff = $('#StaffId');
+                        Staff.children().remove();
+                        Staff.append($("<option>").val("null").text("--Select--"))
+                        $.each(data, function (i, record) {
+                            Staff.append($("<option>").val(record.StaffId).text(record.DisplayName));
+                        });
+
+                        $('#StaffId').append(Staff);
+                        $('#EmpMobileNumber').prop('readonly', true)
+                    }
+
+                });
+            }
+        }
+        else {
+            $('#StaffId').children().remove();
+            $('#ReferenceName').val("");
+        }
+
+    });
+
+    $('#StaffId').change(function () {
+        var StaffId = $('#StaffId').val();
+        $('#EmpMobileNumber').val("");
+
+        $.ajax({
+            url: '/AFrontOffice/GetMobileNumByStaffId',
+            data: { StaffId: StaffId },
+            success: function SuccessFun(data) {
+
+                if (data.MobileNum != "") {
+                    document.getElementById("EmpMobileNumber").value = data.MobileNum;
+                    $('#EmpMobileNumber').prop('readonly', true)
+                }
+                else {
+                    $('#EmpMobileNumber').prop('readonly', false)
+                }
+            }
+        });
+    });
+
+    function SubmitForm() {
+        document.getElementById("Error").innerHTML = "";
+
+        var valid = true;
+        var InquiryNumber = $('#InquiryNumber').val();
+        var InquiryDate = $('#InquiryDate').val();
+        var FirstName = $('#FirstName').val();
+        var FatherName = $('#FatherName').val();
+        var ClassNumber = $('#ClassNumber').val();
+        var DepartmentId = $('#DepartmentId').val();
+        var EmployeeName = $('#EmployeeName').val();
+        var MobileNumber = $('#MobileNumber').val();
+        var DepartmentId = $('#DepartmentId').val();
+        var Email = $('#Email').val();
+        var ValidationDisplay = "Please fill the fields : ";
+        debugger
+        if (InquiryNumber == "") {
+            valid = false;
+            ValidationDisplay.append("Inquiry Number");
+        }
+
+        if (InquiryDate == "") {
+            valid = false;
+            ValidationDisplay += " Inquiry Date,";
+        }
+
+        if (FirstName == "") {
+            valid = false;
+            ValidationDisplay += " First Name, ";
+        }
+
+        if (FatherName == "") {
+            valid = false;
+            ValidationDisplay += " Father Name, ";
+        }
+
+        if (ClassNumber == "0") {
+            valid = false;
+            ValidationDisplay += " Class Number, ";
+        }
+        if (MobileNumber == "") {
+            valid = false;
+            ValidationDisplay += " Mobile Number, ";
+        }
+
+        if (DepartmentId > 0) {
+            if (DepartmentId >= 252 && DepartmentId <= 255) {
+                if (DepartmentId != 253) {
+
+                    if ($('#ReferenceName').val() == "") {
+                        valid = false;
+                        ValidationDisplay += " Reference Name,";
+
+                    }
+
+                    if ($('#EmpMobileNumber').val() == "") {
+                        valid = false;
+                        ValidationDisplay += " Reference Person Mobile Number,";
+                    }
+                }
+            }
+            else {
+                if ($('#StaffId').val() < 1 || $('#StaffId').val() == "null") {
+                    valid = false;
+                    ValidationDisplay += " Employee,";
+                }
+                if ($('#EmpMobileNumber').val() == "") {
+                    valid = false;
+                    ValidationDisplay += " Reference Person Mobile Number,";
+                }
+            }
+        }
+
+        if (valid == false) {
+            ValidationDisplay = ValidationDisplay.slice(0, -1);
+            document.getElementById("Validation").innerHTML = ValidationDisplay;
+        }
+        else {
+
+            if ($('#MobileNumber').val() != "") {
+                valid = ValidateMobNum();
+
+            }
+
+            if (valid == true) {
+
+                if ($('#EmpMobileNumber').val() != "") {
+                    if (DepartmentId > 0) {
+                        if ((DepartmentId > 253 && DepartmentId <= 255) || DepartmentId == 252) {
+                            valid = ValidateEmpMobNum();
+                        }
+                    }
+                }
+            }
+        }
+
+
+        if (valid == true) {
+            if (Email != "") {
+                var email = document.getElementById('Email');
+                var re = /^(([^<>()[\]\\.,;:\s@@\"]+(\.[^<>()[\]\\.,;:\s@@\"]+)*)|(\".+\"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/igm;
+
+                if (!re.test(email.value)) {
+                    document.getElementById("Validation").innerHTML = 'Please provide a valid email address';
+                    email.focus;
+                    valid = false;
+                }
+            }
+        }
+
+
+        if (valid == true) {
+            AcademicYearupPopup();
+            valid = false;
+        }
+        return valid;
+    }
+
+    function ValidateMobNum() {
+
+        var val = true;
+
+        $.ajax({
+
+            url: '/Common/ValidateMobileNum',
+            data: { MobileNo: $('#MobileNumber').val() },
+            success: function (data) {
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            },
+            async: false
+        });
+
+        return val;
+    }
+
+    function ValidateEmpMobNum() {
+
+        var val = true;
+
+        $.ajax({
+
+            url: '/Common/ValidateMobileNum',
+            data: { MobileNo: $('#EmpMobileNumber').val() },
+            success: function (data) {
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = "Enter proper reference mobile number";
+                    val = false;
+                }
+            },
+            async: false
+        });
+
+        return val;
+    }
+
+
+    $('#FirstName').focus(function () {
+        document.getElementById("Status").innerHTML = "";
+    });
+
+    $('#MobileNumber').focus(function () {
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    $('#btnReset').click(function () {
+        location.reload();
+    });
+
+</script>

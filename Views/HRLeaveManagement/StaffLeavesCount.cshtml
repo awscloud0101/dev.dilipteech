@@ -1,0 +1,155 @@
+﻿@model AsteriskBrowserAL.Models.StaffWiseLeaveCount
+
+@{
+    ViewBag.Title = "AttendanceRegister";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            LeaveManagement
+        </li>
+        <li class="active">Staff Leave Count</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("StaffLeavesCount", "HRLeavemanagement", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @*if (null != TempData["StaffLeaves"])
+                {
+                    <span style="color:green;font-weight:bold;">@Html.Raw(TempData["StaffLeaves"])</span>
+                    <input type="hidden" id="Status" value="@TempData["StaffLeaves"]" />
+                }*@
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Staff Leave Count</span>
+
+
+                </div>
+                <div class="widget-box">
+            
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+                                            <div class="col-sm-6">
+                                                @if (null != Model.lstBranch)
+                                                {
+                                                    @Html.DropDownListFor(model => model.lstBranch, new SelectList(Model.lstBranch, "SubscriptionId", "Institute"), "--- Select Branch ---", new { @class = "form-control", @id = "SubscriptionId", @name = "SubscriptionId" })
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                              
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="SearchViewDiv">
+                </div>
+            }
+        </div>
+    </div>
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+</section>
+<script type="text/javascript">
+   
+    $(document).ready(function () {
+        debugger
+        //var Status = $('#Status').val();
+
+        //if (Status != undefined) {
+        //    dialog(Status);
+        //}
+        var SubscriptionId = $('#SubscriptionId').val();
+
+        if (SubscriptionId > 0) {
+            $("#SubscriptionId").val(SubscriptionId);
+            GetData();
+        }
+    });
+
+
+
+
+    function LoadBranchDropdown() {
+        $.ajax({
+            url: '/HREnrollment/GetBranchesByDivisionDefineSchedule',
+            data: { DivisionId: 0, IsAll: true },
+            success: function (result) {
+                Branch = $("#SubscriptionId")
+                Branch.children().remove();
+                $.each(result, function (i, elm) {
+                    Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                })
+                $("#SubscriptionId").append(Branch)
+
+            },
+            async: false
+        })
+
+    }
+    $('#SubscriptionId').change(function () {
+        debugger
+        $("#SearchViewDiv").html("")
+        //var Status = $('#Status').val();
+
+        //if (Status != undefined) {
+        //    dialog(Status);
+        //}
+        GetData();
+
+    });
+    function GetData() {
+
+        $('#SearchViewDiv').html("");
+        var SubscriptionId = $("#SubscriptionId").val();
+        if (SubscriptionId > 0) {
+
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/HRLeaveManagement/StaffData',
+                data: { SubscriptionId: SubscriptionId },
+                success: function (data) {
+                    $('#imagemodal').hide();
+
+                    $("#SearchViewDiv").html(data)
+                },
+                aync: false
+            })
+        }
+    }
+
+
+
+</script>
+
+
+
+
+
+
+
+

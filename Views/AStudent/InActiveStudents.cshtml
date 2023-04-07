@@ -1,0 +1,170 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StudentCategoryActiveStudent>
+@{
+    ViewBag.Title = "InActiveStudents";
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Master
+        </li>
+        <li>
+            <i class=""></i>
+            Studnet
+        </li>
+        <li class="active">InActiveStudents</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+ 
+    @using (Html.BeginForm("InActiveStudents", "MStudent", FormMethod.Post))
+    {
+
+        <div class="box">
+            <div class="box-header">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Select Class")</label>
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("BatchId", null, "--Select Class--", new { @class = "form-control ", onchange = "this.form.submit();" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Select Category")</label>
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("CategoryId", null, "--Select Category--", new { @class = "form-control ", onchange = "this.form.submit();" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-12">
+                @if (null != Model && Model.Count() > 0)
+                {
+
+                    int nsno = 1;
+                    <div class="box">
+                        <div class="box-header">
+                            <button class="btn btn-primary" name="button" type="button" id="SelectAll" value="SelectAll" onclick="Selectall();">
+                                Select All
+                            </button>
+                            <button class="btn btn-primary" name="button" type="button" id="SelectNone" value="SelectNone" onclick="selectnone();">
+                                Select None
+                            </button>
+                            <input class="btn btn-primary "  type="submit" name="button" id="Save" value="Save" />
+                        </div>
+                        <div class="box-body">
+                            <div class="box-body table-responsive no-padding">
+
+                                <table class="table table-hover">
+                                    <tbody>
+                                        <tr>
+                                            <th>
+                                               S.No.
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Select")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("StudnetName")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Admission Number")
+                                            </th>
+
+                                            <th>
+                                                @Html.DisplayName("Category Name")
+                                            </th>
+                                        </tr>
+                                        @for (int i = 0; i < Model.Count(); i++)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @(nsno++)
+                                                </td>
+                                                <td>
+                                                    @Html.Hidden("StudentList.Index", (@i + 10))
+                                                    @Html.Hidden("StudentList[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                                                    @Html.Hidden("StudentList[" + (@i + 10) + "].FirstName", Model.ElementAt(i).FirstName)
+                                                    @Html.Hidden("StudentList[" + (@i + 10) + "].AdmissionNumber", Model.ElementAt(i).AdmissionNumber)
+                                                    @Html.Hidden("StudentList[" + (@i + 10) + "].CategoryName", Model.ElementAt(i).CategoryName)
+                                                    @Html.Hidden("StudentList[" + (@i + 10) + "].CategoryId", Model.ElementAt(i).CategoryId)
+
+                                                    @if (Model.ElementAt(i).Students)
+                                                    {
+                                                        @Html.CheckBox("StudentList[" + (@i + 10) + "].Students", Model.ElementAt(i).Students, new { @class = "CheckBox", @checked = "true" })
+                                                        @Html.Hidden("StudentList[" + (@i + 10) + "].Students", Model.ElementAt(i).StudentId)
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.CheckBox("StudentList[" + (@i + 10) + "].Students", Model.ElementAt(i).Students, new { @class = "CheckBox" })
+                                                        @Html.Hidden("StudentList[" + (@i + 10) + "].Students", Model.ElementAt(i).StudentId)
+                                                    }
+
+                                                <td>
+                                                    @Model.ElementAt(i).FirstName
+                                                </td>
+                                                <td>
+                                                    @Model.ElementAt(i).AdmissionNumber
+                                                </td>
+                                                <td>
+                                                    @Model.ElementAt(i).CategoryName
+
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+
+
+    }
+</section>
+
+
+<script>
+    function Selectall() {
+        $('.CheckBox').each(function () {
+
+            this.checked = true;
+        });
+
+    };
+    window.onload = Selectall();
+
+    function selectnone() {
+        $('.CheckBox').each(function () {
+
+            this.checked = false;
+        });
+
+    };
+   window.onload = selectnone();
+
+</script>
+

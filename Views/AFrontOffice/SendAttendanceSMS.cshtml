@@ -1,0 +1,170 @@
+﻿@model AsteriskBrowserAL.Models.AttendanceData
+
+@{
+    ViewBag.Title = "AttendanceRegister";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Front Offce
+        </li>
+        <li class="active">Send Attendance SMS</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+
+    <div class="page-header">
+        <h1>
+
+            Send Attendnace SMS
+            <small style="float:right;font-weight:bold;">
+                @Html.ActionLink("Back to details", "StudentAttendance")
+            </small>
+        </h1>
+    </div><!-- /.page-header -->
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("SendAttendanceSMS", "AFrontOffice", FormMethod.Post))
+            {
+                <input type="hidden" id="SelStudent" />
+
+                if (null != Model)
+                {
+                    <input type="hidden" id="Status" value="@Model.Status" />
+                }
+                else
+                {
+                    <input type="hidden" id="Status" value="false" />
+                }
+
+                <span style="color:forestgreen" id="Validation"></span>
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Send SMS
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Class</label>
+                                    <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                        <select id="ClassId" name="ClassId" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+                                    <div class="col-xs-6">
+                                        <div id="datepicker" class="input-group date">
+                                            <input class="form-control" type="text" disabled="disabled" id="AttendanceDate" name="AttendanceDate" autocomplete="off" value="@DateTime.Today.ToShortDateString()" placeholder="Select Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Student Category</label>
+                                    <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                        <select id="SType" name="SType" class="form-control">
+                                            <option value="0">--Select--</option>
+                                            <option value="1">All</option>
+                                            <option value="2">Day Scholar</option>
+                                            <option value="3">Hostel</option>
+                                        </select>
+                                    </div>
+                                </div>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    <div id="AttendanceData">
+                    </div>
+            }
+        </div>
+    </div>
+
+</section>
+<script>
+
+    $(document).ready(function () {
+
+        var Status = $('#Status').val();
+
+        if (Status == "value") {
+            document.getElementById("Validation").innerHTML = "Message(s) has been sent successfully"
+        }
+
+        LoadCourseDropdown()
+    });
+
+    function LoadCourseDropdown() {
+        $.ajax({
+            url: '/AFrontOffice/GetClassData',
+            success: function (result) {
+                CourseList = $("#ClassId")
+                CourseList.children().remove();
+                CourseList.append($("<option>").val("").text("--select--"))
+                CourseList.append($("<option>").val("0").text("All"))
+                $.each(result, function (e, record) {
+                    CourseList.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(CourseList)
+            }
+        })
+    }
+    $("#ClassId").change(function () {
+        document.getElementById('SType').value = '0';
+        $('#AttendanceData').html("");
+        document.getElementById("Validation").innerHTML = "";
+       // GetAbsentiesList()
+    });
+
+    $("#SType").change(function () {
+        document.getElementById("Validation").innerHTML = "";
+        GetAbsentiesList()
+    });
+
+    AttendanceData
+
+    //$('#AttendanceDate').change(function () {
+    //    GetAbsentiesList()
+    //});
+
+    function GetAbsentiesList() {
+        debugger
+        $('#AttendanceData').html("");
+        var ClassNumber = $("#ClassId").val();
+        //var Date = $('#AttendanceDate').val();
+        var SType = $("#SType").val();
+        if (ClassNumber != "" && SType!=0) {
+            $.ajax({
+                url: '/AFrontOffice/GetStudentsByClassNumber',
+                data: { ClassNumber: ClassNumber, SType: SType },
+                success: function (data) {
+                    $('#AttendanceData').html(data);
+                }
+            });
+        }
+    }
+
+
+
+</script>
+
+

@@ -1,0 +1,434 @@
+﻿@model AsteriskBrowserAL.Events
+
+@{
+    ViewBag.Title = "Edit Event";
+    List<SelectListItem> Priority = new List<SelectListItem>()
+    {
+        new SelectListItem(){ Text = "Normal" , Value="Normal" },
+        new SelectListItem(){ Text = "High" , Value= "High" },
+        new SelectListItem(){ Text ="Low" , Value = "Low" }
+
+    };
+
+    List<SelectListItem> SendSMSOn = new List<SelectListItem>()
+            {
+                new SelectListItem(){ Text="1 Hour Before" , Value="1 Hour Before"},
+                new SelectListItem(){Text="1 Day Before" , Value="1 Day Before"},
+                new SelectListItem(){Text="2 Days Before" , Value="2 Days Before"},
+            };
+
+
+    List<SelectListItem> SendSMSTo = new List<SelectListItem>()
+            {
+                new SelectListItem(){ Text="---Select---" , Value="0"},
+                new SelectListItem(){ Text="Class" , Value="1"},
+                new SelectListItem(){Text="Employee Category" , Value="2"},
+                new SelectListItem(){Text="Employee Department" , Value="3"},
+            };
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Calendar
+        </li>
+        <li class="active">Events</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<br/>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-3">
+            @*<h3>@Html.ActionLink("<< Events Details", "Events")</h3>*@
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+    @using (Html.BeginForm("EventsE", "ACalendar", FormMethod.Post, new { @class = "form-horizontal", SendSMSTo = 0, SendSMSOn = 0 }))
+    {
+        <form class="form-horizontal" role="form">
+            @Html.HiddenFor(model => model.EventId)
+            <div class="page-header">
+                <h1>
+                  Events
+                    <small style="float:right;">
+                        @Html.ActionLink("Back to Events", "Events")
+                    </small>
+                </h1>
+            </div>
+
+
+            <span style="color:red;font-weight:bold" id="Validation"></span>
+          
+
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <span style="color:red;font-weight:bold;" id="errorEve">@Html.ValidationMessage("Events")</span>
+                    @*<span style="color:red;font-weight:bold;">@Html.ValidationMessage("Events")</span>*@
+
+                    <h3 class="widget-title">Events</h3>
+                    <div class="widget-toolbar no-border">
+                        <div class="inline action-buttons">
+                            @*<div style="float:right;">
+                                    <button type="submit" name="Save" class="btn btn-info btn-xs">
+                                        <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                                    </button>
+                                </div>*@
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <!-- /.box-header -->
+                @*@Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+
+                    if (null != TempData["Events"])
+                    {
+                        @Html.Raw(TempData["Events"])
+                    }
+
+                    <span style="color:red;font-weight:bold;" id="errorEve">@Html.ValidationMessage("Events")</span>
+                    @Html.HiddenFor(model => model.EventId)
+                    if (null != Model)
+                    {
+                        <div class="box">
+                            <div class="box-header">
+                                <h3 class="box-title">Events</h3>
+                                <input id="Save" style="width:80px;" class="btn btn-primary pull-right" onclick="return submitForm();" type="submit" value="Save" name="Save" />
+                                <br />
+
+
+                                @* <button class="btn btn-primary col-xs-1" type="submit">
+                                        Save
+                                    </button>*@
+                <!-- /.box-header -->
+                <!-- form start -->
+
+
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Date Range</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            @if (ViewBag.Date != null)
+                            {
+                                <input type="text" class="form-control pull-right" value="@ViewBag.Date" id="daterange" name="daterange" readonly style="background-color:white;" placeholder="Date Range" autocomplete="off" />
+                            }
+                            else
+                            {
+                                <input type="text" class="form-control pull-right" id="daterange" name="daterange" readonly style="background-color:white;" placeholder="Date Range" autocomplete="off" />
+                            }
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-3" style="display:none;" id="EStartDate">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+                </div>               
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Event")</label>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(model => model.Event, new { @class = "form-control col-sm-5", @id = "EventName", placeholder = "Event", @onclick = "removeError();" })
+                    </div>
+
+                    <div class="col-sm-3">
+                            @Html.ValidationMessage("Event")
+                        </div>
+                    <div class="col-sm-3" style="display:none;" id="EEventName">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Priority")</label>
+
+                    <div class="col-sm-4">
+                        @Html.DropDownList("Priority", Priority, "---Select Priority---", new { @class = "form-control col-sm-5", @id = "Priority", placeholder = "Event", @onclick = "removeError();" })
+                    </div>
+                    <div class="col-sm-3">
+                            @Html.ValidationMessage("Priority")
+                        </div>
+                    <div class="col-sm-3" style="display:none;" id="EPriority">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Status")</label>
+
+                    <div class="col-sm-4">
+                        @Html.RadioButtonFor(model => model.Status, "true")
+                        <span class="lbl">Active</span>
+
+                        @Html.RadioButtonFor(model => model.Status, "false")
+                        <span class="lbl">In Active</span>
+
+                    </div>
+                    <div class="col-sm-3">
+                            @Html.ValidationMessage("Status")
+                        </div>
+                    <div class="col-sm-3" style="display:none;" id="EStatus">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Subject")</label>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(model => model.Subject, new { @class = "form-control col-sm-5", placeholder = "Subject", @id = "Subject", @onclick = "removeError();" })
+                    </div>
+                    <div class="col-sm-3">
+                            @Html.ValidationMessage("Subject")
+                        </div>
+                    <div class="col-sm-3" style="display:none;" id="ESubject">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Send SMS On")</label>
+
+                    <div class="col-sm-4">
+                        @Html.DropDownList("SendSMSOn", SendSMSOn, "---Select---", new { @class = "form-control col-sm-5", @id = "SendSMSOn", @onclick = "removeError();" })
+                    </div>
+                    @*<div class="col-sm-3">
+                            @Html.ValidationMessage("SendSMSOn")
+                        </div>*@
+                    <div class="col-sm-3" style="display:none;" id="ESendSMSOn">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Send SMS To")</label>
+
+                    <div class="col-sm-4">
+                        @Html.DropDownList("SendSMSTo", SendSMSTo, new { @class = "form-control col-sm-5", @id = "SendSMSTo", @onclick = "removeError();" })
+                    </div>
+                    @*<div class="col-sm-3">
+                            @Html.ValidationMessage("SendSMSTo")
+                        </div>*@
+                    <div class="col-sm-3" style="display:none;" id="ESendSMSTo">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Selection List")</label>
+
+                    <div class="col-sm-4">
+                        @{
+                                        IEnumerable<SelectListItem> categories = ViewBag.PopulateListBox;
+                                        List<int> CategoryNames = ViewBag.Edit;
+
+                                        if (CategoryNames != null)
+                                        {
+                                <select class="form-control" name="SelectList" id="Cat" onclick="removeError();" multiple="Multiple">
+                                    @foreach (var cat in (MultiSelectList)ViewBag.PopulateListBox)
+                                                {
+                                                <option value="@cat.Value" id="" @(CategoryNames.Contains(Convert.ToInt32(cat.Value)) ? "selected" : "true") style="width:20px;">@cat.Text</option>
+                                                }
+
+                                </select>
+                                        }
+                                        else
+                                        {
+                                <select class="form-control" name="SelectList" id="Cat" onclick="removeError();" multiple="Multiple">
+                                    @foreach (var cat in (MultiSelectList)ViewBag.PopulateListBox)
+                                                {
+                                                <option value="@cat.Value" style="width:200px;">@cat.Text</option>
+                                                }
+                                </select>
+
+                                        }
+                        }
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.ValidationMessage("SelectionList")
+                    </div>
+                    <div class="col-sm-3" style="display:none;" id="EPopulateListBox">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+
+                </div>
+
+                <div class="hr hr-18 dotted hr-double"></div>
+
+                <div class="clearfix form-actions">
+                    <div class="col-md-offset-3 col-md-9">
+                        <button class="btn btn-success btn-sm" onclick="return submitForm();">
+                            <i class="ace-icon fa fa-check bigger-50"></i>
+                            Save
+                        </button>
+
+                        &nbsp; &nbsp; &nbsp;
+                        <button class="btn btn-sm" type="reset">
+                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                            Reset
+                        </button>
+                    </div>
+
+                </div>
+                </div>
+        </form>
+  
+    }   
+</div>
+  </div>
+        <input type="hidden" id="count" name="count" value="0" />
+    
+</section>
+
+<script type="text/javascript">
+    function validateEvents() {
+
+        document.getElementById("count").value = "1";
+        var StartDate = document.getElementById("daterange").value;
+        //var StartDate = document.getElementById("StartDate").value;
+        //var EndDate = document.getElementById("EndDate").value;
+        var EventName = document.getElementById("EventName").value;
+        var Subject = document.getElementById("Subject").value;
+        var SendSMSOn = document.getElementById("SendSMSOn").value;
+        var SendSMSTo = document.getElementById("SendSMSTo").value;
+        var PopulateListBox = document.getElementById("Cat").value;
+
+        validate = true;
+
+        if (StartDate == "") {
+            document.getElementById("EStartDate").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EStartDate").style.display = "none";
+        }
+
+        //if (EndDate == "") {
+        //    document.getElementById("EEndDate").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("EEndDate").style.display = "none";
+        //}
+
+        if (EventName == "") {
+            document.getElementById("EEventName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EEventName").style.display = "none";
+        }
+
+        //if (Subject == "") {
+        //    document.getElementById("ESubject").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("ESubject").style.display = "none";
+        //}
+        if (SendSMSOn == "") {
+            document.getElementById("ESendSMSOn").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ESendSMSOn").style.display = "none";
+        }
+
+        if (SendSMSTo == "") {
+            document.getElementById("ESendSMSTo").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ESendSMSTo").style.display = "none";
+        }
+
+        if (PopulateListBox == "") {
+            document.getElementById("EPopulateListBox").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EPopulateListBox").style.display = "none";
+        }
+
+        if (validate) {
+            $.ajax({
+                async: false,
+                url: '/ACalendar/CheckEventExistanceEdit',
+                data: { strEventName: EventName, strDates: StartDate },
+                success: function (data) {
+                    if (data.Status == "true") {
+                        $('#errorEve').text('Event Already Exists...');
+                        validate = false;
+                    }
+                    else if (data.Status == "false") {
+                        validate = true;
+                    }
+                }
+            });
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateEvents();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#daterange').focus(function () {
+        $('#EStartDate').hide();
+    });
+    $('#EventName').focus(function () {
+        $('#EEventName').hide();
+    });
+
+    $('#SendSMSOn').focus(function () {
+        $('#ESendSMSOn').hide();
+    });
+    $('#SendSMSTo').focus(function () {
+        $('#ESendSMSTo').hide();
+    });
+    $('#PopulateListBox').focus(function () {
+        $('#EPopulateListBox').hide();
+    });
+
+
+    $("#SendSMSTo").change(function () {
+        var value = $('#SendSMSTo').val();
+        if (value < 1) {
+            $("#Cat").empty();
+        }
+        if (value > 0) {
+            $.ajax({
+                url: '/ACalendar/PopulateListBox',
+                data: { value: value },
+                success: function (data) {
+                    items = "";
+                    $.each(data, function (i, data) {
+                        items += "<option value='" + data.Value + "'>" + data.Text + "</option>";
+                    });
+
+                    $("#Cat").html(items);
+                }
+            });
+        }
+    });
+
+
+</script>

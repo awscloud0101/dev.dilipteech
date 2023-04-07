@@ -1,0 +1,259 @@
+﻿@model AsteriskBrowserAL.Models.Cast_AgeReportViewModel
+
+@{
+    ViewBag.Title = "CasteAgeReports";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Reports
+        </li>
+        <li>
+            <i class=""></i>
+            Others
+        </li>
+        <li class="active">Caste-Age Reports</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<!--Main Content-->
+<section class="content">
+    <br />
+
+    @using (Html.BeginForm("CasteAgeReports", "ROthers", FormMethod.Post))
+    {
+        <div class="col-xs-12">
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title ">Caste-Age Report</h5>
+
+                    <div class="widget-toolbar no-border">
+                        <div class="inline">
+                            <a class="btn btn-info btn-minier P2" style="margin-bottom:8px" onclick="GetData();">View Data</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+
+                        @if (Model.IsCentral)
+                    {
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4">Division</label>
+                                        <div class="col-xs-6">
+                                            @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4">Branch</label>
+                                        <div class="col-xs-6">
+                                            <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                    }
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="col-xs-6">
+                                    <label class="col-xs-4">Section</label>
+                                    <div class="col-xs-6">
+                                        <select id="SectionId" name="SectionId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <br/>
+                    <br />
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <label class="col-sm-3"> Report Name :</label>
+                                    <div id="ReportName">
+                                        <span id="ReportName">Caste Wise Report 2015-2016</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <br />
+                        <br />
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="col-sm-3"></div>
+                                    <div class="col-sm-3">
+                                        <p><input type="radio" id="Report" name="Report" value="1" checked="checked" />Caste Wise Report</p>
+                                        <p><input type="radio" id="Report" name="Report" value="2" />Age Wise Report</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-6">
+                           
+                            </div>
+                        </div>
+                    </div><!-- /.box-header -->
+                </div>
+            </div>
+            </div>
+            if (null != Model)
+            {
+            if (null != Model.InstituteDetails)
+            {
+            <input type="hidden" id="StrtYr" value="@Model.InstituteDetails.FiscalStartDate.Value.Year" />
+            <input type="hidden" id="endYr" value="@Model.InstituteDetails.FiscalEndDate.Value.Year" />
+            }
+            else
+            {
+
+            <input type="hidden" id="StrtYr" />
+            <input type="hidden" id="endYr" />
+            }
+            }
+            else
+            {
+            <input type="hidden" id="StrtYr" />
+            <input type="hidden" id="endYr" />
+            }
+            <div id="SearchDiv"></div>
+            }
+</section>
+
+
+
+
+<script>
+
+    $(document).ready(function () {
+        GetSectionList();
+
+    });
+
+    var strYear = $('#StrtYr').val();
+    var endYr = $('#endYr').val();
+    function OnloadData() {
+        var Years = $("#ReportText").val();
+        var Report = $('input[name=Report]:checked').val()
+
+
+        if (Report == 1) {
+            document.getElementById('ReportName').innerHTML = 'Caste Wise report ('+strYear+'-'+endYr+')'
+        }
+        else {
+            document.getElementById('ReportName').innerHTML = 'Age Wise report('+strYear+'-'+endYr+')'
+
+        }
+
+    }
+
+    function GetData()
+    {
+        var Report = $('input[name=Report]:checked').val()
+        var IsCentral = $('#IsCentral').val()
+        var BranchId = $('#BranchId').val()
+        var SectionId = $('#SectionId').val()
+
+        $.ajax({
+            url: '/AReports/CasteReport',
+            data: { Status: Report, nBranchId: BranchId, nSectionId: SectionId },
+            success: function (Result) {
+                $('#SearchDiv').html(Result)
+            }
+
+        })
+    }
+
+    $('input[name=Report]:radio').change(function () {
+        var Report = $('input[name=Report]:checked').val()
+        if (Report == 1) {
+            document.getElementById('ReportName').innerHTML = 'Caste Wise report (' + strYear + '-' + endYr + ')'
+        }
+        else {
+            document.getElementById('ReportName').innerHTML = 'Age Wise report(' + strYear + '-' + endYr + ')'
+
+        }
+    })
+
+    $('#DivisionId').change(function () {
+
+        var nDivisionId = $('#DivisionId').val();
+        if (nDivisionId != 0) {
+            $.ajax({
+
+                url: '/AReports/GetStudentStrengthBranchesByDivisionId',
+                data: { DivisionId: nDivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    $('#BranchId').change(function () {
+        var BranchId = $('#BranchId').val();
+        if (BranchId > 0) {
+            GetSectionList();
+        }
+    })
+
+
+
+
+    function GetSectionList() {
+        var nDivisionId = $('#DivisionId').val();
+        var BranchId = $('#BranchId').val();
+        $.ajax({
+            url: '/AReports/GetSectionsList',
+            data: { nBranchId: BranchId },
+            success: function (data) {
+
+                var SectionItems = $('#SectionId');
+
+                SectionItems.children().remove();
+
+                SectionItems.append($("<option>").val("null").text("--- Select ---"));
+                $.each(data, function (i, record) {
+                    SectionItems.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+                $('#SectionId').append(SectionItems);
+            }
+        });
+    }
+    window.onload = OnloadData();
+</script>
+
+

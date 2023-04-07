@@ -1,0 +1,113 @@
+﻿
+@{
+    List<LeaveCategories> lstLeaveCategories = new List<LeaveCategories>();
+    int SelCategoryId = 0;
+
+    if (ViewBag.LstLeaveCategories != null)
+    {
+        lstLeaveCategories = ViewBag.LstLeaveCategories;
+
+    }
+
+    if (ViewBag.SelCategoryId != null)
+    {
+        SelCategoryId = ViewBag.SelCategoryId;
+    }
+
+    ViewBag.Title = "LeaveCount";
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            LeaveManagement
+        </li>
+        <li class="active">Leave Type Count</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <div class="table-header">
+        <span style="font-family:calibri;">Leaves Count</span>
+
+
+    </div>
+
+    <div class="widget-box">
+   
+
+        <input type="hidden" id="hdSelCategoryId" value="@SelCategoryId" />
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Leave Category</label>
+                        <div class="col-sm-6">
+                            @Html.DropDownListFor(t => SelCategoryId, new SelectList(lstLeaveCategories, "LeaveCategoryId", "CategoryName"), "--Select--", new { @class = "form-control", id = "CboCategoryId" })
+                        </div>
+                    </div>
+                </div>
+         
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="divPartial">
+    </div>
+
+</section>
+
+<script>
+    debugger
+    $(document).ready(function () {
+        if ($('#hdSelCategoryId').val() > 0) {
+            OpenDialog("Data Saved", "", "")
+            PopulateData();
+        }
+    });
+
+
+    $('#CboCategoryId').change(function () {
+        PopulateData();
+    });
+
+    function PopulateData() {
+        var nCategoryId = $('#CboCategoryId').val();
+        $('#divPartial').html('');
+
+        if (nCategoryId > 0) {
+
+            $('#imagemodal').show();
+
+            $.ajax({
+                url: '/HRLeaveManagement/GetLeaveCategoriesWiseCount',
+                data: { CategoryId: nCategoryId },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#divPartial').html(data);
+                },
+                aync: false
+            });
+        }
+    }
+
+</script>

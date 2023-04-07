@@ -1,0 +1,291 @@
+﻿@model AsteriskBrowserAL.Models.ConveyanceViewModel
+@{
+    ViewBag.Title = "OutStationConveyanceE";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Out Station Conveyance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class=col-xs-3>
+            <h3>@Html.ActionLink("<< Conveyance", "Conveyance", new { strYearMonth = Model.MonthYear, bIsLocal = false })</h3>
+        </div>
+    </div>
+    @if (null != Model)
+    {
+        using (Html.BeginForm("OutStationConveyanceE", "HROperations", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+        {
+
+            <input type="hidden" id="MeetingConveyanceId" name="MeetingConveyanceId" value="@Model.MeetingConveyanceId" />
+            <input type="hidden" name="MonthYear" value="@Model.MonthYear" />
+            <div class="row">
+                <div class="col-xs-12">
+                    <lable style="color:red;">@Html.ValidationMessage("Message")</lable>
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">Out Station Conveyance</h3>
+                            <button class="btn btn-primary pull-right" type="submit" style="width:80px;" onclick="return ValidateForm();">
+                                Save
+                            </button>
+                        </div><!-- /.box-header -->
+                        <br />
+                        @Html.HiddenFor(model => model.ReportingManagerId)
+                        @Html.HiddenFor(model=>model.StaffId)
+                        <div class="box-body">
+                            <div class="form-group">
+
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Date</label>
+                                @if (Model.Date.HasValue)
+                                {
+                                    <div class="col-xs-3">
+                                        <div id="datepicker" class="input-group date">
+                                            <input class="form-control" type="text" id="ConveyanceDate" name="Date" value="@Model.Date.Value.ToShortDateString()" autocomplete="off" placeholder="Schedule Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-3">
+                                        <div id="datepicker" class="input-group date">
+                                            <input class="form-control" type="text" id="ConveyanceDate" name="Date" autocomplete="off" placeholder="Schedule Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                }
+                              
+                                <div class="col-sm-3" style="display:none;" id="vDate">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*From Branch</label>
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.FromBranch, new SelectList(Model.ListBranch, "SubscriptionId", "Institute"), "-- Select --", new { @class = "form-control" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vFrom">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*To Branch</label>
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ToBranch, new SelectList(Model.ListBranch, "SubscriptionId", "Institute"), "-- Select --", new { @class = "form-control" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vTo">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Branches Visited</label>
+                                <div class="col-sm-3">
+                                    @Html.TextAreaFor(model => model.PlacesVisited, 3, 4, new { @class = "form-control" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vPurposeOfVisiting">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Purpose/ Branches Visited</label>
+                                <div class="col-sm-3">
+                                    @Html.TextAreaFor(model => model.PurposeOfVisiting,2,4, new { @class = "form-control" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vPurposeOfVisiting">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">Mode Of Travel</label>
+
+                                <div class="col-xs-3">
+                                    @Html.DropDownListFor(model => model.ModeOfTravelling, new SelectList(Model.ListTravellingMode, "TravellingModeId", "TravellingMode"), "--- Select ---", new { @class = "form-control" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vModeOfTravelling">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Travel Fare</label>
+
+                                <div class="col-xs-3">
+                                    @Html.TextBoxFor(model => model.TravelFare, new { @class = "form-control"})
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vFare">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Food Expenses</label>
+
+                                <div class="col-xs-3">
+                                    @Html.TextBoxFor(model => model.FoodExpense, new { @class = "form-control" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vFoodExpense">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Lodging Fare</label>
+
+                                <div class="col-xs-3">
+                                    @Html.TextBoxFor(model => model.LodgingFare, new { @class = "form-control" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vLodgingFare">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+
+                            @*<div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Total Amount</label>
+
+                                    <div class="col-xs-3">
+                                        @Html.TextBoxFor(model => model.Amount, new { @class = "form-control", @disabled = "disabled" })
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="vAmount">
+                                        <label style="color:red;font-weight:bold;">Required</label>
+                                    </div>
+                                </div>*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</section>
+
+
+<script type="text/javascript">
+
+    $(document).on('focus', '#datepicker', function () {
+        $("#datepicker").datepicker({
+            endDate: $('#dtEndDate').val(),
+            startDate: $('#dtStartDate').val(),
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+
+
+    $('#ModeOfTravelling').change(function () {
+        var nValue = $('#ModeOfTravelling').val();
+        if (nValue != 1) {
+            $('#TravelFare').attr("disabled", "disabled");
+            $('#TravelFare').val("");
+        }
+        else {
+            $('#TravelFare').removeAttr("disabled");
+            $('#TravelFare').val("");
+        }
+    })
+
+    function ValidateForm() {
+
+        var bValidate = true;
+
+        var Date = $('#ConveyanceDate').val();
+        var FromBranch = $('#FromBranch').val();
+        var ToBranch = $('#ToBranch').val();
+        var PurposeOfVisiting = $('#PurposeOfVisiting').val();
+        var ModeOfTravelling = $('#ModeOfTravelling').val();
+        var TravelFare = $('#TravelFare').val();
+        var FoodExpense = $('#FoodExpense').val();
+        var LodgingFare = $('#LodgingFare').val();
+
+        if (Date == "" || Date == null) {
+            $('#vDate').show();
+            bValidate = false;
+        }
+        if (FromBranch == "" || FromBranch == null) {
+            $('#vFrom').show();
+            bValidate = false;
+        }
+        if (ToBranch == "" || ToBranch == null) {
+            $('#vTo').show();
+            bValidate = false;
+        }
+        if (PurposeOfVisiting == "" || PurposeOfVisiting == null) {
+            $('#vPurposeOfVisiting').show();
+            bValidate = false;
+        }
+        if (ModeOfTravelling == "" || ModeOfTravelling == null) {
+            $('#vModeOfTravelling').show();
+            bValidate = false;
+        }
+
+        if (FoodExpense == "" || FoodExpense == null) {
+            $('#vFoodExpense').show();
+            bValidate = false;
+        }
+
+        if (LodgingFare == "" || LodgingFare == null) {
+            $('#vLodgingFare').show();
+            bValidate = false;
+        }
+
+
+        return bValidate;
+
+    };
+
+    $('#ConveyanceDate').focus(function () {
+        $('#vDate').hide();
+    });
+    $('#FromBranch').focus(function () {
+        $('#vFrom').hide();
+    });
+    $('#ToBranch').focus(function () {
+        $('#vTo').hide();
+    });
+    $('#PurposeOfVisiting').focus(function () {
+        $('#vPurposeOfVisiting').hide();
+    });
+    $('#ModeOfTravelling').focus(function () {
+        $('#vModeOfTravelling').hide();
+    });
+    $('#TravelFare').focus(function () {
+        $('#vFare').hide();
+    });
+    $('#FoodExpense').focus(function () {
+        $('#vFoodExpense').hide();
+    });
+    $('#LodgingFare').focus(function () {
+        $('#vLodgingFare').hide();
+    });
+
+</script>

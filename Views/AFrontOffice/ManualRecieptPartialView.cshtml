@@ -1,0 +1,57 @@
+﻿@model List<AsteriskBrowserAL.Models.ManualRecieptData>
+@{
+    int sno = 1;
+}
+    <span id="RemarksValidation" style="color:red;font-weight:bold"></span>
+    <table class="table table-bordered table-striped table-hover nowrap">
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Reciept")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Remarks")
+                </th>
+            </tr>
+        </thead>
+        <tbody id="tbManualReceipt" style="overflow: auto; height: 200px; ">
+            @if (null != Model)
+                    {
+                        for (int i = 0; i < Model.Count(); i++)
+                        {
+                    <tr>
+                        <td>
+                            @Html.Hidden("AdmissionManualMissRecipts.Index", (@i + 10))
+                            @sno
+                            @Html.Hidden("AdmissionManualMissRecipts[" + (@i + 10) + "].Reciept", Model.ElementAt(i).Reciept)
+
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).Reciept
+                        </td>
+                        <td>
+                            @Html.TextBox("AdmissionManualMissRecipts[" + (@i + 10) + "].Remarks", Model.ElementAt(i).Remarks, new { @id = "Remarks", @required = "required" })
+                            @Html.Hidden("AdmissionManualMissRecipts[" + (@i + 10) + "].Remarks", Model.ElementAt(i).Remarks)
+                        </td>
+
+                    </tr>
+
+                            sno++;
+                        }
+
+                    }
+        </tbody>
+    </table>
+
+<script>
+
+    function GetListOfMissingReceips()
+    {
+        var MissingReceipts = @Html.Raw(Json.Encode(Model));
+        return MissingReceipts;
+    }
+</script>

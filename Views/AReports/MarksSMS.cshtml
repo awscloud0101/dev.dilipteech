@@ -1,0 +1,229 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ExaminationResultsData>
+@using AsteriskBrowserAL.Models
+@{
+    ViewBag.Title = "MarksSMS";
+    
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Transactions
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Notification</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<
+
+<!--Main Content-->
+<section class="content">
+    <br />
+   
+    <div class="row">
+        <div class="col-xs-12">
+            
+                @using (Html.BeginForm())
+                {
+
+                    <div class="box">
+                       <div class="box-header">
+                        <h3 class="box-title">Marks SMS</h3>
+                        
+                    </div>
+
+                        <br />
+                        <div class="row">
+                            <div class="box-body">
+
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="col-sm-6">
+
+
+                                            <label class="col-sm-6  control-label no-padding-right">@Html.Label("Select Class")</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownList("BatchId", null, "-- Select --", new { @class = "form-control", onchange = "GetExamDropDown();" })
+
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-6 control-label no-padding-right">@Html.Label("Select Exam")</label>
+                                            <div class="col-sm-6">
+                                                <select id="examsId" name="examsId" class="form-control" onchange="GetExamId();"><option>-- Select --</option></select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br />
+                    </div>
+                    <div class="col-sm-12" style="display:none;" id="message">
+                        <label style="color:red;font-weight:bold;">Messages Sent Successfully....</label>
+                    </div>
+                    <br />
+
+                    if (null != Model)
+                    {
+                        <div class="box">
+                            <div class="box-header">
+                                <h3 class="box-title">Notify Results</h3>
+                                <br />
+                                <br />
+                                <div>
+                                    <input class="btn btn-primary" type="button" name="Notify" value="Notify" onclick="NotifyExamResults()" />
+                                </div>
+                                <div class="col-sm-offset-8">
+                                    <label><input type="checkbox" style="margin-top:-20em" id="selectall" onclick="selectallcheckboxes();" />Select/UnSelect</label>
+                                </div>
+                            </div><!-- /.box-header -->
+
+
+                            <div class="box-body">
+                                <div style="overflow:auto; height:300px;">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        @Html.DisplayName("Student Name")
+                                                    </th>
+
+                                                    <th>
+                                                        @Html.DisplayName("Send SMS")
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbodyId"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+
+                }
+
+            </div>
+    </div>
+</section>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        var batch;
+        var exam;
+
+        function GetExamDropDown() {
+            document.getElementById("message").style.display = 'none';
+            document.getElementById("selectall").checked = false;
+            batch = $('#BatchId').val();
+
+            $.ajax({
+                url: '/AReportsController/LoadExamDropDown',
+                data: { batchId: batch },
+                success: function (exams) {
+                    items = "";
+                    items += "<option value='" + 0 + "' selected='true'>--Select--</option>";
+                    $.each(exams, function (i, exams) {
+                        items += "<option value='" + exams.ExamId + "'>" + exams.ExamName + "</option>";
+                    });
+                    $("#examsId").html(items);
+                }
+            });
+        };
+        var exams;
+        function GetExamId() {
+            document.getElementById("message").style.display = 'none';
+            document.getElementById("selectall").checked = false;
+            exam = $('#examsId').val();
+            selexam = exam
+            exam = document.getElementById('examsId').value;
+            batch = $('#BatchId').val();
+
+            $.ajax({
+                url: '/AReportsController/GetStudentsInformation',
+                data: { batchId: batch, examsId: exam },
+                success: function (data) {
+                    $('#tbodyId').empty();
+                    exams = data.eResults;
+                    var students = data.student;
+                    for (var i = 0; i < students.length; i++) {
+                        var rowData = students[i];
+                        $("#tbodyId").append("<tr>" +
+                       "<td>" + rowData.StudentName + "</td>" +
+                       "<td>" + '<input type = "checkbox" class="case" id = "student" name="student" value = "' + rowData.StudentId + '" />' + "</td>" +
+                        "</tr>");
+                    }
+                }
+            });
+        }
+
+
+        function selectallcheckboxes() {
+            var checked = document.getElementById("selectall").checked;
+            if (checked == true) {
+                var res = document.getElementsByClassName("case");
+                for (var i = 0; i < res.length; i++) {
+                    var val = res[i];
+                    val.checked = true;
+                }
+            }
+
+            if (checked == false) {
+                var res = document.getElementsByClassName("case");
+                for (var i = 0; i < res.length; i++) {
+                    var val = res[i];
+                    val.checked = false;
+                }
+            }
+        };
+
+        function NotifyExamResults() {
+            eResults = exams;
+            var allSelectedValues = [];
+            $("input:checkbox[name=student]:checked").each(function () {
+                allSelectedValues.push($(this).val());
+            });
+
+            $.ajax({
+                url: '/AReportsController/NotifyResults',
+                data: { students: allSelectedValues, eResults: eResults },
+                type:'POST',
+                success: function (data) {
+                    var exams = eResults;
+                    var students = data.students;
+                    //$.each(data, function (i, data) {
+                        //var msg1 = data.Mobile;
+                        //var msg2 = "Student Name: " + data.StudentName;
+                        //var msg3 = "Exam Grades"
+                        //var msg4 = data.TriggerOnLoadMessage;
+                    //});
+                    $("#examsId").focus();
+                    document.getElementById("message").style.display = 'inline';
+
+                }
+            });
+        }
+       
+
+
+    </script>
+
+}
+
+

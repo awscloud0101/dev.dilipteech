@@ -1,0 +1,171 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentDetailsData>
+@{
+    int n = 0;
+}
+
+@{
+    ViewBag.Title = "BonafideCertificate";
+}
+<style>
+    p {
+        width: inherit; /* width: 100px; */
+        white-space: pre-wrap;
+    }
+</style>
+
+<div id="mydiv" align="center">
+    @if (null != Model && Model.Count() > 0)
+    {
+        foreach (var StudentsData in Model)
+        {
+            if (n % 2 == 0)
+            {
+                <br />
+            }
+            else
+            {
+                <br />
+                <br />
+            }
+            <table style="border: 1px solid black;">
+                <tr>
+                    <td>
+                        <div class="box-body table-responsive">
+                            <div class="col-xs-12">
+                                <table style="width:100%;" align="center">
+                                    <tr style="width:100%;">
+                                        <td>
+                                            <table style="width:100%;" align="center">
+                                                <tr style="width:100%;">
+                                                    <td style="width:15%;"></td>
+                                                    <td style="width:85%;">
+                                                        <table style="width:120%;" align="center">
+                                                            <tr align="center">
+                                                                <td align="center">
+                                                                    <div style="font-weight:bold;font-size:23px; font-family:'Calibri';color:cornflowerblue;padding-right:7em">
+                                                                        <b>Demo CampusWhiz</b>
+                                                                    </div>
+                                                                    <div style="font-weight:bold;font-size:16px; font-family:'Calibri';padding-right:9em">
+                                                                        HitechCity,Hyderabad
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <br />                      
+                        <div>
+                            <table style="border:solid" align="center">
+                                <tr>
+                                    <td style="font-family:'Lucida Fax';font-size:20px;font-weight:normal;color:blueviolet">
+                                        STUDY,CONDUCT & DATE OF BIRTH CERTIFICATE
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <br />
+                        <table style="width:100%">
+                            <tr>
+                                <td style="width:500px;font-size:18px;font-family:'Times New Roman'">&nbsp;&nbsp;Admission No :&nbsp;<b>@StudentsData.AdmissionNumber</b></td>
+                                <td>
+                                    <p style="font-size:18px;font-family:'Times New Roman';text-align:right;">Date of Issue :&nbsp;<b>@DateTime.Now.ToString("dd-MM-yyyy")</b></p>
+                                </td>
+                            </tr>
+                        </table>
+                        <br />
+                        <table>
+                            <tr width="100%">
+                                <td width="100%" style="padding-left:5%;font-family:'Brush Script MT';font-size:25px;">
+                                    <br />
+                                    This  is  to  certify  that  Master/Kumari:  <b style="font-family:'Arial';font-style:italic;font-size:20px;white-space:nowrap">&nbsp;@StudentsData.Name</b>,
+                                    D/o,S/o. of Shri/Smt <b style="font-family:'Arial';font-style:italic;font-size:20px;white-space:nowrap">&nbsp;@StudentsData.FatherName</b>&nbsp;has studied in the
+                                    school from class &nbsp;
+                                    <b style="font-family:'Arial';font-style:italic;font-size:20px;white-space:nowrap">
+                                        @StudentsData.BonafideClass
+                                    </b>
+                                    <br />
+                                    <b style="font-family:'Brush Script MT';font-size:20px;font-style:italic;white-space:nowrap">&nbsp; During the year @StudentsData.BonafideYear. His/Her Date of birth according to institution is</b>&nbsp;<span style="white-space:nowrap"></span>
+                                    in
+                                    <b style="font-family:'Arial';font-size:20px;font-style:italic;white-space:nowrap">&nbsp;@StudentsData.DateofBirthDisplay. </b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="100%" style="padding-left:5%;font-family:'Brush Script MT';font-style:italic;font-size:25px;">
+                                    His/Her conduct was Satisfactory during the above peroid.
+                                </td>
+                            </tr>
+                        </table>
+                        <br />
+                        <br />
+                        <br /><br />
+                        <label style="font-family:'Times New Roman'; float:left;padding-left:13%;font-size:14px;"><b>Admission Incharge</b></label>
+                        <label style="font-family:'Times New Roman'; float:right;padding-left:13%;font-size:14px;"><b>Head of Institution</b></label>
+                        <br />
+                        <div>
+                        </div>
+                        <br />
+                    </td>
+                </tr>
+            </table>
+            if (n < (Model.Count() - 1) && (n % 2 != 0))
+            {
+                <div style="page-break-after: always;">
+                </div>
+            }
+
+            n++;
+        }
+    }
+</div>
+
+
+<script>
+    function onloadData() {
+        PrintElem('#mydiv');
+    }
+
+    window.onload = onloadData();
+
+    function PrintElem(elem) {
+
+        Popup(document.getElementById("mydiv").innerHTML)
+    }
+
+    function Popup(data) {
+
+        var mywindow = window.open('', 'my div', 'size=potrait;width: 50%;margin=0;padding=0;');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        var is_chrome = Boolean(mywindow.chrome);
+
+        if (is_chrome) {
+            setTimeout(function () { // wait until all resources loaded
+                mywindow.document.close();
+                mywindow.focus();
+                mywindow.print();
+                mywindow.close();
+                window.location.href = "/AReports/BonafideCertificate?IsGenereated=" + true;
+
+            }, 2050);
+        } else {
+            mywindow.document.close();
+            mywindow.focus();
+            mywindow.print();
+            mywindow.close();
+            window.location.href = "/AReports/BonafideCertificate?IsGenereated=" + true;
+
+        }
+
+        return true;
+    }
+</script>
+
+

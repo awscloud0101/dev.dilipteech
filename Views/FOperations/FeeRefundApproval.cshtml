@@ -1,0 +1,312 @@
+﻿@model AsteriskBrowserAL.Models.FeeRefundData
+
+@{
+
+    ViewBag.Title = "FeeRefundData";
+}
+
+
+<link href="~/plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<!-- CSS -->
+<style>
+    .ui-widget-header, .ui-state-default, ui-button {
+        background: #3c8dbc;
+        border: 1px solid #3c8dbc;
+        color: #3c8dbc;
+        font-weight: normal;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Fee Refund Approval</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+    @using (Html.BeginForm("FeeRefundApproval", "FOperations", FormMethod.Post))
+    {
+        @Html.ValidationMessage("FeeRefundApproval")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+
+
+        <div class="table-header">
+            <span style="font-family:calibri;">Fee Refund Approval</span>
+            <div  style="float:right;margin-right:10px">
+                @*<input type="button" class="btn btn-primary pull-right" id="btnViewData2" style="min-width:80Px" value="View Data" onclick="GetData()" />*@
+                <a class="P2" onclick="GetData()" id="btnViewData2" value="View Data">
+                <span class="btncustom">View Data</span></a>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+             
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="DataBasePath" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Status")</label>
+
+                                        <div class="col-sm-6">
+                                            <select id="Status" class="form-control">
+                                                <option value="-1">--Select--</option>
+                                                <option value="0">Requested</option>
+                                                <option value="1">Approve</option>
+                                                <option value="2">Reject</option>
+                                                <option value="3">Hold</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box-body table-responsive no-padding" id="dvApproveBranchTransfers">
+                </div>
+
+                <div id="dvApprovalRemarks" style="display:none;height:250Px" role="dialog">
+                    <div class="box">
+                        <div class="box-body">
+                            <label class="col-sm-4">@Html.Label("Enter Description")</label>
+                            <div>
+                                @Html.TextBoxFor(model => model.Remarks, new { autocomplete = "off", @class = "form-control textlength", @id = "ActionDescription", placeholder = "Enter Description", @maxlength = 248, @height = "200Px" })
+                                <div class="col-sm-12" style="display:none;" id="ActionDescriptionNull">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-body" id="AmountBody">
+
+                            <label id="=labAmountId" class="col-sm-4">@Html.Label("Enter Amount")</label>
+                            <div>
+                                @Html.TextBoxFor(model => model.PriviousLevelAmount, new { autocomplete = "off", @class = "form-control textlength txtboxNum", @id = "ActionAmount", placeholder = "Enter Amount", @maxlength = 6, @height = "200Px" })
+                                <div class="col-sm-12" style="display:none;" id="ActionAmountNull">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="SearchData" class="row">
+        </div>
+
+
+        if (null != Model)
+        {
+
+            <input style="display:none" id="year" value="@Model.Year" />
+    <input style="display:none" id="Level" value="@Model.Level" />
+        }
+        else
+        {
+            <input style="display:none" id="year" value="" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+    window.onload = LoadData();
+    debugger
+    function LoadData() {
+        GetSubscriptionDropDown();
+    }
+
+    function GetSubscriptionDropDown() {
+        var year = $('#year').val();
+
+        $.ajax({
+            url: "/Account/GetSubscription",
+            data: { year: year },
+            success: function (data) {
+                var SubItems = $('#DataBasePath')
+                SubItems.children().remove();
+                SubItems.append($("<option>").val("null").text("--Select--"))
+                $.each(data.Subscriptions, function (i, record) {
+                    SubItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                });
+
+                $('#DataBasePath').append(SubItems);
+
+                if (data.SelSubId != "") {
+                    $('#DataBasePath').val(data.SelSubId);
+                }
+            }
+
+        });
+    }
+
+    function ApproveBD(FeeRefundId, Level, StudentId,SubscriptionId, StaffId, Type) {
+
+
+
+        debugger
+
+        if (FeeRefundId < 1)
+            return;
+
+
+        debugger
+        if (Type == 1)
+            $('#AmountBody').show();
+        else
+            $('#AmountBody').hide();
+
+        var $dialog = $('#dvApprovalRemarks')
+
+      .dialog({
+          autoOpen: false,
+          width: 600,
+          height: 'auto',
+          resizable: true,
+          title: 'Fee Refund Approval',
+          modal: true,
+          closeOnEscape: false,
+          responsive: true,
+          show: "slide",
+          buttons: {
+              "OK": function () {
+
+                  debugger
+                 
+
+                  var Description = $('#ActionDescription').val();
+                  var Amount = $('#ActionAmount').val();
+
+                  if (Description == "" && Type == 1 && Amount == 0 ) {
+                      $('#ActionDescriptionNull').show();
+                          $('#ActionAmountNull').show();
+
+                      return;
+                  }
+                  else if (Description == "" && Type > 1) {
+                      $('#ActionDescriptionNull').show();
+                      return;
+                  }
+
+                  else {
+                      $(this).dialog("close");
+                      var VrMessage = SaveStatus(FeeRefundId, Level, StudentId, SubscriptionId,StaffId, Type, Description, Amount);
+                      $('#Validation').val(VrMessage);
+                  }
+              },
+              "Close": function () {
+                  $(this).dialog("close");
+              }
+          },
+      });
+
+        $dialog.dialog('open');
+        e.preventDefault();
+        return false;
+    }
+
+    function SaveStatus(FeeRefundId, Level, StudentId, SubscriptionId, StaffId, Type, Description, Amount) {
+        $('#imagemodal').show();
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+            },
+
+            url: '/FOperations/SaveApproveFeeRefund/',
+            data: { FeeRefundId: FeeRefundId, Level: Level, StudentId: StudentId, SubscriptionId: SubscriptionId, StaffId : StaffId, Type: Type, Description: Description ,Amount : Amount},
+            success: function (data) {
+                GetData();
+            },
+            aync: false
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+    function GetData() {
+        debugger
+        var SubscriptionId = $('#DataBasePath').val();
+        var Status = $('#Status').val();
+        var Level = $('#Level').val();
+        $('#dvApproveBranchTransfers').html('');
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (SubscriptionId == "null" || SubscriptionId < 0) {
+           
+            Message += " Branch";
+            isValid = false;
+        }
+
+        if (Status <= -1) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Status";
+            isValid = false;
+        }
+
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        document.getElementById("Validation").innerHTML = "";
+        $('#imagemodal').show();
+        $.ajax
+            ({
+
+                url: '/FOperations/GetFeeRefundRequestData/',
+                data: { SubscriptionId: SubscriptionId, StatusId: Status,Level :Level },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#dvApproveBranchTransfers').html(data);
+                }
+            });
+
+    }
+
+</script>
+
+
+
+
+
+
+
+

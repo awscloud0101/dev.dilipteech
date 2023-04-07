@@ -1,0 +1,143 @@
+﻿@model AsteriskBrowserAL.Models.SectionShufflingViewModel
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Studnet
+        </li>
+        <li class="active">Section Shuffling</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<style>
+    .selected {
+        background-color: #ccc;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <br />
+            <span id="Validation" style="color:green;font-weight:bold"></span>
+            <span id="ErrorId" style="color:red;font-weight:bold"></span>
+            <!-- form start -->
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(true)
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        Section Shuffling
+                    </h5>
+
+                    <div class="widget-toolbar no-border">
+                        <div class="inline action-buttons">
+                            @*<input type="button" class="btn btn-info btn-minier" name="Transfer" id="Transfer" value="Transfer" />*@
+                            @*<a type="button" class="btn btn-info btn-minier" name="Transfer" id="Transfer" value="Transfer"><span class="btn btn-info btn-minier">Transfer</span></a>*@
+                            <a id="Transfer" name="Transfer" value="Transfer" class="P2"><span class="btn btn-info btn-minier">Transfer</span></a>
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title ">Section Shuffling</h3>
+                        <input type="button" class="btn btn-primary pull-right"  name="Transfer" id="Transfer" value="Transfer" />
+
+                    </div>*@
+                <br />
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 ">Class</label>
+                                    <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                        <select id="ClassNumberId" name="ClassNumberId" class="form-control"></select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div id="SearchDiv">
+                @Html.Partial("SectionShufflingPartialView", Model)
+            </div>
+
+
+        </div>
+    </div>
+    <br />
+    <input type="hidden" />
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+</section>
+<script type="text/javascript">
+
+    function onloadData() {
+        LoadClassNumberDropdown();
+    }
+    window.onload = onloadData();
+
+
+    function LoadDivisionCombo() {
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                ClassList = $("#ClassNumberId")
+                ClassList.children().remove();
+                ClassList.append($("<option>").val("").text("--select--"))
+                $.each(result, function (e, record) {
+                    ClassList.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassNumberId").append(ClassList)
+
+
+            }
+        })
+    }
+
+    function LoadClassNumberDropdown() {
+        $.ajax({
+            url: '/AFrontOffice/GetClassNumbersData',
+            success: function (result) {
+                ClassList = $("#ClassNumberId")
+                ClassList.children().remove();
+                ClassList.append($("<option>").val("").text("--select--"))
+                $.each(result, function (e, record) {
+                    ClassList.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassNumberId").append(ClassList)
+            }
+        })
+    }
+
+
+
+
+</script>
+
+
+
+
+

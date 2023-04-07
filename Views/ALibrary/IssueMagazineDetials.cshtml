@@ -1,0 +1,171 @@
+﻿@model AsteriskBrowserAL.MasterMagazineDetails
+@{
+    ViewBag.Title = "MagazineDetails";
+}
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active"> Issue Magazine </li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+<br />
+<br />
+<div class="row">
+    <div class="col-xs-12">
+        <div class="widget-box">
+            <div class="widget-header header-small header-title">
+                <h5 class="widget-title">Issue Magazine</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Magazine Category</label>
+                            <div class="col-sm-6">
+                                <select id="CategoryId" name="CategoryName" class="form-control"></select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Magazine Name</label>
+                            <div class="col-sm-6">
+                                <select class="form-control select2" style="width:210px;" id="MagazineId" name="MagazineName"></select>
+                                @*<select id="MagazineId" name="MagazineName" class="form-control"></select>*@
+                            </div>
+                        </div>
+                        <input type="hidden" id="nMasterMagazineDetailsId" value="@Model.MasterMagazineDetailsId" />
+                        <input type="hidden" id="nMagazineCategoryId" value="@Model.MagazineCategoryId" />
+                        <br />
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="SearchData"></div>
+
+<script>
+
+    function OnloadFunction() {
+        debugger
+        var magazineid = $('#nMasterMagazineDetailsId').val();
+        var categoryid = $('#nMagazineCategoryId').val();
+
+        LoadCategoryDropDown();
+        if (categoryid > 0)
+            $("#CategoryId").val(categoryid);
+
+        if (magazineid > 0) {
+            LoadMagzineDropDown(categoryid);
+            $("#MagazineId").val(magazineid);
+            GetMagazineData(magazineid);
+        }
+
+    }
+
+    function LoadCategoryDropDown() {
+        debugger
+        $.ajax({
+            url: '/ALibrary/GetCategoriesInformation',
+            success: function (result) {
+                catergory = $("#CategoryId")
+                catergory.children().remove();
+                catergory.append($("<option>").val(-1).text("--- Select ---"))
+                catergory.append($("<option>").val("0").text("All"))
+                $.each(result, function (e, record) {
+                    catergory.append($("<option>").val(record.BookCategoryId).text(record.BookCategoryName))
+                })
+                $("#CategoryId").append(catergory);
+
+                //var selVal = $('#nMagazineCategoryId').val();
+                //if (selVal != null && selVal != "" && selVal > -1) {
+                //    document.getElementById("CategoryId").value = selVal;
+                //}
+            },
+            async: false
+        });
+    }
+
+    $('#CategoryId').change(function () {
+        debugger
+     
+        $("#SearchData").hide()
+        $("#MagazineId").hide()
+        var category = $('#CategoryId').val();
+        $('#MagazineId').val('').trigger('change.select2');
+        LoadMagzineDropDown(category);
+    });
+
+    function LoadMagzineDropDown(category) {
+        debugger
+            $.ajax({
+                url: '/ALibrary/GetMagzinesInformation',
+                data: { MasterCategoryId: category },
+                success: function (data) {
+                    debugger
+                    var Magzine = $('#MagazineId')
+                    Magzine.children().remove();
+                    Magzine.append($("<option>").val("-1").text("---Select---"))
+                    Magzine.append($("<option>").val("0").text("All"))
+                    $.each(data, function (e, record) {
+                        Magzine.append($("<option>").val(record.MasterMagazineDetailsId).text(record.Name))
+                    })
+                    $("#MagazineId").append(Magzine);
+
+                },
+                async: false
+            });
+    }
+
+
+    $('#MagazineId').change(function () {
+        debugger
+        $("#SearchData").hide()
+        var magazine = $('#MagazineId').val();
+        GetMagazineData(magazine);
+    });
+
+    function GetMagazineData(magazine) {
+        debugger
+        var category = $('#CategoryId').val();
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/ALibrary/GetIssueMagazineDetailsData',
+            data: { MagazineCategory: category, MasterMagazineId: magazine },
+            success: function (data) {
+                debugger
+                $('#imagemodal').hide();
+                $("#SearchData").show()
+                $("#SearchData").html(data)
+                
+              
+            }
+        })
+    }
+
+
+
+    window.onload = OnloadFunction();
+
+</script>
+
+

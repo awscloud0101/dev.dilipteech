@@ -1,0 +1,634 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionData
+
+@{
+    ViewBag.Title = "Student Registration";
+}
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Front Office
+        </li>
+        <li class="active">Confirm Admission</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+    <script src="~/assets/js/jquery-ui.min.js"></script>
+
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+
+<!-- date-picker -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+
+<!-- daterange picker -->
+<link href="~/assets/css/daterangepicker-bs3.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js" type="text/javascript"></script>
+<script src="~/assets/js/daterangepicker.js"></script>
+
+
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+
+<!--Main Content-->
+<form id="Submit" method="post">
+    <section class="content">
+        <div class="row">
+            <div class=col-xs-6>
+
+            </div>
+        </div>
+        <br />
+        <input type="hidden" id="AcademicYearId" value="@Model.AcademicYearId" />
+        @using (Html.BeginForm("Admission", "AFrontOffice", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <div id="AdmissionView" style="display:inline">
+                <div class="row">
+                    <div class="col-xs-12">
+                        @if (Model.isSaved == true)
+                        {
+                            <span style="color:green;font-weight:bold" id="SaveData">Admission confirmed</span>
+
+                        }
+                        else
+                        {
+                            <span style="color:green;font-weight:bold" id="SaveData"></span>
+
+                        }
+                        <div class="table-header">
+                            <span style="font-family:calibri;">Admission</span>
+                            <div style="float:right">
+                                <button class="btn btn-info btn-minier P2" style="margin-top:2px;width:75px;height:28px;font-weight:bold" name="Create" value="Create" type="submit" onclick="return submitForm()">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                        <div class="widget-box">
+
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Registration Number")</label>
+
+                                            <div class="col-sm-3">
+                                                <input id="ApplicationNumber" class="form-control" value="@Model.DispalyApplicationNumber" />
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div id="SearchData">
+
+                </div>
+            </div>
+
+            <div id="PaymentsView" style="display:none">
+
+            </div>
+            <input type="hidden" id="StudentId" value="@Model.StudentId" />
+            <input type="hidden" id="CboAcademicYearId" value="@Model.AcademicYearId" />
+            <input type="hidden" id="SyblingCoutStudents" />
+
+        }
+
+    </section>
+</form>
+
+
+
+<script>
+
+
+
+    $(document).keypress(function (e) {
+        if (e.which == 13) {
+            return false;
+        }
+    });
+
+    function onloadData() {
+        var StudentId = $("#StudentId").val();
+        if (StudentId > 0) {
+            PopulateStudentDetails();
+        }
+    }
+    window.onload = onloadData();
+
+
+    $("#ApplicationNumber").autocomplete({
+        source: function (request, response) {
+            document.getElementById("SaveData").innerHTML = ""
+
+            if (request.term.length >= 3) {
+                $('#imagemodal').show();
+
+                $.ajax({
+                    url: "/AFrontOffice/PopulateApplicationNumber",
+                    data: { strValue: request.term },
+                    success: function (result) {
+                        response($.map(result, function (data, id) {
+                            return {
+                                label: data.ApplicationNumber,
+                                value: data.ApplicationNumber,
+                                id: data.StudentId
+
+                            };
+                        }));
+                    },
+                    error: function () {
+                        $('#imagemodal').hide();
+                    },
+                    async: false
+                })
+
+                $('#imagemodal').hide();
+            }
+        },
+        minLength: 1,
+        select: function (event, ui) {
+            document.getElementById('StudentId').value = ui.item.id
+            $('#ApplicationNumber').val(ui.item.label);
+            var id = ui.item.value
+            PopulateStudentDetails();
+        }
+    });
+
+
+
+
+    function PopulateStudentDetails() {
+        var StudentId = document.getElementById("StudentId").value;
+        $.ajax({
+            url: '/AFrontOffice/GetStudentDetails',
+            data: { nStudentId: StudentId },
+            success: function (result) {
+                $("#SearchData").html(result)
+            }
+        })
+    }
+
+
+    function submitForm() {
+        var validation = true;
+        validation = Validate()
+
+        if (validation == true) {
+
+            GetPaymentPartialView();
+        }
+
+        validation = false
+
+
+        return validation;
+    }
+
+    function Validate() {
+        var isvalid = true
+        var PersonalInfoVal = " "
+        var ParentInfoVal = " "
+        var ContactInfoVal = ""
+        var GaurdianInfoVal = " "
+        var SiblingsData = ""
+        var regex = /^[789]\d{9}$/;
+
+
+        //Personal
+        var AdmissionDate = $("#AdmissionDate").val();
+        var FirstName = $("#FirstName").val();
+        var LastName = $("#LastName").val();
+        var CourseId = $("#CourseId").val();
+        var StudentBatchId = $("#StudentBatchId").val();
+        var DateofBirth = $("#DateofBirth").val();
+        var AddressLineOne = $("#AddressLineOne").val();
+        var Nationality = $("#NationalityId").val();
+        var Caste = $("#Caste").val();
+        var AadharCardNo = $("#AadharCardNo").val();
+
+
+
+        //Parent
+        var FatherName = $("#FatherName").val();
+        var MotherName = $("#MotherName").val();
+        var ParentAnniversaryDate = $("#ParentAnniversaryDate").val();
+        var FatherOccupation = $("#FatherOccupation").val();
+
+
+        //Sibling
+
+        var BelogsTo = $("#BelongsTo").val();
+        var SiblingCount = $("#SiblingCount").val()
+
+        //Contact
+        var State = $("#State").val();
+        var City = $("#City").val();
+        var PINCode = $("#PINCode").val();
+        var FatherMobileNumber = $("#FatherMobileNumber").val();
+        var MotherMobileNumber = $("#MotherMobileNumber").val();
+        var FatherEmail = $('#FatherEmail').val();
+
+        //Gaurdian
+        var GuardianName = $("#GuardianName").val();
+        var GuardianMobile = $("#GuardianMobile").val();
+        var GardianOccupation = $("#GardianOccupation").val();
+        var GuardianAddress = $("#GuardianAddress").val();
+
+        var ContactPerson = $("#ContactPerson").val();
+
+
+        //Personal Validation
+
+        if (AdmissionDate == "" || AdmissionDate == null || AdmissionDate == "null") {
+            if (PersonalInfoVal == "") {
+                PersonalInfoVal += "Please fill the mandatory fields : Admission Date, "
+
+            }
+            else {
+                PersonalInfoVal += "Admission Date, "
+
+            }
+            isvalid = false
+        }
+
+        if (FirstName == "" || FirstName == null || FirstName == "null") {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+
+                PersonalInfoVal += "Please fill the mandatory fields : First Name, "
+
+            }
+            else {
+                PersonalInfoVal += "First Name, "
+            }
+            isvalid = false
+        }
+
+        if (LastName == "" || LastName == null || LastName == "null") {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Last Name, "
+
+            }
+            else {
+                PersonalInfoVal += "Last Name, "
+            }
+
+            isvalid = false
+        }
+        if (CourseId == "" || CourseId == null || CourseId == "null" || CourseId == 0) {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Class, "
+
+            }
+            else {
+                PersonalInfoVal += "Class, "
+            }
+
+            isvalid = false
+        }
+
+        if (StudentBatchId == "" || StudentBatchId == null || StudentBatchId == "null" || StudentBatchId == 0) {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Section, "
+
+            }
+            else {
+                PersonalInfoVal += "Section, "
+            }
+            isvalid = false
+        }
+
+        if (DateofBirth == "" || DateofBirth == null || DateofBirth == "null") {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Date of Birth, "
+
+            }
+            else {
+                PersonalInfoVal += "Date of Birth,"
+            }
+
+            isvalid = false
+        }
+
+
+
+        if (Nationality == "" || Nationality == null || Nationality == "null" || Nationality == 0) {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Nationality, "
+
+            }
+            else {
+                PersonalInfoVal += "Nationality, "
+            }
+            isvalid = false
+        }
+
+
+        //if (Caste == "" || Caste == null || Caste == "null" || Caste == 0) {
+        //    if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+        //        PersonalInfoVal += "Please fill the mandatory fields : Caste, "
+
+        //    }
+        //    else {
+        //        PersonalInfoVal += "Caste, "
+        //    }
+        //    isvalid = false
+        //}
+
+
+        //if (AadharCardNo == "" || AadharCardNo == null || AadharCardNo == "null" || AadharCardNo == 0) {
+        //    if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+        //        PersonalInfoVal += "Please fill the mandatory fields : Aadhar Card No, "
+
+        //    }
+        //    else {
+        //        PersonalInfoVal += "Aadhar Card No, "
+        //    }
+        //    isvalid = false
+        //}
+
+        //else if (AadharCardNo.length < 12) {
+        //    if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+        //        PersonalInfoVal += "Please fill the mandatory fields : Aadhar Card No Should be 12, "
+
+        //    }
+        //    else {
+        //        PersonalInfoVal += "Aadhar Card should be 12 digits, "
+        //    }
+        //    isvalid = false
+        //}
+
+        //Sibling
+        //if (SiblingCount > 0)
+        //{
+        //    var SyblingCoutStudents = $("#SyblingCoutStudents").val();
+        //    //Iterate all td's in second column
+        //    if (SyblingCoutStudents != SiblingCount)
+        //    {
+        //        SiblingsData = "Please Enter sibling information"
+        //        isvalid = false
+        //    }
+        //}
+
+
+
+
+        //Parent Validation
+        if ((FatherName == "" || FatherName == null || FatherName == "null") && (MotherName == "" || MotherName == null || MotherName == "null") && (GuardianName == "" || GuardianName == null || GuardianName == "null")) {
+            if (ParentInfoVal == "" || ParentInfoVal == null || ParentInfoVal == "null") {
+                ParentInfoVal += "Please fill the mandatory fields : Father name,"
+
+            }
+            else {
+                ParentInfoVal += "Father name, "
+            }
+            isvalid = false
+        }
+
+        //if (ParentAnniversaryDate == "" || ParentAnniversaryDate == null || ParentAnniversaryDate == "null") {
+        //    if (ParentInfoVal == "" || ParentInfoVal == null || ParentInfoVal == "null") {
+        //        ParentInfoVal += "Please fill the mandatory fields : Anniversary Date, "
+
+        //    }
+        //    else {
+        //        ParentInfoVal += "Anniversary Date, "
+        //    }
+
+        //    isvalid = false
+        //}
+
+
+        if (FatherOccupation == "" || FatherOccupation == null || FatherOccupation == "null") {
+            if (ParentInfoVal == "" || ParentInfoVal == null || ParentInfoVal == "null") {
+                ParentInfoVal += "Please fill the mandatory fields : Occupation, "
+
+            }
+            else {
+                ParentInfoVal += "Occupation, "
+            }
+            isvalid = false
+        }
+
+
+
+
+
+        //Contact Validation
+
+        if (AddressLineOne == "" || AddressLineOne == null || AddressLineOne == "null") {
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : Address Line , "
+
+            }
+            else {
+                ContactInfoVal += "Address Line, "
+            }
+
+            isvalid = false
+        }
+
+
+
+        if (State == "" || State == null || State == "null" || State == 0) {
+
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : State, "
+
+            }
+            else {
+                ContactInfoVal += "State, "
+            }
+            isvalid = false
+        }
+
+        if (City == "" || City == null || City == "null" || City == 0) {
+
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : City, "
+
+            }
+            else {
+                ContactInfoVal += "City, "
+            }
+            isvalid = false
+        }
+
+        if ((FatherMobileNumber == "" || FatherMobileNumber == null || FatherMobileNumber == "null") && (MotherMobileNumber == "" || MotherMobileNumber == null || MotherMobileNumber == "null") && (GuardianMobile == "" || GuardianMobile == null || GuardianMobile == "null")) {
+
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : Father Mobile No, "
+
+            }
+            else {
+                ContactInfoVal += "Father Mobile No, "
+            }
+
+            isvalid = false
+        }
+
+        if (FatherMobileNumber != "") {
+            debugger
+            if (!regex.test(FatherMobileNumber)) {
+                ContactInfoVal += "Father Mobile Number is not valid, "
+                isvalid = false;
+            }
+        }
+
+        if (MotherMobileNumber != "") {
+            if (!regex.test(MotherMobileNumber)) {
+                ContactInfoVal += "Mother Mobile Number is not valid, "
+                isvalid = false;
+            }
+        }
+
+
+
+
+
+        if (PINCode == "" || PINCode == null || PINCode == "null" || PINCode == 0) {
+
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : PIN code, "
+
+            }
+            else {
+                ContactInfoVal += "PIN code, "
+            }
+            isvalid = false
+        }
+
+        if (ContactPerson < 1) {
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : Contact Person, "
+
+            }
+            else {
+                ContactInfoVal += "Contact Person, "
+            }
+            isvalid = false
+        }
+
+
+        if (FatherEmail == "" || FatherEmail == null || FatherEmail == "null") {
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : Father Email, "
+            }
+            else {
+                ContactInfoVal += "Father Email, "
+            }
+            isvalid = false
+        }
+
+        if (ContactPerson > 0) {
+            if (ContactPerson < 4) {
+                if ((FatherMobileNumber == "" || FatherMobileNumber == null || FatherMobileNumber == "null")) {
+                    isvalid = false
+                }
+            }
+            else if (ContactPerson == 4) {
+                if ((GuardianName == "" || GuardianName == null || GuardianName == "null")) {
+                    GaurdianInfoVal += "Please fill the mandatory fields :  Guardian Name, "
+                    isvalid = false
+                }
+
+
+                if ((GuardianMobile == "" || GuardianMobile == null || GuardianMobile == "null")) {
+                    GaurdianInfoVal += "Guardian Mobile, "
+                    isvalid = false
+                }
+
+                if ((GardianOccupation == "" || GardianOccupation == null || GardianOccupation == "null")) {
+                    GaurdianInfoVal += "Guardian Occupation"
+                    isvalid = false
+                }
+
+
+            }
+        }
+
+
+        if (isvalid == false) {
+            document.getElementById("PersonalVal").innerHTML = PersonalInfoVal;
+            document.getElementById("ParentVal").innerHTML = ParentInfoVal;
+            document.getElementById("ContactVal").innerHTML = ContactInfoVal;
+            document.getElementById("GuardianVal").innerHTML = GaurdianInfoVal;
+            document.getElementById("GuardianVal").innerHTML = GaurdianInfoVal;
+            document.getElementById("siblingsVal").innerHTML = SiblingsData;
+        }
+        return isvalid;
+    }
+
+    function phonenumber(inputtxt) {
+        var isvalid = true;
+
+        var phoneno = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+        if (inputtxt.value.match(phoneno)) {
+            isvalid = true;
+        }
+        else {
+            isvalid = false;
+        }
+        return isvalid;
+    }
+
+    function GetPaymentPartialView() {
+        document.getElementById("PaymentsView").style.display = "inline"
+        document.getElementById("AdmissionView").style.display = "none"
+        var CourseId = $("#CourseId").val();
+        var AcademicYearId = $("#CboAcademicYearId").val();
+        var AdmissionDate = $("#AdmissionDate").val();
+
+        var Hostel = "";
+
+        if ($('input#Hostel').is(':checked')) {
+            Hostel = true;
+        }
+        else {
+            Hostel = false;
+        }
+        $.ajax({
+            url: '/AFrontOffice/GetPaymnetPartialView',
+            data: { ClassNumber: CourseId, AcademicYearId: AcademicYearId, IsHostel: Hostel, AdmissionDate: AdmissionDate },
+            success: function (data) {
+                $("#PaymentsView").html(data)
+            }
+
+        })
+    }
+
+
+
+</script>

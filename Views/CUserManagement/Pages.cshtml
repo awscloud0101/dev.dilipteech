@@ -1,0 +1,126 @@
+﻿@model AsteriskBrowserAL.Models.PagesData
+@{
+    ViewBag.Title = "Pages";
+}
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Controller
+        </li>
+        <li>
+            <i class=""></i>
+            CUserManagement
+        </li>
+        <li class="active">Pages</li>
+    </ol>
+
+</section>
+<br />
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Pages", "CUserManagement", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" value="@Model.ModuleId" id="selModule" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="box">
+                        <div class="box-body">
+                            <div class="btn-btn pull-right">
+                                <button class="btn btn-primary pull-right P2" id="New" style="width:80px" onclick="LoadPages();" type="button">New</button>
+                            </div>
+
+
+                            <div class="col-xs-6">
+                                <label class="col-xs-4">Module Name</label>
+                                <div class="col-xs-6">
+                                    @Html.DropDownListFor(model => model.ModuleId, new SelectList(Model.ListModule, "ModuleId", "ModuleName"), "-- Select --", new { @class = "form-control", onchange = "onchange();" })
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div id="PageDetails"></div>
+            }
+        </div>
+    </div>
+    <br />
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        OnLoadData();
+    });
+
+
+    function OnLoadData() {
+        var selModule = $('#selModule').val();
+
+        if (selModule != null && selModule > 0) {
+            PagesPartialView(selModule);
+        }
+    }
+
+    function onchange() {
+        debugger
+        var ModuleId = $('#ModuleId').val();
+        PagesPartialView(ModuleId);
+    }
+    function LoadPages() {
+
+        var ModuleName = $("#ModuleId").val();
+
+        if (ModuleName == "" || ModuleName == null) {
+            $('#Validation').html("Select Module");
+            return false;
+        }
+
+        window.location.href = '/CUserManagement/PagesC?nModule=' + ModuleName;
+    }
+    $('#ModuleId').change(function () {
+        $('#Validation').html("");
+
+        var nModule = $("#ModuleId").val();
+
+        if (null == nModule || nModule == "") {
+            $('#PageDetails').html("");
+        }
+
+        PagesPartialView(nModule);
+    })
+
+    function PagesPartialView(nModule) {
+        debugger
+        $('#PageDetails').html('');
+        $('#Validation').html('');
+
+        if (nModule > 0) {
+
+            $('#imagemodal').show();
+
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#imagemodal').hide();
+                    alert(errorThrown);
+                },
+                url: '/CUserManagement/PagesPartialView',
+                data: { nModuleId: nModule },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $('#PageDetails').html(Data);
+                }
+            });
+        }
+    }
+
+
+
+</script>

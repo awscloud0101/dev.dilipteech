@@ -1,0 +1,231 @@
+﻿
+@model List<AsteriskBrowserAL.Models.OpeningBalancesViewModel>
+@{
+    ViewBag.Title = "Opening Balances";
+    int sno = 1;
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Opening Balances</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+<section class="content">
+   
+    <div class="row">
+        <div class="col-xs-12">
+   
+            @using (Html.BeginForm("OpeningBalances", "SeFinance", FormMethod.Post))
+            {
+
+                if (null != TempData["Message"])
+                {
+
+                    <p align="center">
+                        <span class="savedinfo">
+
+
+
+                            <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                            <br />
+                            <span id="Validation" >@Html.Raw(TempData["Message"])</span>
+
+                            <br />
+
+                            <a href="" class="cls1 btncustom">Close</a>
+                            <script>
+
+                                $(document).ready(function () {
+                                    $(".cls1").click(function () {
+
+                                        $(".savedinfo").css("display", "none")
+                                    });
+
+
+
+                            </script>
+                        </span>
+                    </p>
+
+
+
+                             }
+
+                @Html.ValidationMessage("BankDepositCards")
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    <span id="Validation" style="color:red;font-weight:bold"></span>
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Opening Balances</span>
+                        <div style="float:right;margin-right:10px;">
+                            <button type="submit" name="Save" class="btncustom P2" value="Save" onclick="return submitForm()">
+                           Save
+                            </button>   </div>
+
+                    </div>
+
+
+    <table class="table tbhover table-striped table-bordered dynamic-table" id="tbOpeningBalances">
+        <thead>
+            <tr>
+                <th style="text-align:center" colspan="2">
+                    @Html.DisplayName("")
+                </th>
+
+                <th style="text-align:center" colspan="2">
+                    @Html.DisplayName("Payments")
+                </th>
+                <th style="text-align:center" colspan="1">
+                    @Html.DisplayName("Petty Cash")
+                </th>
+            </tr>
+
+
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Branch")
+                </th>
+                <th>
+                    @Html.DisplayName("Cash Amount")
+                </th>
+                <th>
+                    @Html.DisplayName("Cheque Amount")
+                </th>
+                <th>
+                    @Html.DisplayName("Amount")
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                <tr>
+                    @Html.Hidden("LstOpeningBalances.Index", (@i))
+                    @Html.Hidden("LstOpeningBalances[" + (@i) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                    @Html.Hidden("LstOpeningBalances[" + (@i) + "].BranchName", Model.ElementAt(i).BranchName)
+                    @Html.Hidden("LstOpeningBalances[" + (@i) + "].FeePaymentsOpeningBalancesViewModelId", Model.ElementAt(i).FeePaymentsOpeningBalancesViewModelId)
+                    <td>
+                        @(sno++)
+                    </td>
+                    <td>
+                        @Model.ElementAt(i).BranchName
+                        <input type="hidden" id="Branchname" value="@Model.ElementAt(i).BranchName" />
+                    </td>
+                    <td>
+                        
+                        @*@Html.TextBox("LstOpeningBalances[" + (@i) + "].FPCash", Model.ElementAt(i).FPCash, new { @class = "form-control textlength  txtboxNum", @min = "0", @maxlength = "17", @style = "width:220px;text-align:right", @id = "FPCash", name = @Model.ElementAt(i).FPCash })
+                        @Html.Hidden("LstOpeningBalances[" + (@i) + "].FPCash", Model.ElementAt(i).FPCash)*@
+                        @Model.ElementAt(i).FPCash
+
+                    </td>
+
+                    <td>
+                        @*@Html.TextBox("LstOpeningBalances[" + (@i) + "].FpCheque", Model.ElementAt(i).FpCheque, new { @class = "form-control textlength txtboxNum", @min = "0", @maxlength = "17", @style = "width:220px;text-align:right", @id = "FPCash", name = @Model.ElementAt(i).FpCheque })
+                        @Html.Hidden("LstOpeningBalances[" + (@i) + "].FpCheque", Model.ElementAt(i).FpCheque)*@
+                        @Model.ElementAt(i).FpCheque
+                    </td>
+
+                    <td>
+                        @Html.ActionLink(Model.ElementAt(i).PettyCashAmount.ToString(), "PettyCashOpeningBalance", new { nSubscriptionId = @Model.ElementAt(i).SubscriptionId },new{Class="P2"})
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+
+                }
+            }
+         </div>
+    </div>
+
+</section>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+<script type="text/javascript">
+
+    function Load() {
+        document.getElementById("Validation").innerHTML = "";
+    }
+
+    window.onload()
+    {
+        Load();
+    }
+
+    function ValidateData() {
+        var nFPCash = 0;
+        var nFPCheque = 0;
+
+        var isvalid = false;
+
+        $('#tbOpeningBalances tr').each(function (index) {
+            nFPCash = $(this).find('#FPCash').val();
+            nFPCheque = $(this).find('#FPCheque').val();
+
+
+            if (parseInt(nFPCash) != null) {
+                if (parseInt(nFPCash) > 0) {
+
+                    isvalid = true;
+                    return isValid;
+                }
+            }
+
+            if (parseInt(nFPCheque) != null) {
+                if (parseInt(nFPCheque) > 0) {
+                    isvalid = true;
+                    return isValid;
+                }
+            }
+        })
+
+        document.getElementById("Validation").innerHTML = "Modifications are not done yet";
+        return isvalid;
+    }
+
+    function submitForm() {
+
+        var IsValid = ValidateData();
+
+        if (IsValid == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+</script>

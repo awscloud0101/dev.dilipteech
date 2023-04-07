@@ -1,0 +1,241 @@
+﻿
+@model List<AsteriskBrowserAL.Models.DiscountViewModel>
+
+@{
+    ViewBag.Title = "Fee Arrears";
+    int nsno = 1;
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+    string Role = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+}
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="hr hr-18 dotted hr-double"></div>
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="table-header">
+                Records Found (@Model.Count())
+                @*<div style="float:right;">
+                        <button type="submit" name="Save" class="btn btn-info btn-xs P2" style="margin-top:2px">
+                            <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                        </button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+    <input type="hidden" value="@Model.FirstOrDefault().StudentId" />
+    <input type="hidden" value="@Model.FirstOrDefault().FeeArrearId" />
+    <input type="hidden" value="@Model.FirstOrDefault().SubscriptionId" />
+    @*<input type="hidden" value="@Model.FirstOrDefault().ExamId" />*@
+    <span id="DemoValidation" style="color:red;font-weight:bold;display:none"> *select reason</span>
+    <div class="widget-body table-responsive no-padding">
+        <div class="hideScrolling">
+
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayName("SNo")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Student Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Mobile Number")
+                        </th>
+                        @if (bIsCoastal)
+                        {
+                            <th>
+                                @Html.DisplayName("Registration Number")
+                            </th>
+                        }
+
+                        <th>
+                            @Html.DisplayName("Section Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Agreed Amount")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Status")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        <tr>
+
+                            <td>
+                                @(nsno++)
+                                @Html.Hidden("ArrearList.Index", (@i))
+                                @Html.Hidden("ArrearList[" + (@i) + "].StudentId", Model.ElementAt(i).StudentId)
+                                @Html.Hidden("ArrearList[" + (@i) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                @Html.Hidden("ArrearList[" + (@i) + "].FeeArrearId", Model.ElementAt(i).FeeArrearId)
+                                @Html.Hidden("ArrearList[" + (@i) + "].CourseId", Model.ElementAt(i).CourseId)
+                                @Html.Hidden("ArrearList[" + (@i) + "].AdmissionNo", Model.ElementAt(i).AdmissionNo)
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).StudentName
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).LegacyNumber
+                            </td>
+                            @if (bIsCoastal)
+                            {
+                                <td>
+                                    @Model.ElementAt(i).OMRNumber
+                                </td>
+                            }
+                            <td>
+                                @Model.ElementAt(i).SectionName
+
+                            </td>
+
+                            <td>
+                                @Model.ElementAt(i).ArrearAmount
+                                @Html.Hidden("ArrearList[" + (@i) + "].ArrearAmount", Model.ElementAt(i).ArrearAmount, new { @id = "Amount_" + @nsno, @class = "form-control " })
+                            </td>
+
+
+                            @if (Model.ElementAt(i).AcademicYearId == 0)
+                            {
+                                <td>Accepted</td>
+                            }
+                            else if (Model.ElementAt(i).AcademicYearId == 2)
+                            {
+                                <td>Rejected</td>
+                            }
+                            else
+                            {
+
+                                <td>
+                                    <button class="btn btn-info btn-minier btn-success" onclick="ChangeStatus(0,@Model.ElementAt(i).StudentId,@nsno,@Model.ElementAt(i).SubscriptionId)">Approve</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <button class="btn btn-info btn-minier btn-success" onclick="ChangeStatus(2,@Model.ElementAt(i).StudentId,@nsno,@Model.ElementAt(i).SubscriptionId)">Reject</button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+else
+{
+    <span style="font-weight:bold;color:red">Data not available to display</span>
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+<script>
+        //function isNumberKey(evt) {
+        //    var charCode = (evt.which) ? evt.which : event.keyCode
+
+        //    if (charCode == 46 || charCode == 65)
+        //        return true;
+
+        //    if (charCode > 31 && (charCode < 48 || charCode > 57))
+        //        return false;
+
+        //    return true;
+        //}
+
+        function ChangeStatus(Status, StudentId, Id, SubId) {
+            debugger
+            var Amount = $('#Amount_' + Id).val();
+             if (Amount != "") {
+                $.ajax({
+                    url: '/FOperations/FeeArrivedRequestAmountChange',
+                    data: { StudentId: StudentId, Amount: Amount, SubId: SubId, Status: Status },
+                    success: function (data) {
+                        if (data == "True") {
+                            debugger
+                            var nSubscriptionId = $('#SubscriptionId').val()
+                            var nClassNumberId = $('#CourseId').val()
+                            var nStatus = $('#CboStatus').val();
+                            GetStudentList(nSubscriptionId, nClassNumberId, nStatus)
+                        }
+                        //else {
+                        //    $('#DemoValidation').show()
+                        //}
+                        //Popup(data)
+                    }
+                })
+            }
+            else {
+                $('#DemoValidation').show()
+            }
+        }
+        //$("#btnupload").click(function () {
+        //    debugger
+        //    formdata.append('uploadername', $('#FileUpload').val());
+        //    $.ajax({
+        //        url: '/Home/UploadFiles',
+        //        type: "POST",
+        //        contentType: false, // Not to set any content header
+        //        processData: false, // Not to process data
+        //        data: formdata,
+        //        async: false,
+        //        success: function (result) {
+        //            if (result != "") {
+        //                alert(result);
+        //            }
+        //        },
+        //        error: function (err) {
+        //            alert(err.statusText);
+        //        }
+        //    });
+        //});
+
+        //function UploadFile(Status, BudgetRequestId, Id) {
+        //    debugger
+        //    // grab your file object from a file input
+        //    var nid = "FileUpload_" + Id;
+        //    //fileData = document.getElementById(nid).files[0];
+        //    fileData = $("#nid").get(0);
+        //    debugger
+        //    // fileData = '1153:1';
+        //    var data = new FormData();
+
+        //    $.ajax({
+        //        url: '/FOperations/SaveTeacherAssignmentUploads?data=' + fileData.name,
+        //        type: 'POST',
+        //        data: fileData,
+        //        cache: false,
+        //        dataType: 'json',
+        //        processData: false, // Don't process the files
+        //        contentType: "application/octet-stream", // Set content type to false as jQuery will tell the server its a query string request
+        //        success: function (data) {
+        //            alert('successful..');
+        //        },
+        //        error: function (data) {
+        //            alert('Some error Occurred!');
+        //        }
+        //    });
+
+        //}
+</script>
+
+
+
+

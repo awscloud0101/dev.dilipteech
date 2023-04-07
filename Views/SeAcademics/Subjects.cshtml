@@ -1,0 +1,191 @@
+﻿
+@model IEnumerable<AsteriskBrowserAL.Subjects>
+
+
+@{
+    ViewBag.Title = "Subjects";
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Subjects</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<!-- /section:basics/content.breadcrumbs -->
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<script>
+    $("#id-btn-dialog2").on('click', function (e) {
+        e.preventDefault();
+
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            width: '320',
+            modal: true,
+            title: "   Subjects",
+            title_html: true,
+            buttons: [
+                {
+                    html: "<i class='ace-icon fa fa-trash-o bigger-110'></i>&nbsp; Delete",
+                    "class": "btn btn-danger btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+                ,
+                {
+                    html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Cancel",
+                    "class": "btn btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+    });
+</script>
+
+
+<section class="content">
+
+
+    <div class="row" onload="GetSubjects()">
+        <div class="col-xs-12">
+            @Html.ValidationMessage("Subjects")
+            <span style="color:red;" id="EPCombos"></span>
+            @if (null != TempData["Subjects"])
+            {
+                @Html.Raw(TempData["Subjects"])
+            }
+            <div class="table-header">
+                <span style="font-family:calibri;"> Subjects</span>
+                <div class="" style="float:right;margin-right:10px;">
+                    <a href="@Url.Action("SubjectsC", "SeAcademics")" class=" btncustom P2" role="button" id="New" name="New" onclick="return submitForm();">
+                        Add
+                    </a>
+                </div>
+            </div>
+            <div class="widget-box">
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Class")</label>
+
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("BatchId", null, "--Select Class--", new { @class = "form-control", @id = "BatchId", @onchange = "GetSubjects()" })
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="desBatchId">
+                                        <label style="color:red;font-weight:bold; width:130px;">select class </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="SearchViewDiv">
+            </div>
+           
+        </div>
+    </div>
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+
+<script type="text/javascript">
+
+    function GetSubjects() {
+        var Id = $('#BatchId').val();
+
+        if (Id > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/SeAcademics/SubjectsData',
+                data: { BatchId: Id },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchViewDiv").html(Data);
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            $("#SearchViewDiv").html("");
+        }
+    }
+    window.onload = GetSubjects;
+
+    function validateSubjects() {
+
+        document.getElementById("count").value = "1";
+        var BatchId = document.getElementById("BatchId").value;
+        validate = true;
+
+        if (BatchId == "") {
+            document.getElementById("desBatchId").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desBatchId").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+        var validatestatus = validateSubjects();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+    $('#BatchId').click(function () {
+        document.getElementById('desBatchId').style.display = "none"
+    })
+
+    function btnConfirm(Value) {
+        debugger
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeAcademics/ValidationForSubjectsD',
+                data: { id: Value },
+                success: function (data) {
+
+                    var url = '/SeAcademics/SubjectsD?id=' + Value;
+                    var title = "Subjects";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+

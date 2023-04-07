@@ -1,0 +1,514 @@
+﻿@model AsteriskBrowserAL.Models.DaysheetDataViewModel
+@{
+
+
+}
+
+<style>
+    .Text160Left {
+        text-align: left;
+        min-width: 160Px;
+    }
+
+    .Text140Left {
+        text-align: left;
+        min-width: 140Px;
+    }
+
+    .Text40Center {
+        text-align: center;
+        min-width: 40Px;
+    }
+
+    .MyClass td {
+        padding: 10px 20px 0 0;
+    }
+</style>
+
+
+@if (null != Model)
+{
+
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    if (null != Model.LstDaySheetViewModel)
+    {
+
+        int nsno = 1;
+
+        if (!Model.IsCentral)
+        {
+            <div>
+
+                <table class="table table-striped table-bordered table-hover">
+                    <tbody>
+                        <tr>
+                            <td>
+                                Opening cash balance
+                            </td>
+                            <td style="text-align:right">
+                                @Model.OpeningCashbalance
+                            </td>
+                            <td>
+                                Opening cheque balance
+                            </td>
+                            <td style="text-align:right">
+                                @Model.OpeningChequebalance
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="table-header">
+
+            Records Found (@Model.LstDaySheetViewModel.Count())
+            <div style="float:right;">
+                <div class="inline dropdown-hover">
+
+                    <button style="margin-left:2em" class="btn btn-info btn-minier P2" id="btnExport">
+                        <i class="ace-icon fa fa-share bigger-160"></i>
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+
+        @*// print button can  be placed*@
+
+        <div id="dialogAdmission" title="DaySheetRemarks" style="display:none">
+            <div class="widget">
+                <div class="widget-Header">
+                    <div class="col-sm-12" style="display:none;" id="ValidationT">
+                        <label style="color:red;font-weight:bold;">Remarks already existed for selected date</label>
+                    </div>
+                </div>
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label class="col-xs-5 control-label no-padding-right" for="form-field-1">@Html.Label("Remarks")</label>
+                            <div class="col-xs-6">
+                                @*@Html.TextBoxFor(model => model.AdmissionNumber, new { @class = "form-control TextBox ", @style = "width:210px;", @maxlength = "10" })*@
+                                <input class="form-control" type="text" placeholder="Remarks" id="RemarksId" name="Remarks" />
+                                <div class="col-sm-12" style="display:none;" id="Validationfortestbox">
+                                    <label style="color:red;font-weight:bold;"> Please Enter Remarks </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        if (Model.LstDaySheetViewModel.Count() > 0)
+        {
+            <table id="tbDaysheetView" class="table tbhover table-striped table-bordered dynamic-table">
+
+                <thead>
+                    <tr>
+                        <th>
+                            S.No.
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Academic Year")
+                        </th>
+
+                        @if (@Model.IsCentral)
+                        {
+                            <th>
+                                @Html.DisplayName("Division Name")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Branch Name")
+                            </th>
+
+                        }
+
+                        <th>
+                            @Html.DisplayName("Payment Date")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Time")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Student Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Admission No")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Legacy Number")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Roll Number")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Class")
+                        </th>
+
+                        <th style="min-width:112Px">
+                            @Html.DisplayName("Section")
+                        </th>
+
+                        <th class="Text160Left">
+                            @Html.DisplayName("Fee Account Type")
+                        </th>
+                        <th style="min-width:160Px">
+                            @Html.DisplayName("ERP Receipt No")
+                        </th>
+                        <th style="min-width:106Px">
+                            @Html.DisplayName("Template No")
+                        </th>
+                        <th style="min-width:160Px">
+                            @Html.DisplayName("Manual Receipt No")
+                        </th>
+
+                        @if (Model.Individual == true)
+                        {
+                            <th style="min-width:188Px">
+                                @Html.DisplayName("Particular Name")
+                            </th>
+                        }
+
+                        <th style="min-width:120Px">
+                            @Html.DisplayName("Debit Amount")
+                        </th>
+                        <th style="min-width:125Px;">
+                            @Html.DisplayName("Payment Mode")
+                        </th>
+                        <th class="Text160Left">
+                            @Html.DisplayName("Transaction Details")
+                        </th>
+                        <th class="Text160Left">
+                            @Html.DisplayName("Receipt Status")
+                        </th>
+                        <th class="Text160Left">
+                            @Html.DisplayName("QRCode Status")
+                        </th>
+                        <th class="Text160Left">
+                            @Html.DisplayName("IsMobile")
+                        </th>
+
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model.LstDaySheetViewModel)
+                    {
+                        <tr style=@item.Color>
+                            <td>
+                                @(nsno++)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AcademicYear)
+                            </td>
+
+                            @if (Model.IsCentral)
+                            {
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DivisionName)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BranchName)
+                                </td>
+                            }
+                            <td>
+                                @item.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <td style="min-width:120Px">
+                                @Html.DisplayFor(modelItem => item.TransactionDateDisplay)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AdmissionNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LegacyNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RollNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ClassName)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SectionName)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Category)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ReceiptNumber)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DisplayTemplateNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ManualReceiptNumber)
+                            </td>
+
+                            @if (Model.Individual == true)
+                            {
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Particulars)
+                                </td>
+                            }
+
+                            <td style="text-align:right;padding:-30Px">
+                                @Html.DisplayFor(modelItem => item.Receipts)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PaymentType)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TransactionDetails)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.QRCodeStatus)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.IsMobile)
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+        }
+        else
+        {
+            <div class="space-3"></div>
+            <span style="color:red;font-weight:bold;"> Transactions are not done yet</span>
+        }
+
+        if (!Model.IsCentral)
+        {
+            <br />
+            <div>
+                <table class="table table-striped table-bordered table-hover">
+                    <tbody>
+                        <tr>
+                            <td>
+                                Todays' Expenses
+                            </td>
+                            <td style="text-align:right">
+                                @Model.TodayExpenses
+                            </td>
+                            <td>
+                            </td>
+                            <td style="text-align:right">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Todays' Cash Collection
+                            </td>
+                            <td style="text-align:right">
+                                @Model.TotalCashAmount
+                            </td>
+                            <td>
+                                Todays' Cheque Collection
+                            </td>
+                            <td style="text-align:right">
+                                @Model.TotalChequeAmount
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Cancelled receipts(Cash)
+                            </td>
+
+                            <td style="text-align:right">
+                                @Model.CancelledCashAmount
+                            </td>
+                            <td>
+                                Cancelled receipts(Cheque)
+
+                            <td style="text-align:right">
+                                @Model.CancelledChequeAmount
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Cash Grand Total
+                            </td>
+
+                            <td style="text-align:right">
+                                @Model.TotalNetAmount
+                            </td>
+                            <td>
+                                Cheques Grand Total
+                            </td>
+                            <td style="text-align:right">
+                                @Model.TotalNetChequeAmount
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                Swipe Card Collection
+                            </td>
+
+                            <td style="text-align:right">
+                                @Model.SwipeAmount
+                            </td>
+
+                            <td>
+                                Cancelled receipts(Swipe)
+                            </td>
+
+                            <td style="text-align:right">
+                                @Model.CancelledSwipeAmount
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Online Collection
+                            </td>
+
+                            <td style="text-align:right">
+                                @Model.OnlineAmount
+                            </td>
+
+                            <td>
+                                Cancelled receipts(Online)
+                            </td>
+
+                            <td style="text-align:right">
+                                @Model.CancelledOnlineAmount
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Grand Total Today's  Collection
+                            </td>
+
+                            <td style="text-align:right">
+                                @Model.GrandCollectionAmount
+                            </td>
+
+                            <td></td>
+
+                            <td style="text-align:right"></td>
+
+                        </tr>
+
+                        @if ((@Model.BankDepositCashAmount > 0 || @Model.BankDepositChequeAmount > 0))
+                        {
+                            <tr>
+                                <td>
+                                    Cash Deposited In Bank
+                                </td>
+
+                                <td style="text-align:right">
+                                    @Model.BankDepositCashAmount
+                                </td>
+
+                                <td>
+                                    Cheque Deposited In Bank
+                                </td>
+
+                                <td style="text-align:right">
+                                    @Model.BankDepositChequeAmount
+                                </td>
+
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Closing Cash Balance
+                                </td>
+
+                                <td style="text-align:right">
+                                    @Model.ClosinCashbalance
+                                </td>
+
+                                <td>
+                                    Closing Cheque Balance
+                                </td>
+
+                                <td style="text-align:right">
+                                    @Model.ClosingChequebalance
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+            </div>
+
+        }
+        else
+        {
+            <br />
+
+            <div class="well">
+                <h5 class="blue">Total Credit Amount : @Model.LstDaySheetViewModel.Sum(t => t.Receipts)</h5>
+            </div>
+
+        }
+    }
+
+}
+else
+{
+    <span style="color:red;font-weight:bold;"> Data not available to display</span>
+}
+<div class="widget">
+    <div class="widget-Header">
+        @if (Model.IsCentral == false && (Model.UserName.ToUpper() == "PR" || Model.UserName.ToUpper() == "BH" || Model.UserName.ToUpper() == "SA") && Model.IsExisted == false)
+        {
+            <div style="float:right;">
+                <div class="inline dropdown-hover">
+                    <input type="button" id="btnRemarksId" class="btn btn-info btn-minier" onclick="return OpenAdmCofirmDialog()" value="Checke & Approve" />
+                </div>
+            </div>
+            <input type="hidden" id="SubscriptionId" name="SubscriptionId" value="@Model.SubscriptionId" />
+            <input type="hidden" id="UserName" name="UserName" value="@Model.UserName" />
+        }
+    </div>
+
+</div>
+
+<input type="hidden" id="datetime" value="@DateTime.Today" />
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+    $('#btnExport').click(function () {
+        window.location.href = "/FOperations/ExcelDT"
+    });
+</script>
+

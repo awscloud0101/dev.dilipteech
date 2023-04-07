@@ -1,0 +1,382 @@
+﻿
+@{
+    ViewBag.Title = "CC Report";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            DCCR
+        </li>
+        <li class="active">CC Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+<section class="content">
+    <div class="table-header">
+        <span style="font-family:calibri;">CC Report</span>
+        <div class="" style="float:right;margin-right:10px;">
+            <a class="btncustom P2" id="btnViewData">View Data</a>
+    </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color:red;font-weight:bold" id="Validation"></span>
+            <div class="widget-box">
+
+
+                <div class="widget-body">
+
+                    <div class="widget-main">
+
+                        <div class="row">
+                            <div class="row">
+
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboDivision" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboBranch" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                         
+                            <div class="row">
+
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6" id="divMonth">
+                                        <div class="col-sm-4">
+                                            <label for="form-field-1">Select Month</label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <select id="CboMonth" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6" id="divDate" style="display:none;padding-bottom:3px;">
+                                        <div class="col-xs-4">
+                                            <label for="form-field-1">Select Date</label>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" value="@ViewBag.TransactionDate.ToShortDateString()" place placeholder="Select Date" required="required" title="Please select the date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-4">
+                                            <input type="radio" id="rbMonth" value="1" name="Type" checked="checked" />
+                                            <b>Month</b>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <input type="radio" id="rbDay" value="2" name="Type" />
+                                            <b>Day</b>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                          
+                            <div class="row" style="padding-top:1px;">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Head</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboGroupedParticular" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="dvSearchData">
+
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    window.onload = LoadData();
+
+    function LoadData() {
+        LoadDivisionCombo();
+        LoadGroupedParticularCombo();
+        LoadMonthCombo();
+    }
+
+    function LoadGroupedParticularCombo() {
+
+        $.ajax({
+            url: '/DCCR/GetGroupedParituclars',
+            success: function (data) {
+                var HeadItems = $('#CboGroupedParticular');
+
+                HeadItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    HeadItems.append($("<option>").val(record.GroupedParticularId).text(record.ParticularName));
+                });
+
+                $('#CboGroupedParticular').append(HeadItems);
+            },
+            aync: false
+        });
+
+    }
+
+    function LoadDivisionCombo() {
+
+        $.ajax({
+            url: '/Common/GetDivisions',
+            success: function (data) {
+                var DivisionItems = $('#CboDivision');
+
+                DivisionItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    DivisionItems.append($("<option>").val(record.DivisionId).text(record.DivisionName));
+                });
+
+                $('#CboDivision').append(DivisionItems);
+            },
+            aync: false
+        });
+
+    }
+
+
+    function LoadMonthCombo() {
+
+        $.ajax({
+            url: '/DCCR/GetMonths',
+            success: function (data) {
+                var Monthitems = $('#CboMonth');
+
+                Monthitems.children().remove();
+
+                $.each(data, function (i, record) {
+                    Monthitems.append($("<option>").val(record.MonthId).text(record.MonthCode));
+                });
+
+                $('#CboMonth').append(Monthitems);
+            },
+            aync: false
+        });
+
+    }
+
+
+
+    $('#CboDivision').change(function () {
+        document.getElementById("Validation").innerHTML = ""
+
+        var DivisionId = $('#CboDivision').val();
+        $('#dvSearchData').html("");
+        $('#CboBranch').html("");
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+
+                    BranchItems.children().remove();
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    });
+
+
+    $("#CboBranch").change(function () {
+        document.getElementById("Validation").innerHTML = ""
+        $('#dvSearchData').html("");
+    });
+
+    $("#CboGroupedParticular").change(function () {
+
+        document.getElementById("Validation").innerHTML = ""
+        $('#dvSearchData').html("");
+    });
+
+    $("#CboMonth").change(function () {
+
+        document.getElementById("Validation").innerHTML = ""
+        $('#dvSearchData').html("");
+    });
+
+    $('#btnViewData').click(function () {
+
+        debugger;
+
+        $('#dvSearchData').html('');
+
+        var DivisionId = $('#CboDivision').val();
+        var SubscriptionId = $('#CboBranch').val();
+        var MonthOrDateValue = $('#CboMonth').val();
+        var particulars = $('#CboGroupedParticular').val();
+
+        if ($('#rbDay').is(':checked')) {
+            MonthOrDateValue = $('#Date').val();
+        }
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (DivisionId == "null" || DivisionId < 0) {
+            Message += "Division";
+            isValid = false;
+        }
+
+        if (SubscriptionId == "null" || SubscriptionId < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Branch";
+            isValid = false;
+        }
+
+        if ($('#rbMonth').is(':checked')) {
+            if (MonthOrDateValue == "null" || MonthOrDateValue < 1) {
+
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Month";
+                isValid = false;
+            }
+        }
+        else if ($('#rbDay').is(':checked')) {
+
+            if (MonthOrDateValue == "null" || MonthOrDateValue == "") {
+
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Date";
+                isValid = false;
+            }
+
+        }
+
+        if (particulars == "") {
+
+            if (!isValid)
+                Message += ",";
+
+            Message += " Particular";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        $('#imagemodal').show();
+
+        $.ajax
+            ({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#imagemodal').hide();
+                },
+
+                url: '/DCCR/GetCCReportData/',
+                data: { DivisionId: DivisionId, strBranch: SubscriptionId, MonthOrDate: MonthOrDateValue, strGroupedParticulars: particulars },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#dvSearchData').html(data);
+                }
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+
+
+    });
+
+    $("#Date").focus(function () {
+        document.getElementById("Error").innerHTML = ""
+    })
+
+
+    $('#rbMonth').change(function () {
+        SetPicker(false);
+    });
+
+    $('#rbDay').change(function () {
+        SetPicker(true);
+    });
+
+
+    function SetPicker(IsDate) {
+
+        $('#dvSearchData').html('');
+
+        if (IsDate == true) {
+            $('#divMonth').hide();
+            $('#divDate').show();
+        }
+        else {
+            $('#divMonth').show();
+            $('#divDate').hide();
+
+        }
+    }
+
+
+    //$('#CboBranch').select2().select2('val', rr)
+    //var rr1 = [];
+    //var array1 = data.Subjects.split(',');
+    //for (var j = 0; j < array1.length; j++) {
+    //    rr1.push(array1[j]);
+
+    //}
+
+</script>

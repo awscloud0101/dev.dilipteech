@@ -1,0 +1,184 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    ViewBag.Title = "Create Exam Schedules";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Assignment Upload</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<section class="content">
+    <div class="row">
+        @*<div class=col-xs-12>
+                <h3>@Html.ActionLink("<< Exam Schedule Details", "ExamSchedules", new { ClassNumber = Model.ClassNumber, TermNumber = Model.TermNumber, SubscriptionId = Model.SubscriptionId }) </h3>
+            </div>*@
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <span style="color:red;" id="Validation"></span>
+            <div class="box">
+                @using (Html.BeginForm("AssignmentUploadC", "AExamination", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+                {
+
+                    @Html.HiddenFor(model => model.ClassNumber)
+                    @Html.HiddenFor(model => model.SubjectId)
+                    @Html.HiddenFor(model => model.ExaminationPapersId)
+                    @Html.HiddenFor(model => model.SubscriptionId)
+
+                    <input type="hidden" id="SelSubId" value="@Model.SubscriptionId" />
+                    <input type="hidden" id="SelClass" value="@Model.ClassNumber" />
+                    <input type="hidden" id="SelSubjectId" value="@Model.SubjectId" />
+                    <input type="hidden" id="SelContentindexId" value="@Model.ExaminationPapersId" />
+
+                    <div class="page-header">
+
+                        <h1>
+                            Assignment Upload
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "AssignmentUpload", new { ClassNumber = @Model.ClassNumber, SubjectId = @Model.SubjectId, BranchId = @Model.BatchId })
+                            </small>
+                        </h1>
+                    </div>
+                    @*<div class="box-header">
+                <h3 class="box-title">Examination Schedules</h3>
+                <br />
+                <br />
+                <button class="btn btn-primary " style="width:80px" type="submit" onclick="return submitForm();">
+                    Create
+                </button>
+            </div>*@<!-- /.box-header -->
+                    <!-- form start -->
+
+                    <div class="box-body">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Assignment Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.ExamName, new { @class = "form-control textlength", placeholder = "Assignment Name", @id = "ExamName" })
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESExamName">
+                            </span>
+                        </div>
+
+                        @*<div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Video Link")</label>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(model => model.ExamCode, new { @class = "form-control textlength", placeholder = "Video Link", @id = "ExamCode" })
+                    </div>
+
+                    <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESExamCode">
+                    </span>
+                </div>*@
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Upload Documents</label>
+                            <div class="col-sm-3">
+                                <input type="file" name="FileUpload" id="FileUpload" />
+
+                                @*<input type="submit" name="Submit" id="Submit" value="Upload" />*@
+                            </div>
+                        </div>
+
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                        <br />
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    function submitForm() {
+        var validatestatus = validateES();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function validateES() {
+
+        var validate = true;
+
+        var ExamName = document.getElementById("ExamName").value;
+
+        if (ExamName == "") {
+            document.getElementById("ESExamName").innerHTML = "Please enter Assigment Name";
+            validate = false;
+        }
+
+        return validate;
+    };
+
+    //function IsExaminationExisted() {
+    //    var Status = true;
+
+    //    $.ajax({
+
+    //        url: '/AExamination/IsSubjectContentExisted',
+    //        data: { type: "New", id: 0, ExamCode: $('#ExamCode').val(), SubId: $('#SelSubId').val(), ClassNumber: $('#SelClass').val(), SubjectId: $('#SelSubjectId').val() },
+    //        success: function (Data) {
+
+    //            if (Data != "") {
+    //                Status = false;
+    //                document.getElementById("Validation").innerHTML = Data;
+    //            }
+    //        },
+    //        async: false
+    //    });
+
+    //    return Status;
+    //}
+
+    $('#ExamName').focus(function () {
+        document.getElementById("ESExamName").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+</script>
+

@@ -1,0 +1,69 @@
+﻿@model List<AsteriskBrowserAL.Models.ConcessionSettingData>
+@{
+    ViewBag.Title = "Concession Settings";
+    int sno = 1;
+}
+
+@if (Model != null && Model.Count() > 0)
+{
+    
+ 
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    <div class="table-header">
+        Records Found (@Model.Count)
+    </div>
+    <table id="mytab1" class="table tbhover table-striped table-bordered dynamic-table">
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Branch")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Regular")
+                </th>
+                <th>
+                    @Html.DisplayName("Special")
+                </th>
+            </tr>
+        </thead>
+        @for (int i = 0; i < Model.Count(); i++)
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        @(sno++)
+                    </td>
+                    <td>
+                        @Model.ElementAt(i).Branch
+                    </td>
+                    <td>
+                        @Html.Hidden("ConcessionSttingList.Index", (@i + 10))
+                        @Html.Hidden("ConcessionSttingList[" + (@i + 10) + "].BranchAllPrefixId", Model.ElementAt(i).BranchAllPrefixId)
+                        @Html.TextBox("ConcessionSttingList[" + (@i + 10) + "].ConcessionAllow", Model.ElementAt(i).ConcessionAllow, new { @class = "form-control textlength txtboxNum", @readonly = "readonly", @style = "width:120px", id = "regulardays", value = "Readonly field" })
+                        @Html.Hidden("ConcessionSttingList[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                        @Html.Hidden("ConcessionSttingList[" + (@i + 10) + "].StartDate", Model.ElementAt(i).StartDate)
+                        @Html.Hidden("ConcessionSttingList[" + (@i + 10) + "].GeneralId", Model.ElementAt(i).GeneralId)
+
+                    </td>
+                    <td id="special">
+
+                        @Html.TextBox("ConcessionSttingList[" + (@i + 10) + "].SpecialConcession", Model.ElementAt(i).SpecialConcession, new { id = @Model.ElementAt(i).SubscriptionId, @class = "form-control textlength txtboxNum", name = "special", @style = "width:120px", @Maxlength = "3" })
+
+                    </td>
+                </tr>
+            </tbody>
+        }
+
+    </table>
+}
+@Html.Action("DataTableScripts", "Base")
+<script type="text/javascript">
+    document.getElementById("regulardays").readOnly = true;
+
+
+</script>

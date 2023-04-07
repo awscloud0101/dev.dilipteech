@@ -1,0 +1,110 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StaffData>
+
+@{
+    List<AsteriskBrowserAL.Subjects> Colours = new List<AsteriskBrowserAL.Subjects>();
+    Colours.Add(new Subjects { SubjectId = 0, SubjectName = "label-orange" });
+    Colours.Add(new Subjects { SubjectId = 1, SubjectName = "label-blue" });
+    Colours.Add(new Subjects { SubjectId = 2, SubjectName = "label-PaleVioletRed" });
+    Colours.Add(new Subjects { SubjectId = 3, SubjectName = "label-LightSeaGreen" });
+    Colours.Add(new Subjects { SubjectId = 4, SubjectName = "label-success" });
+    Colours.Add(new Subjects { SubjectId = 5, SubjectName = "label-Salmon" });
+    Colours.Add(new Subjects { SubjectId = 6, SubjectName = "label-purple" });
+    Colours.Add(new Subjects { SubjectId = 7, SubjectName = "label-info" });
+
+
+
+    //List<AsteriskBrowserAL.Subjects> Colours = new List<AsteriskBrowserAL.Subjects>();
+    //Colours.Add(new Subjects { SubjectId = 0, SubjectName = "label-danger " });
+    //Colours.Add(new Subjects { SubjectId = 1, SubjectName = "label-grey " });
+    //Colours.Add(new Subjects { SubjectId = 2, SubjectName = "label-purple " });
+    //Colours.Add(new Subjects { SubjectId = 3, SubjectName = "label-pink " });
+    //Colours.Add(new Subjects { SubjectId = 4, SubjectName = "elabel-info " });
+
+}
+
+@{
+    int Count = Colours.Count();
+    int i = 0;
+    string Id = "";
+}
+
+<style>
+    .div {
+        cursor: pointer;
+    }
+</style>
+@if (null != Model && Model.Count() > 0)
+{
+    
+    <input type="hidden" id="DayOfWeek" name="DayOfWeek" value="@Model.FirstOrDefault().DayOfWeek" />
+    <input type="hidden" id="ClassTimingId" name="ClassTimingId" value="@Model.FirstOrDefault().ClassTimingId" />
+    <input type="hidden" id="SubjectId" name="SubjectId" value="@Model.FirstOrDefault().SubjectId" />
+    <input type="hidden" id="weekdate" name="weekdate" value="@Model.FirstOrDefault().weekdate" />
+    <input type="hidden" id="SectionId" name="SectionId" value="@Model.FirstOrDefault().batchId" />
+
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <label class="col-xs-5">@Html.Label("Liesure Staff")</label>
+            <div class="col-xs-5">
+                @Html.DropDownList("StaffId", new SelectList(Model, "StaffId", "FirstName"), "---Select---", new { @class = "form-control textlength", id = "StaffId" })
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <span style="font-weight:bold;color:red">No staff is available for this period</span>
+}
+
+
+
+<input type="hidden" id="Count" value="1" />
+
+
+<script>
+    //function AssignSubstituteStaff(MySpan) {
+    //    debugger
+    //    var Clone = Source.cloneNode(true)
+    //    Clone.addClass("StaffAssigned")
+    //    var SelectedStaffandSubject = $("#SelectedStaffandSubject").val();
+
+    //    var Id = source.getAttribute("id")
+    //    var Name = source.getAttribute("name")
+
+    //    $("#" + SelectedStaffandSubject).append(Clone)
+
+
+    //    Count = parseInt(Count) + 1
+    //    document.getElementById("Count").value = Count
+
+    //}
+    function SaveSubstituteTutor() {
+        debugger
+        var SelStaffId = $('#StaffId').val();
+        var SelDayOfWeek = $('#DayOfWeek').val();
+        var SelClassTimingId = $('#ClassTimingId').val();
+        var SelSubjectId = $('#SubjectId').val();
+        var Selweekdate = $('#weekdate').val();
+        var SelSectionId = $('#SectionId').val();
+        
+        if (SelStaffId > 0 && SelDayOfWeek != null && SelClassTimingId > 0 && SelSubjectId > 0) {
+
+            $.ajax({
+
+                url: '/ATimetable/SaveSubstituteTutorData',
+                data: { StaffId: SelStaffId, DayOfWeek: SelDayOfWeek, ClassTimingId: SelClassTimingId, SubjectId: SelSubjectId, weekdate: Selweekdate, SectionId: SelSectionId },
+                success: function (result) {
+                    $("#imagemodal").hide();
+                    document.getElementById("SaveVal").innerHTML = result;
+                    GetTimeTableTodayData();
+                },
+
+            })
+        }
+
+    }
+
+</script>

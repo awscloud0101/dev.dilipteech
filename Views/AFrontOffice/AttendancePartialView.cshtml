@@ -1,0 +1,482 @@
+﻿@model AsteriskBrowserAL.Models.AttendanceData
+@{
+    int Sno = 1;
+}
+<section>
+
+
+    @if ((null != Model))
+    {
+        if (null != Model.AtttendanceList)
+        {
+            if (Model.AtttendanceList.Count() > 0)
+            {
+
+
+                <span id="Validation" style="color:red;font-weight:bold"></span>
+                <div class="hr hr-18 dotted hr-double"></div>
+
+                <div class="table-header">
+                    Records Found (@Model.AtttendanceList.Count)
+
+                    @if (Model.AttendanceDate == DateTime.Today)
+                    {
+                        <div style="float:right;">
+                            <button type="submit" class="btn btn-info btn-xs" name="button" id="Save" value="Save">
+                                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                            </button>
+                            @if (Model.AttendanceDate == DateTime.Today)
+                            {
+
+                                <div class="inline action-buttons">
+                                    <a id="A" name="View" class="btn btn-info btn-minier" value="A">A</a>
+                                    <a id="P" name="View" class="btn btn-info btn-minier" value="p">P</a>
+                                    <a id="L" name="View" class="btn btn-info btn-minier" value="LT">LT</a>
+                                </div>
+
+                            }
+                        </div>
+                    }
+
+                </div>
+
+                <input type="hidden" id="selbuttonVal" />
+
+                <div>
+                    <table id="AttendanceTable" class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @if (Model.AttendanceDate == DateTime.Today)
+                                    {
+                                        <input type="checkbox" id="Selectall" class="checkbox" />
+                                    }
+                                    else
+                                    {
+                                     @Html.DisplayName("SNo")
+                                    }
+
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Admission No")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Roll No")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Status")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Remarks")
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @for (int i = 0; i < Model.AtttendanceList.Count(); i++)
+                        {
+                                <tr>
+                                    <td>
+                                        @Html.Hidden("SelStudentId", Model.AtttendanceList.ElementAt(i).StudentId)
+                                        @Html.Hidden("SelStatus", Model.AtttendanceList.ElementAt(i).IsStatusExist)
+
+                                        @Html.Hidden("AtttendanceList.Index", (@i + 10))
+                                        @Html.Hidden("AtttendanceList[" + (@i + 10) + "].selectedDate", Model.AtttendanceList.ElementAt(i).AttendanceDate)
+                                        @Html.Hidden("AtttendanceList[" + (@i + 10) + "].StudentId", Model.AtttendanceList.ElementAt(i).StudentId)
+                                        @Html.Hidden("AtttendanceList[" + (@i + 10) + "].AbsentType", Model.AtttendanceList.ElementAt(i).AbsentType)
+
+                                        @if (Model.AttendanceDate == DateTime.Today)
+                                        {
+                                            @Html.CheckBox("AtttendanceList[" + (@i + 10) + "].IsChecked", Model.AtttendanceList.ElementAt(i).IsChecked, new { @id = "Check", @name = "Check", @class = "checkbox",@onchange= "Chboxcheck()", @value = Model.AtttendanceList.ElementAt(i).StudentId })
+                                        }
+                                        else
+                                        {
+                                            @Sno
+                                        }
+
+                                        @Html.Hidden("AtttendanceList[" + (@i + 10) + "].IsChecked", Model.AtttendanceList.ElementAt(i).StudentId)
+                                        @*@Html.Hidden("AtttendanceList[" + (@i + 10) + "].Remarks", Model.AtttendanceList.ElementAt(i).Remarks)*@
+                                    </td>
+
+                                    <td>
+                                        @Model.AtttendanceList.ElementAt(i).StudentName
+                                    </td>
+
+                                    <td>
+                                        @Model.AtttendanceList.ElementAt(i).AdmissionNo
+                                        @Html.Hidden("AtttendanceList[" + (@i + 10) + "].AdmissionNo", Model.AtttendanceList.ElementAt(i).AdmissionNo)
+                                    </td>
+
+                                    <td>
+                                        @Model.AtttendanceList.ElementAt(i).RollNumber
+                                    </td>
+
+                                    <td>
+                                        @if (Model.AtttendanceList.ElementAt(i).AbsentType == 0)
+                                        {
+                                            <b class="text-green">P </b>
+                                        }
+                                        @if (Model.AtttendanceList.ElementAt(i).AbsentType == 1)
+                                        {
+                                            <b class="text-orange">A </b>
+                                        }
+                                        @if (Model.AtttendanceList.ElementAt(i).AbsentType == 3)
+                                        {
+                                            <b class="text-blue"> LT </b>
+                                        }
+                                    </td>
+                                    <td>
+
+                                        @if (Model.AttendanceDate == DateTime.Today && Model.AtttendanceList.ElementAt(i).IsStatusExist == true)
+                                        {
+                                            @Html.TextBox("AtttendanceList[" + (@i + 10) + "].Remarks", Model.AtttendanceList.ElementAt(i).Remarks, new { @id = "Remarks", @name = "Remarks" })
+                                        }
+                                        else
+                                        {
+                                            @Model.AtttendanceList.ElementAt(i).Remarks
+                                        }
+                                        <input type="hidden" id="ClassId" name="ClassNumber" />
+                                        <input type="hidden" id="SectionId" name="SectionId" />
+                                    </td>
+                                </tr>
+                                Sno++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <span style="color: red;"><b>Data not available</b></span>
+            }
+        }
+
+
+    }
+</section>
+@*<div id="dialogRemarks" title="Remarks" style="display:none"> <p>Remarks<input type="text" name="Remarks" id="remarks" class="form-control" /></p> </div>*@
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+	function Chboxcheck() {
+
+		document.getElementById("Validation").innerHTML = "";
+	}
+    function CheckRemarks(result) {
+
+        var val = true;
+
+        $.each(result, function (i, result) {
+
+            $("#AttendanceTable tr").each(function (index) {
+                if (index != 0) {
+
+                    var SelStatus = $(this).find("#SelStatus").val();
+
+                    if (SelStatus == "True") {
+
+                        var StudentId = $(this).find("#SelStudentId").val();
+
+                        if (StudentId == result.value) {
+
+                            var SelRemarks = $(this).find("#Remarks").val();
+
+                            if (SelRemarks == "") {
+
+                                document.getElementById("Validation").innerHTML = "Enter remarks for selected student(s)";
+                                val = false;
+                                return false;
+                            }
+                        }
+                    }
+                }
+            });
+
+            if (val == false) {
+                return false;
+            }
+
+        })
+
+        return val;
+    }
+
+
+
+	$("#A").click(function () {
+		debugger
+
+		var Ids = " ";
+		var result = $('#Check:checked');
+
+		var val = CheckRemarks(result);
+
+		if (val == false)
+			return;
+
+		$.each(result, function (i, result) {
+			Ids += result.value + ":A" + ",";
+
+		});
+		if (Ids != "" && Ids != " ") {
+			UpdateStatus("A")
+		}
+		else {
+			document.getElementById("Validation").innerHTML = "Please select students";
+			return;
+		}
+	});
+
+	$("#L").click(function () {
+		debugger
+		var Ids = " ";
+		var result = $('#Check:checked');
+
+		var val = CheckRemarks(result);
+
+		if (val == false)
+			return;
+
+		$.each(result, function (i, result) {
+			Ids += result.value + ":L" + ",";
+		});
+		if (Ids != "" && Ids != " ") {
+			UpdateStatus("L")
+		}
+		else {
+			document.getElementById("Validation").innerHTML = "Please select students";
+			return;
+		}
+	})
+
+	$("#P").click(function () {
+		debugger
+		var Ids = " ";
+		var result = $('#Check:checked');
+
+		//var val = CheckRemarks(result);
+
+		//if (val == false)
+		//    return;
+
+		$.each(result, function (i, result) {
+			Ids += result.value + ":P" + ",";
+		});
+		if (Ids != "" && Ids != " ") {
+			UpdateStatus("P")
+		}
+		else {
+			document.getElementById("Validation").innerHTML = "Please select students";
+			return;
+		}
+	});
+
+    $('#Remarks').focus(function () {
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    function UpdateStatus(Type) {
+
+        $("#selbuttonVal").val(Type)
+
+        var dateval = $("#SelectDate").val();
+        var SectionId = $("#SectionId").val();
+        var ClassId = $("#ClassId").val();
+        var PreviousStrings = $("#SelStudent").val();
+        var strArray = new Array();
+        var stringStudents = new Array();
+        var ButtonVal = $("#selbuttonVal").val();
+
+        if (PreviousStrings != "") {
+            strArray = PreviousStrings.split(',')
+        }
+
+        var Ids = " ";
+        var arryRemov = new Array();
+
+        var result = $('#Check:checked');
+
+        $.each(result, function (i, result) {
+
+            var Remarks = "";
+
+            $("#AttendanceTable tr").each(function (index) {
+
+                if (index != 0) {
+
+                    var SelStatus = $(this).find("#SelStatus").val();
+
+                    if (SelStatus == "True") {
+
+                        var StudentId = $(this).find("#SelStudentId").val();
+
+                        if (StudentId == result.value) {
+                            var SelRemarks = $(this).find("#Remarks").val();
+
+                            if (SelRemarks != "undefined") {
+                                Remarks = SelRemarks;
+                            }
+                        }
+                    }
+                }
+
+            });
+
+            Ids += result.value + ":" + ButtonVal + ":" + Remarks + ",";
+            if (strArray.length > 0) {
+                $.each(strArray, function (i, e) {
+                    var strResult = e
+                    var strCheckStr = result.value + ":";
+                    if (strResult.includes(strCheckStr) == true) {
+                        arryRemov.push(e)
+                    }
+                });
+            }
+
+
+        });
+
+        if (arryRemov.length > 0) {
+            $.each(arryRemov, function (i, c) {
+                var index = strArray.indexOf(c);
+                strArray.splice(index, 1);
+
+            });
+        }
+        var finalpreviousstr = ""
+        if (strArray.length > 0) {
+            $.each(strArray, function (i, c) {
+                finalpreviousstr += c + ",";
+            });
+        }
+        document.getElementById("SelStudent").value = finalpreviousstr + Ids
+
+        var IsFreeze = $('#IsFreeze').val();
+
+        if (IsFreeze == "value")
+            IsFreeze = true;
+        else
+            IsFreeze = false;
+        debugger
+		var SelStudents = $("#SelStudent").val()		
+        var Attendance = $("#Attendance").val()
+        $.ajax({
+            url: "/AFrontOffice/UpdateStudentAttendance",
+            data: { strStudents: SelStudents, ClassId: ClassId, SectionId: SectionId, Date: dateval, IsFreeze: IsFreeze, Attendance: Attendance },
+            success: function (Data) {
+                $("#SearchViewDiv").html(Data);
+
+				document.getElementById("Validation").innerHTML = "";
+            },
+            async: false
+        })
+    }
+
+
+    //function DialogDisplay(Type) {
+    //    $("#selbuttonVal").val(Type)
+    //    document.getElementById("remarks").value = ""
+
+    //    var dateval = $("#SelectDate").val();
+    //    var SectionId = $("#SectionId").val();
+    //    $("#dialogRemarks").dialog({
+    //        autoOpen: false,
+    //        title: 'Remarks',
+    //        modal: true,
+    //        buttons: {
+    //            "Save": function () {
+    //                var Remarks = $("#remarks").val()
+    //                var PreviousStrings = $("#SelStudent").val()
+    //                var strArray = new Array();
+    //                var stringStudents = new Array();
+    //                var ButtonVal = $("#selbuttonVal").val()
+
+    //                if (PreviousStrings != "") {
+    //                    strArray = PreviousStrings.split(',')
+
+    //                }
+
+    //                var Ids = " ";
+    //                var arryRemov = new Array();
+
+    //                var result = $('#Check:checked');
+
+    //                $.each(result, function (i, result) {
+    //                    Ids += result.value + ":" + ButtonVal + ":" + Remarks + ",";
+    //                    if (strArray.length > 0) {
+    //                        $.each(strArray, function (i, e) {
+    //                            var strResult = e
+    //                            var strCheckStr = result.value + ":";
+    //                            if (strResult.includes(strCheckStr) == true) {
+    //                                arryRemov.push(e)
+    //                            }
+    //                        });
+    //                    }
+
+
+    //                });
+
+    //                if (arryRemov.length > 0) {
+    //                    $.each(arryRemov, function (i, c) {
+    //                        var index = strArray.indexOf(c);
+    //                        strArray.splice(index, 1);
+
+    //                    });
+    //                }
+    //                var finalpreviousstr = ""
+    //                if (strArray.length > 0) {
+    //                    $.each(strArray, function (i, c) {
+    //                        finalpreviousstr += c + ",";
+    //                    });
+    //                }
+    //                document.getElementById("SelStudent").value = finalpreviousstr + Ids
+
+    //                var SelStudents = $("#SelStudent").val()
+    //                $.ajax({
+    //                    url: "/AFrontOffice/UpdateStudentAttendance",
+    //                    data: { strStudents: SelStudents, SectionId: SectionId, Date: dateval, Remarks: Remarks },
+    //                    success: function (Data) {
+    //                        $("#SearchViewDiv").html(Data);
+    //                    }
+    //                })
+    //                $("#dialogRemarks").dialog('close');
+    //            },
+
+    //        }
+    //    });
+
+    //    $("#dialogRemarks").dialog('open');
+
+    //};
+
+
+
+
+
+
+
+
+</script>

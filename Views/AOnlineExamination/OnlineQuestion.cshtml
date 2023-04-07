@@ -1,0 +1,264 @@
+﻿@model AsteriskBrowserAL.Models.OnlineQuestionPaperModel
+@{
+    ViewBag.Title = "QuestionPaper";
+}
+@{
+    Layout = "";
+}
+<style>
+    p {
+        text-align: center;
+    }
+
+    .fraction, .top, .bottom {
+        padding: 0 5px;
+    }
+
+    .fraction {
+        display: inline-block;
+        text-align: center;
+    }
+
+    .bottom {
+        border-top: 1px solid #000;
+        display: block;
+    }
+
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="~/Content/images/campuswhizlogo.png">
+
+    <title>
+        CampusWhiz | GMS
+    </title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+    <!-- bootstrap & fontawesome -->
+    <link href="~/NewTemplateScript/assets/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+    @*<link rel="stylesheet" href="~/assets/font-awesome/4.2.0/css/font-awesome.min.css" />*@
+
+    <!-- page specific plugin styles -->
+    <!-- text fonts -->
+    <link href="~/NewTemplateScript/assets/fonts/fonts.googleapis.com.css" rel="stylesheet" />
+    @*<link rel="stylesheet" href="~/assets/fonts/fonts.googleapis.com.css" />*@
+
+    <!-- ace styles -->
+
+    <link rel="stylesheet" href="~/NewTemplateScript/assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+
+    <script src="~/NewTemplateScript/assets/js/ace-extra.min.js"></script>
+    <link href="~/NewTemplateScript/assets/css/checkbox.css" rel="stylesheet" />
+    @*<link href="~/assets/BTS Styles/AdminCustomStyles.css" rel="stylesheet" />*@
+</head>
+
+<body>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="widget-body">
+                <div class="widget-main">
+                    <form id="form" method="post" oncontextmenu="return false">
+                        <section class="content">
+                            <div class="row">
+                                <div class="col-xs-10 col-xs-offset-1">
+                                    @using (Html.BeginForm("OnlineQuestion", "AOnlineExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+                                    {
+                                        if (null != Model)
+                                        {
+                                            <input type="hidden" value="@Model.StudentId" id="StudentId" />
+                                            <input type="hidden" value="@Model.QuestionPaperId" id="PaperId" />
+                                            <input type="hidden" value="@Model.DurationInMins" id="DurationInMins" />
+                                            <input type="hidden" value="@Model.QuestionPatternId" id="PatternId" />
+                                            <input type="hidden" value="@Model.SubjectId" id="SubjectId" />
+                                        }
+
+                                        <div class="box">
+                                            <div class="box-widget">
+                                                @if (null != Model)
+                                                {
+
+                                                    <b>Note:</b><span>Please do not refresh the page </span><br />
+                                                    <p><b>@Model.PaperName</b></p>
+                                                }
+                                                <h1><span class="pull-right" id="timer"></span></h1>
+                                            </div>
+                                        </div>
+                                        <div id="Data" style="display:none">
+                                            <div class="widget-body">
+                                                <div id="SearchData" class="row">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <br />
+                                        <br />
+
+                                        @*<div style="display:none" id="DisplayPrev">
+                                                <button type="submit" onclick="GetQuestions()" class="btn btn-primary" name="id" id="id" >Prev</button>
+                                            </div>
+                                            <div style="display:none" id="DisplayNext">
+                                                <button type="submit" onclick="GetQuestions()" class="btn btn-primary" name="id" id="id" >Next</button>
+                                            </div>*@
+
+                                    }
+                                </div>
+
+                            </div>
+
+                        </section>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+
+    var selOption = 0;
+    var Subject = "";
+    var option = 0;
+
+    //selOption = localStorage.setItem('option');
+
+    $('.fraction').each(function (key, value) {
+        $this = $(this)
+        var split = $this.html().split("/")
+        if (split.length == 2) {
+            $this.html('<span class="top">' + split[0] + '</span><span class="bottom">' + split[1] + '</span>')
+        }
+    });
+
+    function disableclick(e) {
+        if (e.button == true) {
+            return false;
+        }
+    }
+
+    $(document).ready(function () {
+        debugger;
+        //document.getElementById('OnlineLogin').style.display = "none";
+        //document.getElementById('OnlineSearch').style.display = "none";
+
+        document.onmousedown = disableclick
+
+        //function disableBack() { window.history.forward() }
+        //disableBack();
+        //window.onpageshow = function (evt) { if (evt.persisted) disableBack() }
+
+
+
+        $('a[id="OnlineAsterisk"]').click(function () {
+            return false;
+        });
+
+        localStorage.setItem('i', 0);
+        localStorage.setItem('Subject', "");
+        localStorage.setItem('option', 0);
+        GetQuestions();
+
+        startCountdown();
+        //if (time == false) {
+        //    myFunction();
+        //}
+
+
+    });
+
+    function myFunction() {
+        var hidden = document.createElement("input");
+        hidden.name = "theName";
+        var f = document.getElementById("myForm");
+        f.appendChild(hidden);
+        f.submit();
+    }
+
+    function startCountdown() {
+
+        var count = $('#DurationInMins').val() * 60;
+
+        var counter = setInterval(timer, 1000); //1000 will  run it every 1 second
+
+        function timer() {
+            count = count - 1;
+
+            if (count == -1) {
+                document.getElementById("timer").innerHTML = "";
+                clearInterval(counter);
+                $('#form').submit();
+            }
+
+            var seconds = count % 60;
+            var minutes = Math.floor(count / 60);
+            var hours = Math.floor(minutes / 60);
+            minutes %= 60;
+            hours %= 60;
+
+            if (seconds < 10) {
+                seconds = "0" + seconds;
+            }
+
+            if (minutes < 10) {
+                minutes = "0" + minutes;
+            }
+
+            if (hours < 10) {
+                hours = "0" + hours;
+            }
+
+            document.getElementById("timer").innerHTML = hours + ":" + minutes + ":" + seconds;
+        }
+    }
+
+    //$('#id').click(function () {
+
+    //    alert('btn click');
+    //    GetQuestions();
+    //    return false;
+
+    //});
+
+    function GetQuestions() {
+        debugger;
+        if (null != localStorage.getItem('option')) {
+            selOption = localStorage.getItem('option');
+        }
+        var StudentId = $('#StudentId').val();
+        var PaperId = $('#PaperId').val();
+        var SNo = localStorage.getItem('i');
+        var Subject = $('#SubjectId').val();//localStorage.getItem('Subject');
+        var QuestionId = $('#QuestionId').val();
+        var DurationInMins = $('#DurationInMins').val();
+        var PatternId = $('#PatternId').val();
+        PatternId
+        $.ajax({
+            url: '/AOnlineExamination/OnlineQuestionPaperPartialView',
+            data: { StudentId: StudentId, PaperId: PaperId, QuestionId: QuestionId, nSubjectId: Subject, SNo: SNo, SelOption: selOption, DurationInMins: DurationInMins, PatternId: PatternId},
+            success: function (Data) {
+                document.getElementById("Data").style.display = "inline";
+                $('#SearchData').html(Data);
+            },
+            async: false
+        });
+    }
+
+
+</script>

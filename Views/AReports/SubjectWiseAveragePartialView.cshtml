@@ -1,0 +1,238 @@
+﻿@model List<AsteriskBrowserAL.Models.ExaminationResultsData>
+@{
+    ViewBag.Title = "Exam Results";
+}
+
+@*<script type="text/javascript" src="~/Scripts/canvasjs.js"></script>
+    <script src="~/Scripts/excanvas.js"></script>
+    <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+    <script src="~/Scripts/jquery.canvasjs.min.js"></script>
+    <script src="~/Scripts/jquery.canvasjs.js"></script>*@
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+@if (null != Model && Model.Count() > 0)
+{
+    @Html.ValidationSummary(true)
+
+    <div class="box">
+        <div class="box-header">
+            <h3 class="box-title">Examination Results</h3>
+        </div><!-- /.box-header -->
+        <div class="box-body table-responsive no-padding">
+            <div style="overflow:auto; height:150px;">
+                <table class="table table-hover table-striped table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("Subject")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Avg Marks")
+                            </th>
+                        </tr>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Subject
+                                </td>
+                                <td>
+                                    @item.AvgMarks
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+}
+else
+{<span style="color: red;"><b>Data not available</b></span> }
+
+
+<div id="columnchart_material" style="width: 700px; height: 100px;"></div>
+
+<style>
+    div.google-visualization-tooltip {
+        /*transform: rotate(30deg);*/
+        font-size: 8px;
+    }
+</style>
+
+@*<div id="chartContainer" style="height:400px; width:700px;">*@
+@*</div>*@
+
+<br />
+
+<script type="text/javascript">
+
+    google.load('visualization', '1.0', 
+       { packages: ['corechart', 'bar', 'table'], callback: drawChart });
+
+    function drawChart() {
+        var Results = @Html.Raw(Json.Encode(Model));
+
+        var data = new google.visualization.DataTable();
+
+        data.addColumn('string', 'Subject');
+        data.addColumn('number', 'Avg Score');
+
+        $.each(Results, function (i, record) {
+            data.addRow([record.Subject, parseInt(record.AvgMarks,10)]);
+        });
+
+        var options = {
+            chart: {
+                title: 'SubjectWise Average',
+                //subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+            },
+            tooltip: { isHtml: true },
+            bars: 'vertical',
+            height: 250,
+            vAxis: {format: 'decimal',
+                title:'Score'},
+            hAxis:{ slantedText: true,
+                slantedTextAngle: 45},
+          
+            colors: ['#26C9A9']
+            //colors: ['#1b9e77', '#d95f02', '#7570b3']
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, options);
+    }
+
+
+
+</script>
+
+
+
+
+
+@*<script>
+
+    $(document).ready(function () {
+
+        var Results = @Html.Raw(Json.Encode(Model));
+
+    var chart = new CanvasJS.Chart("chartContainer");
+
+    chart.options.axisY = { prefix: "", suffix: "" };
+    chart.options.title = { text: "Subject-Wise Average" };
+
+    var series1 = { //dataSeries - first quarter
+        type: "column",
+        name: "Student Marks",
+        //showInLegend: true,
+        color : "#f39c12"
+    };
+
+    chart.options.data = [];
+    chart.options.data.push(series1);
+
+    series1.dataPoints =[];
+
+    $.each(Results, function (i, record) {
+        series1.dataPoints.push({
+
+            label: record.Subject,
+            y: parseInt(record.AvgMarks, 10),
+            color: "#f39c12",
+
+        });
+    });
+
+   
+
+    chart.render();
+    });
+
+</script>*@
+
+
+@*<script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var Results = @Html.Raw(Json.Encode(Model));
+
+            var dps1 = [];
+            var dps2 = [];
+            var dps3 = [];
+
+            $.each(Results, function (i, record) {
+
+                dps1.push({
+                    label: record.Subject,
+                    y: parseInt(record.MarksScored, 10),
+                    color: "#f39c12" ,
+                });
+            });
+
+            $.each(Results, function (i, record) {
+
+                dps2.push({
+                    label: record.Subject,
+                    y: parseInt(record.TopperMarks, 10),
+                    color: "#00c0ef" ,
+                });
+            });
+
+            $.each(Results, function (i, record) {
+
+                dps3.push({
+                    label: record.Subject,
+                    y: parseInt(record.MaxMarks, 10),
+                    color: "#00a65a" ,
+                });
+            });
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                //title: {
+                //    text: "Ticket Status"
+                //},
+                colorSet: "greenShades",
+                axisY: {
+                    suffix: " "
+                },
+                legend: {
+                    verticalAlign: 'bottom',
+                    horizontalAlign: "center"
+                },
+                data: [
+                {
+                    type: "column",
+                    bevelEnabled: false,
+                    indexLabel: "{y}",
+                    dataPoints: dps1
+                },
+                  {
+                      type: "column",
+                      bevelEnabled: false,
+                      indexLabel: "{y}",
+                      dataPoints: dps2
+                  },
+                    {
+                        type: "column",
+                        bevelEnabled: false,
+                        indexLabel: "{y}",
+                        dataPoints: dps3
+                    }
+                ]
+            });
+
+            chart.render();
+        });
+    </script>*@
+
+
+
+

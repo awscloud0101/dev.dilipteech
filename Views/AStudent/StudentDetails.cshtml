@@ -1,0 +1,589 @@
+﻿@model AsteriskBrowserAL.Models.StudentModel
+
+@{
+
+    ViewBag.Title = "Student Profile";
+    
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Student Details</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ExcelDT", "AStudent", FormMethod.Post))
+            {
+                <div class="table-header">
+                    <span style="font-family:calibri;">Student Details</span>
+                </div>
+                <div class="widget-box" style="padding:10px;">
+                    @if (null != Model)
+                    {
+                        if (Model.IsCentral == true)
+                        {
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                    <div class="col-sm-6">
+                                        <select id="DivisionId" name="DivisionId" class="form-control" style="height:32px;"></select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                    <div class="col-sm-6">
+                                        <select id="BranchId" name="BranchId" class="form-control" style="height:32px;"></select>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                            <hr style="margin:5px;" />
+                        }
+                        else
+                        {
+                            <input type="hidden" id="DivisionId" />
+                            <input type="hidden" id="BranchId" />
+
+                        }
+                    }
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Academic Year</label>
+                            <div class="col-sm-6">
+                                <select id="CboAcademicYear" tabindex="0" name="AcademicYearId" class="form-control" style="height:32px;"></select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Select Class</label>
+                            <div class="col-sm-6">
+                                <select id="ClassId" name="ClassId" class="form-control" style="height:32px;"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Name</label>
+                            <div class="col-sm-6">
+                                <div class="input-group margin">
+                                    <input type="text" name="Student" id="Student"  placeholder="Search student" class="form-control" palceholder="Search" title="Search student with name" style="height:32px;">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-info btn-sm" onclick="GetStudentData()">Go</button>
+                                    </span>
+                                </div>
+                                @*<input type="text" name="Student" id="Student" placeholder="Search student" class="form-control" palceholder="Search" title="Search student with name" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-info btn-flat">Go!</button>
+                    </span>*@
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Admission Number</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="AdmissionNumber" id="AdmissionNumber" placeholder="Search" class="form-control" style="height:32px;" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Father Mobile No</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="FatherName" id="FatherName" placeholder="Search" class="form-control" style="height:32px;"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="SearchDivHead" style="display:none;">
+                    <div id="tabHead">
+                        <div class="table-header">
+
+                            Student Details
+                            <div style="float:right;margin-right:10px;">
+                                <button type="submit" name="Export to excel" class="btncustom P2">
+                                    Download
+                                </button>
+                            </div>
+                            <div class="col-xs-6 " style="float:right">
+                                <label class="col-sm-5 control-label no-padding-right" for="form-field-1"></label>
+                                <div class="col-xs-3">
+                                    <label><input type="radio" id="StatusA" name="Status" value="1" checked="checked" />Active</label>
+                                </div>
+                                <div class="col-xs-3">
+                                    <label><input type="radio" id="StatusI" name="Status" value="2" /> In-Active</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="overflow:auto;height:400px">
+                        <div id="SearchDiv">
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    @if (null != Model)
+    {
+        <input type="hidden" id="SelClassId" value="@Model.SelClassId" />
+        <input type="hidden" id="SelAdmissionNo" value="@Model.SelAdmissionNo" />
+        <input type="hidden" id="SelName" value="@Model.SelName" />
+        <input type="hidden" id="SelFatherName" value="@Model.SelFatherName" />
+        <input type="hidden" id="SelDivisionId" value="@Model.SelDivision" />
+        <input type="hidden" id="SelBranchId" value="@Model.SelBarnch" />
+        <input type="hidden" id="SelAcademicYearId" value="@Model.AcademicYearId" />
+
+    }
+    else
+    {
+        <input type="hidden" id="SelClassId" />
+        <input type="hidden" id="SelAdmissionNo" />
+        <input type="hidden" id="SelName" />
+        <input type="hidden" id="SelFatherName" />
+        <input type="hidden" id="SelDivisionId" />
+        <input type="hidden" id="SelBranchId" />
+        <input type="hidden" id="SelAcademicYearId" />
+    }
+
+    <input type="hidden" id="isCentral" name="isCentral" value="@Model.IsCentral.ToString()" />
+</section>
+
+<script>
+    //To Aviod excel to download on pressing ENTER Key 
+    // Disable enter key
+    $(document).keypress(
+        function (event) {
+            if (event.which == '13') {
+                event.preventDefault();
+            }
+        });
+</script>
+
+<script>
+
+    function OnloadData() {
+        var IsCentral = document.getElementById("isCentral").value
+
+        LoadAcademicYear();
+
+        if (IsCentral == "True") {
+            LoadDivisionDropdown();
+        }
+        else {
+            LoadClassDropdown()
+        }
+
+        var SelStudentval = $("#SelName").val();
+        var SelClassId = $("#SelClassId").val();
+        var SelBranchid = $("#SelBranchId").val();
+        var SelAdmissionNumber = $("#SelAdmissionNo").val();
+        var SelFatherName = $("#SelFatherName").val();
+
+        document.getElementById("Student").value = SelStudentval;
+        document.getElementById("AdmissionNumber").value = SelAdmissionNumber;
+
+        document.getElementById("BranchId").value = SelBranchid;
+        document.getElementById("FatherName").value = SelFatherName;
+
+        if ((SelStudentval == "" || SelStudentval == null || SelStudentval == "null") && (SelFatherName == "" || SelFatherName == null || SelFatherName == "null") && (SelAdmissionNumber == "" || SelAdmissionNumber == null || SelAdmissionNumber == "null") && (ClassId == null || ClassId == "" || ClassId == "null")) {
+            GetStudentData();
+        }
+
+    }
+
+    function LoadAcademicYear() {
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                Obj = $("#CboAcademicYear")
+
+                Obj.children().remove();
+
+                $.each(result, function (i, elm) {
+                    Obj.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(Obj)
+                var SelAcademicYearId = $("#SelAcademicYearId").val();
+
+                if (SelAcademicYearId >= 0) {
+                    document.getElementById("CboAcademicYear").value = SelAcademicYearId;
+                }
+            }
+        })
+
+    }
+
+    function LoadDivisionDropdown() {
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+                var SelDivisionId = $("#SelDivisionId").val();
+                if (SelDivisionId >= 0) {
+                    document.getElementById("DivisionId").value = SelDivisionId;
+                    LoadBranchDropdown();
+                }
+
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        var Division = $("#DivisionId").val();
+        if (Division >= 0) {
+            LoadBranchDropdown();
+
+        }
+        else {
+            $("#Student").val("");
+            $("#AdmissionNumber").val("");
+            $("#FatherName").val("");
+            document.getElementById("BranchId").value = "";
+            $("#BranchId").html("")
+            document.getElementById("SearchDivHead").style.display = "none"
+            $("#SearchDiv").html("")
+        }
+
+
+
+    })
+
+    $("#BranchId").change(function () {
+        var BranchId = document.getElementById("BranchId").value;
+        if (BranchId >= 0) {
+            LoadClassDropdown()
+        }
+        else {
+            $("#Student").val("");
+            $("#AdmissionNumber").val("");
+            $("#FatherName").val("");
+            document.getElementById("ClassId").value = "";
+            $("#ClassId").html("")
+            document.getElementById("SearchDivHead").style.display = "none"
+
+            $("#SearchDiv").html("")
+        }
+
+
+
+    })
+
+
+    $("#StatusA").click(function () {
+        GetStudentData();
+    })
+
+    $("#StatusI").click(function () {
+        GetStudentData();
+    })
+
+    function LoadBranchDropdown() {
+        debugger
+        var DivisionId = $("#DivisionId").val()
+        var isall = true;
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: isall },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                    var SelBranchid = $("#SelBranchId").val();
+
+                    if (SelBranchid >= 0) {
+                        document.getElementById("BranchId").value = SelBranchid
+                        LoadClassDropdown()
+                    }
+                },
+                async: false
+            })
+        }
+        else {
+            document.getElementById("BranchId").value = ""
+            $("#BranchId").html("")
+            document.getElementById("SearchDivHead").style.display = "none"
+
+            $("#SearchDiv").html("")
+        }
+    }
+
+
+
+    function LoadClassDropdown() {
+        var SelClassId = $("#SelClassId").val();
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                Section = $("#ClassId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                Section.append($("<option>").val("-1").text("All"))
+
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(Section)
+                if (SelClassId > 0) {
+                    document.getElementById("ClassId").value = SelClassId;
+                    GetStudentData();
+                }
+
+            },
+            async: false
+        })
+    }
+
+    //$('#Student').click(function () {
+    //    debugger;
+    //    var Studentval = $("#Student").val();
+    //    var ClassId = $("#ClassId").val();
+    //    var AdmissionNumber = $("#AdmissionNumber").val();
+    //    var FatherName = $("#FatherName").val();
+
+    //    if (e.keyCode == 8 || e.keyCode == 46) {
+    //        if ((ClassId == null || ClassId == "null" || ClassId == "") && (Studentval == "" || Studentval == null || Studentval == "null") && (AdmissionNumber == "" || AdmissionNumber == null || AdmissionNumber == "null") && (FatherName == "" || FatherName == null || FatherName == "null")) {
+    //            document.getElementById("SearchDivHead").style.display = "none"
+
+    //            $("#SearchDiv").html("");
+    //        }
+    //        else {
+    //            GetStudentData();
+    //        }
+
+    //    }
+    //})
+
+    //$('#Student').keyup(function (e) {
+    //    var Studentval = $("#Student").val();
+    //    var ClassId = $("#ClassId").val();
+    //    var AdmissionNumber = $("#AdmissionNumber").val();
+    //    var FatherName = $("#FatherName").val();
+
+    //    if (e.keyCode == 8 || e.keyCode == 46) {
+    //        if ((ClassId == null || ClassId == "null" || ClassId == "") && (Studentval == "" || Studentval == null || Studentval == "null") && (AdmissionNumber == "" || AdmissionNumber == null || AdmissionNumber == "null") && (FatherName == "" || FatherName == null || FatherName == "null")) {
+    //            document.getElementById("SearchDivHead").style.display = "none"
+
+    //            $("#SearchDiv").html("");
+    //        }
+    //        else {
+    //            GetStudentData();
+    //        }
+
+    //    }
+    //});
+
+    $('#AdmissionNumber').keyup(function (e) {
+        var Studentval = $("#Student").val();
+        var ClassId = $("#ClassId").val();
+        var AdmissionNumber = $("#AdmissionNumber").val();
+        var FatherName = $("#FatherName").val();
+
+        if (e.keyCode == 8 || e.keyCode == 46) {
+            if ((Studentval == "" || Studentval == null || Studentval == "null") && (FatherName == "" || FatherName == null || FatherName == "null") && (AdmissionNumber == "" || AdmissionNumber == null || AdmissionNumber == "null") && (ClassId == null || ClassId == "" || ClassId == "null") && (FatherName == "" || FatherName == null || FatherName == "null")) {
+                document.getElementById("SearchDivHead").style.display = "none"
+
+                $("#SearchDiv").html("");
+            }
+            else {
+                GetStudentData();
+            }
+
+        }
+    });
+
+    $('#AdmissionNumber').keyup(function (e) {
+        var Studentval = $("#Student").val();
+        var ClassId = $("#ClassId").val();
+        var FatherName = $("#FatherName").val();
+        var AdmissionNumber = $("#AdmissionNumber").val();
+        if (e.keyCode == 8 || e.keyCode == 46) {
+            if ((Studentval == "" || Studentval == null || Studentval == "null") && (FatherName == "" || FatherName == null || FatherName == "null") && (AdmissionNumber == "" || AdmissionNumber == null || AdmissionNumber == "null") && (ClassId == null || ClassId == "" || ClassId == "null") && (FatherName == "" || FatherName == null || FatherName == "null")) {
+                document.getElementById("SearchDivHead").style.display = "none"
+
+                $("#SearchDiv").html("");
+            }
+            else {
+                GetStudentData();
+            }
+
+        }
+    });
+    $('#FatherName').keyup(function (e) {
+        var Studentval = $("#Student").val();
+        var ClassId = $("#ClassId").val();
+        var FatherName = $("#FatherName").val();
+        var AdmissionNumber = $("#AdmissionNumber").val();
+        if (e.keyCode == 8 || e.keyCode == 46) {
+            if ((Studentval == "" || Studentval == null || Studentval == "null") && (FatherName == "" || FatherName == null || FatherName == "null") && (AdmissionNumber == "" || AdmissionNumber == null || AdmissionNumber == "null") && (ClassId == null || ClassId == "" || ClassId == "null") && (FatherName == "" || FatherName == null || FatherName == "null")) {
+                document.getElementById("SearchDivHead").style.display = "none"
+
+                $("#SearchDiv").html("");
+            }
+            else {
+                GetStudentData();
+            }
+
+        }
+    });
+
+
+    //$("#Student").autocomplete({
+    //    source: function (request, response) {
+    //        if (request.term.length >= 3) {
+    //            GetStudentData();
+
+    //        }
+    //    },
+    //});
+
+    $("#FatherName").autocomplete({
+        source: function (request, response) {
+            if (request.term.length >= 10) {
+                GetStudentData();
+            }
+        },
+    });
+
+
+
+    $("#AdmissionNumber").autocomplete({
+        source: function (request, response) {
+            if (request.term.length >= 3) {
+                GetStudentData();
+            }
+        },
+    });
+
+
+
+
+    $("#ClassId").change(function () {
+        var ClassNumber = $("#ClassId").val();
+        if (ClassNumber != "") {
+            GetStudentData();
+
+        }
+        else {
+            $("#Student").val("");
+            $("#AdmissionNumber").val("");
+            $("#FatherName").val("");
+            document.getElementById("SearchDivHead").style.display = "none"
+
+            $("#SearchDiv").html("")
+        }
+    })
+
+    $("#CboAcademicYear").change(function () {
+        debugger
+        var ClassId = $("#ClassId").val();
+        var Student = $("#Student").val();
+        var Status = $("input[name=Status]:checked").val()
+        var AdmissionNumber = $("#AdmissionNumber").val();
+        var FatherName = $("#FatherName").val();
+        var BranchId = document.getElementById("BranchId").value;
+        var DivisionId = $("#DivisionId").val()
+        var AcademicYear = $("#CboAcademicYear").val();
+        if (AcademicYear != "") {
+            GetStudentData();
+
+        }
+        else {
+            $("#Student").val("");
+            $("#AdmissionNumber").val("");
+            $("#FatherName").val("");
+            document.getElementById("SearchDivHead").style.display = "none"
+
+            $("#SearchDiv").html("")
+        }
+    })
+
+
+    function GetStudentData() {
+        var ClassId = $("#ClassId").val();
+        var Student = $("#Student").val();
+        var Status = $("input[name=Status]:checked").val()
+        var AdmissionNumber = $("#AdmissionNumber").val();
+        var FatherName = $("#FatherName").val();
+        var BranchId = document.getElementById("BranchId").value;
+        var DivisionId = $("#DivisionId").val()
+        var AcademicyearId = $("#CboAcademicYear").val()
+
+        if (BranchId == "") {
+            BranchId = -1
+        }
+        if (DivisionId == "") {
+            DivisionId = -1
+        }
+
+        if (ClassId == -1 || ClassId > 0 || Student != "" || AdmissionNumber != "" || FatherName != "") {
+            $('#imagemodal').show();
+
+            $.ajax({
+                url: "/AStudent/GetStudents",
+                data: { StudentName: Student, AdmissionNumber: AdmissionNumber, FatherName: FatherName, ClassId: ClassId, BranchId: BranchId, DivisionId: DivisionId, Status: Status, AcademicYearId: AcademicyearId },
+                success: function (result) {
+                    $("#imagemodal").hide();
+                    document.getElementById("SearchDivHead").style.display = "inline"
+                    document.getElementById("tabHead").style.display = "none";
+                    $("#SearchDiv").html(result);
+
+                    if ($('#noData').val() == undefined) {
+                        document.getElementById("tabHead").style.display = "inline";
+                    }
+                },
+                error: function () {
+                    $("#imagemodal").hide();
+                },
+                async: false
+            }).done(function () {
+                $("#imagemodal").hide();
+            });
+        }
+
+
+    }
+    window.onload = OnloadData();
+</script>

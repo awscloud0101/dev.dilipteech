@@ -1,0 +1,304 @@
+﻿@model AsteriskBrowserAL.Models.FeepaymentsReports
+@{
+    ViewBag.Title = "Payment History";
+    int Sno = 1;
+
+    int PSno = 1;
+
+    int no = 1;
+
+}
+
+
+
+<div class="row">
+    @using (Html.BeginForm())
+        {
+        <div class="box-body">
+            @if (Model != null)
+                    {
+
+                        if (Model.Details.Count() > 0)
+                        {
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Payment History Details</h3>
+                                    <br />
+                                    <br />
+                                </div><!-- /.box-header -->
+                                <div>
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="dynamic-table" class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                       S.No.
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Fee Particular")
+                                                    </th>
+
+                                                    <th>
+                                                        @Html.DisplayName("Paid Amount")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Receipt No")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Payment Date")
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody style="overflow:auto;height:250px">
+                                                @foreach (var s in Model.Details)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @Sno
+                                                        </td>
+                                                        <td>
+                                                            @s.FeeParticularName
+                                                        </td>
+                                                        <td>
+                                                            @s.DebitAmount
+                                                        </td>
+                                                        <td>
+                                                            @s.ReceiptNo
+                                                        </td>
+                                                        <td>
+                                                            @s.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                                                        </td>
+
+                                                    </tr>
+                                                    Sno++;
+
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            @*<span style="color: red;"><b>Data is not available</b></span>*@
+                        }
+                        if (Model.Summary.Count() > 0)
+                        {
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Payment History Summary</h3>
+                                    <br />
+                                    <br />
+                                </div><!-- /.box-header -->
+                                <div>
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="dynamic-table" class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                       S.No.
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Fee Particular")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Particular Amount")
+                                                    </th>
+                                                    @*<th>
+                                                            @Html.DisplayName("Discount")
+                                                        </th>*@
+                                                    <th>
+                                                        @Html.DisplayName("Paid Amount")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Due Amount")
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody style="overflow:auto;height:250px">
+                                                @foreach (var s in Model.Summary)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @PSno
+                                                        </td>
+                                                        <td>
+                                                            @s.FeeParticularName
+                                                        </td>
+                                                        <td>
+                                                            @s.DueAmount
+                                                        </td>
+                                                        @*<td>
+                                                                @s.DiscountAmount
+                                                            </td>*@
+                                                        <td>
+                                                            @s.DebitAmount
+                                                        </td>
+                                                        <td>
+                                                            @s.BalanceAmount
+                                                        </td>
+
+                                                    </tr>
+                                                    PSno++;
+
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        else
+                        {
+                            @*<span style="color: red;"><b>Summary data is not available</b></span>*@
+                        }
+
+                            if (Model.PendingAmount > 0)
+                            {
+                                <label style="color:red;display:none;" id="errormsg">Amount exceeding actual payable</label>
+                                <label style="color:red;display:none;" id="errormsg1">Enter amount</label>
+                                <div class="box">
+                                    <div class="box-header">
+                                        <h3 class="box-title">Make Payment for @Model.StudentName</h3>
+                                    </div><!-- /.box-header -->
+                                    <div>
+                                        <div class="box-body table-responsive no-padding">
+                                            <table id="dynamic-table" class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                           S.No.
+                                                        </th>
+                                                        <th>
+                                                            @Html.DisplayName("Particular")
+                                                        </th>
+                                                        <th>
+                                                            @Html.DisplayName("Due Amount")
+                                                        </th>
+                                                        <th>
+                                                            @Html.DisplayName("Paid Amount")
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody style="overflow:auto;height:250px">
+                                                    @foreach (var element in Model.ViewPendingFees)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                @no
+                                                            </td>
+                                                            <td>
+                                                                @element.FeeParticularName
+                                                            </td>
+                                                            <td>
+                                                                @element.DueAmount
+                                                            </td>
+
+                                                            <td>
+                                                                @(element.PaidAmount - element.DiscountAmount)
+                                                            </td>
+
+                                                        </tr>
+                                                        no++;
+                                                    }
+
+
+                                                </tbody>
+
+                                            </table>
+                                            <br />
+                                            <table class="table table-hover table-bordered table-hover">
+                                                <tr style="text-align:left;">
+                                                    <td width="200">
+                                                        <input type="hidden" value="@Model.PendingAmount" id="PendingAmount" />
+                                                        <label>Enter amount to pay</label>
+
+                                                    </td>
+                                                    <td width="300">
+                                                        <input type="number" name="PayingAmount" id="PayingAmount" min="1" value="@Model.PendingAmount" class="form-control" style="width:250px;" />
+
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-primary" style="width:80px;" id="pay" onclick="return ValidatePayment();">Pay</button>
+                                                    </td>
+
+                                                </tr>
+                                            </table>
+                                            <input type="hidden" value="@Model.ParentId" id="ParentId" />
+                                            <input type="hidden" value="@Model.StudentId" id="StudentId1" />
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                            }
+                             else
+                            {
+                                @*<span style="color: red;"><b>Summary data is not available</b></span>*@
+                            }
+
+
+        }
+          else
+                {
+                <span style="color: red;"><b>Data is not available</b></span>
+
+
+                    }
+
+    </div>
+
+
+    }
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            function ValidatePayment() {
+                var validation = true;
+                var Amount = parseInt($('#PayingAmount').val(), 0);
+                var PendingAmount = parseInt($('#PendingAmount').val(), 0);
+
+                var StudentId = $('#StudentId1').val();
+                var ParentId = $('#ParentId').val();
+
+                if (PayingAmount == null || PayingAmount < 0) {
+                    validation = false;
+                    $('#errormsg1').show();
+                }
+
+                if (Amount > PendingAmount) {
+                    validation = false;
+                    $('#errormsg').show();
+                }
+
+                if (validation) {
+                    window.location.href = "/PayMoney/Pay?nUserId=2&nStudentId=2&dPayingAmount=100";
+                }
+
+                return false;
+            }
+
+            function isEmptyOrSpaces(str) {
+                return str === null || str.match(/^ *$/) !== null;
+            }
+
+            $("#PayingAmount").keypress(function (e) {
+                $('#errormsg1').hide();
+                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                    return false;
+                }
+            });
+        </script>
+

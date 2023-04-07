@@ -1,0 +1,312 @@
+﻿@model AsteriskBrowserAL.Models.DaysheetViewModel
+@{
+    ViewBag.Title = "Funds Withdrawal Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Fee Collection Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+  
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ExcelDT", "FReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+
+                <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Fee Collection Report</span>
+                    <div class="" style="float:right;margin-right:10px;">
+                        @*<input type="button" class="btn btn-info btn-minier" id="ViewData" style="min-width:80Px" value="View Data" onclick="GetData();" />*@
+                        <a class="btncustom P2" id="ViewData" onclick="GetData();">View Data</a>
+                    </div>
+
+                </div>
+
+
+                <div class="widget-box">
+
+              
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            @if (Model.IsCentral)
+                                {
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4">Division</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.LstDivisions, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4">Branch</label>
+                                            <div class="col-sm-6">
+                                                <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                }
+
+                        
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Date Range</label>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control pull-right" id="daterange" name="DateRange" autocomplete="off" />
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-4">
+                                            <input type="radio" id="Individual" value="1" name="Status" checked="checked" />
+                                            <b>Individual</b>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <input type="radio" id="Consolidated" value="2" name="Status" />
+                                            <b>Consolidated</b>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="row" style="padding-top:5px;">
+                                <div class="col-sm-12">
+
+                                    <div id="divPaymentMode" class="col-sm-6">
+                                        <label class="col-sm-4">Payment Mode</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboPaymentMode" class="form-control">
+                                                <option value="-1">--Select--</option>
+                                                <option value="0">All</option>
+                                                <option value="1">Cash</option>
+                                                <option value="3">Cheque</option>
+                                                <option value="5">Swipe</option>
+                                                <option value="6">Online</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div id="divGroupBy" style="display:none" class="col-sm-6">
+                                        <label class="col-sm-4">Group by</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboGroupBy" class="form-control">
+                                                <option value="0">--Select--</option>
+                                                <option value="1">Account Type</option>
+                                                <option value="2">Receipt Number</option>
+                                                <option value="3">Template Number</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+           
+                   <div class="overflowscroll" style="overflow-x:hidden;">
+
+                       <div id="ReportData"></div>
+                   </div>
+              
+            }
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+
+    $('#Individual').click(function () {
+        $('#ReportData').html('');
+
+        $('#divPaymentMode').show();
+        $('#divGroupBy').hide();
+
+    });
+
+    $('#Consolidated').click(function () {
+
+        $('#ReportData').html('');
+
+        $('#divGroupBy').show();
+        $('#divPaymentMode').hide();
+    });
+
+    var DisplayValidation = "";
+
+    $('#DivisionId').change(function () {
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    function GetData() {
+
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        var Validation = ValidateControls();
+
+        if (Validation == false) {
+
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+            var IsCentral = $('#IsCentral').val();
+            var DateRange = $('#daterange').val();
+            var nBranchId = $('#BranchId').val();
+            var nDivisionId = $('#DivisionId').val();
+            var Value = true;
+            var nTypeId = 0;
+
+
+            var Status = $("input[name=Status]:checked").val();
+
+            if (Status == 1) {
+                nTypeId = $("#CboPaymentMode").val();
+            }
+            else {
+                Value = false;
+                nTypeId = $('#CboGroupBy').val();
+            }
+
+            $('#imagemodal').show();
+
+            if (IsCentral == "value")
+                IsCentral = "true";
+
+            $.ajax({
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+
+                url: '/FReports/GetIndividualReportBySuscriptionId',
+                data: { DivisionId: nDivisionId, BranchId: nBranchId, Date: DateRange, IsCentral: IsCentral, IsIndividual: Value, TypeId: nTypeId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#ReportData').html('');
+                    $('#ReportData').html(data);
+                },
+                aync: false
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+
+    function ValidateControls() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+
+        var Date = $("#daterange").val();
+        if (Date == "") {
+            valid = false;
+            DisplayValidation += "Date, ";
+        }
+
+
+        var Status = $("input[name=Status]:checked").val();
+
+        if (Status == 1) {
+
+            var nPaymentMode = $("#CboPaymentMode").val();
+
+            if (nPaymentMode < 0) {
+                valid = false;
+                DisplayValidation += "Payment Mode";
+            }
+        }
+        else {
+            var TypeId = $("#CboGroupBy").val();
+
+            if (TypeId < 1) {
+                valid = false;
+                DisplayValidation += "Group by";
+            }
+
+        }
+
+        return valid;
+
+    };
+
+
+</script>

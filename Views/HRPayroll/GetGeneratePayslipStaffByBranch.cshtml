@@ -1,0 +1,147 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.EmployeeCTCData>
+@{
+    int Sno = 1;
+}
+<section class="content">
+    <hr />
+    <div class="row">
+        <div class="col-xs-12">
+            @if (Model.Count() > 0)
+            {
+
+                <div class="table-header">
+                    Payslips
+                    @if (ViewBag.MonthId != null && ViewBag.MonthId > 0)
+                    {
+                        <div style="float:right">
+                            <button class="btn btn-info btn-minier" onclick="location.href='@Url.Action("DownloadBulkPaySlips", "HRPayroll", new { nBranchId = ViewBag.BranchId, nMonthId = ViewBag.MonthId, nYearId = ViewBag.YearId })'">
+                                Bulk Pay Slips Download
+                            </button>
+                            @*<button class="btn btn-info btn-minier" onclick="location.href='@Url.Action("SendPaySlipsToMails", "HRPayroll", new { nDivisionId=ViewBag.DivisionId, nBranchId = ViewBag.BranchId, nMonthId = ViewBag.MonthId, nYearId = ViewBag.YearId })'">
+                                Send pdf To Mail
+                            </button>*@
+                        </div>
+                    }
+                </div>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                SNo
+                            </th>
+                            <th>
+                                @Html.DisplayName("Employee ID")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Employee Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Net Amount")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Month")
+                            </th>
+                            <th> </th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @(Sno++)
+                                </td>
+                                <td>
+                                    @item.EmployeeNumber
+                                </td>
+                                <td>
+                                    @item.EmployeeName
+                                </td>
+                                <td>
+                                    @item.NetSalary
+                                </td>
+                                <td>
+                                    @item.MonthName
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" onclick="Action(@item.PayrollId ,1)">Print</button> &nbsp;&nbsp; <button class="btn btn-sm btn-info" onclick="Action(@item.PayrollId ,2)">PDF</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <br /> <br />
+                <span id="NoDataMsg" style="color:red;margin-left:20px">There is no data to display</span>
+            }
+            <br />
+        </div>
+    </div>
+</section>
+
+<script>
+    function Action(PayrollId, ActionId) {
+        if (PayrollId > 0 && ActionId > 0) {
+            // Print
+            if (ActionId == 1) {
+                $.ajax({
+                    url: '/HRPayroll/GenerateEmployeePaySlip',
+                    data: { nPayrollId: PayrollId, nActionId: ActionId },
+                    success: function (data) {
+                        debugger
+                        Popup(data);
+                    },
+                    aync: false
+                });
+            }
+            else if (ActionId == 2) {
+                window.location = "/HRPayroll/GenerateEmployeePaySlip?nPayrollId=" + PayrollId + "&nActionId=" + ActionId;
+            }
+        }
+    }
+
+    //function Popup(data) {
+    //    debugger
+    //    var mywindow = window.open('', 'my div', 'height=300,width=600');
+    //    mywindow.document.write('<p></p>');
+    //    mywindow.document.write(data);
+    //    mywindow.document.write('<p></p>');
+
+    //    mywindow.document.close();
+    //    mywindow.focus();
+
+    //    mywindow.print();
+    //    mywindow.close();
+    //    return true;
+    //}
+    function Popup(data) {
+        debugger
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        var is_chrome = Boolean(mywindow.chrome);
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+        if (is_chrome) {
+            setTimeout(function () { // wait until all resources loaded
+                debugger
+                mywindow.document.close(); // necessary for IE >= 10
+                mywindow.focus(); // necessary for IE >= 10
+                mywindow.print(); // change window to winPrint
+                mywindow.close(); // change window to winPrint
+            }, 250);
+        } else {
+            debugger
+            setTimeout(function () {
+                mywindow.document.close(); // necessary for IE >= 10
+                mywindow.focus(); // necessary for IE >= 10
+
+                mywindow.print();
+                mywindow.close();
+            }, 250)
+        }
+        return true;
+    }
+</script>

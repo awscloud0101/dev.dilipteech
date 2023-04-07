@@ -1,0 +1,178 @@
+﻿@model AsteriskBrowserAL.Holidays
+
+@{
+    ViewBag.Title = "Edit Holidays";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Calendar
+        </li>
+        <li class="active">Holidays</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<section class="content">
+  
+  
+    <div class="row">
+    <div class="col-xs-12">
+        @using (Html.BeginForm("HolidaysE", "ACalendar", FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+
+      
+                @Html.HiddenFor(model => model.HolidaysId)
+
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                <div class="table-header">
+                
+                        Holidays
+                        <small style="float:right;" class="textheader">
+                            @Html.ActionLink("Back to Holidays", "Holidays")
+                        </small>
+                   
+                </div>
+                <div class="widget-box row" style="padding:10px">
+
+
+                    <form class="form-horizontal" role="form">
+                        <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Holiday Date")</label>
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div id="datepicker" class="input-group date">
+                                            <input class="form-control" type="text" id="HolidayDate" name="HolidayDate" value="@Model.HolidayDate.Value.ToShortDateString()" d data-date-format="dd/mm/yyyy" placeholder="Select Holiday Date" autocomplete="off" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="" style="display:none;" id="dateHoliday">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+                            </div>
+
+                        
+                            @*<div class="col-sm-3">
+                                    <span style="color: red;font-weight: bold;">@Html.ValidationMessage("HolidayDate")</span>
+                                </div>*@
+                        </div>
+
+</div>
+
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+
+                                <div class="col-sm-8">
+                                    @Html.TextBoxFor(model => model.Description, new { @class = "form-control textlength", @id = "Desc", placeholder = "Description" })
+                                    <div class="" style="display:none;" id="descrHoliday">
+                                        <label style="color:red;font-weight:bold;"> Required </label>
+                                    </div>
+                                </div>
+
+                               
+                                @*<div class="col-sm-3">
+                    <span style="color: red;font-weight: bold;">@Html.ValidationMessage("Description")</span>
+                </div>*@
+                              
+                                
+                                    
+                            
+                            </div>
+                        </div>
+
+                        <div class=" col-md-9" align="left">
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+        }
+    </div>
+              
+  </div>
+
+
+   
+    <input type="hidden" id="count" name="count" value="0" />
+    <input type="hidden" name="OldHolidayDate" id="OldHolidayDate" value="@Model.HolidayDate.Value.ToShortDateString()" />
+    <input type="hidden" name="OldDescription" id="OldDescription" value="@Model.Description" />
+</section>
+
+
+<script type="text/javascript">
+    function validateHolidays() {
+
+        document.getElementById("count").value = "1";
+        var HolidayDate = document.getElementById("HolidayDate").value;
+        var Desc = document.getElementById("Desc").value;
+
+        validate = true;
+
+        if (HolidayDate == "") {
+            document.getElementById("dateHoliday").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("dateHoliday").style.display = "none";
+        }
+
+        if (Desc == "") {
+            document.getElementById("descrHoliday").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("descrHoliday").style.display = "none";
+        }
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateHolidays();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+    $('#HolidayDate').focus(function () {
+        $('#dateHoliday').hide();
+    });
+    $('#Desc').focus(function () {
+        $('#descrHoliday').hide();
+    });
+
+</script>
+
+@*@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}*@
+
+
+

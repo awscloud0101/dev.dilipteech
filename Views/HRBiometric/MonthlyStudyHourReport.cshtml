@@ -1,0 +1,276 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.MonthlyStudyHourReportData>
+
+@{
+    ViewBag.Title = "Monthly Study Hour Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Biometric
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Monthly Study Hour Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+   <br/>
+   
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("MonthlyStudyHourReport", "HRBiometric", FormMethod.Post))
+            {            
+
+                <div class="box">
+                    <div class="box-header">
+                        <input type="button" class="btn btn-primary pull-right" id="ViewData" name="View Data" value="View Data" onclick="GetStudyHourReport()" />
+                        <h3 class="box-title"> Monthly Study Hour Report</h3>
+                        </div>
+                        <div class="box-body" >
+                           
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Select Shift</label>
+                                                <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                    <select id="StaffShiftId" name="Shift" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                
+                               
+                                <div class="form-group">
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Select Date Range</label>
+                                                <div class="col-sm-6">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control pull-right" id="daterange" name="DateRange" autocomplete="off" />
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-calendar"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-3" id="InTime">
+
+                                                </div>
+                                                <div class="col-sm-3" id="OutTime">
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        <br />
+
+                                    </div>
+                                    <br />
+                                </div>
+                                @*<input type="button" id="ViewData" name="View Data" value="View Data" onclick="GetStudyHourReport()" />*@
+                            </div>
+                   
+
+                <div id="SearchDiv">
+                    @Html.Partial("MonthlyStudyHourReportPartialView", Model)
+                </div>
+
+            }
+        </div>
+
+                </div>
+            </section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        function Shifts() {
+            $.ajax({
+                url: '/HRBiometric/LoadShiftDrp',
+                success: function (Data) {
+                    var ShiftItems = $('#StaffShiftId')
+                    ShiftItems.children().remove();
+                    ShiftItems.append($("<option>").val("").text("---Select---"))
+                    $.each(Data, function (i, record) {
+                        ShiftItems.append($("<option>").val(record.StaffShiftId).text(record.StaffShiftName))
+
+                    });
+                    $('#StaffShiftId').append(batchItems);
+                }
+            });
+        }
+
+        $("#StaffShiftId").change(function () {
+            var ShiftId = $('#StaffShiftId').val();
+            alert(ShiftId)
+            $.ajax({
+                url: '/HRBiometric/GetShiftRecord',
+                data: { ShiftId: ShiftId },
+                success: function (Data) {
+                    alert(Data)
+                    document.getElementById('InTime').innerHTML = "Shift In-Time :<b>"+Data.InTime+"</b>"
+                    document.getElementById('OutTime').innerHTML = "Shift Out-Time :<b>" + Data.OutTime + "</b>"
+                }
+            });
+        })
+
+
+        function GetStudyHourReport()
+        {
+            var ShiftId = $('#StaffShiftId').val();
+            var DateRange = $('#daterange').val();
+            var Dates = new Array();
+            Dates = DateRange.split('-');
+            var startDate = Dates[0];
+            var endDate = Dates[1];
+            $.ajax({
+                url: '/HRBiometric/GetStudyHourReport',
+                data: { ShiftId: ShiftId, startDate: startDate, endDate: endDate },
+                success: function(Data)
+                {
+
+                }
+            })
+
+        }
+
+        window.onload = Shifts();
+    </script>
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,99 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffData>
+
+
+<div class="table-header">
+    Currently Assigned
+
+    <div style="float:right;">
+        <a id="Remove" value="Remove" name="button" class="btn btn-info btn-minier P2">
+            <i class="ace-icon fa fa-minus-square bigger-160"></i>
+        </a>
+    </div>
+
+</div><!-- /.box-header -->
+
+<div style="overflow: auto;  height:300px ">
+    <table id="tbAssignedStaff" class="table tbhover table-striped table-bordered">
+       
+        <tbody>
+            <tr>
+                <th>
+                    <input type="checkbox" id="SelectRemoveall" class="checkbox" />
+                </th>
+                <th>
+                    @Html.DisplayName("Employee No")
+                </th>
+                <th>
+                    @Html.DisplayName("Employee Name")
+                </th>
+            </tr>
+
+            @if (null != Model && Model.Count() > 0)
+            {
+                for (int i = 0; i < Model.Count(); i++)
+                {
+                    <tr>
+                        @Html.Hidden("HiddenAssignedStaffId", Model.ElementAt(i).StaffId)
+                        <td>
+                            @Html.Hidden("AssignedStaff.Index", (@i + 10))
+                            @Html.Hidden("AssignedStaff[" + (@i + 10) + "].StaffSubjectAssociationId", Model.ElementAt(i).StaffSubjectAssociationId)
+                            @Html.Hidden("AssignedStaff[" + (@i + 10) + "].EmployeeNumber", Model.ElementAt(i).EmployeeNumber)
+                            @Html.Hidden("AssignedStaff[" + (@i + 10) + "].FirstName", Model.ElementAt(i).FirstName)
+                            @Html.Hidden("AssignedStaff[" + (@i + 10) + "].Priority", Model.ElementAt(i).Priority)
+                            @Html.CheckBox("AssignedStaff[" + (@i + 10) + "].IsChecked", Model.ElementAt(i).IsChecked, new { @id = "CheckR", @class = "checkbox", @name = "Check", @Value = Model.ElementAt(i).StaffId })
+                            @Html.Hidden("AssignedStaff[" + (@i + 10) + "].IsChecked", Model.ElementAt(i).IsChecked)
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).EmployeeNumber
+                        </td>
+
+                        <td>
+                            @Model.ElementAt(i).FirstName
+                        </td>
+                    </tr>
+                }
+            }
+
+
+        </tbody>
+    </table>
+
+</div>
+
+
+
+
+<script>
+
+    $('#SelectRemoveall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #CheckR').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #CheckR').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $("#Remove").click(function () {
+        debugger
+        var result = $('#CheckR:checked');
+        var Ids = "";
+        var AssignStaff = $("#AssStaff").val()
+        var value = "";
+
+
+        $.each(result, function (i, result) {
+            value = result.value + ","
+            Ids += value;
+            AssignStaff =  AssignStaff.replace(value, "")
+        });
+        document.getElementById("RemStaff").value += Ids;
+        document.getElementById("AssStaff").value = AssignStaff;
+        AssignStaffToSubject()
+    })
+
+
+</script>

@@ -1,0 +1,402 @@
+﻿@model AsteriskBrowserAL.Models.SearchedBookData
+
+@{
+    ViewBag.Title = "Searched Books";
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Issue Book</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("IssueBookD", "ALibrary", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <br />
+                if (null != TempData["IssueBookD"])
+                {
+                    <span style="color: red;">@TempData["IssuebookD"] </span>
+                }
+                <div class="page-header">
+                    <h1>
+                        Book Issue User Entry
+                        <small style="float:right;">
+                            @Html.ActionLink("Back To Details ", "SearchBooks", new { BookCategoryId = ViewBag.SelectedCategoryId })
+                        </small>
+                    </h1>
+                </div><!-- /.page-header -->
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("Searched Books")</span>
+
+                @Html.HiddenFor(model => model.BookDetailsId)
+                @Html.HiddenFor(model => model.BookCategoryId)
+                @Html.HiddenFor(model => model.MasterBookId)
+                <form class="form-horizontal" role="form">
+                    <div class="box">
+                        <div class="box-body">
+
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("User Category Name")</label>
+
+                                <div class="col-sm-3">
+                                    <select id="UserCategory" name="UserCategory" class="form-control">
+                                        <option value="0">--Select User Category Name--</option>
+
+                                    </select>
+                                </div>
+                                <div id="vUserCategory" style="display:none;color:red;">*Required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("User Class/Department")</label>
+
+                                <div class="col-sm-3">
+                                    <select id="Class" name="Class"  class="form-control">
+                                        <option value="0">-- Select --</option>
+                                    </select>
+                                    <select id="Department" name="Department" style="display:none;" class="form-control">
+                                        <option value="0">-- Select --</option>
+                                    </select>
+                                </div>
+                                <div id="vClassvDepartment" style="display:none;color:red;">*Required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("User")</label>
+
+                                <div class="col-sm-3">
+                                    <select id="User" name="User" class="form-control">
+                                        <option value="0">--Select User Name--</option>
+                                    </select>
+                                </div>
+                                <div id="vUser" style="display:none;color:red;">*Required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Issue Date")</label>
+
+                                <div class="col-sm-3">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                <input id="IssueDate" class="form-control" type="text" name="IssueDate" value="@DateTime.Today.Date.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                            <div id="vIssueDate" style="display:none;color:red;">*Required</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    @Html.ValidationMessageFor(model => model.IssueDate)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Return Date")</label>
+
+                                <div class="col-sm-3">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                <input class="form-control" type="text" name="ReturnDate" id="ReturnDate" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                            <div id="vReturnDate" style="display:none;color:red;">*Required</div>
+                                            <div id="highdate" style="display:none;color:red;">Retun date must greater than issue date</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    @Html.ValidationMessageFor(model => model.ReturnDate)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Name")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.MasterBookName, new { @class = "form-control", @readonly = "readonly" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Author")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.Author, new { @class = "form-control", @readonly = "readonly" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("ISBN")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.ISBN, new { @class = "form-control", @readonly = "readonly" })
+                                </div>
+                            </div>
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <div class="col-md-offset-3 col-md-9">
+                                <button class="btn btn-success btn-sm" name="IssueBook" id="IssueBook" type="submit" @*onclick="return validation()"*@>
+                                    <i class="ace-icon fa fa-check bigger-50"></i>
+                                    Issue Book
+                                </button>
+
+                                &nbsp; &nbsp; &nbsp;
+                                <button class="btn btn-sm" type="reset" onclick="return resetManageBooks();">
+                                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                                    Reset
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+
+</section>
+
+<!-- date-picker -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+
+<!-- daterange picker -->
+<script>
+
+    $(window).ready(function () {
+        $.ajax({
+            url: '/ALibrary/GetCatagories',
+            dataType: "json",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+
+                items = "<option value='" + 0 + "'>--- Select ---</option>";
+                $.each(data, function (i, data) {
+                    items += "<option value='" + data.UserCategoryId + "'>" + data.UserCategoryName + "</option>";
+                });
+                $("#UserCategory").html(items);
+
+                var url = "";
+
+            },
+            error: function (response) {
+
+            },
+            failure: function (response) {
+
+            }
+        });
+
+    });
+
+
+    $("#UserCategory").change(function () {
+
+        var nCategoryId = $('#UserCategory').val();
+
+        if (nCategoryId == 1) {
+            LoadDepartment();
+        }
+
+        if (nCategoryId == 2) {
+            LoadStudentClasses();
+        }
+
+        //if (nCategoryId == 3) {
+        //    LoadStudentClasses();
+        //}
+        if (nCategoryId == 0) {
+            var items = "<option value='" + 0 + "'>--- Select ---</option>";
+            $("#User").html(items);
+
+            items = "<option value='" + 0 + "'>--- Select ---</option>";
+            $("#Class").html(items);
+
+            items = "<option value='" + 0 + "'>--- Select ---</option>";
+
+        }
+    })
+
+    function LoadDepartment() {
+        $("#Class").hide();
+        $("#Department").show();
+
+
+        $.ajax({
+            url: '/ALibrary/GetDepartments',
+            success: function (data) {
+                items = "<option value='" + 0 + "'>--- Select ---</option>";
+                $.each(data, function (i, data) {
+                    items += "<option value='" + data.DepartmentId + "'>" + data.DepartmentName + "</option>";
+                });
+                $("#Department").html(items);
+
+            }
+        })
+    }
+
+    function LoadStudentClasses() {
+        $("#Class").show();
+        $("#Department").hide();
+
+        $.ajax({
+            url: '/ALibrary/GetClasses',
+            success: function (data) {
+                items = "<option value='" + 0 + "'>--- Select ---</option>";
+                $.each(data, function (i, data) {
+                    items += "<option value='" + data.ClassNumber + "'>" + data.ClassNumberDisplay + "</option>";
+                });
+                $("#Class").html(items);
+            }
+        })
+    }
+
+    $("#Class").change(function () {
+        var res = $('#Class').val();
+        if (res != 0) {
+            $.ajax({
+                url: '/ALibrary/GetCatagories_listofdata_Student',
+                data: { nCourseId: res },
+                success: function (data) {
+                    items = "<option value='" + 0 + "'>--- Select ---</option>";
+                    $.each(data, function (i, data) {
+                        items += "<option value='" + data.StudentId + "'>" + data.FirstName + ' ' + data.LastName + '(' + data.AdmissionNumber + ')' + "</option>";
+                    });
+                    $("#User").html(items);
+                }
+            })
+        }
+        else { var items = "<option value='" + 0 + "'>--- Select ---</option>"; $("#User").html(items); }
+
+    })
+    $("#Department").change(function () {
+        var res = $('#Department').val();
+        if (res != 0) {
+            $.ajax({
+                url: '/ALibrary/GetCatagories_listofdata_Employee',
+                data: { departmentid: res },
+                success: function (data) {
+                    items = "<option value='" + 0 + "'>--- Select ---</option>";
+                    $.each(data, function (i, data) {
+                        items += "<option value='" + data.StaffId + "'>" + data.FirstName + ' ' + data.LastName + '(' + data.EmployeeNumber + ')' + "</option>";
+                    });
+                    $("#User").html(items);
+                    $("#Department").append(items);
+                }
+            })
+        }
+        else { var items = "<option value='" + 0 + "'>--- Select ---</option>"; $("#User").html(items); }
+    })
+
+    function GetStaffDetails(nCategory) {
+        if (nCategory == 1)
+            nCategory = 1;
+        else
+            nCategory = 2;
+        if (nCategory != 0) {
+            $.ajax({
+                url: '/ALibrary/GetStundetsByClassId',
+                data: { nCategory: nCategory },
+                success: function (data) {
+                    items = "<option value='" + 0 + "'>--- Select ---</option>";
+                    $.each(data, function (i, data) {
+                        items += "<option value='" + data.StudentId + "'>" + data.FirstName + ' ' + data.LastName + '('+data.EmployeeNumber+')'+"</option>";
+                    });
+                    $("#Department").html(items);
+                }
+            })
+        }
+        else { var items = "<option value='" + 0 + "'>--- Select ---</option>"; $("#Department").html(items); }
+    };
+   
+</script>
+<script>
+    $('#IssueBook').click(function () {
+        debugger
+        var UserCategory = document.getElementById("UserCategory");
+        var User = document.getElementById("User");
+        var Class = document.getElementById("Class");
+        var Department = document.getElementById("Department");
+        var issuedt = document.getElementById("IssueDate");
+        var lastdt = document.getElementById("ReturnDate");
+
+        if (UserCategory.value == "0") {
+            $('#vUserCategory').show();
+            return false;
+        }
+        if (Class.value == "0" && Department.value == "0") {
+            $('#vClassvDepartment').show();
+            return false;
+        }
+        var issuedate = new Date($('#IssueDate').val());
+        var returndate = new Date($('#ReturnDate').val());
+        if (issuedate > returndate) {
+
+            $('#highdate').show();
+            return false;
+        }
+
+
+        if (User.value == "0") {
+            $('#vUser').show();
+            return false;
+        } if (issuedt.value == "") {
+            $('#vIssueDate').show();
+            return false;
+        } if (lastdt.value == "") {
+            $('#vReturnDate').show();
+            return false;
+        }
+        return true;
+    });
+
+        $("#UserCategory").focus(function () {
+            $('#vUserCategory').hide();
+        });
+        $("#ReturnDate").focus(function () {
+            $('#highdate').hide();
+        });
+        $("#Class").focus(function () {
+            $('#vClassvDepartment').hide();
+        });
+        $("#Department").focus(function () {
+            $('#vClassvDepartment').hide();
+        });
+
+        $("#User").focus(function () {
+            $('#vUser').hide();
+        });
+        $("#IssueDate").focus(function () {
+            $('#vIssueDate').hide();
+        });
+        $("#ReturnDate").focus(function () {
+            $('#vReturnDate').hide();
+        });
+      
+    </script>
+@*<button class="btn btn-primary" name="IssueBook" id="IssueBook" type="submit" style="width:80px;">
+        Issue Book
+    </button>*@

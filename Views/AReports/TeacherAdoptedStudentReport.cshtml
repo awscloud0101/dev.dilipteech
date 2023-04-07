@@ -1,0 +1,95 @@
+﻿@model AsteriskBrowserAL.Models.StaffAdoptedStudentDataModel
+
+@{
+    ViewBag.Title = "Staff Adopted Student Report";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Reports
+        </li>
+        <li>
+            <i class=""></i>
+            Others
+        </li>
+        <li class="active">Staff Adopted Student Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <br />
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ExcelTeacherAdoptedStudentReportDT", "AReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="widget-box">
+
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                Staff Adopted Student Report
+                            </h5>
+                        </div>
+                        <br />
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right">@Html.Label("Staff")</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.StaffId, new SelectList(Model.IstStaff, "StaffId", "FirstName"), "--Select--", new { @class = "form-control", @id = "StaffId" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                       
+                    </div>
+                }
+
+
+                <div id="StaffAdoptedStudentData"></div>
+
+
+            }
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    $('#StaffId').change(function () {
+        var nStaffId = $('#StaffId').val();
+        if (nStaffId > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url:'/AReports/GetTeacherAdoptedStudentList',
+                data: {StaffId: nStaffId},
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#StaffAdoptedStudentData').html(data);
+                }
+            })
+        }
+        else {
+            $('#StaffAdoptedStudentData').html("");
+        }
+    })
+</script>
+

@@ -1,0 +1,613 @@
+﻿@model AsteriskBrowserAL.Models.SalaryItemsViewData
+@using AsteriskBrowserAL.Helpers
+
+@{
+    double dBasicSalary = 0;
+}
+<link rel="stylesheet" href="~/assets/css/bootstrap-editable.min.css" />
+
+<script src="~/assets/js/bootstrap-editable.min.js"></script>
+<script src="~/assets/js/ace-editable.min.js"></script>
+
+
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+<div class="row">
+    <div class="col-sm-12">
+        @if (Model.ListSalaryItemsEarnings.Count() > 0)
+        {
+            <input type="hidden" id="selEEEsiPercentage" name="selEEEsiPercentage" value="@Model.EEEsiPercentage" />
+            <input type="hidden" id="selEEREsiPercentage" name="selEEREsiPercentage" value="@Model.EEREsiPercentage" />
+            <input type="hidden" id="selGross" name="selGross" value="@Model.Gross" />
+            <div class="hr hr-18 dotted hr-double"></div>
+
+            <div class="col-sm-12">
+                <div class="widget-header  widget-header-small">
+                    <div style="float:left">
+                        Salary Items
+
+                    </div>
+                    <div style="float:right">
+                        <button type="button" id="test" name="test" value="Update" class="btn btn-info btn-sm pull-right">
+                            Update
+                        </button>
+                        <input type="button" id="Print" name="Print" value="Print" style="margin-right:10px" class="btn btn-info btn-sm pull-right" />
+                    </div>
+                </div>
+                <div>
+                    <table class="table table-bordered table-striped table-hover" style="font:16px">
+                        <tbody>
+                            <tr>
+                                <th>@Html.DisplayName("Component Category")</th>
+                                <th style="text-align:center;"> @Html.DisplayName("Per Month")</th>
+                                <th style="text-align:center;"> @Html.DisplayName("Per Annum")</th>
+                            </tr>
+
+                            @for (int i = 0; i < Model.ListSalaryItemsEarnings.Count; i++)
+                            {
+                                @Html.HiddenFor(x => Model.ListSalaryItemsEarnings[i].EmployeeId, new { @id = "EmployeeId" })
+                                if (Model.ListSalaryItemsEarnings.ElementAt(i).CategoryName.ToUpper().Contains("GROSS"))
+                                {
+                                    continue;
+                                }
+                                else if (Model.ListSalaryItemsEarnings.ElementAt(i).CategoryName.ToUpper().Contains("BASIC"))
+                                {
+                                    @Html.HiddenFor(x => Model.ListSalaryItemsEarnings[i].CalculatedAmount, new { @id = "dBasicSalary"  })
+                                }
+                                <tr style="height:50px;">
+                                    <td>
+                                        @Model.ListSalaryItemsEarnings.ElementAt(i).CategoryName
+                                    </td>
+
+                                    <td style="text-align:right;">
+                                        @if (Model.ListSalaryItemsEarnings.ElementAt(i).PercentageOf == 0 && Model.ListSalaryItemsEarnings.ElementAt(i).PercentageValue > 0)
+                                        {
+                                            for (int j = 0; j < Model.ListSalaryItemsDeductions.Count; j++)
+                                            {
+                                                if (@Model.ListSalaryItemsDeductions.ElementAt(j).CategoryName == "EE PF")
+                                                {
+                                                    if (@Model.ListSalaryItemsDeductions.ElementAt(j).CalculatedAmount == 0)
+                                                    {
+                                                        @Html.TextBoxFor(x => Model.ListSalaryItemsEarnings[i].CalculatedAmount, new { style = "width: 100px;", @id = "txtBasicSalary" })
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.TextBoxFor(x => Model.ListSalaryItemsEarnings[i].CalculatedAmount, new { style = "width: 100px;", @id = "txtBasicSalary", @disabled = "disabled" })
+                                                    }
+                                                }
+                                            }
+
+
+                                        }
+
+
+                                        else
+                                        {
+                                            @Html.DisplayFor(x => Model.ListSalaryItemsEarnings[i].CalculatedAmount)
+                                        }
+                                        @*<span class="editable" id="CalculatedAmount" name="CalculatedAmount">@Model.ListSalaryItemsEarnings[i].CalculatedAmount</span>*@
+                                    </td>
+                                    <td style="text-align:right;">
+                                        @{
+                                            double nYearValue = Model.ListSalaryItemsEarnings.ElementAt(i).CalculatedAmount * 12;
+                                        }
+                                        @nYearValue
+                                    </td>
+                                </tr>
+                            }
+                            <tr>
+                                <td>@Html.DisplayName("Total Gross")</td>
+
+                                <td style="text-align:right;">
+                                    @Model.Gross
+                                </td>
+                                <td style="text-align:right;">
+                                    @{
+                                        double nValue = Model.Gross.Value * 12;
+                                    }
+                                    @nValue
+                                </td>
+
+                            </tr>
+
+
+                            @for (int i = 0; i < Model.ListSalaryItemsDeductions.Count; i++)
+                            {
+
+                                <tr style="height:50px;">
+                                    <td>
+                                        @Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName
+                                    </td>
+
+                                    <td style="text-align:right;">
+                                        @if (Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName == "EE ESI" || Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName == "ER ESI")
+                                        {
+                                            if (@Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount == 0)
+                                            {
+                                                <input type="checkbox" id="EEESICheckBox" name="EEEsiCheck" />
+                                                @Html.TextBoxFor(x => Model.ListSalaryItemsDeductions[i].CalculatedAmount, new { style = "width: 100px;", @id = "txtEEESI", @disabled = "disabled" })
+                                            }
+                                            else
+                                            {
+                                                <input type="hidden" value="@Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount" id="txtEEESI" />
+                                                @Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount
+                                            }
+                                        }
+                                        else if (Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName == "EE PF" || Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName == "ER PF")
+                                        {
+                                            if (@Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount == 0)
+                                            {
+                                                <input type="checkbox" id="EEPFCheckBox" name="EEPFCheck" />
+                                                @Html.TextBoxFor(x => Model.ListSalaryItemsDeductions[i].CalculatedAmount, new { style = "width: 100px;", @id = "txtEEPF", @disabled = "disabled" })
+                                            }
+                                            else
+                                            {
+                                                <input type="hidden" value="@Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount" id="txtEEPF" />
+                                                @Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount
+                                            }
+                                        }
+                                        else
+                                        {
+                                            @Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount
+                                        }
+                                    </td>
+                                    <td style="text-align:right;">
+                                        @{
+                                            double nYearValue = Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount * 12;
+                                        }
+                                        @nYearValue
+                                    </td>
+                                </tr>
+
+                            }
+                            <tr>
+                                <td>@Html.DisplayName("Net Take Home")</td>
+
+                                <td style="text-align:right;">
+                                    @Model.NetTakeHome
+                                </td>
+                                <td style="text-align:right;">
+                                    @{
+                                        double nTakeHomeValue = Model.NetTakeHome.Value * 12;
+                                    }
+                                    @nTakeHomeValue
+                                </td>
+
+                            </tr>
+
+
+
+                            @for (int i = 0; i < Model.ListSalaryItemsContributions.Count; i++)
+                            {
+
+                                <tr style="height:50px;">
+                                    <td>
+                                        @Model.ListSalaryItemsContributions.ElementAt(i).CategoryName
+                                    </td>
+                                 
+                                    <td style="text-align:right;">
+                                        @if (Model.ListSalaryItemsContributions.ElementAt(i).CategoryName == "EE ESI" || Model.ListSalaryItemsContributions.ElementAt(i).CategoryName == "ER ESI")
+                                        {
+                                            if (@Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount == 0)
+                                            {
+                                                <input type="checkbox" id="ERESICheckBox" name="EREsiCheck" />
+                                                @Html.TextBoxFor(x => Model.ListSalaryItemsContributions[i].CalculatedAmount, new { style = "width: 100px;", @id = "txtERESI", @readonly = "readonly" })
+                                            }
+                                            else
+                                            {
+                                                <input type="hidden" value="@Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount" id="txtERESI" />
+                                                @Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount
+
+                                            }
+                                        }
+                                        else if (Model.ListSalaryItemsContributions.ElementAt(i).CategoryName == "ER PF")
+                                        {
+                                            if (@Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount == 0)
+                                            {
+                                                <input type="checkbox" id="ERPFCheckBox" name="ERPFCheck" />
+                                                @Html.TextBoxFor(x => Model.ListSalaryItemsContributions[i].CalculatedAmount, new { style = "width: 100px;", @id = "txtERPF", @readonly = "readonly" })
+                                            }
+                                            else
+                                            {
+                                                <input type="hidden" value="@Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount" id="txtERPF" />
+                                                @Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount
+
+                                            }
+                                        }
+
+                                        else
+                                        {
+                                            @Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount
+                                        }
+                                    </td>
+                                    <td style="text-align:right;">
+                                        @{
+                                            double nYearValue = Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount * 12;
+                                        }
+                                        @nYearValue
+                                    </td>
+                                </tr>
+
+                            }
+                            <tr>
+                                <td>@Html.DisplayName("Cost to Company")</td>
+
+                                <td style="text-align:right;">
+                                    @Model.CostToCompany
+                                </td>
+                                <td style="text-align:right;">
+                                    @{
+                                        double nCostToCompanyValue = Model.CostToCompany.Value * 12;
+                                    }
+                                    @nCostToCompanyValue
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        }
+        else
+        {
+            <span style="color: red;"><b>Data not available</b></span>
+        }
+
+    </div>
+</div>
+<div id="PrintDiv" style="display:none;">
+    <div id="mydiv" style="height:100%">
+
+        <table class="table" border="1" border-collapse="collapse" border-spacing="0" style="font:16px;width:100%;max-width:100%;margin-bottom:20px;">
+            <tr>
+                <th>@Html.DisplayName("Employee Name")</th>
+                <th style="text-align:center;"> @Model.EmployeeName</th>
+            </tr>
+            <tr>
+                <th>@Html.DisplayName("Branch")</th>
+
+                <th style="text-align:center;"> @Model.Branch</th>
+            </tr>
+            <tr>
+                <th>@Html.DisplayName("Desination")</th>
+
+                <th style="text-align:center;"> @Model.Designation</th>
+            </tr>
+        </table>
+
+        <table border="1" style="font:16px;width:100%;max-width:100%;margin-bottom:20px;">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayName("Component Category")</th>
+                    <th style="text-align:center;"> @Html.DisplayName("Per Month")</th>
+                    <th style="text-align:center;"> @Html.DisplayName("Per Annum")</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.ListSalaryItemsEarnings.Count; i++)
+                {
+                    @Html.HiddenFor(x => Model.ListSalaryItemsEarnings[i].EmployeeId, new { @id = "EmployeeId" })
+                    if (Model.ListSalaryItemsEarnings.ElementAt(i).CategoryName.ToUpper().Contains("GROSS"))
+                    {
+                        continue;
+                    }
+                    else if (Model.ListSalaryItemsEarnings.ElementAt(i).CategoryName.ToUpper().Contains("BASIC"))
+                    {
+                        @Html.HiddenFor(x => Model.ListSalaryItemsEarnings[i].CalculatedAmount, new { @id = "dBasicSalary" })
+                    }
+                    <tr style="height:50px;">
+                        <td>
+                            @Model.ListSalaryItemsEarnings.ElementAt(i).CategoryName
+                        </td>
+
+                        <td style="text-align:right;">
+                            @if (Model.ListSalaryItemsEarnings.ElementAt(i).PercentageOf == 0 && Model.ListSalaryItemsEarnings.ElementAt(i).PercentageValue > 0)
+                            {
+                                for (int j = 0; j < Model.ListSalaryItemsDeductions.Count; j++)
+                                {
+                                    if (@Model.ListSalaryItemsDeductions.ElementAt(j).CategoryName == "EE PF")
+                                    {
+                                        if (@Model.ListSalaryItemsDeductions.ElementAt(j).CalculatedAmount == 0)
+                                        {
+                                            @Html.DisplayFor(x => Model.ListSalaryItemsEarnings[i].CalculatedAmount)
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(x => Model.ListSalaryItemsEarnings[i].CalculatedAmount)
+                                        }
+                                    }
+                                }
+
+
+                            }
+
+
+                            else
+                            {
+                                @Html.DisplayFor(x => Model.ListSalaryItemsEarnings[i].CalculatedAmount)
+                            }
+                            @*<span class="editable" id="CalculatedAmount" name="CalculatedAmount">@Model.ListSalaryItemsEarnings[i].CalculatedAmount</span>*@
+                        </td>
+                        <td style="text-align:right;">
+                            @{
+                                double nYearValue1 = Model.ListSalaryItemsEarnings.ElementAt(i).CalculatedAmount * 12;
+                            }
+                            @nYearValue1
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td>@Html.DisplayName("Total Gross")</td>
+
+                    <td style="text-align:right;">
+                        @Model.Gross
+                    </td>
+                    <td style="text-align:right;">
+                        @{
+                            double nValue1 = Model.Gross.Value * 12;
+                        }
+                        @nValue1
+                    </td>
+
+                </tr>
+
+
+                @for (int i = 0; i < Model.ListSalaryItemsDeductions.Count; i++)
+                {
+
+                    //if (Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName == "PT")
+                    //{
+                    //    continue;
+                    //}
+
+                    <tr style="height:50px;">
+                        <td>
+                            @Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName
+                        </td>
+
+                        <td style="text-align:right;">
+                            @if (Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName == "EE ESI" || Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName == "ER ESI")
+                            {
+                                if (@Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount == 0)
+                                {
+                                    @Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount
+                                }
+                                else
+                                {
+                                    @Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount
+                                }
+                            }
+                            else if (Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName == "EE PF" || Model.ListSalaryItemsDeductions.ElementAt(i).CategoryName == "ER PF")
+                            {
+                                if (@Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount == 0)
+                                {
+                                    @Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount
+                                }
+                                else
+                                {
+                                    @Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount
+                                }
+                            }
+                            else
+                            {
+                                @Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount
+                            }
+                        </td>
+                        <td style="text-align:right;">
+                            @{
+                                double nYearValue1 = Model.ListSalaryItemsDeductions.ElementAt(i).CalculatedAmount * 12;
+                            }
+                            @nYearValue1
+                        </td>
+                    </tr>
+
+                }
+                <tr>
+                    <td>@Html.DisplayName("Net Take Home")</td>
+
+                    <td style="text-align:right;">
+                        @Model.NetTakeHome
+                    </td>
+                    <td style="text-align:right;">
+                        @{
+                            double nTakeHomeValue1 = Model.NetTakeHome.Value * 12;
+                        }
+                        @nTakeHomeValue1
+                    </td>
+
+                </tr>
+
+
+
+                @for (int i = 0; i < Model.ListSalaryItemsContributions.Count; i++)
+                {
+
+                    <tr style="height:50px;">
+                        <td>
+                            @Model.ListSalaryItemsContributions.ElementAt(i).CategoryName
+                        </td>
+                        @*<td style="text-align:right;">
+                                @Html.HiddenFor(x => Model.ListSalaryItemsContributions[i].PayrollId)
+                                @if (Model.ListSalaryItemsContributions.ElementAt(i).PercentageOf == 0 && Model.ListSalaryItemsContributions.ElementAt(i).PercentageValue == 0)
+                                {
+                                    @Html.TextBoxFor(x => Model.ListSalaryItemsContributions[i].PercentageValue, new { style = "width: 30px;", disabled = "disabled" })
+                                }
+                                else
+                                {
+                                    <span class="editable" id="PercentageValueContri" name="PercentageValueContri">@Model.ListSalaryItemsContributions[i].PercentageValue</span>
+                                }
+                            </td>*@
+                        <td style="text-align:right;">
+                            @if (Model.ListSalaryItemsContributions.ElementAt(i).CategoryName == "EE ESI" || Model.ListSalaryItemsContributions.ElementAt(i).CategoryName == "ER ESI")
+                            {
+                                if (@Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount == 0)
+                                {
+                                    @Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount
+                                }
+                                else
+                                {
+                                    @Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount
+
+                                }
+                            }
+                            else if (Model.ListSalaryItemsContributions.ElementAt(i).CategoryName == "ER PF")
+                            {
+                                if (@Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount == 0)
+                                {
+
+                                    @Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount
+                                }
+                                else
+                                {
+                                    @Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount
+
+                                }
+                            }
+
+                            else
+                            {
+                                @Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount
+                            }
+                        </td>
+                        <td style="text-align:right;">
+                            @{
+                                double nYearValue1 = Model.ListSalaryItemsContributions.ElementAt(i).CalculatedAmount * 12;
+                            }
+                            @nYearValue1
+                        </td>
+                    </tr>
+
+                }
+                <tr>
+                    <td>@Html.DisplayName("Cost to Company")</td>
+
+                    <td style="text-align:right;">
+                        @Model.CostToCompany
+                    </td>
+                    <td style="text-align:right;">
+                        @{
+                            double nCostToCompanyValue1 = Model.CostToCompany.Value * 12;
+                        }
+                        @nCostToCompanyValue1
+                    </td>
+
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var ModelData = @Html.Raw(Json.Encode(Model));
+    });
+
+    $('#EEESICheckBox').click(function (){
+        debugger
+        if (this.checked)
+        {
+            var  selEEEsiPercentage=$('#selEEEsiPercentage').val();
+            var selGross=$('#selGross').val();
+            var  CalEEEsiAmount=Math.round(selEEEsiPercentage*selGross)/100;
+            $('#txtEEESI').val(Math.round(CalEEEsiAmount));
+        }else
+        {
+            $('#txtEEESI').val(0);
+        }
+
+
+    })
+
+    $('#EEPFCheckBox').click(function (){
+        debugger
+        if (this.checked)
+        {
+            //var  selEEEsiPercentage=$('#selEEEsiPercentage').val();
+            //var selGross=$('#selGross').val();
+            //var  CalEEEsiAmount=Math.round(selEEEsiPercentage*selGross)/100;
+            $('#txtEEPF').val(1800);
+        }else
+        {
+            $('#txtEEPF').val(0);
+        }
+
+
+    })
+
+    $('#ERPFCheckBox').click(function (){
+        debugger
+        if (this.checked)
+        {
+            //var  selEEEsiPercentage=$('#selEEEsiPercentage').val();
+            //var selGross=$('#selGross').val();
+            //var  CalEEEsiAmount=Math.round(selEEEsiPercentage*selGross)/100;
+            $('#txtERPF').val(1800);
+        }else
+        {
+            $('#txtERPF').val(0);
+        }
+
+
+    })
+
+    $('#ERESICheckBox').click(function (){
+        debugger
+        if (this.checked)
+        {
+            var  selEEREsiPercentage=$('#selEEREsiPercentage').val();
+            var selGross=$('#selGross').val();
+            var  CalEREsiAmount=Math.round(selEEREsiPercentage*selGross)/100;
+            $('#txtERESI').val(Math.round(CalEREsiAmount));
+        }else
+        {
+            $('#txtERESI').val(0);
+        }
+    })
+</script>
+
+<script>
+
+    $('#Print').click(function () {
+        $('#imagemodal').show();
+        //$('#mydiv').html(Data);
+        $('#imagemodal').hide();
+        PrintElem('#mydiv');
+        document.body.style.cursor = 'default';
+
+    });
+
+
+    function PrintElem(elem) {
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+
+</script>
+
+
+
+
+

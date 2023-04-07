@@ -1,0 +1,217 @@
+﻿@model AsteriskBrowserAL.Models.ItemGroupViewModel
+
+@{
+    ViewBag.Title = "Create Item Group";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Master Data
+        </li>
+        <li class="active">Item Group</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<section class="content">
+    @*<div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Item Group Details", "ItemGroup", new { CategoryId = (null != Model) ? Model.CategoryId : 0, SubCategoryId = (null != Model) ? (Model.InventorySubCategoryId.HasValue ? Model.InventorySubCategoryId.Value : 0) : 0 })</h3>
+        </div>
+    </div>*@
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ItemGroupC", "SMasterData", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" value="@(Model.InventorySubCategoryId.HasValue ? Model.InventorySubCategoryId.Value : 0)" id="SelSubCategoryId"/>
+                @Html.HiddenFor(model => model.InventorySubCategoryId)
+                @Html.HiddenFor(model => model.CategoryId)
+    <span style="color:red;font-weight:bold;" id="Validation"></span>
+            <input type="hidden" id="ItemTypeName" name="ItemTypeName">
+            <div class="box">
+                    @*<div class="box-header">
+                        <h3 class="box-title">Item Group</h3>
+                            <button class="btn btn-primary pull-right" type="submit" style="width:80px;" onclick="return submitForm();">
+                                Create
+                            </button>
+
+                    </div>*@
+                <div class="box-header">
+
+
+                    <div class="page-header">
+                        <br />
+                        <h1>
+                            Item Group
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "ItemGroup",new { CategoryId=@Model.CategoryId, SubCategoryId=@Model.InventorySubCategoryId })
+                            </small>
+                        </h1>
+                    </div><!-- /.page-header -->
+                    <!-- form start -->
+
+
+                </div><!-- /.box-header -->
+         
+
+                    <div class="box-body">
+
+                      
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Code Name")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Description, new { @class = "form-control textlength", @id = "Code", @maxlength = "3", placeholder = "Code" })
+                            </div>
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="CodeVal">
+                          </span>                 
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Class")</label>
+
+                            <div class="col-sm-3">
+
+                                @if (null != Model)
+                                {
+                                    if (null != Model.lstClassNumbers)
+                                    {
+                                        @Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.lstClassNumbers, "ClassNumber", "ClassNumberDisplay"),"--- Select ---", new { @class = "form-control", @id = "ClassNumber" })
+                                    }
+                                    else
+                                    {
+                                        <select id="ClassNumber"></select>
+                                    }
+                                }
+
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="ClassNumberVal">
+                            </span>
+
+                        </div>
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+                        </div>
+                    
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+<script type="text/javascript">
+    function ValidateItemGroup() {
+        var ItemTypeName = $("#ItemTypeName").val();
+        var Code = $("#Code").val();
+        var ClassNumber = $("#ClassNumber").val();
+
+        validate = true;
+
+        //if (ItemTypeName == "") {
+        //    document.getElementById("ItemTypeNameVal").innerHTML = "Please enter name";
+        //    validate = false;
+        //}
+
+        if (Code == "") {
+            document.getElementById("CodeVal").innerHTML = "Please enter code";
+            validate = false;
+        }
+
+        if (ClassNumber < 1 || ClassNumber == "" || ClassNumber == "null" || ClassNumber == null) {
+            document.getElementById("ClassNumberVal").innerHTML = "Please select class number";
+            validate = false;
+        }
+
+        if (validate == true)
+        {
+            validate = IsNameExists();
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = ValidateItemGroup();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    //$('#ItemTypeName').focus(function () {
+    //    document.getElementById("ItemTypeNameVal").innerHTML = "";
+    //    document.getElementById("Validation").innerHTML = "";
+    //});
+
+    $('#Code').focus(function () {
+        document.getElementById("CodeVal").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    $('#ClassNumber').change(function () {
+        document.getElementById("ClassNumberVal").innerHTML = "";
+        $('#ItemTypeName').val($("#ClassNumber option:selected").text());
+    });
+
+    function IsNameExists() {
+        var val = true;
+        $.ajax({
+
+            url: '/SMasterData/IsItemGroupNameExists/',
+            data: { Type: "New", ItemTypeId: 0, Code: $('#Code').val(), ClassNumber: $('#ClassNumber').val(), SubCategoryId: $('#SelSubCategoryId').val() },
+            success: function (data) {
+
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            },
+            async: false
+        });
+
+        return val;
+    }
+
+
+
+</script>
+
+
+
+
+
+
+

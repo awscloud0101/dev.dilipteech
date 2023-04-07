@@ -1,0 +1,1107 @@
+﻿@model List<AsteriskBrowserAL.Models.CoastalProgressCard>
+@using AsteriskBrowserAL.Helpers
+@{
+    int n = 0;
+    int nCount = 0;
+    double MaxMarks = Model.FirstOrDefault().StudentMarks.FirstOrDefault().MaxMarks;
+    if (null != Model)
+    {
+        var data = Model.Select(s => s.StudentMarks).ToList();
+        n = data.Count();
+    }
+
+    List<ScholasticsGrading> ScholasticGrade = new List<ScholasticsGrading>();
+    ScholasticGrade.Add(new ScholasticsGrading { ScholasticsGradePoint = 1, ScholasticsGrade = "A1" });
+    ScholasticGrade.Add(new ScholasticsGrading { ScholasticsGradePoint = 2, ScholasticsGrade = "A2" });
+    ScholasticGrade.Add(new ScholasticsGrading { ScholasticsGradePoint = 3, ScholasticsGrade = "B1" });
+    ScholasticGrade.Add(new ScholasticsGrading { ScholasticsGradePoint = 4, ScholasticsGrade = "B2" });
+    ScholasticGrade.Add(new ScholasticsGrading { ScholasticsGradePoint = 5, ScholasticsGrade = "C1" });
+    ScholasticGrade.Add(new ScholasticsGrading { ScholasticsGradePoint = 6, ScholasticsGrade = "C2" });
+    ScholasticGrade.Add(new ScholasticsGrading { ScholasticsGradePoint = 7, ScholasticsGrade = "D1" });
+    ScholasticGrade.Add(new ScholasticsGrading { ScholasticsGradePoint = 8, ScholasticsGrade = "Nil" });
+
+
+    string Grade = "";
+    int GradePoint = 0;
+    double TotalTestMarks = 0;
+    double TwoPapersMarks = 0;
+    double TotalPaper1Marks = 0;
+    double TotalPaper2Marks = 0;
+
+    int nSubjectCount = 0;
+    double AvgGradePoint = 0;
+    double TotalGradePoint = 0;
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Approve Bank Deposit</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<input type="hidden" id="ExamId" value="@Model.FirstOrDefault().ExamId" />
+<input type="hidden" id="DivisionId" value="@Model.FirstOrDefault().DivisionId" />
+<input type="hidden" id="BranchId" value="@Model.FirstOrDefault().BranchId" />
+<input type="hidden" id="ClassNumber" value="@Model.FirstOrDefault().ClassNumber" />
+
+<html>
+<head>
+    <title>Test</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+        table, td, th {
+            border: 1px solid black;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div id="mydiv" style="display:none">
+
+
+        @if (null != Model)
+        {
+            foreach (var p in Model)
+            {
+                nCount++;
+                @*<div class="col-xs-12" style="border:groove">
+                    <img class="col-xs-11" id="avatar" width="100" height="110" style="float:left;text-decoration:none" src="@p.InstituteDet.InstituteLogo" />
+                    <b style="font-weight:bold; font-size:30px; font-family:'Segoe UI'"> &nbsp; &nbsp;Gowtham Model Schools - @p.InstituteDet.InstituteName</b>
+                    <br />
+                    <br />
+                    <br />
+                    <div style="background-color:#C0C0C0">
+                        <div align="center" style="font:25px; font-size:25px; font-family:'Segoe UI'"><b> @p.Exam</b></div>
+                    </div>
+
+                </div>*@
+        <div>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            @if (null != p.InstituteDet.InstituteLogo)
+            {
+                <div align="center">
+
+                    <img width="120" height="80" src="@p.InstituteDet.InstituteLogo" />
+
+                </div>
+            }
+            <br />
+            <br />
+            <div style="background-color:#C0C0C0">
+                <div align="center" style="font:28px;font-size:28px;font-family:'Segoe UI';"><b> @p.InstituteDet.InstituteName.ToUpper()</b></div>
+            </div>
+            <div style="background-color:#C0C0C0">
+                <div align="center" style="font:28px;font-size:28px;font-family:'Segoe UI';"><b> @p.InstituteDet.InstituteAddress.ToUpper()</b></div>
+            </div>
+
+            <div style="background-color:#C0C0C0">
+                <div align="center" style="font:28px;font-size:28px;font-family:'Segoe UI';"><b> @p.ExamCode.ToUpper()</b></div>
+            </div>
+            <br />
+            @*Stdent Details*@
+            <table style="width:1000px;font-family:'Segoe UI'">
+                <tr>
+                    <td style="font-size:20px;width:55%">
+                        <b style="font-size:22px"> Name : </b>@p.StudentName
+                    </td>
+                    @*<td style="width:50%;font-size:20px">
+                    <b style="font-size:22px"> Father Name : </b>
+                    @p.FatherName
+                </td>*@
+                </tr>
+            </table>
+            <table style="width:1000px;font-family:'Segoe UI'">
+                <tr>
+                    <td style="width:55%;font-size:20px">
+                        <b style="font-size:22px"> Admission No : </b>@p.AdmissionNo
+                    </td>
+
+                    <td style="width:50%;font-size:20px">
+                        <b style="font-size:22px"> Class : </b>@p.Class
+                    </td>
+                </tr>
+            </table>
+            <table style="width:1000px;font-family:'Segoe UI'">
+                <tr>
+                    <td style="width:55%;font-size:20px">
+                        <b style="font-size:22px"> Class Rank : </b>@p.Ranks.Rank / @p.Ranks.TotalRank
+                    </td>
+
+                    <td style="width:50%;font-size:20px">
+                        <b style="font-size:22px"> Section Rank : </b>@p.Ranks.SectionRank / @p.Ranks.TotalSectionStudents
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <br />
+
+            @if (p.ClassNumber > 0 && p.ClassNumber <= 10)
+            {
+                <table style="font:14;font-family:'Segoe UI'">
+                    <tr>
+                        <td>
+                            <table style="border:1px solid black;width:1000px;height:300px" rules="all">
+
+                                <tbody>
+                                    <tr style="border:1px solid black">
+
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Subject
+                                        </th>
+                                        <th style="font-size:20px;background-color:#C0C0C0">
+                                            Total
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Grade
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Grade Point
+                                        </th>
+                                    </tr>
+                                    <tr style="border:1px solid black">
+
+                                        <th style="font-size:20px;background-color:#C0C0C0">
+                                            @MaxMarks
+                                        </th>
+                                    </tr>
+
+                                    @{
+                                        TotalTestMarks = Math.Round(p.StudentMarks.Where(s => s.IsScholastic == false).Sum(s => s.UnitTest), 1);
+                                        TotalGradePoint = 0;
+                                    }
+
+                                    @foreach (var m in p.StudentMarks.Where(s => s.IsScholastic == false).OrderBy(s => s.OrderId))
+                                    {
+                                        <tr style="text-align:center;">
+
+                                            <td style="font-size:20px;text-align:left">
+
+                                                &nbsp; @m.Subject
+                                            </td>
+                                            <td style="font-size:20px">
+                                                @if (m.IsAbscent == true)
+                                                {
+                                                    <p>A</p>
+                                                }
+                                                else
+                                                {
+                                                    @m.DisplayMarksScored
+                                                }
+                                            </td>
+
+                                            @if (m.DisplayMarksScored != "")
+                                            {
+                                                if (m.Subject.Replace(" ", "").ToUpper().StartsWith("IILANGUAGE"))
+                                                {
+                                                    if (MaxMarks == 100)
+                                                    {
+                                                        Utility.GetGradeAndGradePointForCoastal1stTo5th(ref Grade, ref GradePoint, m.UnitTest);
+                                                    }
+                                                    else
+                                                    {
+                                                        Utility.GetGradeAndGradePointFor50Marks(ref Grade, ref GradePoint, m.UnitTest);
+                                                    }
+                                                    <td style="text-align:center">
+                                                        @Grade
+                                                    </td>
+                                                    <td style="text-align:center">
+
+                                                        @if (GradePoint == 0)
+                                                        {
+                                                            @("-")
+                                                        }
+                                                        else
+                                                        {
+                                                            @GradePoint
+
+                                                            TotalGradePoint += GradePoint;
+                                                        }
+
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    if (MaxMarks == 100)
+                                                    {
+                                                        Utility.GetGradeAndGradePointForCoastal1stTo5th(ref Grade, ref GradePoint, m.UnitTest);
+                                                    }
+                                                    else
+                                                    {
+                                                        Utility.GetGradeAndGradePointFor50Marks(ref Grade, ref GradePoint, m.UnitTest);
+                                                    }
+                                                    <td style="text-align:center">
+                                                        @Grade
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        @if (GradePoint == 0)
+                                                        {
+                                                            @("-")
+                                                        }
+                                                        else
+                                                        {
+                                                            @GradePoint
+                                                            TotalGradePoint += GradePoint;
+                                                        }
+
+                                                    </td>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                                <td></td>
+                                            }
+
+
+                                        </tr>
+                                    }
+
+                                    <tr style="font-size:12px; text-align:left;">
+
+                                        <th style="font-size:20px;text-align:left">
+                                            @*&nbsp; Total/Overall grade/Overall grade point*@
+
+                                            &nbsp; Total/Overall grade point
+                                        </th>
+
+                                        <th style="font-size:20px;text-align:center">
+                                            @TotalTestMarks
+                                        </th>
+                                        @{
+
+                                            nSubjectCount = p.StudentMarks.Where(s => s.IsScholastic == false).ToList().Count();
+
+                                            if (nSubjectCount > 0)
+                                            {
+                                                AvgGradePoint = Math.Round((TotalGradePoint / nSubjectCount), 1);
+                                            }
+                                        }
+
+                                        <th style="font-size:20px;text-align:center">
+                                            @*@Grade*@
+                                        </th>
+                                        <th style="font-size:20px;text-align:center">
+                                            @if (AvgGradePoint == 0)
+                                            {
+                                                @("-")
+                                            }
+                                            else
+                                            {
+                                                @AvgGradePoint
+                                            }
+
+                                        </th>
+
+
+
+                                    </tr>
+
+
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            }
+            else if (p.ClassNumber >= 60 && p.ClassNumber <= 80)
+            {
+                <table style="font:14;font-family:'Segoe UI'">
+                    <tr>
+                        <td>
+                            <table style="border:1px solid black;width:1000px;height:300px" rules="all">
+
+                                <tbody>
+                                    <tr style="border:1px solid black">
+
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Subject
+                                        </th>
+                                        <th style="font-size:20px;background-color:#C0C0C0">
+                                            Total
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Grade
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Grade Point
+                                        </th>
+                                    </tr>
+                                    <tr style="border:1px solid black">
+
+                                        <th style="font-size:20px;background-color:#C0C0C0">
+                                            100 Marks
+                                        </th>
+                                    </tr>
+
+                                    @{
+                                        TotalTestMarks = Math.Round(p.StudentMarks.Where(s => s.IsScholastic == false).Sum(s => s.UnitTest), 1);
+
+                                        TotalGradePoint = 0;
+
+                                    }
+                                    @foreach (var m in p.StudentMarks.Where(s => s.IsScholastic == false).OrderBy(s => s.OrderId))
+                                    {
+
+                                        <tr style="text-align:center;">
+
+                                            <td style="font-size:20px;text-align:left">
+
+                                                &nbsp; @m.Subject
+                                            </td>
+                                            <td style="font-size:20px">
+                                                @if (m.IsAbscent == true)
+                                                {
+                                                    <p> A</p>
+                                                }
+                                                else
+                                                {
+                                                    @m.DisplayMarksScored
+                                                }
+                                            </td>
+
+                                            @if (m.DisplayMarksScored != "")
+                                            {
+                                                if (m.Subject.Replace(" ", "").ToUpper().StartsWith("IILANGUAGE"))
+                                                {
+                                                    Utility.GetGradeAndGradePointForCoastal2ndLang(ref Grade, ref GradePoint, m.UnitTest);
+
+                                                    <td style="text-align:center">
+                                                        @Grade
+                                                    </td>
+                                                    <td style="text-align:center">
+
+                                                        @if (GradePoint == 0)
+                                                        {
+                                                            @("-")
+                                                        }
+                                                        else
+                                                        {
+                                                            @GradePoint
+                                                            TotalGradePoint += GradePoint;
+                                                        }
+
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    Utility.GetGradeAndGradePointForCoastalNonLang(ref Grade, ref GradePoint, m.UnitTest);
+
+                                                    <td style="text-align:center">
+                                                        @Grade
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        @if (GradePoint == 0)
+                                                        {
+                                                            @("-")
+                                                        }
+                                                        else
+                                                        {
+                                                            @GradePoint
+                                                            TotalGradePoint += GradePoint;
+                                                        }
+
+                                                    </td>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                                <td></td>
+                                            }
+
+                                        </tr>
+                                    }
+
+                                    <tr style="font-size:12px; text-align:left;">
+
+                                        <th style="font-size:20px;text-align:left">
+                                            &nbsp; Total/Overall grade point
+                                        </th>
+
+                                        <th style="font-size:20px;text-align:center">
+                                            @TotalTestMarks
+                                        </th>
+                                        @{
+
+                                            nSubjectCount = p.StudentMarks.Where(s => s.IsScholastic == false).ToList().Count();
+
+                                            if (nSubjectCount > 0)
+                                            {
+                                                AvgGradePoint = Math.Round((TotalGradePoint / nSubjectCount), 1);
+                                            }
+                                        }
+
+                                        <th style="font-size:20px;text-align:center">
+                                            @*@Grade*@
+                                        </th>
+                                        <th style="font-size:20px;text-align:center">
+                                            @if (AvgGradePoint == 0)
+                                            {
+                                                @("-")
+                                            }
+                                            else
+                                            {
+                                                @AvgGradePoint
+                                            }
+
+                                        </th>
+
+
+
+                                    </tr>
+
+
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+            }
+            else if (p.ClassNumber == 90 || p.ClassNumber == 100)
+            {
+                <table style="font:14;font-family:'Segoe UI'">
+                    <tr>
+                        @*Student Marks*@
+                        <td>
+                            <table style="border:1px solid black;width:1000px;height:300px" rules="all">
+
+                                <tbody>
+                                    <tr style="border:1px solid black">
+
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Subject
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Paper - 1
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Paper - 2
+                                        </th>
+                                        <th style="font-size:20px;background-color:#C0C0C0">
+                                            Total
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Grade
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Grade Point
+                                        </th>
+                                    </tr>
+                                    <tr style="border:1px solid black">
+                                        <th style="font-size:20px;background-color:#C0C0C0">
+                                            100 Marks
+                                        </th>
+                                    </tr>
+
+                                    @{
+                                        TotalPaper1Marks = Math.Round(p.StudentMarks.Where(s => s.IsScholastic == false).Sum(s => s.Paper1Marks), 1);
+                                        TotalPaper2Marks = Math.Round(p.StudentMarks.Where(s => s.IsScholastic == false).Sum(s => s.Paper2Marks), 1);
+
+                                        TotalGradePoint = 0;
+
+                                    }
+                                    @foreach (var m in p.StudentMarks.Where(s => s.IsScholastic == false).OrderBy(s => s.OrderId))
+                                    {
+                                        TwoPapersMarks = m.Paper1Marks + m.Paper2Marks;
+                                        TotalTestMarks += TwoPapersMarks;
+
+                                        <tr style="text-align:center;">
+                                            <td style="font-size:20px;text-align:left">
+
+                                                &nbsp; @m.Subject
+                                            </td>
+                                            <td style="font-size:20px">
+                                                @if (m.IsAbscent == true)
+                                                {
+                                                    <p> A</p>
+                                                }
+                                                else
+                                                {
+                                                    @m.DisplayPaper1MarksScored
+                                                }
+
+                                            </td>
+                                            <td style="font-size:20px">
+                                                @if (m.IsAbscent == true)
+                                                {
+                                                    <p> A</p>
+                                                }
+                                                else
+                                                {
+                                                    @m.DisplayPaper2MarksScored
+                                                }
+
+                                            </td>
+                                            <td style="font-size:20px">
+                                                @(TwoPapersMarks)
+                                            </td>
+
+                                            @if (m.DisplayPaper1MarksScored != "" || m.DisplayPaper2MarksScored != "")
+                                            {
+                                                if (m.Subject.Replace(" ", "").ToUpper().StartsWith("IILANGUAGE"))
+                                                {
+                                                    Utility.GetGradeAndGradePointForCoastal2ndLang(ref Grade, ref GradePoint, TwoPapersMarks);
+
+                                                    <td style="text-align:center">
+                                                        @Grade
+                                                    </td>
+                                                    <td style="text-align:center">
+
+                                                        @if (GradePoint == 0)
+                                                        {
+                                                            @("-")
+                                                        }
+                                                        else
+                                                        {
+                                                            @GradePoint
+                                                            TotalGradePoint += GradePoint;
+                                                        }
+
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    Utility.GetGradeAndGradePointForCoastalNonLang(ref Grade, ref GradePoint, TwoPapersMarks);
+
+                                                    <td style="text-align:center">
+                                                        @Grade
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        @if (GradePoint == 0)
+                                                        {
+                                                            @("-")
+                                                        }
+                                                        else
+                                                        {
+                                                            @GradePoint
+                                                            TotalGradePoint += GradePoint;
+                                                        }
+
+                                                    </td>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                                <td></td>
+                                            }
+
+
+                                        </tr>
+                                    }
+
+                                    <tr style="font-size:12px; text-align:left;">
+
+                                        <th style="font-size:20px;text-align:left">
+                                            &nbsp; Total/Overall grade point
+                                        </th>
+                                        <th style="font-size:20px;text-align:center">
+                                            @TotalPaper1Marks
+                                        </th>
+                                        <th style="font-size:20px;text-align:center">
+                                            @TotalPaper2Marks
+                                        </th>
+                                        <th style="font-size:20px;text-align:center">
+                                            @TotalTestMarks
+                                        </th>
+                                        @{
+
+                                            nSubjectCount = p.StudentMarks.Where(s => s.IsScholastic == false).ToList().Count();
+
+                                            if (nSubjectCount > 0)
+                                            {
+                                                AvgGradePoint = Math.Round((TotalGradePoint / nSubjectCount), 1);
+                                            }
+                                        }
+
+                                        <th style="font-size:20px;text-align:center">
+                                            @*@Grade*@
+                                        </th>
+                                        <th style="font-size:20px;text-align:center">
+                                            @if (AvgGradePoint == 0)
+                                            {
+                                                @("-")
+                                            }
+                                            else
+                                            {
+                                                @AvgGradePoint
+                                            }
+
+                                        </th>
+
+
+
+                                    </tr>
+
+
+                                </tbody>
+                            </table>
+                            @{TotalTestMarks = 0;
+                            }
+                        </td>
+                    </tr>
+                </table>
+
+            }
+            else
+            {
+                <table style="font:14;font-family:'Segoe UI'">
+                    <tr>
+                        <td>
+                            <table style="border:1px solid black;width:1000px;height:300px" rules="all">
+
+                                <tbody>
+                                    <tr style="border:1px solid black">
+
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Subject
+                                        </th>
+                                        <th style="font-size:20px;background-color:#C0C0C0">
+                                            Total
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Grade
+                                        </th>
+                                        <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                            Grade Point
+                                        </th>
+                                    </tr>
+                                    <tr style="border:1px solid black">
+
+                                        <th style="font-size:20px;background-color:#C0C0C0">
+                                            100 Marks
+                                        </th>
+                                    </tr>
+
+                                    @{
+                                        TotalTestMarks = Math.Round(p.StudentMarks.Where(s => s.IsScholastic == false).Sum(s => s.UnitTest), 1);
+                                        TotalGradePoint = 0;
+                                    }
+
+                                    @foreach (var m in p.StudentMarks.Where(s => s.IsScholastic == false).OrderBy(s => s.OrderId))
+                                    {
+                                        <tr style="text-align:center;">
+
+                                            <td style="font-size:20px;text-align:left">
+
+                                                &nbsp; @m.Subject
+                                            </td>
+                                            <td style="font-size:20px">
+                                                @if (m.IsAbscent == true)
+                                                {
+                                                    <p>A</p>
+                                                }
+                                                else
+                                                {
+                                                    @m.DisplayMarksScored
+                                                }
+                                            </td>
+
+                                            @if (m.DisplayMarksScored != "")
+                                            {
+                                                if (m.Subject.Replace(" ", "").ToUpper().StartsWith("IILANGUAGE"))
+                                                {
+                                                    Utility.GetGradeAndGradePointForCoastal1stTo5th(ref Grade, ref GradePoint, m.UnitTest);
+
+                                                    <td style="text-align:center">
+                                                        @Grade
+                                                    </td>
+                                                    <td style="text-align:center">
+
+                                                        @if (GradePoint == 0)
+                                                        {
+                                                            @("-")
+                                                        }
+                                                        else
+                                                        {
+                                                            @GradePoint
+
+                                                            TotalGradePoint += GradePoint;
+                                                        }
+
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    Utility.GetGradeAndGradePointForCoastal1stTo5th(ref Grade, ref GradePoint, m.UnitTest);
+
+                                                    <td style="text-align:center">
+                                                        @Grade
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        @if (GradePoint == 0)
+                                                        {
+                                                            @("-")
+                                                        }
+                                                        else
+                                                        {
+                                                            @GradePoint
+                                                            TotalGradePoint += GradePoint;
+                                                        }
+
+                                                    </td>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                                <td></td>
+                                            }
+
+
+                                        </tr>
+                                    }
+
+                                    <tr style="font-size:12px; text-align:left;">
+
+                                        <th style="font-size:20px;text-align:left">
+                                            @*&nbsp; Total/Overall grade/Overall grade point*@
+
+                                            &nbsp; Total/Overall grade point
+                                        </th>
+
+                                        <th style="font-size:20px;text-align:center">
+                                            @TotalTestMarks
+                                        </th>
+                                        @{
+
+                                            nSubjectCount = p.StudentMarks.Where(s => s.IsScholastic == false).ToList().Count();
+
+                                            if (nSubjectCount > 0)
+                                            {
+                                                AvgGradePoint = Math.Round((TotalGradePoint / nSubjectCount), 1);
+                                            }
+                                        }
+
+                                        <th style="font-size:20px;text-align:center">
+                                            @*@Grade*@
+                                        </th>
+                                        <th style="font-size:20px;text-align:center">
+                                            @if (AvgGradePoint == 0)
+                                            {
+                                                @("-")
+                                            }
+                                            else
+                                            {
+                                                @AvgGradePoint
+                                            }
+
+                                        </th>
+
+
+
+                                    </tr>
+
+
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            }
+
+
+
+
+            <br />
+            @*<table style="border:1px solid black;font-family:'Segoe UI';width:50%" rules="all">
+            <tr>
+                <td style="background-color:#C0C0C0;font-weight:bold;font-size:20px" align="left">Subjects</td>
+                <td style="background-color:#C0C0C0;font-weight:bold;font-size:20px" align="center">Grade</td>
+            </tr>
+            @foreach (var sg in p.StudentMarks.Where(s => s.IsScholastic == true).OrderBy(s => s.OrderId))
+            {
+                <tr>
+                    <td style="font-size:20px" align="left">@sg.Subject</td>
+                    <td style="font-size:20px" align="center">
+                        @{
+                            var grade = ScholasticGrade.FirstOrDefault(sc => sc.ScholasticsGradePoint == sg.UnitTest);
+                        }
+
+                        @if (null != grade)
+                        {
+                            @grade.ScholasticsGrade
+                        }
+                    </td>
+                </tr>
+            }
+        </table>*@
+
+            <br />
+
+            @*<table>
+            <tr>
+                <td>
+                    <table style="border:1px solid black;font-family:'Segoe UI';width:1000px" rules="all">
+                        <tbody>
+                            <tr>
+                                <td style="font-size:20px;background-color:#C0C0C0;">
+                                    <b style="font-size:20px;">Attendance</b>
+                                </td>
+
+                                <td style="font-size:20px" align="center">
+                                    June
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    July
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    Aug
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    Sep
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    Oct
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    Nov
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    Dec
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    Jan
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    Feb
+                                </td>
+
+                                <td style="font-size:20px" align="center">
+                                    Mar
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    Apr
+                                </td>
+
+
+
+
+                            </tr>
+                            <tr>
+                                <td style="background-color:#C0C0C0;">
+                                    <b style="font-size:20px">Working Days</b>
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJuneWorkingDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJulyWorkingDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJAugWorkingDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJSepWorkingDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nOctWorkingDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nNovWorkingDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nDecWorkingDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJanWorkingDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nFebWorkingDays
+                                </td>
+
+                                <td style="font-size:20px" align="center">
+                                    @p.nMarWorkingDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nAprilWorkingDays
+                                </td>
+
+                            </tr>
+                            <tr>
+
+                                <td style="background-color:#C0C0C0;">
+                                    <b style="font-size:20px">Days present</b>
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJunePresentDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJulyPresentDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJAugPresentDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJSepPresentDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nOctPresentDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nNovPresentDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nDecPresentDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nJanPresentDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nFebPresentDays
+                                </td>
+
+                                <td style="font-size:20px" align="center">
+                                    @p.nMarPresentDays
+                                </td>
+                                <td style="font-size:20px" align="center">
+                                    @p.nAprilPresentDays
+                                </td>
+
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+                    <br />
+                    <table style="border:1px solid black;width:1000px;font-family:'Segoe UI';height:150px">
+                        <tbody>
+                            <tr style="background-color:#C0C0C0">
+
+                                <td style="font-size:20px;height:20px;font-weight:bold">
+                                    Teacher Remarks
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td style="font-size:20px">@p.TeacherAssessment</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </td>
+            </tr>
+        </table>*@
+        </div>
+                <br />
+                <br />
+                <table style="width:1000px;font-family:'Segoe UI'">
+                    <tr>
+                        <td style="width:55%;font-size:20px">
+                            <b style="font-size:22px"> Class Teacher  </b>
+                        </td>
+
+                        <td style="width:50%;font-size:20px">
+                            <b style="font-size:22px"> Parent  </b>
+                        </td>
+                        <td style="width:50%;font-size:20px">
+                            <b style="font-size:22px"> Principal  </b>
+                        </td>
+                    </tr>
+                </table>
+                @*<table style="width:1500px">
+                    <tbody>
+                        <tr>
+
+                            <td style="font-size:20px;height:50px;text-align:center">
+                                <b style="font-size:20px"> Principal</b>
+                            </td>
+                            <td style="font-size:20px;height:50px;text-align:center">
+                                <b style="font-size:20px"> Class Teacher</b>
+
+
+                            </td>
+                            <td style="font-size:20px;height:50px;text-align:center">
+                                <b style="font-size:20px"> Parent</b>
+
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>*@
+                if (nCount != n)
+                {
+                    <div style="page-break-after:always">
+                    </div>
+                }
+                else
+                {
+                    nCount = 0;
+                }
+
+
+            }
+        }
+    </div>
+
+</body>
+</html>
+
+<script>
+
+    function onloadData() {
+        PrintElem('#mydiv');
+    }
+    window.onload = onloadData();
+
+    function PrintElem(elem) {
+        var BranchId = $("#BranchId").val();
+        var DivisionId = $("#DivisionId").val()
+        var ClassNumber = $("#ClassNumber").val();
+        var ExamId = $("#ExamId").val();
+        Popup($(elem).html());
+
+        window.location.href = "/AReports/CostalProgressCardReport?Emd=" + ExamId + "&IdB=" + BranchId + "&IdDn=" + DivisionId + "&ClNb=" + ClassNumber
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=400,width=300,size=landscape');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+
+</script>

@@ -1,0 +1,258 @@
+﻿@model AsteriskBrowserAL.Models.CautionDepositDataModel
+@{
+    ViewBag.Title = "Caution Deposit";
+    int nSno = 1;
+}
+
+@if (null != TempData["CautionDeposit"])
+{
+    @Html.Raw(TempData["CautionDeposit"])
+}
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+@if (null != Model)
+{
+    <input type="hidden" id="BatchId" name="BatchId" value="@Model.SectionId" />
+    if (null != Model.lstCDData && Model.lstCDData.Count() > 0)
+    {
+        
+            @Html.ValidationMessage("CautionDeposit")
+            <span style="color:red" id="Validation"></span>
+            
+                <div class="table-header">
+                    Caution Deposit
+                    <div style="float:right">
+                        <div title="Save" class="inline action-buttons">
+                            <input type="submit" class="btn btn-info btn-minier P2"  name="button" id="Save" value="Save"  />
+                            @*<a name="button" id="Save" value="Save" class="btn btn-info btn-minier">
+                                <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                            </a>*@
+                        </div>
+                        <div title="Print" class="inline action-buttons">
+                            <a value="Print" onclick="PrintElem('#mydiv')" class="btn btn-info btn-minier P2">
+                                <i class="fa fa fa-print bigger-160"></i>
+                            </a>
+                        </div>
+                        <div title="Print-Receipt" class="inline action-buttons">
+                            <a value="Print-Receipt"  onclick="location.href='@Url.Action("CautionDepositPrintReceipt", "TFinance")" class="btn btn-info btn-minier P2">
+                            </a>
+                        </div>
+                    </div>
+
+                    @*<input type="submit" style="width:80px;" name="button" id="Save" value="Save" class="btn btn-primary" />*@
+                    @*<input class="btn btn-primary" style="width:80px" type="button" value="Print " onclick="PrintElem('#mydiv')" />
+                    <button class="btn btn-primary" style="width:110px" type="button" onclick="location.href='@Url.Action("CautionDepositPrintReceipt", "TFinance")'">Print-Receipt</button>*@
+                </div><!-- /.box-header -->
+        <div style="overflow:auto; max-height:350px;">
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <tr>
+                    <th>
+                        @Html.DisplayName("SNo")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Old Amount")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Paid Amount")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Reamaining Amount")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Used Amount")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Issue Amount")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Collection Amount")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Remarks")
+                    </th>
+
+                </tr>
+                @for (int i = 0; i < Model.lstCDData.Count(); i++)
+                    {
+                @Html.Hidden("lstCautionDepositData.Index", @i)
+                @Html.Hidden("lstCautionDepositData[" + @i + "].StudentId", @Model.lstCDData.ElementAt(i).StudentId)
+                @Html.Hidden("lstCautionDepositData[" + @i + "].PaidAmount", @Model.lstCDData.ElementAt(i).PaidAmount)
+                @Html.Hidden("lstCautionDepositData[" + @i + "].RemaingAmount", @Model.lstCDData.ElementAt(i).RemaingAmount)
+                @Html.Hidden("lstCautionDepositData[" + @i + "].BatchId", @Model.lstCDData.ElementAt(i).BatchId)
+                @Html.Hidden("lstCautionDepositData[" + @i + "].RemaingAmount", @Model.lstCDData.ElementAt(i).RemaingAmount)
+                @Html.Hidden("lstCautionDepositData[" + @i + "].StudentName", @Model.lstCDData.ElementAt(i).StudentName)
+                @Html.Hidden("lstCautionDepositData[" + @i + "].SectionId", @Model.lstCDData.ElementAt(i).SectionId)
+                <tr>
+                    <td>
+                        @(nSno++)
+                    </td>
+                    <td>
+                        @Model.lstCDData.ElementAt(i).StudentName
+                    </td>
+                    <td>
+                        @Model.lstCDData.ElementAt(i).OldAmount
+                    </td>
+                    <td>
+                        @Model.lstCDData.ElementAt(i).PaidAmount
+                    </td>
+                    <td>
+                        @Model.lstCDData.ElementAt(i).RemaingAmount
+                    </td>
+                    <td>
+                        @Model.lstCDData.ElementAt(i).CautionDepositUsedAmount
+                    </td>
+                    <td>
+                        @Html.TextBox("lstCautionDepositData[" + @i + "].CautionDepositIssueAmount", @Model.lstCDData.ElementAt(i).CautionDepositIssueAmount)
+                        @Html.Hidden("lstCautionDepositData[" + @i + "].CautionDepositIssueAmount", @Model.lstCDData.ElementAt(i).CautionDepositIssueAmount)
+
+
+                    </td>
+                    <td>
+                        @Html.TextBox("lstCautionDepositData[" + @i + "].CollectionAmount", @Model.lstCDData.ElementAt(i).CollectionAmount)
+                        @Html.Hidden("lstCautionDepositData[" + @i + "].CollectionAmount", @Model.lstCDData.ElementAt(i).CollectionAmount)
+
+
+                    </td>
+                    <td>
+                        @Html.TextBox("lstCautionDepositData[" + @i + "].Remarks", @Model.lstCDData.ElementAt(i).Remarks)
+                        @Html.Hidden("lstCautionDepositData[" + @i + "].Remarks", @Model.lstCDData.ElementAt(i).Remarks)
+
+
+                    </td>
+                    <td>
+                        @Html.ActionLink("Details", "CautionDepositDetails", new {@Class="P2", StudentId = @Model.lstCDData.ElementAt(i).StudentId, StudentName = @Model.lstCDData.ElementAt(i).StudentName,SectionId = @Model.lstCDData.ElementAt(i).SectionId })
+                    </td>
+                </tr>
+                    }
+            </table>
+        </div>
+    }
+
+}
+else
+{
+            <div >
+                <span style="font-weight:bold;color:red">Data not available to display</span>
+            </div>
+            }
+
+
+            <script type="text/javascript">
+                function PrintElem(elem) {
+                    Popup($(elem).html());
+                }
+
+                function Popup(data) {
+                    var mywindow = window.open('', 'my div', 'height=300,width=600');
+                    mywindow.document.write('<p></p>');
+                    mywindow.document.write(data);
+                    mywindow.document.write('<p></p>');
+
+                    mywindow.document.close();
+                    mywindow.focus();
+
+                    mywindow.print();
+                    mywindow.close();
+                    return true;
+                }
+            </script>
+            <body>
+                <div id="mydiv" style="display:none">
+                    @if (null != Model)
+                    {
+                        if (null != Model.lstCDData && Model.lstCDData.Count() > 0)
+                        {
+                            int SNo = 1;
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <img class=" col-xs-11" id="avatar" width="50" height="43" src="@ViewBag.ImageData" style="margin-bottom:-1.5em;" />
+                                    <b style="font-weight:bold; margin-left:0.3em; font-size:20px; font-family:'Segoe UI'">@ViewBag.InstituteName</b>
+                                </div>
+                                <div style="margin-left:3.7em; font-family:'Segoe UI'"><b>@ViewBag.InstituteAddres</b></div>
+                                <br />
+
+                                <hr style="width:100%; margin-bottom:-0.5em" />
+                                <hr style="width:100%;" />
+                                <div align="center" style="font:12%; font-family:'Segoe UI'"><b>CAUTION DEPOSIT</b></div>
+                                <hr style="width:100%;" />
+                                <hr style="width:100%; margin-top:-0.5em" />
+
+                                <div class="col-xs-12 box-body table-responsive">
+                                    <table class="table table-hover" rules="rows" cellpadding="5" style="width:675px; font-size:12px;">
+                                        <tbody>
+                                            <tr style="font-size:13px; font-family:'Segoe UI'; font-weight:bold; text-align:left;">
+
+                                                <th>
+                                                    @Html.DisplayName("SNo")
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayName("Student Name")
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayName("Old Amount")
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayName("Paid Amount")
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayName("Issued Amount")
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayName("Reamaining Amount")
+                                                </th>
+
+
+                                            </tr>
+                                            @for (int i = 0; i < Model.lstCDData.Count(); i++)
+                                            {
+                                                <tr style="font-family:'segoe ui'">
+                                                    <td>
+                                                        @(SNo++)
+                                                    </td>
+                                                    <td>
+                                                        @Model.lstCDData.ElementAt(i).StudentName
+
+                                                    </td>
+                                                    <td>
+                                                        @Model.lstCDData.ElementAt(i).OldAmount
+                                                    </td>
+                                                    <td>
+                                                        @Model.lstCDData.ElementAt(i).PaidAmount
+                                                    </td>
+                                                    <td>
+                                                        @Model.lstCDData.ElementAt(i).CautionDepositUsedAmount
+                                                    </td>
+                                                    <td>
+                                                        @Model.lstCDData.ElementAt(i).RemaingAmount
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+
+                                    <br />
+                                    <b style="font-family:'segoe ui';font-size:13px;">Total Old Caution Amount = @("Rs. " + Model.TotalOldCautionAmount)</b><br />
+                                    <b style="font-family:'segoe ui';font-size:13px;">Total Paid Amount = @("Rs. " + Model.TotalPaidAmount)</b><br />
+                                    <b style="font-family:'segoe ui';font-size:13px;">Total Issued Amount = @("Rs. " + Model.TotalIssuedAmount)</b><br />
+                                    <b style="font-family:'segoe ui';font-size:13px;">Remaining Amount = @("Rs. " + Model.TotalRemainingAmount)</b>
+                                </div>
+                            </div>
+                        }
+
+
+                    }
+                </div>
+            </body>
+
+
+
+
+
+
+

@@ -1,0 +1,357 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionData
+
+@{
+    ViewBag.Title = "ExamAnalysis";
+}
+
+   @section BreadCrumb{
+
+<ul class="breadcrumb">
+    <li>
+        <i class="menu-icon fa fa-list"></i>
+        Academics
+    </li>
+    <li>
+        <i class=""></i>
+        Reports
+    </li>
+    <li class="active">Coastal Progress Card Report</li>
+</ul><!-- /.breadcrumb -->
+
+        }
+
+
+
+
+
+
+
+<section class="content">
+
+    <br />
+    @using (Html.BeginForm("CostalProgressCardReport", "AReports", FormMethod.Post))
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header"></div>
+                    <div class="box-body">
+                        <input type="hidden" id="isCentral" value="@Model.IsCentral.ToString()" />
+                        <input type="hidden" id="SelExamId" value="@Model.ExamId" />
+                        <input type="hidden" id="SelClassNumber" value="@Model.SelClassId" />
+                        <input type="hidden" id="SelDivisionId" value="@Model.SelDivision" />
+                        <input type="hidden" id="SelBranchId" value="@Model.SelBarnch" />
+                        <input type="hidden" id="SelSectionId" value="@Model.SelSectionId" />
+
+                        <div class="widget-box">
+                            <div class="widget-header widget-header-flat widget-header-small">
+                                <h5 class="widget-title">
+                                    Coastal Progress Card Report
+                                </h5>
+
+                                <div class="widget-toolbar no-border">
+                                    <div class="inline dropdown-hover">
+                                        <div class="inline action-buttons">
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    @if (Model.IsCentral == true)
+                        {
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Division</label>
+                                                <div class="col-sm-6">
+                                                    <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="BranchId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                            <br />
+                                        </div>
+                                        <br />
+                        }
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Class</label>
+                                            <div class="col-sm-6">
+                                                <select id="ClassNumber" name="ClassNumber" class="form-control"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Section</label>
+                                            <div class="col-sm-6">
+                                                <select id="SectionId" name="SectionId" class="form-control"></select>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Examination</label>
+                                            <div class="col-sm-6">
+                                                <select id="ExamId" name="Exam" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br />
+
+
+                                </div>
+                            </div>
+                            
+                           
+                        </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    <div id="SearchDiv"></div>
+    }
+
+
+</section>
+<div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+    <p style="position:absolute; top: 50%; left:50%;">
+        <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+    </p>
+</div>
+<script>
+
+
+
+
+    function OnloadData() {
+        var IsCentral = $("#isCentral").val()
+        if (IsCentral == "True") {
+            LoadDivisionDropdown();
+
+        }
+        else {
+            LoadClassDropdown()
+        }
+
+    }
+    window.onload = OnloadData();
+
+    function LoadDivisionDropdown() {
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+                var SelDivisionId = $("#SelDivisionId").val();
+                if (SelDivisionId >= 0) {
+                    document.getElementById("DivisionId").value = SelDivisionId;
+                    LoadBranchDropdown();
+                }
+
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        var Division = $("#DivisionId").val();
+        $("#BranchId").html("")
+        $("#SearchDiv").html("")
+        $("#ClassId").html("")
+        if (Division >= 0) {
+            LoadBranchDropdown();
+
+        }
+    })
+
+    $("#BranchId").change(function () {
+        var BranchId = document.getElementById("BranchId").value;
+        $("#SearchDiv").html("")
+        $("#ClassId").html("")
+        if (BranchId >= 0) {
+            LoadClassDropdown()
+        }
+
+
+
+
+    })
+
+
+
+
+    function LoadBranchDropdown() {
+        var DivisionId = $("#DivisionId").val()
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: true },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                    var SelBranchid = $("#SelBranchId").val();
+
+                    if (SelBranchid >= 0) {
+                        document.getElementById("BranchId").value = SelBranchid
+                        LoadClassDropdown()
+                    }
+                },
+                async: false
+            })
+        }
+        else {
+            document.getElementById("BranchId").value = ""
+            $("#BranchId").html("")
+            $("#SearchDiv").html("")
+        }
+    }
+
+    //1st Section Dropdown
+    function GetSectionDropDown() {
+        var ClassNumber = $("#ClassNumber").val();
+        var SelSectionId = $("#SelSectionId").val();
+        if (ClassNumber > 0) {
+            $.ajax({
+                //  url: '/AFrontOffice/GetSectionDropDown',
+                url: '/AFrontOffice/GetSectionDropDownByClassNumber',
+                data: { nClassNumber: ClassNumber },
+                success: function (Data) {
+                    var SectionDRP = $('#SectionId')
+                    SectionDRP.children().remove();
+                    SectionDRP.append($("<option>").val("").text("--Select--"))
+                    $.each(Data, function (i, record) {
+                        SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                    });
+                    $('#SectionId').append(SectionDRP);
+                    if (SelSectionId > 0) {
+                        document.getElementById("SectionId").value = SelSectionId
+                        GetExaminations();
+                    }
+                },
+                async: false
+            })
+        }
+
+
+    }
+
+    function LoadClassDropdown() {
+
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                Section = $("#ClassNumber")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassNumber").append(Section)
+                var SelClassNumber = $("#SelClassNumber").val();
+                if (SelClassNumber > 0 || SelClassNumber > -1) {
+                    document.getElementById("ClassNumber").value = SelClassNumber;
+                    GetSectionDropDown()
+
+
+                }
+
+            },
+            async: false
+        })
+    }
+
+
+    $("#ClassNumber").change(function () {
+        $("#SectionId").html("")
+        GetSectionDropDown()
+
+    })
+
+    $("#SectionId").change(function () {
+        $('#ExamId').html("")
+        GetExaminations()
+    })
+
+
+
+    function GetExaminations() {
+        var ClassNumber = $("#ClassNumber").val();
+        var SectionId = $("#SectionId").val();
+        if (SectionId > 0) {
+            $.ajax({
+                url: '/Common/GetExaminationsByClassNumber',
+                data: { ClassNumber: ClassNumber },
+                success: function (result) {
+                    var Exam = $('#ExamId')
+                    Exam.children().remove();
+                    Exam.append($("<option>").val("null").text("--Select--"))
+                    $.each(result, function (i, record) {
+                        Exam.append($("<option>").val(record.ExamId).text(record.ExamName))
+                    })
+                    $('#ExamId').append(Exam);
+                    var SelExamId = $("#SelExamId").val()
+                    if (SelExamId > 0) {
+                        document.getElementById("ExamId").value = SelExamId
+                        GetResults();
+                    }
+                },
+                async: false
+            })
+        }
+
+
+    }
+
+    $("#ExamId").change(function () {
+        GetResults()
+    })
+
+
+    function GetResults() {
+        var BranchId = $("#BranchId").val();
+        var DivisionId = $("#DivisionId").val()
+        var ClassNumber = $("#ClassNumber").val();
+        var SectionId = $("#SectionId").val();
+        var ExamId = $("#ExamId").val();
+        $("#imagemodal").show()
+
+        $.ajax({
+            url: '/AReports/GetExaminationsResultsByExamId',
+            data: { DivisionId: DivisionId, BranchId: BranchId, ClassNumber: ClassNumber, ExamId: ExamId, SectionId: SectionId },
+            success: function (result) {
+                $("#imagemodal").hide()
+                $('#SearchDiv').html(result);
+                $("#imagemodal").hide();
+            },
+            async: false
+        })
+
+    }
+
+</script>
+
+
+

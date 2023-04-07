@@ -1,0 +1,114 @@
+﻿@model  IEnumerable<AsteriskBrowserAL.Models.ContentData>
+
+@if (null != Model)
+{
+    if (Model.Count() > 0)
+    {
+        int SNo = 1;
+
+        <div class="table-header">
+            <span class="box-title">Records Found(@Model.Count())</span>
+        </div>
+
+
+        <table id="mytab1" class="table table-striped table-bordered table-hover" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Content Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Content URI")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Central")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Browser")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("URL")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Order")
+                    </th>
+
+                    <th></th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>
+                            @(SNo++)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ContentName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ContentURI)
+                        </td>
+                        <td>
+                            @if (item.IsCentral == true)
+                            {
+                                @Html.Raw("Yes")
+                            }
+                            else
+                            {
+                                @Html.Raw("No")
+                            }
+                        </td>
+                        <td>
+                            @if (item.IsBrowser == true)
+                            {
+                                @Html.Raw("Yes")
+                            }
+                            else
+                            {
+                                @Html.Raw("No")
+                            }
+
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CBURL)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.COrderId)
+                        </td>
+
+
+                        <td>
+
+                            <div class="hidden-sm hidden-xs action-buttons">
+                                <a class="green P2" href="@Url.Action("ContentE", "CUserManagement",new { id = item.ContentId, ModuleId = item.ModuleId, PageId = item.PageId })">
+                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                </a>
+                                <a class="red P2" onclick="DeleteContent(@item.ContentId)">
+                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                </a>
+                            </div>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    else
+    {
+        <span style="color:red;font-weight:bold">Data is not available</span>
+    }
+}

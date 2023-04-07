@@ -1,0 +1,496 @@
+﻿@model AsteriskBrowserAL.Models.RunPayRollModel
+@{
+    bool visibility = false;
+    string strYearMonth = string.Empty;
+    var PayRollData = Model.PayRollData.ToList();
+    var m_PData = Model.PayRollData.FirstOrDefault();
+    var IsTransfered = PayRollData.Where(t => t.IsTransfered == true);
+    if (null != m_PData)
+    {
+        strYearMonth = m_PData.Year + "-" + m_PData.Month;
+        if (IsTransfered.Count() > 0)
+        {
+            visibility = true;
+        }
+        else
+        {
+            visibility = false;
+        }
+    }
+
+    int transfrCount = 0;
+}
+
+@if (null != Model)
+{
+    if (Model.PayRollData != null)
+    {
+        if (Model.PayRollData.Count() > 0)
+        {
+
+
+            <input type="hidden" value="@visibility" id="visibility" />
+            <input type="hidden" value="@strYearMonth" id="YearMonth" />
+            <div class="box-body">
+                <div style="overflow:auto; height:500px;">
+                    <table class="table table-hover table-striped table-bordered nowrap" style="font-size:14px;">
+                        <tbody>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Employee ID")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Employee Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Loss Of Pay")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Net Amount")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Pay")
+                                    <input type="checkbox" id="checkAll" />
+                                </th>
+                                @foreach (var result in Model.ListVariableComponents)
+                                {
+                                    <th>
+                                        @result.ComponentName
+                                    </th>
+                                }
+                            </tr>
+
+                            @for (int i = 0; i < Model.PayRollData.Count; i++)
+                            {
+                                string color = string.Empty;
+
+                                if (Model.PayRollData.ElementAt(i).IsTransfered == true)
+                                {
+                                    color = "grey";
+                                    transfrCount++;
+                                }
+
+                                <tr style="background-color:@color;">
+                                    <td>@(i + 1)</td>
+                                    <td>
+                                        @Html.Hidden("lstRunPayroll.Index", (@i))
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].PayrollId", Model.PayRollData.ElementAt(i).PayrollId)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].EmployeeId", Model.PayRollData.ElementAt(i).EmployeeId)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].EmployeeName", Model.PayRollData.ElementAt(i).EmployeeName)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].EmployeeNumber", Model.PayRollData.ElementAt(i).EmployeeNumber)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].Month", Model.PayRollData.ElementAt(i).Month)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].Year", Model.PayRollData.ElementAt(i).Year)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].IsTransfered", Model.PayRollData.ElementAt(i).IsTransfered)
+
+                                        @Model.PayRollData.ElementAt(i).EmployeeNumber
+                                    </td>
+                                    <td>
+                                        @Model.PayRollData.ElementAt(i).EmployeeName
+                                    </td>
+
+
+                                    @if (Model.PayRollData.ElementAt(i).IsTransfered == true)
+                                    {
+
+                                        <td style="text-align-last:right;">
+                                            @Model.PayRollData.ElementAt(i).LossOfPay
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].LossOfPay", 0, new { @id = "lop" + i + "", style = "width:100px;" })
+                                        </td>
+                                        <td style="text-align-last:right;">
+                                            @Model.PayRollData.ElementAt(i).NetAmount
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].NetAmount", 0, new { @id = "amount" + i + "", style = "width:100px;" })
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="Priority" disabled="disabled" />
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].Priority", false, new { @id = "IsChecked" + i + "", style = "width:100px;" })
+                                        </td>
+
+                                        for (int j = 0; j < Model.PayRollData.ElementAt(i).ListVariableComponentsData.Count(); j++)
+                                        {
+                                            var item = Model.PayRollData.ElementAt(i).ListVariableComponentsData.ElementAt(j);
+                                            <td>
+                                                @Html.Hidden("lstRunPayroll[" + @i + "].IsDecuct", item.IsDeduction, new { @id = "Isdeduct" + i + "v" + j + "" })
+
+                                                @Html.TextBox("lstRunPayroll[" + @i + "].Amount", item.Amount, new { @type = "number", @step = "Any", @id = "amount" + i + "", @onkeypress = "return validateNum(event);", @class = "amt", @style = "text-align-last:right;width:100px;", disabled = "disabled" })
+                                            </td>
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        <td>
+                                            @Html.TextBox("lstRunPayroll[" + @i + "].LossOfPay", Model.PayRollData.ElementAt(i).LossOfPay, new { @type = "number", @min = "0", @id = "lop" + i + "", @onkeypress = "return validateNum(event);", @style = "text-align-last:right;width:100px;" })
+                                        </td>
+                                        <td>
+                                            @Html.TextBox("lstRunPayroll[" + @i + "].NetAmount", Model.PayRollData.ElementAt(i).NetAmount, new { @type = "number", @step = "Any", @id = "amount" + i + "", @onkeypress = "return validateNum(event);", @class = "amt", @style = "text-align-last:right;width:100px;" })
+                                        </td>
+                                        <td>
+                                            @Html.CheckBox("lstRunPayroll[" + @i + "].IsChecked", Model.PayRollData.ElementAt(i).IsChecked, new { @class = "case", @id = "IsChecked" + i + "" })
+                                            @*@Html.Hidden("lstRunPayroll[" + @i + "].IsChecked", Model.ElementAt(i).IsChecked, new { @id = "PayId" })*@
+                                        </td>
+
+                                        for(int j=0; j < Model.PayRollData.ElementAt(i).ListVariableComponentsData.Count(); j++)
+                                        {
+                                            var item = Model.PayRollData.ElementAt(i).ListVariableComponentsData.ElementAt(j);
+                                            <td>
+                                                @Html.Hidden("lstRunPayroll[" + @i + "].IsDecuct", item.IsDeduction, new { @id = "Isdeduct" + i + "v" + j + "" })
+
+                                                @Html.TextBox("lstRunPayroll[" + @i + "].Amount", item.Amount, new { @type = "number", @step = "Any", @id = "variableamount" + i + "v"+j+"", @onkeypress = "return validateNum(event);", @class = "amt", @style = "text-align-last:right;width:100px;" })
+                                            </td>
+                                        }
+
+                                    }
+
+
+
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="dialog" style="display:none">Do you wish to create the bank statement?</div>
+
+        }
+    }
+}
+else
+{
+    <span style="color: red;"><b>Data not available</b></span>
+}
+
+<script type="text/javascript">
+
+    $('#checkAll').click(function () {
+        if ($(this).is(':checked')) {
+            var res = document.getElementsByClassName("case");
+            for (var i = 0; i < res.length; i++) {
+                var val = res[i];
+                val.checked = true;
+            }
+        }
+        else {
+            var res = document.getElementsByClassName("case");
+            for (var i = 0; i < res.length; i++) {
+                var val = res[i];
+                val.checked = false;
+            }
+        }
+    });
+
+    $(document).ready(function(){
+        $('#BankStatement').hide();
+        $('#SalaryStatment').hide();
+        var result = $('#visibility').val();
+        if(result){
+            $('#SalaryStatment').show();
+            $('#BankStatement').show();
+        }
+    })
+
+    function validateNum(e) {
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            return false;
+        }
+    };
+
+    $('.case').on('click', function () {
+        $('#error').hide();
+        $('#error2').hide();
+        $('#pe').hide();
+    });
+
+    $('.amt').focus(function () {
+        $('#error1').hide();
+        $('#error2').hide();
+        $('#pe').hide();
+    });
+
+    //$('#AbscentP').click(function () {
+    //    debugger
+    //    var IsChecked = document.getElementById("AbscentP").checked;
+    //    if (IsChecked) {
+    //        $('#LopIdForA').removeAttr('readonly');
+    //        $('#AbsentsVal').removeAttr('readonly');
+    //        $('#LopIdForA').val(1);
+    //        $('#AbsentsVal').val(2);
+    //    }
+    //    else if (!IsChecked) {
+    //        $('#LopIdForA').attr('readonly', true);
+    //        $('#AbsentsVal').attr('readonly', true);
+    //        $('#LopIdForA').val('');
+    //        $('#AbsentsVal').val('');
+    //    }
+    //});
+
+
+    //$('#LateP').click(function () {
+    //    debugger
+    //    var IsChecked = document.getElementById("LateP").checked;
+    //    if (IsChecked)
+    //    {
+    //        $('#LateVal').removeAttr('readonly');
+    //        $('#LOPForL').removeAttr('readonly');
+    //        $('#LateVal').val(3);
+    //        $('#LOPForL').val(1);
+    //    }
+    //    else if (!IsChecked) {
+    //        $('#LateVal').attr('readonly', true);
+    //        $('#LOPForL').attr('readonly', true);
+    //        $('#LateVal').val('');
+    //        $('#LOPForL').val('');
+    //    }
+    //});
+
+    $('#SelectAll').click(function () {
+        debugger
+        $('#error').hide();
+        var res = document.getElementsByClassName("case");
+        for (var i = 0; i < res.length; i++) {
+            var val = res[i];
+            val.checked = true;
+        }
+    });
+
+    $('#SelectNone').click(function () {
+        debugger
+        var res = document.getElementsByClassName("case");
+        for (var i = 0; i < res.length; i++) {
+            var val = res[i];
+            val.checked = false;
+        }
+    });
+
+    $('#Calculate').click(function () {
+        debugger
+        //var LateIsChecked = document.getElementById("LateP").checked;
+        //if (LateIsChecked)
+        //    LateIsChecked = 'yes';
+        //else if (!LateIsChecked)
+        //    LateIsChecked = 'no';
+        var LateLOP = 0;
+        var Lateval = $('#LateVal').val();
+        if (Lateval == ""){
+            Lateval = 0;
+            LateIsChecked = 'no';
+        }
+        else{
+            LateIsChecked = 'yes';
+            LateLOP = Lateval
+        }
+
+        ////var AbsentIsChecked = document.getElementById("AbscentP").checked;
+        ////if (AbsentIsChecked)
+        ////    AbsentIsChecked = 'yes';
+        //else if (!AbsentIsChecked)
+        //    AbsentIsChecked = 'no';
+        var AbsentLOP = 0;
+        var AbsentVal = $('#AbsentsVal').val();
+        if (AbsentVal == ""){
+            AbsentVal = 0;
+            AbsentIsChecked = 'no';
+        }
+        else{
+            AbsentIsChecked = 'yes';
+            AbsentLOP = AbsentVal
+        }
+
+        //var AbsentLOP = $('#LopIdForA').val();
+        //if (AbsentLOP == "")
+        //    AbsentLOP = 0
+
+        monthNdyear = $("#YearAndMnth").val();
+
+        var branch =  $('#Branches').val();
+        var result = monthNdyear.split('-');
+        var n_Year = result[0];
+        var n_Month = result[1];
+
+        var branch = $('#Branches').val();
+        if (branch == undefined || branch == null || branch == "")
+            branch = 0;
+
+        if (LateIsChecked || AbsentIsChecked) {
+            $.ajax({
+                url: '/HRPayroll/CalculatePayrolls',
+                data: {nBranch: branch, YearMonth: monthNdyear, chkLatePolicy: LateIsChecked, chkAbsentPolicy: AbsentIsChecked, nNoOfAbsentdays: AbsentVal, nNoOfAbLOP: AbsentLOP, nNoOfLatedays: Lateval, nNoOfLtLOP: LateLOP },
+                beforeSend:function(){
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    if (data.length > 0) {
+                        $("#SearchDiv").html(data)
+                        document.getElementById('DivId').style.display = "inline"
+                    }
+                    else {
+                        document.getElementById('DivId').style.display = "none"
+                    }
+                },
+            }).done(function(){
+                $('#imagemodal').hide();
+            });
+        };
+
+        return false;
+    });
+
+    function TransferSalries() {
+        debugger;
+        var lstRunPayroll1 = [];
+        var chk = 0;
+        var amnt = 0;
+
+
+        function set(value){
+            return value;
+        }
+
+        var lstRunPayroll = Html.Raw(Json.Encode(PayRollData));
+
+        for (i = 0; i < lstRunPayroll.length; i++) {
+            var result = 'amount'+i;
+            var res = document.getElementById(result).value;
+            var checked = document.getElementById("IsChecked"+i+"").checked;
+            var lop = document.getElementById("lop" + i + "").value;
+            if(checked){
+                chk++;
+                if(res > 0){
+                    lstRunPayroll[i].NetAmount = res;
+                    lstRunPayroll[i].IsChecked = checked;
+                    lstRunPayroll[i].LossOfPay = lop;
+                    for (j = 0; j < lstRunPayroll[i].ListVariableComponentsData.length; j++){
+                        var result1 = 'variableamount'+ i+'v'+j;
+                        var res1 = document.getElementById(result1).value;
+
+                        var isdeductval = 'Isdeduct' + i + 'v' + j + '';
+
+                        var val =  document.getElementById(isdeductval).value;
+
+                        lstRunPayroll[i].ListVariableComponentsData[j].IsDeduction = val;
+                        lstRunPayroll[i].ListVariableComponentsData[j].Amount = res1;
+                    }
+                    lstRunPayroll1.push(lstRunPayroll[i]);
+                    amnt++;
+                }
+            }
+        }
+
+        if(chk < 1 && amnt < 1)
+        {
+            $('#pe').hide();
+            $('#error1').hide();
+            $('#error').hide();
+            $('#error2').show();
+            return false;
+        }
+
+        else if(chk < 1)
+        {
+            $('#pe').hide();
+            $('#error1').hide();
+            $('#error2').hide();
+            $('#error').show();
+            return false;
+        }
+
+        else if(amnt < 1)
+        {
+            $('#pe').hide();
+            $('#error').hide();
+            $('#error2').hide();
+            $('#error1').show();
+            return false;
+        }
+       
+        var branch = $('#Branches').val();
+        if (branch == undefined || branch == null || branch == "")
+            branch = 0;
+        $("#SearchDiv").hide();
+        $.ajax({
+            url: "/HRPayroll/TransferSalaries",
+            data: { lstRunPayroll: lstRunPayroll1, nBranchId: branch },
+            type: "POST",
+            beforeSend:function(){
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                debugger;
+                $("#SearchDiv").show();
+                var $dialog = $('<div></div>')
+                   .html('Successfully Transferred')
+
+                   .dialog({
+                       autoOpen: false,
+                       title: 'Fee Payments',
+                       modal: true,
+                       buttons: {
+                           "OK": function () {
+                               $dialog.dialog('close');
+
+                           }
+
+                       }
+                   });
+                yesnodialog('yes','no');
+                $dialog.dialog('open');
+                $('#pe').show();
+
+                //document.getElementById("pe").innerHTML = "Successfully Transferred Salaries";
+                $("#SearchDiv").html(data);
+            },
+            error: function () {
+                document.body.style.cursor = 'default';
+                $('#imagemodal').hide();
+            },
+        }).done(function(){
+            $('#imagemodal').hide();
+        });
+        return false;
+    };
+
+    function yesnodialog(button1, button2) {
+        var btns = {};
+        btns[button1] = function () {
+            GetBanckStatement();
+            $(this).dialog("close");
+        };
+        btns[button2] = function () {
+            // Do nothing
+            $(this).dialog("close");
+        };
+        document.getElementById('dialog').style.display = "inline"
+        $("#dialog").dialog({
+            autoOpen: true,
+            display: 'inline',
+            title: 'Salaries',
+            modal: true,
+            buttons: btns
+
+        });
+    }
+
+
+    function GetBanckStatement(){
+        debugger
+        var yearMonth = $('#YearMonth').val();
+        var strValue = yearMonth+","+"no"+","+0+","+0+","+"no"+","+0+","+0+",";
+        var branchNo = $('#Branches').val();
+        if(branchNo == '0' || branchNo==null || branchNo == "")
+            branchNo = 0;
+        var url = "/HRPayroll/BankStatementForSalaries?stringVal="+strValue+"&nBranchId=" + branchNo;
+        window.location.href = url;
+    };
+
+    $('#SalaryStatment').click(function(){
+        debugger
+        var strValue = $('#YearMonth').val();
+        var branchNo = $('#Branches').val();
+        if(branchNo == '0' || branchNo==null || branchNo == "")
+            branchNo = 0;
+        window.location.href = "/HRPayroll/GenerateSalaryStatement?nBranch=" + branchNo;
+    })
+</script>

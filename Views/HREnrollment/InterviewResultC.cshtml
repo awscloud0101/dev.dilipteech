@@ -1,0 +1,283 @@
+﻿@model AsteriskBrowserAL.Models.InterviewResults
+@{
+    ViewBag.Title = "InterviewResultC";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+
+        </li>
+        <li>
+            <i class=""></i>
+            Enrollment
+        </li>
+        <li class="active">Interview Result</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="page-header">
+                        <h1>
+                            Interview Results
+                            <br />
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "InterviewResults")
+                            </small>
+                        </h1>
+                    </div>
+                    <br/>
+                    @using (Html.BeginForm("InterviewResultC", "HREnrollment", FormMethod.Post, new { @class = "form-horizontal" }))
+                    {
+                        <span style="color:red;font-weight:bold;">@Html.ValidationMessage("InterviewResultC")</span>
+                        <input type="hidden" value="@Model.StaffInterviewId" name="StaffInterviewId" />
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <!-- PAGE CONTENT BEGINS -->
+                                <form class="form-horizontal" role="form">
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Interviewer</label>
+
+                                        <div class="col-sm-3">
+                                            @Html.DropDownListFor(model => model.Interviewer, new SelectList(Model.ListInterviwer, "StaffId", "DisplayName"), "--- Select ---", new { @class = "form-control", @id = "Interviewer" })
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="vStaff">
+                                            <label style="color:red;font-weight:bold;"> Please select Interviewer</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Interview Status</label>
+                                        <div class="col-sm-3">
+                                            @Html.DropDownListFor(model => model.InterviewStatus, new SelectList(Model.ListEmployeeStatus, "EmployeeStatusId", "StatusName"), "--- Select ---", new { @class = "form-control", @id = "InterviewStatus" })
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="vStatus">
+                                            <label style="color:red;font-weight:bold;"> Please select Status</label>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Marks (in % of)</label>
+
+                                        <div class="col-sm-3">
+                                            <input type="text" class="form-control allownumericwithdecimal" name="Marks" id="Marks" onkeyup="this.value = minmax(this.value, 0, 100)" />
+                                            @*<text class="form-control" name="Marks" maxlength="2" id="Marks"></text>*@
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="vMarks">
+                                            <label style="color:red;font-weight:bold;"> Select Interviewer</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Subject Knowledge (out of 10)</label>
+
+                                        <div class="col-xs-3">
+                                            <input type="text" class="form-control allownumericwithdecimal" name="SubjectKnowledge" id="SubjectKnowledge" onkeyup="this.value = minmax(this.value, 0, 10)" />
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="vSubKnwl">
+                                            <label style="color:red;font-weight:bold;"> Please enter Subject knowledge</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Teaching Ability</label>
+
+                                        <div class="col-xs-3">
+                                            @Html.DropDownListFor(model => model.TeachingAbility, new SelectList(Model.ListTeachingAbilities, "Ability", "Ability"), "--- Select ---", new { @class = "form-control", @id = "Ability" })
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="vTeaching">
+                                            <label style="color:red;font-weight:bold;"> Please select Teaching Ability</label>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Communication</label>
+
+                                        <div class="col-xs-3">
+                                            @Html.DropDownListFor(model => model.Communication, new SelectList(Model.Communications, "Communication", "Communication"), "--- Select ---", new { @class = "form-control", @id = "Comnctn" })
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="vCommunication">
+                                            <label style="color:red;font-weight:bold;"> Please select Communication</label>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Overall Result</label>
+
+                                        <div class="col-xs-3">
+                                            @Html.DropDownListFor(model => model.OverallResults, new SelectList(Model.OverallResults, "OverallResult", "OverallResult"), "--- Select ---", new { @class = "form-control", @id = "Ovalsts" })
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="vOvrlrslts">
+                                            <label style="color:red;font-weight:bold;"> Please select Overall Status</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="hr hr-18 dotted hr-double"></div>
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <button class="btn btn-success btn-sm" onclick="return ValidateForm();" type="submit">
+                                            <i class="ace-icon fa fa-check bigger-50"></i>
+                                            Save
+                                        </button>
+
+                                        &nbsp; &nbsp; &nbsp;
+                                        <button class="btn btn-sm" type="reset">
+                                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                                            Reset
+                                        </button>
+                                    </div>
+                                    </form>
+                            </div>
+                        </div>
+
+                    }
+                </div>
+    </div>
+
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+<script type="text/javascript">
+
+    //$('#SubjectKnowledge').keyup(function () {
+    //    var val = $('#SubjectKnowledge').val();
+    //    var value = parseInt(val);
+
+    //    if (value > 10) {
+    //        $(this).val('');
+    //        return false;
+
+    //    }
+    //});
+
+    //$('#Marks').keyup(function () {
+    //    var val = $('#Marks').val();
+    //    var value = parseInt(val);
+
+    //    if (value > 100) {
+    //        $(this).val('');
+    //        return false;
+
+    //    }
+    //});
+
+    function ValidateForm() {
+        var bValidate = true;
+
+        var interviewer = $('#Interviewer').val();
+        var Istatus = $('#InterviewStatus').val();
+        var Marks = $('#Marks').val();
+        var SubKnwl = $('#SubjectKnowledge').val();
+        var Ability = $('#Ability').val();
+        var Comunctn = $('#Comnctn').val();
+        var Overlsts = $('#Ovalsts').val();
+
+        if (interviewer == "" || interviewer == undefined) {
+            bValidate = false;
+            $('#vStaff').show();
+        }
+
+        if (Istatus == "" || Istatus == undefined || Istatus == "--- Select ---") {
+            bValidate = false;
+            $('#vStatus').show();
+        }
+
+        if (Marks == "" || Marks == undefined) {
+            bValidate = false;
+            $('#vMarks').show();
+        }
+
+        if (SubKnwl == "" || SubKnwl == undefined) {
+            bValidate = false;
+            $('#vSubKnwl').show();
+        }
+
+        if (Overlsts == "" || Overlsts == undefined) {
+            bValidate = false;
+            $('#vOvrlrslts').show();
+        }
+
+        if (Ability == "" || Ability == undefined) {
+            bValidate = false;
+            $('#vTeaching').show();
+        }
+
+        if (Comunctn == "" || Comunctn == undefined) {
+            bValidate = false;
+            $('#vCommunication').show();
+        }
+
+        return bValidate;
+    }
+
+    $('#Interviewer').change(function () {
+        $('#vStaff').hide();
+
+    });
+    $('#InterviewStatus').change(function () {
+        $('#vStatus').hide();
+    });
+    $('#Marks').change(function () {
+        $('#vMarks').hide();
+    });
+    $('#SubjectKnowledge').change(function () {
+        $('#vSubKnwl').hide();
+    });
+
+    $('#Ability').change(function () {
+        $('#vTeaching').hide();
+    });
+    $('#Comnctn').change(function () {
+        $('#vCommunication').hide();
+    });
+    $('#Ovalsts').change(function () {
+        $('#vOvrlrslts').hide();
+    });
+
+
+    $(".allownumericwithdecimal").on("keypress keyup", function (event) {
+        debugger
+        //this.value = this.value.replace(/[^0-9\.]/g,'');
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+
+
+    $(".allownumeric").on("keypress keyup", function (event) {
+        $(this).val($(this).val().replace(/[^\d].+/, ""));
+        if ((event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+
+    function minmax(value, min, max) {
+        debugger
+        if (parseFloat(value) < min || isNaN(value))
+            return 0;
+        else if (parseFloat(value) > max)
+            return max;
+        else return value;
+    }
+</script>

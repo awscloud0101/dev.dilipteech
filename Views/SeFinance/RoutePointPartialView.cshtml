@@ -1,0 +1,111 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.VehicleRoutePointViewModel>
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+    hideScrolling:hover {
+        overflow: auto;
+    }
+</style>
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    <div class="table-header">
+        Records Found (@Model.Count())
+    </div>
+    <input type="hidden" name="BranchId" value="@Model.FirstOrDefault().BranchId" id="BranchId" />
+
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Route Point Name")
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @(nsno++)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RoutepointName)
+                            </td>
+                            <td>
+                                <div class="hidden-sm hidden-xs action-buttons">
+                                    <a class="green" href="@Url.Action("RoutePointE", "SeFinance", new { TransportPlanId = item.TransportPlanId, id = item.VehicleRoutePointId ,BranchId = item.BranchId })">
+                                        <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                    </a>
+                                    <a class="red" onclick="btnConfirm(@item.VehicleRoutePointId,@item.BranchId)">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                    </a>
+                                </div>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+      
+
+    
+}
+else
+{
+    <span style="color: red;"><b>Data not available</b></span>
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+
+<script>
+
+    function btnConfirm(Value) {
+        debugger
+        var BranchId = $('#BranchId').val();
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeFinance/ValidationForRoutePointD',
+                data: { Id: Value,nBranchId:BranchId },
+                success: function (data) {
+
+                    var url = '/SeFinance/RoutePointD?id=' + Value + '&BranchId=' + BranchId;
+                    var title = "Route Point";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

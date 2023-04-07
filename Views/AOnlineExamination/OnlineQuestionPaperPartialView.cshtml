@@ -1,0 +1,230 @@
+﻿
+@model AsteriskBrowserAL.Models.OnlineQuestionPaperModel
+@{
+    //List<IGrouping<int, AsteriskBrowserAL.Models.OnlineQuestionPaperModel>> lstSubGroupingList = new List<IGrouping<int, AsteriskBrowserAL.Models.OnlineQuestionPaperModel>>();
+    //ViewBag.Title = "QuestionPaper";
+    //if (null != ViewBag.SubGroupingList)
+    //{
+    //    lstSubGroupingList = ViewBag.SubGroupingList;
+    //}
+
+    ViewBag.Title = "QuestionPaper";
+}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+<section class="content" oncontextmenu="return false">
+    @*<div class="row">
+            <div class="col-xs-12">
+                <h3>QuestionPaper</h3>
+
+            </div>
+        </div>*@
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @if (null != Model && null != Model.lstSubGroupingList)
+            {
+                @Html.HiddenFor(model => model.AdmissionNo)
+                @Html.HiddenFor(model => model.QuestionPaperId)
+                @Html.HiddenFor(model => model.QuestionPatternId)
+                @Html.HiddenFor(model => model.QuestionId)
+                @Html.HiddenFor(model => model.QuestionPatternId)
+                <input type="hidden" value="@Model.QuestionId" id="QuestionId" />
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h4 class="widget-title">QuestionPaper</h4>
+
+                        @*<br />*@
+
+                        @*@if (Model.lstSubGroupingList.Count() > 0)
+                            {
+                                foreach (var s in Model.lstSubGroupingList)
+                                {
+                                    foreach (var g in s)
+                                    {
+                                        <button class="Subject btn btn-primary" type="submit" value="@s.Key" id="Subject" name="Subject">@g.SubjectName</button>
+                                        break;
+                                    }
+                                }
+                            }*@
+
+
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+                    @if (@Model.IsImageExam)
+                    {
+                        <div class="row col-sm-12">
+                            <div class="widget-body">
+                                <br />
+                                <input type="button" class="btn btn-primary" id="Submit" value="Submit" name="Submit" />
+                                <br />
+                                <br />
+                                <span class="row">
+                                    @(@Model.SNo) @(".")<img src="@Model.Question" style="height:120px;width:850px" />
+                                </span>
+                                <br />
+                                <br />
+                                @Html.RadioButtonFor(model => model.Sel_Option, "1", new { name = "Sel_Option" }) &nbsp; 1<br />
+                                @Html.RadioButtonFor(model => model.Sel_Option, "2", new { name = "Sel_Option" }) &nbsp; 2<br />
+                                @Html.RadioButtonFor(model => model.Sel_Option, "3", new { name = "Sel_Option" }) &nbsp; 3<br />
+                                @Html.RadioButtonFor(model => model.Sel_Option, "4", new { name = "Sel_Option" }) &nbsp; 4
+
+                                <br />
+                                <br />
+                                <br />
+
+                                @if (Model.SNo > 1)
+                                {
+                                    <button type="submit" class="prev btn btn-primary" name="id" value="@(Model.SNo-1)">Prev</button>
+                                }
+
+                                @if (Model.SNo < Model.NoOfQuestions)
+                                {
+                                    <button type="submit" class="next btn btn-primary" name="id" id="next" value="@(Model.SNo+1)">Next</button>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row col-sm-12">
+                            <div class="widget-body">
+                                <br />
+                                <input type="button" class="btn btn-primary" id="Submit" value="Submit" name="Submit" />
+                                <br />
+                                <br />
+                                <span class="row">
+                                    @(@Model.SNo) @(". ")
+                                    <span>@Model.Question</span>
+                                </span>
+                                <br />
+                                <br />
+                                @Html.RadioButtonFor(model => model.Sel_Option, "1", new { name = "Sel_Option" })&nbsp;&nbsp;&nbsp;&nbsp;1. &nbsp;&nbsp;<span>@Model.Option1</span> <br />
+                                @Html.RadioButtonFor(model => model.Sel_Option, "2", new { name = "Sel_Option" })&nbsp;&nbsp;&nbsp;&nbsp;2. &nbsp;&nbsp;<span>@Model.Option2</span> <br />
+                                @Html.RadioButtonFor(model => model.Sel_Option, "3", new { name = "Sel_Option" })&nbsp;&nbsp;&nbsp;&nbsp;3. &nbsp;&nbsp;<span>@Model.Option3</span> <br />
+                                @Html.RadioButtonFor(model => model.Sel_Option, "4", new { name = "Sel_Option" })&nbsp;&nbsp;&nbsp;&nbsp;4. &nbsp;&nbsp;<span>@Model.Option4</span>
+
+                                <br />
+                                <br />
+                                <br />
+
+                                @if (Model.SNo > 1)
+                                {
+                                    <button type="submit" class="prev btn btn-primary" name="id" value="@(Model.SNo-1)">Prev</button>
+                                }
+
+                                @if (Model.SNo < Model.NoOfQuestions)
+                                {
+                                    <button type="submit" class="next btn btn-primary" name="id" id="next" value="@(Model.SNo+1)">Next</button>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    }
+                    <br />
+                </div>
+
+
+            }
+
+        </div>
+
+    </div>
+
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        localStorage.setItem('option', 0);
+
+        //document.onkeydown(function (e) {
+        //    if (e.keyCode == 116) {
+        //        return false;
+        //    }
+        //})
+
+        document.onmousedown = disableclick;
+    });
+
+    function disableclick(e) {
+        if (e.button == true) {
+            return false;
+        }
+    }
+
+    $('input[name="Sel_Option"]').click(function radioButton() {
+
+        selOption = $(this).val();
+
+        localStorage.setItem('option', selOption);
+
+    });
+
+
+    $('.prev').click(function () {
+        debugger;
+        localStorage.setItem('Subject', "");
+        var value = $(this).val();
+
+        localStorage.setItem('i', value);
+
+        GetQuestions();
+        return false;
+
+    });
+
+    $('.next').click(function () {
+        debugger
+        localStorage.setItem('Subject', "");
+        var value = $(this).val();
+        localStorage.setItem('i', value);
+
+        GetQuestions();
+        return false;
+
+    });
+
+    $('.Subject').click(function () {
+        //alert('sub')
+        localStorage.setItem('i', 0);
+        var Subject = $(this).val();
+        //alert(Subject);
+        localStorage.setItem('Subject', Subject);
+
+        GetQuestions();
+        return false;
+    });
+
+
+    $("#Submit").click(function (e) {
+        debugger;
+        var $dialog = $('<div></div>')
+            .html('Do you want to submit?')
+            .dialog({
+                autoOpen: false,
+                title: 'Online Examination',
+                modal: true,
+                buttons: {
+                    "Yes": function () {
+                        $dialog.dialog('close');
+                        $("#form").submit();
+                    },
+                    No: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+        $dialog.dialog('open');
+        e.preventDefault();
+        return false;
+    });
+
+</script>

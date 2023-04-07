@@ -1,0 +1,142 @@
+﻿@model List<AsteriskBrowserAL.Models.CoScholasticsResultsData>
+
+@{
+    string UserRole = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+    <div class="hr hr-18 dotted hr-double"></div>
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="table-header">
+                Records Found (@Model.Count())
+                <div style="float:right;">
+                    <button type="submit" name="Save" class="btn btn-info btn-xs P2" style="margin-top:2px">
+                        <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+
+        <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Roll Number")
+                    </th>
+                    @if (bIsCoastal)
+                                {
+                                <th>
+                                    @Html.DisplayName("Registration Number")
+                                </th>
+                                }
+                    <th>
+                        @Html.DisplayName("Legacy Number")
+                    </th>
+                    @*<th>
+                        @Html.DisplayName("Project (5)")
+                    </th>*@
+                    <th>
+                        @Html.DisplayName("Reading (5)")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Writing (5)")
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count(); i++)
+                            {
+                            <tr>
+                                <td>
+                                    @Html.Hidden("lstCoScholasticResults.Index", (@i + 10))
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @Html.Hidden("lstCoScholasticResults[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                                    @Model.ElementAt(i).DisplayName
+                                </td>
+                                <td>
+                                    @Model.ElementAt(i).RollNumber
+                                </td>
+                                @if (bIsCoastal)
+                                    {
+                                    <td>
+                                        @Model.ElementAt(i).OMRNumber
+                                    </td>
+                                    }
+                                <td>
+                                    @Model.ElementAt(i).LegacyNumber
+                                </td>
+
+                                @if (Model.ElementAt(i).IsVisibile)
+                                    {
+                                    @*<td>
+                                        @Html.TextBox("lstCoScholasticResults[" + (@i + 10) + "].Project", Model.ElementAt(i).Project, new { @class = "form-control textlength", @maxlength = "4", @min = "0", onkeypress = "return isNumberKey(event)", @max = "5", @style = "width:100px" })
+                                    </td>*@
+                                    <td>
+                                        @Html.TextBox("lstCoScholasticResults[" + (@i + 10) + "].Reading", Model.ElementAt(i).Reading, new { @class = "form-control textlength", @maxlength = "4", @min = "0", onkeypress = "return isNumberKey(event)", @max = "5", @style = "width:100px" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBox("lstCoScholasticResults[" + (@i + 10) + "].Writing", Model.ElementAt(i).Writing, new { @class = "form-control textlength", @maxlength = "4", @min = "0", onkeypress = "return isNumberKey(event)", @max = "5", @style = "width:100px" })
+                                    </td>
+                                    }
+                                    else
+                                    {
+                                    @*<td>
+                                        @Html.TextBox("lstCoScholasticResults[" + (@i + 10) + "].Project", Model.ElementAt(i).Project, new { @class = "form-control textlength", @readonly = "readonly", @maxlength = "4", @min = "0", onkeypress = "return isNumberKey(event)", @max = "5", @style = "width:100px" })
+                                    </td>*@
+                                    <td>
+                                        @Html.TextBox("lstCoScholasticResults[" + (@i + 10) + "].Reading", Model.ElementAt(i).Reading, new { @class = "form-control textlength", @maxlength = "4",  @min = "0", onkeypress = "return isNumberKey(event)", @max = "5", @style = "width:100px" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBox("lstCoScholasticResults[" + (@i + 10) + "].Writing", Model.ElementAt(i).Writing, new { @class = "form-control textlength", @maxlength = "4",  @min = "0", onkeypress = "return isNumberKey(event)", @max = "5", @style = "width:100px" })
+                                    </td>
+                                    }
+
+                            </tr>
+                            }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <span style="color: red;"><b>No data to display</b></span>
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    $('.textlength').on('input', function () {
+        var value = $(this).val();
+        if ((value !== '') && (value.indexOf('.') === -1)) {
+            $(this).val(Math.min(value, 5));
+        }
+    });
+</script>
+
+
+

@@ -1,0 +1,677 @@
+﻿@model AsteriskBrowserAL.Models.StaffInterviewsData
+@{
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Enrollment
+        </li>
+        <li class="active">Upload Resume</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+<style type="text/css">
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+<div class="row">
+
+    <!--Main Content-->
+    <section class="content">
+        <br />
+        <div class="col-xs-12">
+            @using (Html.BeginForm("UploadResume", "HREnrollment", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+            {
+                if (Model != null)
+                {
+                }
+                <span style="font-weight:bold;color:green;">@Html.ValidationMessage("UploadResume")</span>
+                <span style="font-weight:bold;color:red;">@Html.ValidationMessage("Validate")</span>
+
+                <input type="hidden" id="ClassesCanHandle" name="ClassesCanHandle" />
+                <input type="hidden" id="Subjects" name="Subjects" />
+
+
+                <input type="hidden" value="@ViewBag.Print" name="Print" id="Print" />
+                <div class="row">
+                    <div class="col-xs-12">
+                        <span id="Validation" style="color:red;font-weight:bold"></span>
+                        <div class="widget-box">
+                            <div class="widget-header">
+                                <h5 class="widget-title">Upload Resume</h5>
+
+                                <div class="widget-toolbar no-border">
+                                    <div title="Save" class="inline action-buttons">
+                                        <button class="btn btn-info btn-minier P2" onclick="return ValidateForm()">
+                                            <i class="ace-icon fa fa-floppy-o bigger-160">
+                                            </i>
+                                        </button>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main">
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-2">@Html.Label("Search")</label>
+                                            <div class="col-xs-3">
+                                                <div class="input-group custom-search-form col-xs-12">
+                                                    <input type="text" class="form-control" name="SearchString" id="SearchString" placeholder="Use email id to edit">
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-search"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-2">@Html.Label("*Email Id", new { @class = "required" })</label>
+                                            <div class="col-xs-3">
+                                                <input type="text" name="EmailId" id="EmailId" class="form-control" placeholder="Email Id" />
+                                            </div>
+                                            <div class="col-xs-1"></div>
+                                            <label class="col-xs-2">@Html.Label("*Branch Interested", new { @class = "required" })</label>
+                                            <div class="col-xs-3">
+                                                @Html.DropDownListFor(model => model.BranchId, new SelectList(Model.lstBranchIntrested, "SubscriptionId", "Institute", 0), new { @class = "form-control", id = "BranchId" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-2">@Html.Label("*First Name", new { @class = "required" })</label>
+                                            <div class="col-xs-3">
+                                                <input type="text" name="FirstName" id="FirstName" class="form-control" placeholder="First Name" />
+                                            </div>
+                                            <div class="col-xs-1"></div>
+
+                                            <label class="col-xs-2">@Html.Label("Last Name")</label>
+                                            <div class="col-xs-3">
+                                                <input type="text" name="LastName" id="LastName" class="form-control" placeholder="Last Name" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-2">@Html.Label("*Father Name", new { @class = "required" })</label>
+                                            <div class="col-xs-3">
+                                                <input type="text" name="FatherName" id="FatherName" class="form-control" placeholder="Father Name" />
+                                            </div>
+                                            <div class="col-xs-1"></div>
+
+                                            <label class="col-xs-2">@Html.Label("*Department", new { @class = "required" })</label>
+                                            <div class="col-xs-3">
+                                                @Html.DropDownListFor(model => model.DepartmentId, new SelectList(Model.lstDepartments, "DepartmentId", "DepartmentName", 0), new { @class = "form-control", id = "DepartmentId" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <br />
+
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-2">@Html.Label("*Mobile Number", new { @class = "required" })</label>
+                                            <div class="col-xs-3">
+                                                <input type="text" name="MobileNumber" id="MobileNumber" maxlength=10 class="form-control txtboxNum" placeholder="Mobile Number" />
+                                            </div>
+
+                                            <div class="col-xs-1"></div>
+
+                                            <label class="col-xs-2">@Html.Label("*Alternate Mobile", new { @class = "required" })</label>
+                                            <div class="col-xs-3">
+                                                <input type="text" name="AlternateMobileNumber" id="AlternateMobileNumber" maxlength=10 class="form-control txtboxNum" placeholder="Alternate Mobile Number" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-2">@Html.Label("*Qualification", new { @class = "required" })</label>
+                                            <div class="col-xs-3">
+                                                @Html.DropDownListFor(model => model.QualificationId, new SelectList(Model.lstQualification, "QualificationsId", "Name", 0), new { @class = "form-control", id = "QualificationId" })
+                                            </div>
+                                            <div class="col-xs-1"></div>
+
+                                            <label class="col-xs-2">@Html.Label("Additional Qualification")</label>
+                                            <div class="col-xs-3">
+                                                @Html.DropDownListFor(model => model.AdditionalQualificationId, new SelectList(Model.lstAdditionalQualification, "QualificationsId", "Name", 0), new { @class = "form-control", id = "AdditionalQualificationId" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+
+                                            <label class="col-xs-2">@Html.Label("*Classes Can Handle", new { @class = "required" })</label>
+                                            <div class="col-xs-9">
+                                                @Html.DropDownListFor(model => model.ClassesCanHandle, new SelectList(Model.lstClassesCanHandle, "ClassNumber", "ClassNumberDisplay", 0), new { @class = "form-control select2", id = "ClassId", @multiple = "multiple" })
+                                            </div>
+                                            <div class="col-xs-1">
+                                                <label> <input type="checkbox" id="checkbox"> All</label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div>
+                                                <label class="col-xs-2">@Html.Label("*Subjects Can Teach", new { @class = "required" })</label>
+                                                <div class="col-xs-9">
+                                                    @Html.DropDownListFor(model => model.SubjectId, new SelectList(Model.lstSubjects, "SubjectName", "SubjectName", 0), new { @class = "form-control select2", id = "SubjectId", @multiple = "multiple" })
+                                                </div>
+                                                <div class="col-xs-1">
+                                                    <label> <input type="checkbox" id="checkbox1"> All</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-2">@Html.Label("*Experience", new { @class = "required" })</label>
+                                            <div class="col-xs-2">
+                                                @Html.DropDownListFor(model => model.ExperienceInYears, new SelectList(Model.lstExperienceInYears), "Year", new { @class = "form-control", id = "ExperienceInYears" })
+                                            </div>
+                                            <div class="col-xs-2">
+                                                @Html.DropDownListFor(model => model.ExperienceInMonths, new SelectList(Model.lstExperienceInMonths), "Month", new { @class = "form-control", id = "ExperienceInMonths" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-3">@Html.Label("*Upload resume document", new { @class = "required" })</label>
+                                            <div class="col-xs-2">
+                                                @*<input type="button" id="browse" name="browse" value="choose file"  multiple="multiple"   />
+                                                    <div id="selectedFiles"></div>*@
+
+                                                <input type="file" id="resumeImages" name="resumeImages" multiple="multiple" />
+                                                <div id="selectedFiles"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-3">@Html.Label("Attached Documents")</label>
+                                            <div class="col-xs-8">
+                                                <select id="lblResumes" name="fileId" multiple="multiple" class="col-xs-5"></select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <br />
+
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-xs-10">@Html.Label("Note : Use email Id for Editing")</label>
+                                        </div>
+                                    </div>
+                                    <br />
+
+
+
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </section>
+
+
+</div>
+<input name="StaffInterviewsId" id="StaffInterviewsId" type="hidden" />
+
+
+
+<script type="text/javascript">
+    var StaffInterviewsId = 0;
+
+    function ResetData() {
+        $("#FirstName").val('');
+        $("#LastName").val('');
+        $("#MobileNumber").val('');
+        $("#AlternateMobileNumber").val('');
+        $("#EmailId").val('');
+        $("#FatherName").val('');
+        $("#QualificationId").val(0);
+        $("#AdditionalQualificationId").val(0);
+
+
+        $("#ClassId > option").removeAttr("selected");
+        $("#ClassId").trigger("change");
+        $("#SubjectId > option").removeAttr("selected");
+        $("#SubjectId").trigger("change");
+
+        $("#ExperienceInYears").val(null);
+        $("#ExperienceInMonths").val(null);
+        $("#BranchId").val(0);
+        $("#DepartmentId").val(0);
+        $("#EmailIdToEdit").val('');
+        $("#resumeImages").val('');
+        //$("#SubjectId").val('');
+        document.getElementById('lblResumes').innerHTML = null;
+    }
+
+    window.onload = ResetData();
+
+
+    function ValidateMobNum() {
+
+        var val = true;
+
+        $.ajax({
+
+            url: '/UploadResume/ValidateMobileNum',
+            data: { MobileNo: $('#MobileNumber').val() },
+            success: function (data) {
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            }
+        });
+
+        return val;
+    }
+    var selDiv = "";
+    document.addEventListener("DOMContentLoaded", init, false);
+
+    function handleFileSelect(e) {
+        var BranchItems = $('#lblResumes');
+        BranchItems.children().remove();
+        if (!e.target.files) return;
+
+        selDiv.innerHTML = "";
+        var arrFiles = [];
+        var files = e.target.files;
+        for (var i = 0; i < files.length; i++) {
+            var option = document.createElement("option");
+            var f = files[i];
+            //arrFiles.push(f.name);
+            //$('lblResumes)'.add(f.name,i);
+            // $('lblResumes)'.add(f.name);
+            // selDiv.innerHTML += f.name + "<br/>";
+            BranchItems.append($("<option>").text(f.name));
+            // $('#lablResumes').append()
+            //$('#lblResumes').append(BranchItems);
+
+        }
+
+    }
+
+    function init() {
+        document.querySelector('#resumeImages').addEventListener('change', handleFileSelect, false);
+        selDiv = document.querySelector("#selectedFiles");
+    }
+
+
+    function ValidateForm() {
+        
+        debugger
+        var message = "";
+        var Validate = true;
+        var FirstName = $("#FirstName").val();
+        var MobileNumber = $("#MobileNumber").val();
+        var FatherName = $("#FatherName").val();
+        var EmailId = $("#EmailId").val();
+        var Qualifications = $("#QualificationId").val();
+        var AdditionalQualifications = $("#AdditionalQualificationId").val();
+        var ClassId = $("#ClassId").val();
+        var SubjectId = $("#SubjectId").val();
+        var BranchId = $("#BranchId").val();
+        var YearOfExperience = $("#ExperienceInYears").val();
+        var MonthsOfExperience = $("#ExperienceInMonths").val();
+        var UploadedResumes = $("#resumeImages").val();
+        var DepartmentId = $("#DepartmentId").val();
+        var AlternateMobile = $("#AlternateMobileNumber").val();
+        var resumes = $("#lblResumes").val;
+
+        document.getElementById("ClassesCanHandle").value = ClassId;
+        document.getElementById("Subjects").value = SubjectId;
+
+        if (FirstName == "" || FirstName == undefined) {
+            message += "First Name, ";
+            Validate = false;
+        }
+        if (FatherName == "" || FatherName == undefined) {
+            message += "Father Name, ";
+            Validate = false;
+        }
+        if (AlternateMobile == "" || AlternateMobile == undefined) {
+            message += "Alternate Mobile, ";
+            Validate = false;
+        }
+
+        if (MobileNumber == "" || MobileNumber == undefined) {
+            message += "Mobile Number, ";
+            Validate = false;
+        }
+        if (EmailId == "" || EmailId == undefined) {
+            message += "Email Id, ";
+            Validate = false;
+        }
+
+        if (Qualifications <= 0 || Qualifications == undefined) {
+            message += "Qualifications, ";
+            Validate = false;
+        }
+       
+        if (ClassId <= 0 || ClassId == undefined) {
+            message += "Classes Can Handle, ";
+            Validate = false;
+        }
+        if (SubjectId == "--- Select ---" || SubjectId == undefined) {
+            message += "Subjects, ";
+            Validate = false;
+        }
+        if (BranchId <= 0 || BranchId == undefined) {
+            message += "Branch Intrested, ";
+            Validate = false;
+        }
+        if (DepartmentId <= 0 || DepartmentId == undefined) {
+            message += "Department, ";
+            Validate = false;
+        }
+
+        if (((YearOfExperience == "" || YearOfExperience == undefined || YearOfExperience == 0)) && (MonthsOfExperience == "" || MonthsOfExperience == undefined)) {
+            message += "Experience, ";
+            Validate = false;
+        }
+        //UploadedResumes == "" && (resumes==""||resumes.length< 1
+        if (UploadedResumes == "") {
+            message += "Upload Resume, ";
+            Validate = false;
+        }
+
+        if (!Validate)
+            document.getElementById("Validation").innerHTML = "Please fill the fields, " + message.slice(0, -2);
+
+        return Validate;
+    }
+    //$('#browse').click(function () {
+    //    alert("haiii");
+    //    var selectDialogueLink = $('<a href="">Select files</a>');
+    //    var fileSelector = $('<input type="file">');
+
+    //    selectDialogueLink.click(function () {
+    //        fileSelector.click();
+    //        return false;
+    //    });
+
+    //   // $('body').html(selectDialogueLink);
+    //});
+
+    $('#SaveApplication').click(function () {
+        debugger;
+        $('#tempMSg').val('');
+        if (!ValidateForm()) {
+            return false;
+        }
+        return true;;
+    });
+
+    $('#Reset').click(function () {
+        debugger;
+        $('#tempMSg').val('');
+        ResetData();
+    });
+
+    function readURLF(input) {
+        var str = "";
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#Fimage')
+                    .attr('src', e.target.result)
+
+            };
+            reader.readAsDataURL(input.files[0]);
+            $('#resumeImages').val(input.files[0])
+            str = reader.FileName + ";" + str
+        }
+    }
+    $("#resumeImages").change(function () {
+        var str = "";
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#Fimage')
+                .attr('src', e.target.result)
+
+        };
+        str = reader.FileName + ";" + str
+        $("#txtresumeImages").val(str)
+    });
+
+
+    $("#files").click(function (e) {
+        handleFileSelect(e);
+    });
+
+
+
+
+    $("#SearchString").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetData();
+        };
+        if (!this.value) {
+            ResetData();
+        };
+    });
+
+    $("#SearchString").autocomplete({
+        source: function (request, response) {
+            if (request.term.length < 3) {
+                return;
+            }
+            $('#imagemodal').show();
+            $.ajax({
+                url: "/HREnrollment/GetAutoFillEmailSearch",
+                type: "POST",
+                dataType: "json",
+                data: { strVal: request.term },
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.EmailId,
+                            value: data.EmailId,
+                            id: data.EmailId,
+                        };
+                    }));
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        },
+        minLength: 1,
+
+        select: function SelectEvent(event, ui) {
+            debugger;
+            StudentId = ui.item.value;
+            AutoFillStaffData(ui.item.id);
+        }
+    });
+
+
+
+    $("#ClassId").each(function () {
+    });
+
+    var objStudent = [];
+
+    function AutoFillStaffData(emailId) {
+        if (emailId.length < 3)
+            return;
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/HREnrollment/AutoFillStaffData',
+            data: { strEmail: emailId },
+            success: function (data) {
+                objStudent = data;
+                //debugger;
+                $('#tempMSg').val('');
+                $("#EmailId").val(emailId);
+                $("#FirstName").val(data.FirstName);
+                $("#LastName").val(data.LastName);
+                $("#MobileNumber").val(data.MobileNumber);
+                $("#FatherName").val(data.FatherName);
+                $("#AlternateMobileNumber").val(data.AlternateMobileNumber);
+                $("#QualificationId").val(data.Qualifications);
+                $("#AdditionalQualificationId").val(data.AdditionalQualifications);
+                $("#BranchId").val(data.BranchIntrested);
+                var rr = [];
+                var array = data.ClassesCanHandle.split(',');
+                for (var i = 0; i < array.length; i++) {
+                    rr.push(array[i]);
+                }
+
+                $('#ClassId').select2().select2('val', rr)
+                var rr1 = [];
+                var array1 = data.Subjects.split(',');
+                for (var j = 0; j < array1.length; j++) {
+                    rr1.push(array1[j]);
+
+                }
+
+                $('#SubjectId').select2().select2('val', rr1)
+                $('#DepartmentId').val(data.DepartmentId);
+                $("#ExperienceInYears").val(data.ExperienceInYears);
+                $("#ExperienceInMonths").val(data.ExperienceInMonths);
+
+                var attachment = [];
+                var arr = data.FileName.split(',');
+                for (var k = 0; k < arr.length; k++) {
+                    attachment.push(arr[k]);
+                    $('#lblResumes').append("<option value=" + data.value + ">" + arr[k] + "</option>")
+                }
+                $('#imagemodal').hide();
+
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            },
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    $(".select2").select2();
+
+
+    $('#lblResumes').change(function () {
+
+    });
+
+    $("#lblResumes option:selected").each(function () {
+        var optionVal = $(this).val();
+        var exists = false;
+        $('#SelectedItems option').each(function () {
+            if (this.value == optionVal) {
+                exists = true;
+            }
+        });
+
+        if (!exists) {
+            inHTML += '<option value="' + $(this).val() + '">' + $(this).text() + '</option>';
+        }
+    });
+
+
+</script>
+
+<script>
+
+    $("#checkbox").click(function () {
+        if ($("#checkbox").is(':checked')) {
+            $("#ClassId > option").prop("selected", "selected");
+            $("#ClassId").trigger("change");
+        } else {
+            $("#ClassId > option").removeAttr("selected");
+            $("#ClassId").trigger("change");
+        }
+    });
+
+
+    $("#checkbox1").click(function () {
+        if ($("#checkbox1").is(':checked')) {
+            $("#SubjectId > option").prop("selected", "selected");
+            $("#SubjectId").trigger("change");
+        } else {
+            $("#SubjectId > option").removeAttr("selected");
+            $("#SubjectId").trigger("change");
+        }
+    });
+</script>

@@ -1,0 +1,149 @@
+﻿@model AsteriskBrowserAL.Models.StudentDetailsData
+@{
+    ViewBag.Title = "SportsResults";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Students
+        </li>
+        <li class="active">Sport Results</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("SportsResults", "AStudent", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                if (null != TempData["SportsResults"])
+                {
+                    <input type="hidden" id="Status" value="@TempData["SportsResults"]" />
+                }
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Sports Results</span>
+
+
+                </div>
+                <div class="widget-box">
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.SectionId, new SelectList(Model.lstSections, "SectionId", "SectionCode"), "-- Select --", new { @class = "form-control", @id = "nSectionId" })
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">SportName</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.SportsId, new SelectList(Model.lstSports, "SportsId", "SportsName"), "-- Select --", new { @class = "form-control", @id = "nSportsId" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">SportsSchedule</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.SportScheduleId, new SelectList(Model.lstSportsSchedules, "SportsScheduleId", "Name"), "-- Select --", new { @class = "form-control", @id = "nSportsScheduleId" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ExaminationResults"></div>
+                if (null != Model)
+                {
+
+                    @*<input type="hidden" name="selBranchId" value="@Model.BranchId" />
+                        <input type="hidden" name="selDivisionId" value="@Model.DivisionId" />*@
+                    @*<input type="hidden" id="selClassNumber" name="selClassNumber" value="@Model.SectionId" />*@
+                    @*<input type="hidden" id="selExamId" name="selExamId" value="@Model.ExaminationId" />*@
+                }
+            }
+        </div>
+    </div>
+    <div id="ValidationMsg" title="Kitting" style="display:none"></div>
+
+</section>
+
+<script>
+    function OnloadData() {
+
+        var Status = $('#Status').val();
+
+        if (Status != undefined) {
+            dialog(Status);
+        }
+    }
+
+    $('#nSectionId').change(function () {
+        debugger
+        //document.getElementById("#ExaminationResults").innerHTML = "";
+        $("#ExaminationResults").html('');
+        var SectionId = $('#nSectionId').val();
+        var SportScheduleId = $('#nSportsScheduleId').val();
+        if (SportScheduleId > 0)
+            GetStudents()
+    });
+
+    $('#nSportsId').change(function () {
+        //document.getElementById("#ExaminationResults").innerHTML = "";
+        $("#ExaminationResults").html('');
+        var SportScheduleId = $('#nSportsScheduleId').val();
+        if (SportScheduleId > 0)
+            GetStudents()
+    });
+
+    $('#nSportsScheduleId').change(function () {
+        debugger
+        //document.getElementById("#ExaminationResults").innerHTML = "";
+        $("#ExaminationResults").html('');
+        var SportScheduleId = $('#nSportsScheduleId').val();
+        if (SportScheduleId > 0)
+            GetStudents()
+    });
+
+    function GetStudents() {
+        debugger
+
+        var SectionId = $("#nSectionId").val();
+        var SportsId = $("#nSportsId").val();
+        var SportsScheduleId = $('#nSportsScheduleId').val();
+
+        if (SportsId < 0 || SectionId < 0)
+            return;
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Astudent/GetStudentsFoSportsResults',
+            data: { SectionId: SectionId, SportsId: SportsId, SportsScheduleId: SportsScheduleId },
+            success: function (Data) {
+                $('#imagemodal').hide();
+                $('#ExaminationResults').html(Data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        })
+            ;
+    }
+</script>
+

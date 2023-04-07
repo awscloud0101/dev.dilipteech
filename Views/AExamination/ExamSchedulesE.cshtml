@@ -1,0 +1,332 @@
+﻿@model AsteriskBrowserAL.Models.ExamShedulesData
+
+@{
+    ViewBag.Title = "Create Exam Schedules";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Exam Schedules</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <span style="color:red;" id="Validation"></span>
+            @using (Html.BeginForm("ExamSchedulesE", "AExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" id="TermNumber" name="TermNumber" value="@Model.TermNumber" />
+                    <input type="hidden" id="ClassNumber" name="ClassNumber" value="@Model.ClassNumber" />
+                    <input type="hidden" id="ExamId" name="ExamId" value="@Model.ExamId" />
+                    @Html.HiddenFor(model => model.ClassNumber)
+                    @Html.HiddenFor(model => model.TermNumber)
+                    @Html.HiddenFor(model => model.ExamId)
+
+                    <div class="table-header">
+                  
+                            Examination Schedules
+                            <small style="float:right;" class="textheader">
+                                @Html.ActionLink("Back to details", "ExamSchedules", new { ClassNumber = Model.ClassNumber, TermNumber = Model.TermNumber, SubscriptionId = Model.SubscriptionId })
+                            </small>
+                   
+                    </div><!-- /.page-header -->
+
+
+                <!-- form start -->
+
+
+                <div class="widget-box row" style="padding:10px">
+                    <form class="form-horizontal" role="form">
+                        <div class="row">
+
+                            <div class="form-group col-sm-6">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Exam Code")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.ExamCode, new { @class = "form-control textlength", placeholder = "Exam Code", @id = "ExamCode" })
+                                    <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESExamCode">
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-sm-6">
+                                <div class="row ">
+                                    <div class="form-group  col-sm-12">
+                                        <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("CCE Exam")</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.CCEExam, new SelectList(Model.lstCCEExam, "CCEExamId", "CCEExamName"), "--- Select ---", new { @class = "form-control", @disabled = "disabled", id = "CCEExamId" })
+                                            <span class="" style="color:red;font-weight:bold;" id="ESCCEExam">
+                                            </span>
+
+                                        </div>
+
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="row">
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Exam Name")</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.ExamName, new { @class = "form-control textlength", @disabled = "disabled", placeholder = "Exam Name", @id = "ExamName" })
+                                            <span class="" style="color:red;font-weight:bold;" id="ESExamName">
+                                            </span>
+
+
+                                        </div>
+
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Start Date")</label>
+
+                                    <div class="col-sm-6">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                    @if (Model.StartDate.HasValue)
+                                                    {
+                                                        <input class="form-control" value="@Model.StartDate.Value.ToShortDateString()" type="text" name="StartDate" id="StartDate" autocomplete="off" placeholder="Select Start Date" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input class="form-control" type="text" name="StartDate" id="StartDate" autocomplete="off" placeholder="Select Start Date" />
+                                                    }
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <span class="col-sm-3" id="ESStartDate" style="color:red;font-weight:bold;">
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                 
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("End Date")</label>
+
+                                    <div class="col-sm-6">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+
+                                                    @if (Model.EndDate.HasValue)
+                                                    {
+                                                        <input class="form-control" value="@Model.EndDate.Value.ToShortDateString()" type="text" name="EndDate" id="EndDate" autocomplete="off" placeholder="Select End Date" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input class="form-control" type="text" name="EndDate" id="EndDate" autocomplete="off" placeholder="Select End Date" />
+                                                    }
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="col-sm-3" id="ESEndDate" style="color:red;font-weight:bold;">
+                                        </span>
+                                    </div>
+                                 
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-9">
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" name="Save" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+</div>
+          
+
+                        
+
+                        
+
+                        
+
+                        
+
+
+                        
+
+                       
+
+                        
+
+                 
+            }
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    function submitForm() {
+        var validatestatus = validateES();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function validateES() {
+
+        var validate = true;
+        var ExamCode = document.getElementById("ExamCode").value;
+        var ExamName = document.getElementById("ExamName").value;
+        //alert(ExamName);
+        var StartDate = document.getElementById("StartDate").value;
+        //alert(StartDate);
+        var EndDate = document.getElementById("EndDate").value;
+        //alert(EndDate);
+
+        var CCEExam = $('#CCEExamId').val();
+
+        if (CCEExam == "") {
+            document.getElementById("ESCCEExam").innerHTML = "Please select CCE exam";
+            validate = false;
+        }
+
+
+        if (ExamName == "") {
+            document.getElementById("ESExamName").innerHTML = "Please enter exam name";
+            validate = false;
+        }
+
+        if (StartDate == "") {
+            document.getElementById("ESStartDate").innerHTML = "Please select start date";
+            validate = false;
+        }
+
+        if (ExamCode == "") {
+            document.getElementById("ESExamCode").innerHTML = "Please enter exam code";
+            validate = false;
+        }
+
+        if (EndDate == "") {
+            document.getElementById("ESEndDate").innerHTML = "Please select end date";
+            validate = false;
+        }
+
+        if (StartDate != "" && EndDate != "") {
+            if (new Date(EndDate).getTime() < new Date(StartDate).getTime()) {
+                document.getElementById("ESStartDate").innerHTML = "Start date should be greater than end date";
+                validate = false;
+            }
+        }
+
+        if (validate == true) {
+            var status = IsExaminationExisted();
+            validate = status;
+        }
+
+        return validate;
+    };
+
+    function IsExaminationExisted() {
+        var Status = true;
+
+        CCEExam = $('#CCEExamId').val();
+
+        $.ajax({
+
+            url: '/AExamination/IsExamScheduleExisted',
+            data: { type: "Edit", id: $('#ExamId').val(), ExamCode: $('#ExamCode').val(), TermNumber: $('#TermNumber').val(), ClassNumber: $('#ClassNumber').val(), CCEExamId: CCEExam },
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                    document.getElementById("Validation").innerHTML = Data;
+                }
+
+            },
+            async: false
+        });
+
+        return Status;
+    }
+
+    $('#ExamName').focus(function () {
+        document.getElementById("ESExamName").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    $('#StartDate').change(function () {
+        document.getElementById("ESStartDate").innerHTML = "";
+    });
+
+    $('#EndDate').change(function () {
+        document.getElementById("ESEndDate").innerHTML = "";
+    });
+
+    $('#CCEExamId').focus(function () {
+        document.getElementById("ESCCEExam").innerHTML = "";
+    });
+
+    $('#ExamCode').focus(function () {
+        document.getElementById("ESExamCode").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+</script>
+
+
+

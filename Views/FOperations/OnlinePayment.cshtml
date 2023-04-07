@@ -1,0 +1,147 @@
+﻿@model AsteriskBrowserAL.Models.FeePaymentsData
+@{
+    ViewBag.Title = "OnlinePayment";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Online Payment</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="~/script/jquery-2.0.3.js"></script>
+<script src="~/script/jquery-ui.js"></script>
+<script src="~/js/jquery-1.10.2.js"></script>
+<script src="~/js/jquery-ui.js"></script>
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <br />
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Online Payment</h3>
+                    <br />
+                    <br />
+                @if (null != Model)
+                {
+                    <input type="hidden" id="StudentId2" value="@Model.StudentId" />
+                }
+                    <div class="form-group">
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label no-padding-right">@Html.Label("Select Student")</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="StudentId" id="StudentId" class="form-control" placeholder="Enter text to search" />
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div><!-- /.box-header -->
+               
+            </div>
+        </div>
+    </div>
+    
+    <div id="PaymentDetails"></div>
+      
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+    window.onload = OnloadData();
+
+    function OnloadData() {
+        var id = $('#StudentId2').val();
+        if (id > 0) {
+            GetPaymentHistoryDetails(id);
+        }
+
+       // window.location.href = "/PayMoney/Pay?nUserId=2&nStudentId=2&dPayingAmount=100";
+
+    }
+
+
+    $('#StudentId').autocomplete({
+        source: function (request, response) {
+            if (request.term.length < 3) {
+                return;
+            }
+
+            $('#imagemodal').show();
+            $.ajax({
+                url: "/FOperations/GetStudents",
+                type: "POST",
+                dataType: "json",
+                data: { parentId: 0, batchId: 0, admissionId:0, strVal: request.term },
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.FirstName,
+                            value: data.FirstName,
+                            id: data.StudentId,
+                        };
+                    }));
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        },
+        minLength: 1,
+
+        select: function SelectEvent(event, ui) {
+            debugger;
+            Id = ui.item.id;
+            $('#PaymentDetails').html("");
+            GetPaymentHistoryDetails(Id);
+        }
+
+    });
+
+    function GetPaymentHistoryDetails(id) {
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/FOperations/GetPaymentsHistory',
+            data: { nStudentId: id },
+            success: function (data) {
+                $('#PaymentDetails').html(data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            },
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+</script>

@@ -1,0 +1,138 @@
+﻿@model List<AsteriskBrowserAL.Models.PettyCashSubHeadsData>
+@{
+    ViewBag.Title = "Petty Cash SubHead";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Petty Cash Sub Heads</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+
+    <div class="col-xs-12">
+        <div class="row">
+
+            @using (Html.BeginForm("PettyCashSubHeads", "SeFinance", FormMethod.Post))
+            {
+
+                <span style="font-weight:bold;color:red" id="Validation"></span>
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Petty Cash Sub Heads</span>
+                    <div  style="float:right;margin-right:10px;">
+                        <a class="btncustom P2" id="NewSubHead" name="New">
+                   Add</a>
+      </div>
+
+                </div>
+
+
+
+
+
+
+
+
+
+                <div class="widget-box">
+       
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Head Name")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownList("PettyCashHeadId", null, "--Select--", new { @class = "form-control", id = "PettyCashHeadId" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="SearchViewDiv" class="box-body table-responsive no-padding">
+                    @Html.Partial("PettyCashSubHeadsPartial", Model)
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    $('#NewSubHead').click(function () {
+       
+        var PettyCashHeadId = $('#PettyCashHeadId').val();
+        if (PettyCashHeadId < 1) {
+            document.getElementById("Validation").innerHTML = "Please select Head Name";
+            return false;
+
+        }
+        else {
+            window.location.href = "/SeFinance/PettyCashSubHeadsC?HeadId=" + PettyCashHeadId
+        }
+
+    });
+
+    $('#PettyCashHeadId').change(function () {
+
+        if ($(this).val() > 0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+
+        GetPettyCashHeads();
+
+    })
+
+    function GetPettyCashHeads() {
+        var PettyCashHeadId = $('#PettyCashHeadId').val();
+        if (PettyCashHeadId > 0) {
+            $.ajax({
+                url: '/SeFinance/PettyCashHeadsName',
+                data: { PettyCashHeadId: PettyCashHeadId },
+                success: function (Data) {
+                    $("#SearchViewDiv").html(Data);
+                },
+            });
+        }
+        else {
+            $("#SearchViewDiv").html("");
+        }
+    }
+    window.onload = GetPettyCashHeads;
+    function btnConfirm(Value) {
+
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeFinance/ValidationForPettyCashSubHeadD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SeFinance/PettyCashSubHeadD?id=' + Value;
+                    var title = "Petty Cash SubHeads";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+</script>

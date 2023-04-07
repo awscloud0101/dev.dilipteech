@@ -1,0 +1,182 @@
+﻿@model AsteriskBrowserAL.Models.FinanceIncomeViewData
+
+@{
+    ViewBag.Title = "MiscellaneousFee";
+}
+
+@section breadcrumb{
+
+    <ul class="breadcrumb">
+
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Miscellaneous Fee</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+    <br/>
+    <br/>
+
+    @if (null != Model)
+    {
+        using (Html.BeginForm("MiscellaneousFee", "FOperations", FormMethod.Post))
+        {
+
+            if (Model.FinanceCategoryId.HasValue)
+            {
+                <input type="hidden" id="SelCategoryId" value="@Model.FinanceCategoryId.Value" />
+
+            }
+            else
+            {
+                <input type="hidden" id="SelCategoryId"  value="0" />
+            }
+
+            <input type="hidden" id="FinanceCategoryId" name="ClassTimingsId" value="@Model.FinanceCategoryId" />
+            //<input type="hidden" id="DurationId" name="DurationId" value="@Model.DurationId" />
+
+            <span style="color:red;" id="CTCombo"></span>
+
+
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        Miscellaneous Fee
+                    </h5>                   
+                            <div class="widget-toolbar no-border">
+                                <div class="inline action-buttons">
+                                    <a class="blue" id="New" name="New"><i class="fa fa-plus-circle bigger-200 P2" onclick="return submitForm()" style="margin-top:3px"></i></a>
+                                </div>
+                            </div>
+                    
+
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <div class="col-xs-12">
+
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary(true)
+                                <span style="color: red;">@Html.ValidationMessage("Category")</span>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Category")</label>
+
+                                                <div class="col-sm-6">
+
+                                                    @if (null != Model.LestFinanceCategory)
+                                                    {
+                                                        @Html.DropDownListFor(model => model.LestFinanceCategory, new SelectList(Model.LestFinanceCategory, "FinanceCategoryId", "CategoryName"), "--- Select Category ---", new { @class = "form-control", @id = "CategoryId",@name="CategoryId" })
+                                                    }
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <input name="val" type="hidden" id="val" value="1" />
+            <div id="SearchData" class="row"></div>
+
+        }
+    }
+
+
+
+<script>
+
+
+    $(document).ready(function () {
+
+
+        var Category = $('#SelCategoryId').val();
+
+        if (Category > 0) {
+            $("#CategoryId").val(Category);
+            GetData();
+        }
+    });
+
+    $('#CategoryId').change(function () {
+        debugger
+        document.getElementById("CTCombo").innerHTML = "";
+      
+        GetData();
+       // submitForm();
+       
+    });
+
+
+    function GetData() {
+
+        $('#SearchData').html("");
+        var Category = $("#CategoryId").val();
+        if (Category > 0) {
+
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/FOperations/MiscellaneousFeeData',
+                data: { CategoryId: Category },
+                success: function (data) {
+                    $('#imagemodal').hide();
+
+                    $("#SearchData").html(data)
+                },
+                aync: false
+            })
+        }
+    }
+  
+    function submitForm() {
+        debugger
+        var CategoryId = $('#CategoryId').val();
+        //var DurationId = $('#DurationId').val();
+
+        if ( CategoryId < 1 || CategoryId =='') {
+
+            document.getElementById("CTCombo").innerHTML = "Please select the Category";
+            return false;
+        }
+          
+        else {
+            
+            window.location.href = '/FOperations/MiscellaneousFeeC?CategoryId=' + CategoryId + '';
+          
+        }
+    };
+
+
+</script>
+
+
+

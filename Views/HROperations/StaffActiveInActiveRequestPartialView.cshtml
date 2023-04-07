@@ -1,0 +1,115 @@
+﻿@model  AsteriskBrowserAL.Models.StaffActiveInActiveData
+
+@{
+    int sno = 1;
+}
+
+<div>
+
+    @if ((null != Model))
+    {
+            <div class="table-header">
+              Staff Active Inactive Request
+
+            </div>
+
+
+
+            <div class="overflowscroll">
+
+                <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;overflow:auto;">
+                    <thead>
+                        <tr>
+                            <th>
+                                S.No.
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Staff Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Employee Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Legacy Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Status")
+                            </th>
+
+                            <th>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.lststaff)
+                        {
+                            <tr>
+                                <td>
+                                    @sno
+                                </td>
+                                <td>
+                                    @s.DisplayName
+                                </td>
+                                <td>
+                                    @s.EmployeeNumber
+                                </td>
+
+                                <td>
+                                    @s.LegacyNumber
+                                </td>
+                                <td>
+                                    @if (s.Status.HasValue)
+                                    {
+                                        if (s.Status.Value == 1)
+                                        {
+                                            <span class="label label-success">Active</span>
+
+                                        }
+                                        else if (s.Status.Value == 2)
+                                        {
+                                            <span class="label label-danger">In-Active</span>
+
+                                        }
+                                    }
+
+
+
+                                </td>
+                                <td>
+                                    @if (!s.IsStatusExist)
+                                    {
+                                        if (s.Status.HasValue)
+                                        {
+                                            if (s.Status.Value == 1)
+                                            {
+                                                @Html.ActionLink("Make In-Active", "StaffActiveInActiveSendRequest", new { id = s.StaffId, RStatus = 2, nSubscriptionId = Model.BranchId, nDivisionId = Model.DivisionId }, new { Class = "P2" })
+                                            }
+                                            else if (s.Status.Value == 2)
+                                            {
+                                                @Html.ActionLink("Make Active", "StaffActiveInActiveSendRequest", new { id = s.StaffId, RStatus = 1, nSubscriptionId = Model.BranchId, nDivisionId = Model.DivisionId }, new { Class = "P2" })
+
+                                            }
+                                        }
+
+                                    }
+                                </td>
+
+                            </tr>
+                            sno++;
+                        }
+
+
+                    </tbody>
+                </table>
+            </div>
+       
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold"> Data not available</span>
+    }
+    @Html.Action("DataTableScripts", "Base")
+</div>
+

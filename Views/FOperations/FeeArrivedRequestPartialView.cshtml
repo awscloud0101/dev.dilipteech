@@ -1,0 +1,129 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentDetailsData>
+@{
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+    <div class="table-header">
+        Records Found (@Model.Count)
+
+    </div>
+    <div style="overflow:auto;height:400px">
+        <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("SNo")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Branch Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Section")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Admission Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Request Status")
+                    </th>
+                </tr>
+
+            </thead>
+            <tbody>
+
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+
+                    <tr>
+                        <td>
+                            @Html.Hidden("lstStudents.Index", (@i + 10))
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].BranchName", Model.ElementAt(i).BranchName)
+
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].Name", Model.ElementAt(i).Name)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].ClassName", Model.ElementAt(i).ClassName)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].FatherName", Model.ElementAt(i).FatherName)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].DateofBirthDisplay", Model.ElementAt(i).DateofBirthDisplay)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].AdmissionNumber", Model.ElementAt(i).AdmissionNumber)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].ClassNumber", Model.ElementAt(i).ClassNumber)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].AdmissionDate", Model.ElementAt(i).AdmissionDate)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].AdmittedClassId", Model.ElementAt(i).AdmittedClassId)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].AdmittedYear", Model.ElementAt(i).AdmittedYear)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].Section", Model.ElementAt(i).Section)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                            @Model.ElementAt(i).BranchName
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).Section
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).AdmissionNumber
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).Name
+                        </td>
+                        @if (Model.ElementAt(i).BatchId == 255)
+                        {
+                            <td>
+                                @Html.ActionLink("Request", "StudentFeeArrivedRequest", new { StudentId = Model.ElementAt(i).StudentId }, new { @Class = "P2" })
+                            </td>
+                        }
+                        else if (Model.ElementAt(i).BatchId == 0)
+                        {
+                            <td>
+                                Approved
+                            </td>
+                        }
+                        else if (Model.ElementAt(i).BatchId == 1)
+                        {
+                            <td>
+                                Request Pending
+                            </td>
+                        }
+                        else if (Model.ElementAt(i).BatchId == 2)
+                        {
+                            <td>
+                                @Html.ActionLink("Request", "StudentFeeArrivedRequest", new { StudentId = Model.ElementAt(i).StudentId }, new { @Class = "P2" })
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+}
+else
+{
+    <span style="color: red;"><b>No sudents available to display</b></span>
+}
+
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+</script>
+
+
+
+

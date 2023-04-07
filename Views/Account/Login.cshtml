@@ -1,0 +1,414 @@
+﻿
+@using AsteriskBrowserAL.Models
+@model Login
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>CampusWhiz | Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=PT+Sans:400,700'>
+    <link rel="stylesheet" href="~/Content/LoginPageFiles/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/LoginPageFiles/css/style.css">
+    <!-- Javascript -->
+    <script src="~/Content/LoginPageFiles/js/jquery-1.8.2.min.js"></script>
+    <script src="~/Content/LoginPageFiles/js/bootstrap.min.js"></script>
+    <script src="~/Content/LoginPageFiles/js/jquery.backstretch.min.js"></script>
+
+</head>
+
+<body style="background-size: cover; position: fixed; background-repeat: no-repeat; top: 0px;">
+    <div class="register-container container">
+        <div class="row">
+            <div class="register span5" style="float:right;">
+                <form name="form1" method="post">
+                    <h2 style="color:#666;">
+                        <a href="https://campuswhiz.com/" target="_blank">
+                            <p class="wow" style="line-height:10px;"> <img src="~/Content/LoginPageFiles/img/logo.png" width="200px;" class="img-responsive" /></p>
+                            </a>
+                    </h2>
+                    <ul class="nav nav-tabs">
+                        <li class="active dummy" onclick="selectTab(1)" id="StaffLogin1"><a href="#StaffLogin" data-toggle="tab"><span class="fa fa-group"></span> Staff </a></li>
+                        <li class="dummy" onclick="selectTab(2)" id="ParentLogin1"><a href="#ParentLogin" data-toggle="tab"><span class="fa fa-user"></span> Parent </a></li>
+                        <li class="frget" id="ForgetPassword1"><a href="#ForgotPassword" data-toggle="tab"><span class="fa fa-question-circle-o"></span> Forgot Password</a></li>
+                        <hr style="margin:0px;padding:0px;width:85%;" />
+                    </ul>
+
+                    <div class="tab-content">
+                        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+                        {
+                            if (Model.LoginType > 0)
+                            {
+                                <input name="LoginType" id="LoginType" type="hidden" value="@Model.LoginType" />
+                            }
+                            else
+                            {
+                                <input name="LoginType" id="LoginType" type="hidden" value="1" />
+                            }
+
+                            <input type="hidden" id="IsLogin" value="@Model.IsLogin" />
+                            <input type="hidden" id="IsParentLogin" value="@Model.IsParentLogin" />
+                            <span id="msg" style="color:red">@Html.ValidationMessage("Login")</span>
+                            @Html.AntiForgeryToken()
+
+                            if (null != Model)
+                            {
+                                <input type="hidden" id="ReturnUrl" name="ReturnUrl" value="@Model.ReturnUrl" />
+                            }
+
+                            <!-- Staff and Parent Tab  -->
+                            <div class="tab-pane active" id="StaffLogin" style="height:345px ;">
+                                <p style="font-size:15px;color:#00A859;font-weight:bold;"> Please Enter Your Information</p>
+                                <hr style="margin:13px;" />
+                                @if ((Model.IsLogin != null && Model.IsLogin == "true") || (Model.IsParentLogin != null && Model.IsParentLogin == "true"))
+                                {
+                                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "Username or Mobile Number", @id = "Username", @readonly = "readonly", @autocomplete = "off", @required = "required" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "Username or Mobile Number", @id = "Username", autocomplete = "off", @required = "required" })
+                                }
+                                <span class="fa fa-user icon"></span>
+                                @if ((Model.IsLogin != null && Model.IsLogin == "true") || (Model.IsParentLogin != null && Model.IsParentLogin == "true"))
+                                {
+                                    <input type="text" class="form-control" id="Password" name="Password" value="***" readonly="readonly" required="required" />
+                                }
+                                else
+                                {
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @id = "Password", placeholder = "Password", autocomplete = "off", @required = "required" })
+                                }
+                                <span class="fa fa-lock icon"></span>
+
+
+                                <div style="position:relative;top:0px;">
+                                    @if ((Model.IsLogin != null && Model.IsLogin == "true") || (Model.IsParentLogin != null && Model.IsParentLogin == "true"))
+                                    {
+                                        <div style="position:relative;top:0px;">
+                                            <div class="button" style="position:absolute;left:70%;top:-20px;">
+                                                <strong class="fa fa-key" style="font-size:14px;margin-right:3px;"></strong>
+                                                <span>
+                                                    <a href="@Url.Action("Logout", "Account")" style="color:white;text-decoration:none;font-size:15px;font-weight:100;"> Logout</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" name="btn" id="Login" class="button" style="position:absolute;left:70%;top:-20px;">
+                                            <strong class="fa fa-key" style="margin-right:3px;"></strong>
+                                            <span style="color:white;text-decoration:none;font-size:15px;font-weight:100;"> Login </span>
+                                        </button>
+                                    }
+                                    <br />
+                                </div>
+
+                                <div id="StaffPartialView" style="display:none">
+                                    @if (Model.IsLogin != null && Model.IsLogin == "true")
+                                    {
+                                        <select id="year" name="year" style="height:35px;" required="required"></select>
+                                    }
+                                    else
+                                    {
+                                        <select id="year" name="year" style="height:35px;" disabled="disabled"></select>
+                                    }
+
+                                    @if (Model.IsLogin != null && Model.IsLogin == "true")
+                                    {
+                                        <select id="DataBasePath" name="DataBasePath" style="height:35px;" required="required"></select>
+                                    }
+                                    else
+                                    {
+                                        <select id="DataBasePath" name="DataBasePath" style="height:35px;" disabled="disabled"></select>
+                                    }
+
+                                    <div style="position:relative;top:-8px;">
+                                        @if (Model.IsLogin != null && Model.IsLogin == "true")
+                                        {
+                                            <button type="button" name="GO" id="btnGo" class="button" style="position:absolute;left:70%;top:-20px;">
+                                                @*<strong class="fa fa-check" style="margin-right:3px;"></strong>*@
+                                                <span style="color:white;text-decoration:none;font-size:15px;font-weight:100;"> Go </span>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" name="GO" id="btnGo" class="button" style="position:absolute;left:70%;top:-20px;">
+                                                @*<strong class="fa fa-check" style="margin-right:3px;"></strong>*@
+                                                <span style="color:white;text-decoration:none;font-size:15px;font-weight:100;"> Go </span>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                                <div id="ParentPartialView" style="display:none">
+                                    @if (Model.IsParentLogin != null && Model.IsParentLogin == "true")
+                                    {
+                                        <select id="stdsList" name="stdsList" style="height:35px;" required="required"></select>
+                                    }
+                                    else
+                                    {
+                                        <select id="stdsList" name="stdsList" style="height:35px;" disabled="disabled"></select>
+                                    }
+
+                                    <div style="position:relative;top:-8px;">
+                                        @if (Model.IsParentLogin != null && Model.IsParentLogin == "true")
+                                        {
+                                            <button type="button" id="btnParentGo" class="button" style="position:absolute;left:70%;top:-20px;">
+                                                @*<strong class="fa fa-check" style="margin-right:3px;"></strong>*@
+                                                <span style="color:white;text-decoration:none;font-size:15px;font-weight:100;"> Go </span>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" id="btnParentGo" class="button" style="position:absolute;left:70%;top:-20px;">
+                                                @*<strong class="fa fa-check" style="margin-right:3px;"></strong>*@
+                                                <span style="color:white;text-decoration:none;font-size:15px;font-weight:100;"> Go </span>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Staff Tab End -->
+                        }
+
+
+                        <!-- Forgot Password -->
+                        <div class="tab-pane" id="ForgotPassword" style="height:200px;">
+                            @using (Html.BeginForm("ForgotPassword", "Account", FormMethod.Post, new { @style = "border:none" }))
+                            {
+                                <p style="font-size:15px;color:#00A859;font-weight:bold;"><span class="fa fa-key"> <span style="font-size:15px;color:#00A859;font-weight:bold;">Retrieve Password</span></span></p>
+                                <hr style="margin:15px;" />
+
+                                <input type="text" id="txtFpUserName" name="UserName" placeholder="username" required>
+                                <span class="fa fa-user icon"></span>
+
+                                <button type="submit" id="btnForgotPassword" class="button" style="position:relative;left:37%;top:0px;width:110px;">
+                                    <strong class="fa fa-share" style="margin-right:3px;"></strong>
+                                    <span style="color:white;text-decoration:none;font-size:15px;font-weight:100;"> Send Me! </span>
+                                </button>
+                            }
+                        </div>
+                        <!-- Forgot Password End-->
+                        <!--Footer Icons Start-->
+                        <div align="left" style="position:relative;top:0px;">
+                            <hr style="margin:1px;" />
+                            <p>
+                                <strong>Follow us on </strong>	: <br /><a href="https://www.facebook.com/CampusWhiz/" target="_blank">
+                                    <span class="fa fa-facebook socialicon" style="background-color:#47639f"></span>
+                                </a>
+                                <a href="https://twitter.com/CampusWhiz" target="_blank">
+                                    <span class="fa fa-twitter socialicon" style="background-color:#4AB3F4"></span>
+                                </a>
+                                <a href="https://www.linkedin.com/company/13436332/" target="_blank">
+                                    <span class="fa fa-linkedin socialicon" style="background-color:#0f72b0"></span>
+                                </a>
+                            </p>
+                        </div>
+                        <!--Footer Icons End-->
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div>
+        @using (Html.BeginForm("ParentLogin", "Account", FormMethod.Post, new { @id = "btnParentLoginHidden" }))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="usernamehidden" id="usernamehidden" />
+        }
+    </div>
+
+    <script type="text/javascript">
+
+        // #region Staff Login Scripts
+        var isLogin = $("#IsLogin").val();
+        if (isLogin == "true") {
+            GetYearDropDown()
+        }
+        function GetYearDropDown() {
+            $.ajax({
+                url: "/Account/GetYearDrpDwn",
+                success: function (data) {
+                    var yearItems = $('#year')
+                    yearItems.children().remove();
+                    yearItems.append($("<option>").val("null").text("--Select Year--"))
+                    $.each(data.Year, function (i, record) {
+                        yearItems.append($("<option>").val(record).text(record));
+                    });
+                    if (data.SelYear != "") {
+                        $('#year').val(data.SelYear);
+                        GetSubscriptionDropDown();
+                    }
+                }
+            });
+        }
+        $('#year').change(function () {
+            GetSubscriptionDropDown()
+        })
+        function GetSubscriptionDropDown() {
+            var year = $('#year').val();
+            $.ajax({
+                url: "/Account/GetSubscription",
+                data: { year: year },
+                success: function (data) {
+                    var SubItems = $('#DataBasePath')
+                    SubItems.children().remove();
+                    SubItems.append($("<option>").val("null").text("--Select--"))
+                    $.each(data.Subscriptions, function (i, record) {
+                        SubItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+                    if (data.SelSubId != "") {
+                        $('#DataBasePath').val(data.SelSubId);
+                    }
+                }
+            });
+        }
+        $('#btnGo').click(function () {
+            var year = $("#year").val();
+            var DropdownId = $("#DataBasePath").val();
+            var ReturnUrl = $("#ReturnUrl").val();
+            if (year != "" && year != "null" && year != null) {
+                if (DropdownId != "" && DropdownId != "null" && DropdownId != null) {
+                    window.location.href = '/Account/Goto?SubscriptionId=' + DropdownId + '&ReturnUrl=' + ReturnUrl;
+                }
+                else {
+                    $('#msg').html('Please select institute')
+                }
+            }
+            else {
+                $('#msg').html('Please select year')
+            }
+        })
+
+        // endregion Staff Login Scripts
+
+        //#region  Parent Login Scripts
+        var IsParentLogin = $("#IsParentLogin").val();
+        if (IsParentLogin == "true") {
+            LoadStudentLogins()
+        }
+        function LoadStudentLogins() {
+            var username = $('#Username').val()
+            var logintype = $('#LoginType').val()
+            $.ajax({
+                url: "/Account/LoadStudentsOnUsername",
+                data: { username: username, logintype: logintype },
+                success: function (data) {
+                    var stdsList = $('#stdsList')
+                    stdsList.children().remove();
+                    stdsList.append($("<option>").val("null").text("--Select Student--"))
+                    $.each(data, function (i, record) {
+                        stdsList.append($("<option>").val(record).text(record));
+                    });
+                }
+            });
+        }
+        $('#btnParentGo').click(function () {
+            var Student = $("#stdsList").val();
+            if (Student != "" && Student != "null" && Student != null) {
+                $('#usernamehidden').val(Student)
+                $("#btnParentLoginHidden").submit();
+            }
+            else {
+                $('#msg').html('Please select Student')
+            }
+        })
+
+        // endregion Parent Login Scripts
+
+        //#region Forget Password
+        $("#btnForgotPassword").click(function () {
+            var IsValid = true;
+            var strUsername = $('#txtFpUserName').val().trim();
+            if (strUsername.length > 3) {
+                $.ajax({
+                    url: "/Account/CheckMailorEmailExistance",
+                    data: { UserName: strUsername },
+                    success: function (data) {
+                        if (data.UserExisted == false) {
+                            $('#msg').html('User details are not avilable');
+                            IsValid = false;
+                        }
+                        else if (data.UserExisted == true && data.IsContactDetailsExisted == false) {
+                            $('#msg').html('User contact details are not available.Please contact your administrator');
+                            IsValid = false;
+                        }
+                    },
+                    async: false
+                });
+            }
+            return IsValid;
+        })
+        // endregion Forget Password
+
+
+        //#region Other Scripts
+        window.onload = dontGoBack();
+        window.onload = LoadScripts();
+
+        function dontGoBack() { window.history.forward() }
+        window.onpageshow = function (evt) { if (evt.persisted) dontGoBack() }
+        window.onunload = function () { void (0) }
+
+        if (isLogin == "true" || IsParentLogin == "true") {
+            $('#StaffLogin1').css('pointer-events', 'none'); $('#ParentLogin1').css('pointer-events', 'none');
+            $('#ForgetPassword1').css('pointer-events', 'none');
+        }
+        $('#Login').click(function () {
+            debugger
+            $('#msg').html('')
+            if ($('#Username').val() == "" && $('#Password').val() == "") {
+                $('#msg').html('UserName & Password are required')
+                return false;
+            }
+            else if ($('#Username').val() == "") {
+                $('#msg').html('Please enter UserName')
+                return false;
+            }
+            else if ($('#Password').val() == "") {
+                $('#msg').html('Please enter Password')
+                return false;
+            }
+        })
+        function LoadScripts() {
+            var TabId = $('#LoginType').val()
+            if (TabId == 1) { TabOne(); }
+            else if (TabId == 2) { TabTwo(); }
+            else if (TabId == 3) { TabThree(); }
+        }
+        function selectTab(TabId) {
+            $("#msg").html(''); $('#LoginType').val(TabId); $('#Username').val(''); $('#Password').val('')
+            if (TabId == 1) { TabOne(); }
+            else if (TabId == 2) { TabTwo(); }
+            else if (TabId == 3) { TabThree(); }
+        }
+        function TabOne() {
+            $("#StaffLogin1").addClass("active"); $("#StaffLogin").addClass("active");
+            $("#ParentLogin1").removeClass("active"); $("#ForgetPassword1").removeClass("active"); $("#ForgotPassword").removeClass("active");
+            $('#StaffPartialView').show(); $('#ParentPartialView').hide();
+            $('#StaffLogin').css('height', '345px');
+        }
+        function TabTwo() {
+            $('#StaffPartialView').hide(); $("#ParentLogin1").addClass("active"); $("#StaffLogin").addClass("active");
+            $("#StaffLogin1").removeClass("active"); $("#ForgetPassword1").removeClass("active"); $("#ForgotPassword").removeClass("active");
+            if (IsParentLogin == "true") { $('#StaffLogin').css('height', '280px'); $('#ParentPartialView').show(); }
+            else { $('#StaffLogin').css('height', '230px'); $('#ParentPartialView').hide(); }
+        }
+        function TabThree() {
+            $("#ForgetPassword1").addClass("active"); $("#ForgotPassword").addClass("active");
+            $("#StaffLogin1").removeClass("active"); $("#StaffLogin").removeClass("active");
+        }
+        $('#Username').focus(function () { $("#msg").html('') })
+        $('#Password').focus(function () { $("#msg").html('') })
+        $('#txtFpUserName').focus(function () { $("#msg").html('') })
+                    // endregion Other Scripts
+    </script>
+</body>
+</html>
+
+

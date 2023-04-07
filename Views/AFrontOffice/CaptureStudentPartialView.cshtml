@@ -1,0 +1,286 @@
+﻿
+
+<script src="~/assets/js/webcam.js"></script>
+
+<input id="mydata" type="hidden" name="mydata" value="" />
+<input id="resetdata" type="hidden" name="resetdata" value="" />
+
+
+    <div class="row" style="margin: 0 auto;  text-align: center;background:#fcfcfc;">
+
+
+        <div class="col-sm-6 " style=" padding: 5px">
+
+            <div class="col-sm-6" align="center">
+                <div id="my_camera" style="width:200px;height:250px;border:1px solid #e5e4e4;" align="center" ></div>
+
+            </div>
+            <div class="col-sm-6">
+                <br/><br />
+                <span class="fa fa-camera" style="color:#e2e2e2;font-size:550%;"> </span><br/>
+                <a class="btn btn-danger btn-sm" role="button" href="javascript:void(take_snapshot())">Take Snapshot</a>
+            </div>
+  
+
+
+        </div>
+
+        <div class="col-sm-6" style="padding: 5px;" >
+                
+
+            <div class="col-sm-6" align="center">
+
+                <div class="cropArea" style="border:1px solid #e5e4e4; padding: 5px;width:200px;height:250px;" >
+
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.Photo))
+                    {
+                        <div id="my_result" style="width:200px;height:250px" align="center">
+                            <img id="show" src="@ViewBag.Photo" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="my_result" style="width:200px;height:250px" align="center">
+                            <img id="show" src="~/Content/images/NoPhoto.jpg" />
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-sm-6" style="z-index:250;">
+                <br /><br />
+                <span class="fa fa-edit" style="color:#e2e2e2;font-size:550%;"> </span><br />
+                <input class="btn btn-warning btn-sm" id="cropbutton" type="button" value="Crop"/>
+              
+                <input class="btn btn-primary btn-sm" type="button" id="Reset" value="Reset" />
+                
+                <input class="btn btn-success btn-sm" type="submit" value="Save" />
+            </div>
+               
+            
+
+
+        </div>
+   
+    </div>
+
+
+<script src="~/assets/js/jquery.Jcrop.min.js"></script>
+<link href="~/assets/css/jquery.Jcrop.css" rel="stylesheet" />
+@*<script src="http://jcrop-cdn.tapmodo.com/v0.9.12/js/jquery.Jcrop.min.js"></script>
+    <link rel="stylesheet" href="http://jcrop-cdn.tapmodo.com/v0.9.12/css/jquery.Jcrop.css" type="text/css" />*@
+
+
+<script language="JavaScript">
+
+    $('#Reset').click(function () {
+        canvas = null;
+        image = new Image();
+        image.onload = validateImage;
+        image.src = $('#resetdata').val();
+    })
+
+    var crop_max_width = 396;
+    var crop_max_height = 396;
+    var jcrop_api;
+    var canvas;
+    var context;
+    var image;
+
+    var prefsize;
+
+    Webcam.set('flip_horiz', false);
+
+    Webcam.set({
+        width: 200,
+        height: 250,
+        dest_width: 200,
+        dest_height: 250,
+        image_format: 'png',
+        jpeg_quality: 90,
+        force_flash: false,
+        flip_horiz: false,
+        fps: 45
+    });
+
+    Webcam.set("swfURL", "/assets/swf/webcam.swf");
+    Webcam.reset();
+    Webcam.attach('#my_camera');
+
+    function take_snapshot() {
+        Webcam.snap(function (data_uri) {
+            canvas = null;
+            image = new Image();
+            image.onload = validateImage;
+            image.src = data_uri;
+
+            //    document.getElementById('my_result').innerHTML = '<img style="width:480px;height:480px" src="' + data_uri + '"/>';
+
+            var raw_image_data = data_uri.replace(/^data\:image\/\w+\;base64\,/, '');
+
+            document.getElementById('mydata').value = raw_image_data;
+
+            document.getElementById('resetdata').value = data_uri;
+        });
+    }
+
+
+
+    $("#file").change(function () {
+        loadImage(this);
+    });
+
+    function loadImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            canvas = null;
+            reader.onload = function (e) {
+                image = new Image();
+                image.onload = validateImage;
+                image.src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function dataURLtoBlob(dataURL) {
+        var BASE64_MARKER = ';base64,';
+        if (dataURL.indexOf(BASE64_MARKER) == -1) {
+            var parts = dataURL.split(',');
+            var contentType = parts[0].split(':')[1];
+            var raw = decodeURIComponent(parts[1]);
+
+            return new Blob([raw], {
+                type: contentType
+            });
+        }
+        var parts = dataURL.split(BASE64_MARKER);
+        var contentType = parts[0].split(':')[1];
+        var raw = window.atob(parts[1]);
+        var rawLength = raw.length;
+        var uInt8Array = new Uint8Array(rawLength);
+        for (var i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+
+        return new Blob([uInt8Array], {
+            type: contentType
+        });
+    }
+
+    function validateImage() {
+        if (canvas != null) {
+            image = new Image();
+            image.onload = restartJcrop;
+            image.src = canvas.toDataURL('image/png');
+
+            var data_uri = image.src;
+
+            var raw_image_data = data_uri.replace(/^data\:image\/\w+\;base64\,/, '');
+
+            document.getElementById('mydata').value = raw_image_data;
+
+        } else restartJcrop();
+    }
+
+    function restartJcrop() {
+        if (jcrop_api != null) {
+            jcrop_api.destroy();
+        }
+        $("#my_result").empty();
+        $("#my_result").append("<canvas id=\"canvas\">");
+        canvas = $("#canvas")[0];
+        context = canvas.getContext("2d");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        context.drawImage(image, 0, 0);
+        $("#canvas").Jcrop({
+            onSelect: selectcanvas,
+            onRelease: clearcanvas,
+            boxWidth: crop_max_width,
+            boxHeight: crop_max_height
+        }, function () {
+            jcrop_api = this;
+        });
+        clearcanvas();
+    }
+
+    function clearcanvas() {
+        prefsize = {
+            x: 0,
+            y: 0,
+            w: canvas.width,
+            h: canvas.height,
+        };
+    }
+
+    function selectcanvas(coords) {
+        prefsize = {
+            x: Math.round(coords.x),
+            y: Math.round(coords.y),
+            w: Math.round(coords.w),
+            h: Math.round(coords.h)
+        };
+    }
+
+    function applyCrop() {
+        canvas.width = prefsize.w;
+        canvas.height = prefsize.h;
+        context.drawImage(image, prefsize.x, prefsize.y, prefsize.w, prefsize.h, 0, 0, canvas.width, canvas.height);
+        validateImage();
+    }
+
+    function applyScale(scale) {
+        if (scale == 1) return;
+        canvas.width = canvas.width * scale;
+        canvas.height = canvas.height * scale;
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        validateImage();
+    }
+
+    function applyRotate() {
+        canvas.width = image.height;
+        canvas.height = image.width;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.translate(image.height / 2, image.width / 2);
+        context.rotate(Math.PI / 2);
+        context.drawImage(image, -image.width / 2, -image.height / 2);
+        validateImage();
+    }
+
+    function applyHflip() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.translate(image.width, 0);
+        context.scale(-1, 1);
+        context.drawImage(image, 0, 0);
+        validateImage();
+    }
+
+    function applyVflip() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.translate(0, image.height);
+        context.scale(1, -1);
+        context.drawImage(image, 0, 0);
+        validateImage();
+    }
+
+    $("#cropbutton").click(function (e) {
+        debugger
+        applyCrop();
+    });
+    
+    $("#scalebutton").click(function (e) {
+        var scale = prompt("Scale Factor:", "1");
+        applyScale(scale);
+    });
+    $("#rotatebutton").click(function (e) {
+        applyRotate();
+    });
+    $("#hflipbutton").click(function (e) {
+        applyHflip();
+    });
+    $("#vflipbutton").click(function (e) {
+        applyVflip();
+    });
+
+</script>

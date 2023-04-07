@@ -1,0 +1,321 @@
+﻿@model AsteriskBrowserAL.Models.DaysheetViewModel
+@{
+    ViewBag.Title = "Day Sheet";
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Day Sheet</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+<!--Main Content-->
+<section class="content">
+
+    @using (Html.BeginForm("ExcelDT", "FOperations", FormMethod.Post))
+    {
+        <input type="hidden" id="cntrlIndividual" />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Day Sheet</span>
+                    <div class="" style="float:right;margin-right:10px;">
+                        <a class="btncustom P2" id="btnViewData">View Data</a>
+                    </div>
+
+                </div>
+
+
+
+                <div class="widget-box">
+     
+                    <div class="widget-body">
+
+                        <div class="widget-main">
+                            <div class="row">
+                                <input type="hidden" value="@Model.IsCentral" id="IsCentral" />
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.LstDivisions, "DivisionId", "DivisionName"), new { @class = "form-control", id = "CboDivision" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="CboBranch" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+
+
+                                <div class="col-xs-6">
+                                    <div class="col-sm-4">
+                                        <label for="form-field-1">Select Date</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div id="datepicker" class="input-group date">
+                                            <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" value="@Model.TransactionDate.Value.ToShortDateString()" placeholder="Select Date" required="required" title="Please select the date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="col-sm-4">
+                                        <input type="radio" id="Individual" value="1" name="Status" checked="checked" />
+                                        <b>Individual</b>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="radio" id="Consolidated" value="2" name="Status" />
+                                        <b>Consolidated</b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="PvDaySheet">
+
+                </div>
+            </div>
+        </div>
+    }
+
+</section>
+
+<script type="text/javascript">
+
+    $('#Individual').click(function () {
+        document.getElementById("Validation").innerHTML = ""
+        $('#cntrlIndividual').val(true);
+
+        $('#PvDaySheet').html('');
+
+    });
+
+    $('#Consolidated').click(function () {
+        document.getElementById("Validation").innerHTML = ""
+
+        $('#cntrlIndividual').val(false);
+        $('#PvDaySheet').html('');
+    });
+
+    $('#CboDivision').change(function () {
+        document.getElementById("Validation").innerHTML = ""
+
+        var DivisionId = $('#CboDivision').val();
+        $('#PvDaySheet').html("");
+        $('#CboBranch').html("");
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+
+            var ClassItems = $('#CboClassNumber');
+            ClassItems.children().remove();
+            ClassItems.append($("<option>").val(0).text(""));
+
+        }
+    });
+
+
+    $("#CboBranch").change(function () {
+        document.getElementById("Validation").innerHTML = ""
+
+        $('#PvDaySheet').html("");
+    })
+
+    $('#btnViewData').click(function () {
+        var DivisionId = $('#CboDivision').val();
+        var SubscriptionId = $('#CboBranch').val();
+        var Date = $('#Date').val();
+        var IsIndividual = $('#cntrlIndividual').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            if (DivisionId == "null" || DivisionId <= 0 && DivisionId != -1) {
+                Message += "Division";
+                isValid = false;
+            }
+
+            if (SubscriptionId == "null" || SubscriptionId <= 0 && SubscriptionId != -1) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Branch";
+                isValid = false;
+            }
+        }
+
+        if (Date == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Date";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        $.ajax
+            ({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    //alert(errorThrown);
+                    //$('#imagemodal').hide();
+                },
+
+                url: '/FOperations/GetDaySheetReportBySubcriptionId/',
+                data: { dtSelectedDate: Date, DivisionId: DivisionId, SubscriptionId: SubscriptionId, IsIndividual: IsIndividual },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#PvDaySheet').html(data);
+                }
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+
+
+    });
+
+    //$("#Date").focus(function () {
+    //    document.getElementById("Error").innerHTML = ""
+    //})
+    $('#RemarksId').focusin(function () {
+        $('#Validationfortestbox').hide();
+    });
+
+
+    function validateEP() {
+        debugger
+        var Status = true;
+        var datetime = $('#datetime').val();
+        $.ajax({
+
+            url: '/FOperations/VerifyDaysSheet',
+            data: { datetime: datetime },
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                }
+            },
+            async: false
+        });
+
+        return Status;
+    }
+    function OpenAdmCofirmDialog() {
+        debugger;
+        var SubscriptionId = $('#SubscriptionId').val();
+        var SelectedDate = $('#Date').val();
+        var UserName = $('#UserName').val();
+        var $dialog = $('#dialogAdmission').dialog({
+            resizable: true,
+            draggable: false,
+            width: '600',
+            modal: true,
+            closeOnEscape: false,
+            responsive: true,
+            title: 'DaySheet Remarks',
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            title_html: true,
+            buttons: [
+                {
+                    html: "Save",
+                    "class": "btn btn-success btn-minier",
+                    click: function () {
+                        debugger
+                        var Remarks = document.getElementById('RemarksId').value;
+                        if (Remarks == null || Remarks == "" || Remarks == " ") {
+                            $("#Validationfortestbox").show();
+                            return false;
+                        }
+                       else {
+                            $(this).dialog("close");
+                            window.location.href = "/FOperations/SaveDaysSheetRemarks?SubscriptionId=" + SubscriptionId + "&UserName=" + UserName + "&Remarks=" + Remarks + "&SelectedDate=" + SelectedDate;
+                        }
+
+                    }
+
+                },
+                 {
+                     html: 'Close',
+                     "class": "btn btn-danger btn-minier",
+                     click: function () {
+                         $(this).dialog("close");
+                     }
+                 }
+            ]
+        });
+    }
+</script>

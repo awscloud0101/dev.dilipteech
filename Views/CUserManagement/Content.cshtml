@@ -1,0 +1,255 @@
+﻿@model AsteriskBrowserAL.Models.ContentData
+@{
+    ViewBag.Title = "Content";
+}
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Controller
+        </li>
+        <li>
+            <i class=""></i>
+            CUserManagement
+        </li>
+        <li class="active">Content</li>
+    </ol>
+
+</section>
+<br />
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Content", "CUserManagement", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" value="@Model.ModuleId" id="selModule" />
+                    <input type="hidden" value="@Model.PageId" id="selPage" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+
+                            <h5 class="widget-title">
+                                Content
+                            </h5>
+
+                            <div class="widget-toolbar no-border">
+                                <div class="inline dropdown-hover">
+                                    <div class="inline action-buttons">
+                                        <a class="P2" id="New" onclick="NewContent();"><span class="btn btn-info btn-minier">New</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-3">Module</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.ModuleId, new SelectList(Model.ListModule, "ModuleId", "ModuleName"), "-- Select --", new { @class = "form-control", onchange = "onchange();" })
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-3">Page</label>
+                                                <div class="col-sm-6">
+                                                    @if (Model.ListPages == null)
+                                                    {
+                                                        <select id="PageId" class="form-control"></select>
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.DropDownListFor(model => model.PageId, new SelectList(Model.ListPages, "PageId", "PageName"), "-- Select --", new { @class = "form-control", onchange = "onchange();" })
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                }
+
+                <br />
+                <div id="ContentDetails"></div>
+
+            }
+        </div>
+    </div>
+
+</section>
+
+<script>
+
+    $('#ModuleId').change(function () {
+        var Module = $("#ModuleId").val();
+
+        if (Module > 0)
+            LoadModuleDropDown(Module);
+    })
+
+    $('#PageId').change(function () {
+        $('#ContentDetails').html("");
+        LoadPages();
+    })
+
+    function LoadPages() {
+
+
+        var nModule = $('#ModuleId').val()
+        var nPage = $('#PageId').val()
+
+
+        if (nModule > 0 && nPage > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/CUserManagement/ContentPartialView',
+                data: { nModuleId: nModule, nPageId: nPage },
+                success: function (Data) {
+                    $('#ContentDetails').html(Data);
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+
+    }
+
+
+    function LoadModuleDropDown(Module) {
+        $('#ContentDetails').html("");
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/CUserManagement/GetPagesByModuleId',
+            data: { nModule: Module },
+            success: function (Data) {
+                var PagesDRP = $('#PageId')
+                PagesDRP.children().remove();
+                PagesDRP.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    PagesDRP.append($("<option>").val(record.PageId).text(record.PageName));
+                });
+                $('#PageId').append(PagesDRP);
+
+                if ($('#selModule').val() > 0) {
+                    $('#PageId').val($('#selPage').val());
+                }
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+    }
+
+    function NewContent() {
+
+        var ModuleId = $("#ModuleId").val();
+        var PageId = $("#PageId").val();
+
+        if (PageId == null || ModuleId == null) {
+            $('#Validation').html("Select Module");
+            $('#Validation').html("Select Page");
+            return false;
+        }
+
+        window.location.href = '/CUserManagement/ContentC?nModule=' + ModuleId + '&nPage=' + PageId;
+    }
+
+    $(document).ready(function () {
+        LoadData();
+        var selPage = $('#selPage').val();
+        var selModule = $('#selModule').val();
+
+        if (selPage > 0) {
+            LoadRoomDropDown(selModule);
+            $('#PageId').val(selPage);
+        }
+    });
+
+    function LoadData() {
+        debugger
+        var selModule = $('#selModule').val();
+        var selPage = $('#selPage').val();
+        if (selModule != null && selPage > 0) {
+            Pages(selPage, selModule);
+        }
+
+
+    }
+
+    function Pages(nPage, nModule) {
+        debugger
+        $('#ContentDetails').html('');
+        $('#Validation').html('');
+
+        if (nPage > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#imagemodal').hide();
+                    alert(errorThrown);
+                },
+                url: '/CUserManagement/ContentPartialView',
+                data: { nPageId: nPage, nModuleId: nModule },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $('#ContentDetails').html(Data);
+
+                }, error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+    function DeleteContent(nContentId) {
+
+        if (nContentId > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#imagemodal').hide();
+                    alert(errorThrown);
+                },
+                url: '/CUserManagement/DeleteContent',
+                data: { ContenId: nContentId },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+
+
+                    if (Data == "Success") {
+                        LoadPages();
+                    }
+
+                }, error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+
+</script>

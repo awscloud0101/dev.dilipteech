@@ -1,0 +1,157 @@
+﻿@using AsteriskBrowserAL.Helpers
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-key"></i>
+            Controls
+        </li>
+        <li>
+            <i class=""></i>
+            UserManagement
+        </li>
+        <li class="active">Users</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<style>
+    a.nav-menu {
+        cursor: pointer;
+    }
+
+    li.menu-item {
+        cursor: pointer;
+    }
+</style>
+<section class="content">
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+   
+            @using (Html.BeginForm())
+            {
+                    <!-- form start -->
+                @Html.AntiForgeryToken()
+                <div class="table-header">
+                    Users
+                    <div style="float:right;margin-right:10px;">
+                        <button type="button" name="button" id="Save" class="btncustom P2" value="Save">
+                        Save
+                        </button>
+                    </div>
+                </div>
+                <div class="widget-box">
+                   
+
+                    <span id="SaveData" style="color:green;font-weight:bold"></span>
+                    <span id="Error" styl e="color:red;font-weight:bold"></span>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div id="form">
+                                <div class="row">
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Level</label>
+                                        <div class="col-sm-6">
+                                            <select class="form-control" id="RoleId"></select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                       
+                            </div>
+                        </div><!-- /.widget-main -->
+                    </div><!-- /.widget-body -->
+                </div><!-- /.widget-box -->
+
+
+
+                <div class="col-sm-6">
+                    <div id="LovMaster">
+
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div id="PageContents">
+
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+
+
+    <input type="hidden" id="SelPage" />
+
+</section>
+
+
+
+
+
+<script>
+
+    function onloaddata() {
+
+        LoadRoleDropDown()
+    }
+
+    function LoadRoleDropDown() {
+
+        $.ajax({
+            url: '/CUserManagement/GetUserRoles',
+            success: function (Result) {
+                var Role = $('#RoleId')
+                Role.children().remove();
+                Role.append($("<option>").val("").text("--Select--"))
+                $.each(Result, function (i, record) {
+                    Role.append($("<option>").val(record.EmployeeDesignationId).text(record.DesignationName));
+                });
+                $('#RoleId').append(Role);
+
+            }
+        })
+
+
+    }
+
+    $("#RoleId").change(function () {
+        document.getElementById("Error").innerHTML = "";
+        document.getElementById("SaveData").innerHTML = ""
+        $("#PageContents").html("")
+        GetLOVData()
+    })
+
+    function GetLOVData() {
+        var RoleId = $("#RoleId").val();
+        if (RoleId > 0) {
+            $.ajax({
+                url: '/CUserManagement/GetPages',
+                success: function (result) {
+                    $("#LovMaster").html(result)
+                }
+            })
+        }
+        else {
+            document.getElementById("SelPage").value = "";
+            $("#LovMaster").html("")
+            $("#PageContents").html("")
+
+        }
+    }
+
+
+    window.onload = onloaddata();
+
+
+</script>

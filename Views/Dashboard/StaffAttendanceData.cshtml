@@ -1,0 +1,156 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffAttendanceRegister>
+@{
+    int Sno = 1;
+}
+
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<!-- CSS -->
+<style>
+    .ui-widget-header, .ui-state-default, ui-button {
+        background: #3c8dbc;
+        border: 1px solid #3c8dbc;
+        color: #3c8dbc;
+        font-weight: bold;
+    }
+
+
+    .table-fixed thead {
+        width: 97%;
+    }
+
+    .table-fixed tbody {
+        height: 230px;
+        overflow-y: auto;
+        width: 100%;
+    }
+
+    .table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
+        display: block;
+    }
+
+        .table-fixed tbody td, .table-fixed thead > tr > th {
+            float: left;
+            border-bottom-width: 0;
+        }
+</style>
+
+@if ((null != Model))
+{
+
+
+
+    if (Model.Count() > 0)
+    {
+        <span id="Validation" style="color:red;font-weight:bold"></span>
+
+
+        <div class="table-header">
+            Staff Attendance - Day wise
+            <div style="float:right;margin-right:10px;">
+
+            </div>
+        </div>
+
+
+        <div class="overflowscroll">
+
+            <table id="AttendanceTable" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                <thead>
+                    <tr>
+
+                        <th>
+                            S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Branch")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Staff")
+                        </th>
+                       
+                        <th>
+                            @Html.DisplayName("Mobile Number")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Status")
+                        </th>
+                        <th>
+                            @Html.DisplayName("In Time")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Out Time")
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        <tr>
+
+                            <td>
+                                @Sno
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).BranchName
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).Name
+                            </td>
+                           
+                            <td>
+                                @Model.ElementAt(i).MobileNumber
+                            </td>
+                            <td>
+
+                                @if (Model.ElementAt(i).IsManual == true)
+                                {
+                                    <span style="color:orangered">@Model.ElementAt(i).AttendanceStatus</span>
+                                }
+                                else
+                                {
+                                    @Model.ElementAt(i).AttendanceStatus
+                                }
+
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).InTime
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).OutTime
+                            </td>
+
+
+                        </tr>
+                        Sno++;
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+    }
+    else
+    {
+        <span style="color: red;"><b>Data not available</b></span>
+    }
+}
+else
+{
+    <span style="color: red;"><b>Data not available</b></span>
+}
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+
+
+
+
+<script>
+
+    $('#btnExport').click(function () {
+        ExportToExcel("AttendanceTable")
+    });
+
+</script>

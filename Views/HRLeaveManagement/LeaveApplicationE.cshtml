@@ -1,0 +1,198 @@
+﻿@model AsteriskBrowserAL.StaffLeaves
+
+@{
+    ViewBag.Title = "LeaveApplicationE";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Transactions
+        </li>
+        <li>
+            <i class=""></i>
+            Staff
+        </li>
+        <li class="active">Leave Application</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    @*<div class="row">
+            <div class=col-xs-12>
+                <h3>@Html.ActionLink("<< Leave Application Details", "LeaveApplication", new { StaffId = ViewBag.Sel_StaffId })</h3>
+            </div>
+        </div>
+        <br />*@
+
+    <div class="row">
+        <div class="col-xs-12">
+          
+                @using (Html.BeginForm("LeaveApplicationE", "HRLeaveManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+
+                    <div class="box-header">
+                        <div class="page-header">
+                            <br />
+                            <h1>
+                                Leave Application
+                                <small style="float:right;">
+                                    @Html.ActionLink("Back to details", "LeaveApplication")
+                                </small>
+                            </h1>
+                        </div>
+
+                    </div>
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("LeaveApplicationE")</span>
+                    @*@Html.ValidationSummary(true)*@
+                    @*<span style="color: red;">@Html.ValidationMessage("LeaveApplicationE")</span>*@
+                    @*<div class="box-header">
+                    <h3 class="box-title ">Leave Application</h3>
+                    <button class="btn btn-primary pull-right" id="Save" name="Save" type="submit" value="Save">
+                        Save
+                    </button>
+                </div>*@
+
+
+                    @Html.HiddenFor(model => model.LeaveId)
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Leave Date")</label>
+
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                        @if (null != @Model.LeaveDate)
+                                        {
+                                            <input class="form-control" type="text" name="LeaveDate" value="@Model.LeaveDate.Value.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" type="text" name="LeaveDate" autocomplete="off" placeholder="Select Date" />
+
+                                        }
+                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span style="color: red;">@TempData["ErrorDate"]</span>
+                    </div>
+                    <input type="hidden" id="id" name="id" value="0">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Is Half Day")</label>
+
+                        <div class="col-sm-3">
+                            @Html.DropDownList("isHalfDayValue", null, "--Select--", new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-sm-3">
+                            @Html.ValidationMessageFor(model => model.IsHalfDay)
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Leave Type")</label>
+
+                        <div class="col-sm-3">
+                            @Html.DropDownList("LeaveTypeId", null, "--Select--", new { @class = "form-control", @id = "LeaveTypesId" })
+                        </div>
+
+                        <div class="col-sm-3">
+                            <span id="LeaveType" style="color:red;font-weight:bold"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Reporting To")</label>
+
+                        <div class="col-sm-3">
+                            @Html.DropDownList("ReportingTo", null, "--Select--", new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-sm-3">
+                            @Html.ValidationMessageFor(model => model.StaffId)
+                        </div>
+                    </div>
+    @*<div class="hr hr-18 dotted hr-double"></div>*@
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Remarks")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.Remarks, new { @class = "form-control", placeholder = "Remarks" })
+                        </div>
+                     
+                        <div class="col-sm-3">
+                            <span style="color: red;"> @Html.ValidationMessageFor(model => model.Remarks)</span>
+                        </div>
+                    </div>
+
+    <div class="hr hr-18 dotted hr-double"></div>
+    <div class="col-md-offset-3 col-md-9">
+        <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+            <i class="ace-icon fa fa-check bigger-50"></i>
+            Save
+        </button>
+
+        &nbsp; &nbsp; &nbsp;
+        <button class="btn btn-sm" type="reset">
+            <i class="ace-icon fa fa-undo bigger-50"></i>
+            Reset
+        </button>
+
+    </div>
+
+
+                }
+
+                @*<h5>
+                    Leaves Utilized = @ViewBag.LeavesUtilized
+                </h5>
+
+
+            <h5>
+                Leaves Remained = @ViewBag.LeavesRemined
+            </h5>
+
+
+            <h5>
+                Total Leaves = @ViewBag.TotalLeaves
+            </h5>*@
+
+                @if (null != TempData["LeaveApplicationC"])
+                {
+                    @Html.Raw(TempData["LeaveApplicationC"])
+                }
+
+
+                <br />
+
+
+            </div>
+
+        </div>
+   
+</section>
+
+
+
+
+
+
+
+
+
+
+
+

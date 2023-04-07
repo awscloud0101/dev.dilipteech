@@ -1,0 +1,90 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ElectiveSubjectsStudentViewData>
+
+@{
+    ViewBag.Title = "ElectiveSubjectsGroupsDet";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Elective Groups</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!--Main Content-->
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-4>
+            <h3>@Html.ActionLink("<< Elective Subject Groups Details", "ElectiveSubjectGroups", new { BatchId = ViewBag.Selected_BatchId })</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class=col-xs-3>
+            <h3>@Html.ActionLink("New Elective Subject", "ElectiveSubjectsC")</h3>
+        </div>
+    </div>
+
+    <br />
+    @using (Html.BeginForm("ElectiveSubjectsGroupsDet", "SeAcademics", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-xs-12">
+                @if (null != Model)
+                {
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">Elective Subject Groups</h3>
+                        </div><!-- /.box-header -->
+
+                        <div class="box-body table-responsive no-padding">
+                            @Html.ValidationMessage("Book Details")
+
+                            <table id="dynamic-table" class="table table-striped table-bordered table-hover">
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayName("Subject Name")
+                                        </th>
+
+                                        <th></th>
+                                    </tr>
+
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.SubjectName)
+                                            </td>
+                                            <td>
+                                                @Html.ActionLink("Edit", "ElectiveSubjectsE", new { id = item.ElectiveSubjectId }) |
+                                                @Html.ActionLink("Details", "ElectiveSubjectsDet", new { id = item.ElectiveSubjectId }) |
+                                                @Html.ActionLink("Delete", "ElectiveSubjectsD", new { id = item.ElectiveSubjectId })
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                }
+                else
+                {<span style="color: red;"><b>Data not available</b></span> }
+            </div>
+        </div>
+    }
+</section>
+

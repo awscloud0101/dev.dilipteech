@@ -1,0 +1,1094 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionData
+@{
+
+}
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<div class="table-header">
+    <span style="font-family:calibri;">Registration Fill Up</span>
+   
+</div><!-- /.box-header -->
+<br /><br />
+<section class="content">
+
+    <form action="/AFrontOffice/Application" method="Post">
+
+        <input type="hidden" value="@ViewBag.Print" name="Print" id="Print" />
+        <input type="hidden" name="ReferenceRelationName" id="ReferenceRelationName" />
+       
+        <div class="row">
+            <div class="col-xs-12">
+                <span id="Validation" style="color:red;font-weight:bold"></span>
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+
+                        <h5 class="widget-title">
+                            <i class="ace-icon fa fa-pencil-square-o"></i>
+                            Registration Fill Up
+                        </h5>
+
+                        <div class="widget-toolbar no-border">
+                        
+                        </div>
+
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Search")</label>
+                                        <div class="col-sm-6">
+                                            <div class="input-group custom-search-form col-xs-12">
+                                                <input type="text" class="form-control" name="SearchString" id="SearchString" placeholder="Search">
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-search"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("*Inquiry Number", new { @class = "required" })</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" name="InquiryNumber" id="InquiryNumber" class="form-control" value="@Model.InquiryNumber" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("*Inquiry Date", new { @class = "required" })</label>
+                                        <div class="col-sm-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="InquiryDate" name="InquiryDate" disabled="disabled" autocomplete="off" placeholder="Inquiry Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("*Registration Number", new { @class = "required" })</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model)
+                                            {
+                                                <input type="text" id="ApplicationNumber" name="ApplicationNumber" class="form-control" value="@Model.ApplicationNumber" />
+                                            }
+                                            else
+                                            {
+                                                <input type="text" id="ApplicationNumber" name="ApplicationNumber" class="form-control" />
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("*Registration Date", new { @class = "required" })</label>
+                                        <div class="col-sm-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="ApplicationDate" name="ApplicationDate" disabled="disabled" value="@DateTime.Today.ToString("MM/dd/yyyy")" autocomplete="off" placeholder="Admission Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("*First Name", new { @class = "required" })</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" name="FirstName" id="FirstName" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label(" Last Name")</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" name="LastName" id="LastName" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+                            <hr/>
+                            <div class="inline action-buttons" >
+                                <button class="btn btn-info btn-xs P2" style="margin-top:2px" value="SaveApplication" name="Buttontype" id="SaveApplication">
+                                    Save & Submit
+                                </button>
+                                <button class="btn btn-success btn-xs P2" style="margin-top:2px" id="Save" value="Save" type="submit" name="Buttontype">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hr hr-18 dotted hr-double"></div>
+
+        <!--Academic Year-->
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h5 class="widget-title">Academic Year</h5>
+                        <div class="widget-toolbar">
+                            <a href="#" data-action="collapse">
+                                <i class="ace-icon fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-5">@Html.Label("Academic Year")</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.AcademicYearId, new SelectList(Model.lstAcademicYear, "AcademicYearId", "Name"), new { @class = "form-control textlength", id = "CboAcademicYearId" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="hr hr-18 dotted hr-double"></div>
+
+        <!--Personal Information-->
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+
+                        <h5 class="widget-title">
+                            Personal &amp; Academic  Details
+                        </h5>
+
+                        <!-- tools box -->
+
+                        <div class="widget-toolbar">
+                            <a href="#" data-action="collapse">
+                                <i class="ace-icon fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5 ">@Html.Label("*Class", new { @class = "required" })</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownList("CourseId", null, "-- Select --", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("*Date of Birth", new { @class = "required" })</label>
+                                        <div class="col-sm-6">
+                                            <div id="DateOfBirth" class="input-group date">
+                                                <input class="form-control" type="text" id="DateofBirth" name="DateofBirth" autocomplete="off" placeholder="Date of Birth" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-5">@Html.Label("Gender")</label>
+                                        <div class="col-sm-6">
+                                            <label>@Html.RadioButtonFor(m => m.Gender, 0, new { @name = "Male", @id = "Male", @checked = "checked" }) Male@*<input type="radio" value="0" name="Gender" />Male*@</label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label>@Html.RadioButtonFor(m => m.Gender, 1, new { @name = "Female", @id = "Female" }) Female</label>
+                                            @*<label><input type="radio" value="1" name="Gender" />Female</label>*@
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("*Mobile Number", new { @class = "required" })</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.MobileNumber, new { @class = "form-control  textlength txtboxNum", placeholder = "Mobile Number", @maxlength = "10" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("*Father's Name", new { @class = "required" })</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.FatherName, new { @id = "FatherName", @class = "form-control", placeholder = "Father's Name" })
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("*Mother's Name", new { @class = "required" })</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.MotherName, new { @id = "MotherName", @class = "form-control", placeholder = "Mother's Name" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Address")</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.AddressLineOne, new { @class = "form-control", placeholder = "Address" })
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Email")</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.FatherEmail, new { @class = "form-control textlength", @id = "Email", @maxlength = "40", placeholder = "jsmith@example.com" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Other Details")</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.Remarks, new { @class = "form-control", placeholder = "Other Details" })
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="hr hr-18 dotted hr-double"></div>
+        @*Student Related Uploads*@
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Uploads
+                        </h5>
+                        <!-- tools box -->
+                        <div class="widget-toolbar">
+                            <a href="#" data-action="collapse">
+                                <i class="ace-icon fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6" style="background:#fff;border:dotted 1px grey;padding:10px;">
+                                         
+                                            <label class="col-sm-5">
+                                                @Html.Label("Student Photo")
+                                            <input type="file" class="choose" name="StudentPhotoDocs" style="margin-top:0.5em" onchange="readURL(this,1);" />
+
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <img width="100" height="100" id="DisplayImage1" />
+
+                                        </div>
+                                   
+                                    </div>
+                                    <div class="col-xs-6"  style="background:#fff;border:dotted 1px grey;padding:10px;">
+                                        <label class="col-sm-5 " >@Html.Label("Aadhar Card")
+                                            <input type="file" class="choose" name="AadhaarPhotoDocs" style="margin-top:0.5em" onchange="readURL(this,2);" />
+                                        
+                                        </label>
+
+                                        <div class="col-sm-6">
+                                            <img width="100" height="100" id="DisplayImage2" />
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br /><br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6"  style="background:#fff;border:dotted 1px grey;padding:10px;">
+                                        <label class="col-sm-5">@Html.Label("Father Photo")
+                                            <input type="file" class="choose" name="ParentPhotoDocs" style="margin-top:0.5em" onchange="readURL(this,3);" />
+
+                                        
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <img width="100" height="100" id="DisplayImage3" />
+                                                  </div>
+                                    </div>
+                                    <div class="col-sm-6" style="background:#fff;border:dotted 1px grey;padding:10px;">
+                                        <label class="col-sm-5">@Html.Label("Mother Photo")
+                                            <input type="file" class="choose" name="MotherPhotoDocs" style="margin-top:0.5em" onchange="readURL(this,4);" />
+
+                                        
+                                        </label>
+                                        <div class="col-xs-6">
+                                            <img width="100" height="100" id="DisplayImage4" />
+                                                  </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hr hr-18 dotted hr-double"></div>
+        @*Source of Inquiry (Staff / Others)*@
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Source of Inquiry (Staff / Others)
+                        </h5>
+                        <!-- tools box -->
+                        <div class="widget-toolbar">
+                            <a href="#" data-action="collapse">
+                                <i class="ace-icon fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Reference Source")</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownList("Other", null, "-- Select --", new { @class = "form-control", @disabled = "disabled" })
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6" id="ReferenceText">
+                                        <label class="col-sm-5" id="Name">Name</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.ReferenceName, new { @class = "form-control", placeholder = "Reference Name", @id = "ReferenceName", @disabled = "disabled" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5" id="EmpMob">Mobile Number</label>
+                                        <div class="col-sm-6">
+                                            @Html.TextBoxFor(model => model.ReferencePersonMobile, new { @class = "form-control", placeholder = "Mobile Number", @id = "ReferencePersonMobile", @disabled = "disabled" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+
+</section>
+
+
+<input name="StudentId" id="StudentId" type="hidden" />
+
+
+<script type="text/javascript">
+    function readURL(input, value) {
+        debugger
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#DisplayImage' + value + '')
+                    .attr('src', e.target.result)
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+
+<script type="text/javascript">
+    var StudentId = 0;
+    var IsvalidDate = true;
+
+    function onloadData() {
+
+        $('#datepicker1').datepicker({
+            autoclose: true,
+        });
+
+
+        var SelEnquiryNo = $("#InquiryNumber").val()
+        if (SelEnquiryNo != "" && SelEnquiryNo != null && SelEnquiryNo != "null") {
+            AutoFillStudentData(SelEnquiryNo, "Inquiry");
+        }
+    }
+    window.onload = onloadData()
+
+    $("#InquiryNumber").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetData();
+        };
+        if (!this.value) {
+            ResetData();
+        };
+    });
+
+    $("#SearchString").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            $("#InquiryNumber").val('');
+            ResetData();
+        };
+        if (!this.value) {
+            $("#InquiryNumber").val('');
+            ResetData();
+        };
+    });
+
+
+    //$("#FirstName").keyup(function (e) {
+    //    var keycode = e.keyCode;
+    //    if (keycode == 8 || keycode == 46) {
+    //        $("#SearchString").val('');
+    //        $("#InquiryNumber").val('');
+    //        ResetData();
+    //    };
+    //    if (!this.value) {
+    //        $("#SearchString").val('');
+    //        $("#InquiryNumber").val('');
+    //        ResetData();
+    //    };
+    //});
+
+    //Overall Search
+    $("#SearchString").autocomplete({
+        source: function (request, response) {
+            if (request.term.length < 3) {
+                return;
+            }
+            $('#imagemodal').show();
+            $.ajax({
+                url: "/AFrontOffice/GetAutoFillForOverallSearch",
+                type: "POST",
+                dataType: "json",
+                data: { strVal: request.term },
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.SearchString,
+                            value: data.SearchString,
+                            id: data.SearchStringValue,
+                        };
+                    }));
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        },
+        minLength: 1,
+
+        select: function SelectEvent(event, ui) {
+            debugger;
+            StudentId = ui.item.value;
+            AutoFillStudentData(ui.item.id, "Overall");
+        }
+    });
+
+    //$("#ApplicationNumber").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#FirstName").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#LastName").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#CourseId").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#DateofBirth").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+
+    //$("#MobileNumber").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#FatherName").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#MotherName").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#AddressLineOne").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#Remarks").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#Other").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#ReferenceName").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+
+    //});
+    //$("#ReferencePersonMobile").focus(function () {
+    //    document.getElementById("Validation").innerHTML = " ";
+    //});
+
+    function ResetData() {
+        $("#ApplicationNumber").val();
+        $("#FirstName").val('');
+        $("#LastName").val('');
+        $("#CourseId").val('');
+        $("#DateofBirth").val('');
+        $("#Male").attr('checked', 'checked');
+        $("#MobileNumber").val('');
+        $("#FatherName").val('');
+        $("#MotherName").val('');
+        $("#AddressLineOne").val('');
+        $("#Remarks").val('');
+        $("#Other").val('');
+        $("#ReferenceName").val('');
+        $("#ReferencePersonMobile").val('');
+    }
+
+    //window.onload = PrintFeePayments();
+    $("#InquiryNumber").autocomplete({
+        source: function (request, response) {
+            if (request.term.length < 3) {
+                return;
+            }
+            var InqNo = $('#InquiryNumber').val();
+            $('#imagemodal').show();
+            $.ajax({
+                url: "/AFrontOffice/GetInquiryNumbers",
+                type: "POST",
+                dataType: "json",
+                data: { strVal: request.term },
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.InquiryNumber,
+                            value: data.InquiryNumber,
+                            StudentId: data.StudentId,
+                        };
+                    }));
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        },
+        minLength: 1,
+
+        select: function SelectEvent(event, ui) {
+            debugger;
+            StudentId = ui.item.value;
+            AutoFillStudentData(ui.item.value, "Inquiry");
+        }
+    });
+
+    //Application fee
+    $("#ApplicationNumber").autocomplete({
+        source: function (request, response) {
+
+            if (request.term.length < 3) {
+                return;
+            }
+
+            $('#imagemodal').show();
+            $.ajax({
+                url: "/AFrontOffice/GetApplicationNumbers",
+                type: "POST",
+                dataType: "json",
+                data: { strVal: request.term },
+                success: function (json) {
+                    //if (json.length < 1) {
+                    //    document.getElementById("Validation").innerHTML = "Applications not available ";
+                    //}
+
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.ApplicationNumber,
+                            value: data.ApplicationNumber,
+                        };
+                    }));
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        },
+        minLength: 1,
+
+        //select: function SelectEvent(event, ui) {
+        //    debugger;
+        //    StudentId = ui.item.value;
+        //    AutoFillStudentData(ui.item.value);
+        //}
+    });
+
+
+    ////First Name
+    //$("#FirstName").autocomplete({
+    //    source: function (request, response) {
+    //        if (request.term.length < 3) {
+    //            return;
+    //        }
+
+    //        $('#imagemodal').show();
+    //        $.ajax({
+    //            url: "/AFrontOffice/GetStudentNames",
+    //            type: "POST",
+    //            dataType: "json",
+    //            data: { strVal: request.term },
+    //            success: function (json) {
+    //                response($.map(json, function (data, id) {
+    //                    return {
+    //                        label: data.FirstName,
+    //                        value: data.FirstName,
+    //                        id: data.StudentId,
+    //                    };
+    //                }));
+    //            },
+    //            error: function () {
+    //                $('#imagemodal').hide();
+    //            },
+    //        }).done(function () {
+    //            $('#imagemodal').hide();
+    //        });
+    //    },
+    //    minLength: 1,
+
+    //    select: function SelectEvent(event, ui) {
+    //        debugger;
+    //        StudentId = ui.item.value;
+    //        AutoFillStudentData(ui.item.id, "Name");
+    //    }
+    //});
+
+
+
+    var objStudent = [];
+
+    function AutoFillStudentData(strval, type) {
+        $("#tempMSg").hide();
+
+        document.getElementById("Validation").innerHTML = "";
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AFrontOffice/GetAutoFillStudentData',
+            data: { strVal: strval, type: type },
+            success: function (data) {
+                objStudent = data;
+                debugger;
+                document.getElementById("StudentId").value = data.StudentId;
+
+                if (null != data.InquiryDate) {
+                    $("#InquiryDate").val($.datepicker.formatDate("mm/dd/yy", (new Date(parseInt(data.InquiryDate.substr(6))))));
+                }
+
+                //$("#ApplicationNumber").val(data.ApplicationNumber);
+                $("#FirstName").val(data.FirstName);
+                $("#LastName").val(data.LastName);
+
+                if (data.CourseId > 0) {
+                    $("#CourseId").val(data.CourseId);
+                }
+                else {
+                    $('#CourseId').attr('tabindex', 0)
+                }
+
+
+                if ($.datepicker.formatDate("mm/dd/yy", new Date(parseInt(data.DateofBirth.substr(6)))) != "01/01/1") {
+                    $("#DateofBirth").val($.datepicker.formatDate("mm/dd/yy", new Date(parseInt(data.DateofBirth.substr(6)))));
+                }
+
+                if (data.Gender == 0) {
+                    $("#Male").prop("checked", true);
+                }
+
+                else if (data.Gender == 1) {
+                    $("#Female").prop("checked", true);
+                }
+
+                else
+                    $("#Male").prop("checked", true);
+
+                $('#CboAcademicYearId').val(data.AcademicYearId);
+                $("#InquiryNumber").val(data.InquiryNumber);
+                $("#MobileNumber").val(data.FatherMobileNumber);
+                $("#FatherName").val(data.FatherName);
+                $("#MotherName").val(data.MotherName);
+                $("#AddressLineOne").val(data.AddressLineOne);
+                $("#Remarks").val(data.Remarks);
+
+                if (data.ReferencePersonId > 0) {
+                    $("#Other").val(data.ReferencePersonId);
+                }
+                else {
+                    $('#Other').attr('tabindex', 0)
+                }
+
+                $("#ReferenceName").val(data.ReferenceName);
+                $("#Email").val(data.FatherEmail);
+                $("#ReferencePersonMobile").val(data.ReferencePersonMobile);
+
+                debugger
+
+                $('#DisplayImage1').attr('src', data.StudentPhotoPath)
+                $('#DisplayImage2').attr('src', data.AadhaarPhotoPath)
+                $('#DisplayImage3').attr('src', data.ParentPhotoPath)
+                $('#DisplayImage4').attr('src', data.MotherPhotoPath)
+
+
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            },
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    };
+
+    function ValidateForm(validateApplicationNumber) {
+        var message = "";
+
+        var Validate = true;
+        var InquiryNumber = $("#InquiryNumber").val();
+
+        var ApplicationNumber = $("#ApplicationNumber").val();
+        var ApplicationDate = $("#ApplicationDate").val();
+        var FirstName = $("#FirstName").val();
+        var FatherName = $("#FatherName").val();
+        var MotherName = $("#MotherName").val();
+        var Class = $("#CourseId").val();
+        var DOB = $("#DateofBirth").val();
+        var MobileNo = $("#MobileNumber").val();
+        var Email = $('#Email').val();
+        var seldob = false;
+        var CNo = 0;
+
+        var date = new Date($('#DateofBirth').val());
+        var today = new Date();
+        var tdate = today.getYear() - 3;
+
+        var selyear = date.getYear();
+
+
+        if (InquiryNumber == "" || InquiryNumber == undefined) {
+            Validate = false;
+            message += "Inquiry Number, ";
+        }
+
+        if (validateApplicationNumber == true) {
+
+            if (ApplicationNumber == "" || ApplicationNumber == undefined) {
+                message += "Registration Number, ";
+                Validate = false;
+            }
+            else {
+
+                $.ajax({
+                    url: '/AFrontOffice/GetApplicationNumberRage',
+                    async: false,
+                    data: { strApplicationNo: ApplicationNumber },
+                    success: function (data) {
+                        if (data == "No") {
+                            Validate = false;
+                            message += "Registration Number is not in Range, ";
+                        }
+                    },
+                })
+            }
+
+
+
+            if (ApplicationDate == "" || ApplicationDate == undefined) {
+                message += "Registration Date,";
+                Validate = false;
+            }
+        }
+
+        if (FirstName == "" || FirstName == undefined) {
+            message += "First Name, ";
+            Validate = false;
+        }
+
+        if (FatherName == "" || FatherName == undefined) {
+            message += "Father Name, ";
+            Validate = false;
+        }
+
+        if (MotherName == "" || MotherName == undefined) {
+            message += "Mother Name, ";
+            Validate = false;
+        }
+
+        if (Class == "" || Class == undefined) {
+            message += "Class, ";
+            Validate = false;
+        }
+        else {
+            CNo = parseInt(Class);
+        }
+
+        if (DOB == "" || DOB == undefined) {
+            message += "Date of Birth, ";
+            Validate = false;
+        }
+
+        if (MobileNo == "" || MobileNo == undefined) {
+            message += "Mobile Number, ";
+            Validate = false;
+        } else {
+            $.ajax({
+
+                url: '/Common/ValidateMobileNum',
+                data: { MobileNo: $('#MobileNumber').val() },
+                success: function (data) {
+                    if (data != "") {
+                        message += data + ",";
+                        Validate = false;
+                    }
+                }, async: false,
+            });
+        }
+
+        if (Email != "") {
+            var email = document.getElementById('Email');
+            var re = /^(([^<>()[\]\\.,;:\s@@\"]+(\.[^<>()[\]\\.,;:\s@@\"]+)*)|(\".+\"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/igm;
+
+            if (!re.test(email.value)) {
+                message += 'Please provide a valid email address, ';
+                email.focus;
+                valid = false;
+            }
+        }
+
+
+        if (!Validate)
+            document.getElementById("Validation").innerHTML = "Please fill the fields, " + message.slice(0, -2);
+
+        return Validate;
+    }
+
+
+    function ValidateMobNum() {
+        var val = true;
+        $.ajax({
+
+            url: '/Common/ValidateMobileNum',
+            data: { MobileNo: $('#MobileNumber').val() },
+            success: function (data) {
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            }, async: false,
+        });
+
+        return val;
+    }
+
+    $('#SaveApplication').click(function () {
+
+        $('#tempMSg').val('');
+
+        if (!ValidateForm(true)) {
+            return false;
+        }
+
+        return true;;
+    });
+
+
+    $('#Save').click(function () {
+
+        $('#tempMSg').val('');
+
+        if (!ValidateForm(false)) {
+            return false;
+        }
+
+        return true;;
+    });
+
+
+
+    function GetData() {
+
+        objStudent.InquiryDate = $("#InquiryDate").val();
+        objStudent.ApplicationNumber = $("#ApplicationNumber").val();
+        objStudent.FirstName = $("#FirstName").val();
+        objStudent.LastName = $("#LastName").val();
+        objStudent.Class = $("#CourseId").val();
+        objStudent.DateofBirth = $("#DateofBirth").val();
+        objStudent.Gender = $("#Gender").val();
+
+        objStudent.MobileNumber = $("#MobileNumber").val();
+        objStudent.FatherName = $("#FatherName").val();
+        objStudent.MotherName = $("#MotherName").val();
+        objStudent.AddressLineOne = $("#AddressLineOne").val();
+        objStudent.Remarks = $("#Remarks").val();
+        objStudent.Other = $("#Other").val();
+        //objStudent.ReferenceName = ("#ReferenceName").val();
+        objStudent.ReferencePersonMobile = $("#ReferencePersonMobile").val();
+    }
+
+
+    //on Requirement of gangadhar sir
+
+    //$('#CourseId').change(function () {
+    //    debugger
+
+    //    $('#DateofBirth').val('');
+    //    var ClassNo = $('#CourseId').val();
+
+    //    if (ClassNo == "" || ClassNo == undefined)
+    //        return;
+
+    //    var CNo = parseInt(ClassNo);
+
+    //    if (CNo < 1)
+    //        return;
+
+    //    $.ajax({
+    //        url: "/AFrontOffice/SetDobDateLimit",
+    //        type: "POST",
+    //        dataType: "json",
+    //        data: { ClassNumber: CNo },
+    //        success: function (json) {
+    //            $('#datepicker1').datepicker("setStartDate", new Date(json.strStartDate));
+    //            $('#datepicker1').datepicker("setEndDate", new Date(json.strEndDate));
+    //        },
+    //        error: function () {
+    //        },
+
+    //        async: false,
+
+    //    }).done(function () {
+    //    });
+
+
+
+
+    //});
+
+
+
+    $(document).on('focus', '#DateOfBirth', function () {
+        debugger
+
+        $(this).datepicker({
+            startDate: "1/1/1900",
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+</script>

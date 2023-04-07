@@ -1,0 +1,133 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentAttendanceApprove>
+@{
+    ViewBag.Title = "Student Attendance Freeze";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            FrontOffice
+        </li>
+        <li class="active">Student Attendance Freeze</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+</style>
+
+<!--Main Content-->
+<section class="content">
+    <div class="row">
+        <div class=col-xs-6>
+
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("StudentAttendanceFreeze", "AFrontOffice", FormMethod.Post))
+            {
+                if (null != TempData["StudentAttendanceFreeze"])
+                {
+                    <span style="color:green;font-weight:bold;">@Html.Raw(TempData["StudentAttendanceFreeze"])</span>
+                }
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    <span id="Validation" style="color:red;font-weight:bold"></span>
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">Student Attendance Freeze</h3>
+                            <button class="btn btn-primary pull-right" type="submit" style="width:80px;" name="Save" value="Save">
+                                Save
+                            </button>
+                            <br />
+                            <br />
+                            <div class="form-group">
+                                <label class="col-sm-3"><span class="red"></span>Enter Regular Days</label>
+                                <div class="col-sm-3">
+                                    <input class="form-control col-sm-4" id="regular" name="regular" min="0" maxlength="3" />
+                                </div>
+                                <div>
+                                    <input type="button" id="RegularSet" name="RegularSet" value="Set" class=" btn btn-primary" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="SearchData">
+                            @Html.Partial("StudentAttendanceFreezePartialView", Model)
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <span style="color: red;"><b>Data is not available</b></span>
+                }
+
+                <br />
+            }
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+
+    $("#RegularSet").click(function () {
+        var RegularDays = $('#RegularSet').val();
+        var Regular = $('#regular').val();
+
+        if (Regular == null || Regular <= 0 || Regular == "") {
+            document.getElementById("Validation").innerHTML = " Please enter Regular Days"
+        }
+        else {
+            document.getElementById("Validation").innerHTML = ""
+        }
+
+        if (Regular != null) {
+            $.ajax({
+                url: '/AFrontOffice/GetRegularDays',
+                data: { Regular: Regular },
+                success: function (result) {
+                    $("#SearchData").html(result);
+                }
+            })
+        }
+        else {
+        }
+    })
+
+    $("#regular").keypress(function (e) {
+        //if the letter is not digit then display error and don't type anything
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            //display error message
+            return false;
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+

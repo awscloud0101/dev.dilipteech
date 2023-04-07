@@ -1,0 +1,187 @@
+﻿@model AsteriskBrowserAL.Models.EmployerContributionData
+@{
+    ViewBag.Title = "EmployerContributionC";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Employee Contribution</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content">
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("EmployerContributionC", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <br />
+
+                <div class="box">
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("EmployerContribution")</span>
+
+                    <div class="page-header">
+                   
+                        <h1>
+                            Employer Contribution
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "EmployerContribution", new { CategoryId = Model.EmployerContributionId })
+                            </small>
+                        </h1>
+                    </div><!-- /.page-header -->
+                    <!-- form start -->
+                    <form class="form-horizontal" role="form">
+                        <div class="box-body">
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("*Contribution To", new { @class = "required" })</label>
+
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.PayrollCategoryComponentsId, new SelectList(Model.ListPayrollComponents, "PayrollCategoryComponentsId", "CategoryName"), "--- Select ---", new { @class = "form-control" })
+                                </div>
+
+                                <div class="col-sm-3" style="display:none;" id="nameNull">
+                                    <label style="color:red;font-weight:bold;">   Enter Contribution Name </label>
+                                </div>
+
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Percentage (%)", new { @class = "required" })</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.Percentage, new { @class = "form-control allownumericwithdecimal", onkeyup = "this.value = minmax(this.value, 0, 100)" })
+                                </div>
+
+                                <div class="col-sm-3" style="display:none;" id="percentagenull">
+                                    <label style="color:red;font-weight:bold;"> Enter Percentage value </label>
+                                </div>
+
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Percentage Of", new { @class = "required"})</label>
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.PercentageOfComponentId, new SelectList(Model.ListPayrollComponents, "PayrollCategoryComponentsId", "CategoryName"), "--- Select ---", new { @class = "form-control" })
+                                </div>
+                                @*<input type="hidden" id="PercentageOfComponentId" name="PercentageOfComponentId" value="@Model.PercentageOfComponentId">*@
+                                <div class="col-sm-3" style="display:none;" id="vPercentageOf">
+                                    <label style="color:red;font-weight:bold;">   Select Payroll Component</label>
+                                </div>
+                            </div>
+                         
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <div class="col-md-offset-3 col-md-9">
+                                <button class="btn btn-success btn-sm" onclick="return ValidateForm();" type="submit">
+                                    <i class="ace-icon fa fa-check bigger-50"></i>
+                                    Save
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <button class="btn btn-sm" type="reset">
+                                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                                    Reset
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+
+
+                </div>
+            }
+        </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+    function ValidateForm() {
+        var bIsValid = true;
+
+        var ContributionName = $('#PayrollCategoryComponentsId').val();
+        var PercentageValue = $('#Percentage').val();
+        var PercentageOf = $('#PercentageOfComponentId').val();
+        validate = true;
+
+        if (ContributionName == "" || ContributionName == undefined) {
+            $('#nameNull').show();
+            bIsValid = false;
+        }
+        if (PercentageValue == "" || PercentageValue == undefined) {
+            bIsValid = false;
+            $('#percentagenull').show();
+
+        }
+        //if (PercentageOf < 1 || PercentageOf == undefined) {
+        //    bIsValid = false;
+        //    $('#vPercentageOf').show();
+        if (PercentageOf == "" || PercentageOf == undefined) {
+                bIsValid = false;
+               $('#vPercentageOf').show();
+        }
+
+        return bIsValid;
+    }
+
+    $('#PayrollCategoryComponentsId').focus(function () {
+        $('#nameNull').hide();
+    });
+    $('#Percentage').focus(function () {
+        $('#percentagenull').hide();
+    });
+    $('#PercentageOfComponentId').focus(function () {
+        $('#vPercentageOf').hide();
+    });
+
+    function minmax(value, min, max) {
+        debugger
+        if (parseFloat(value) < min || isNaN(value))
+            return 0;
+        else if (parseFloat(value) > max)
+            return 100;
+        else return value;
+    }
+
+
+
+    $(".allownumericwithdecimal").on("keypress keyup", function (event) {
+        debugger
+        //this.value = this.value.replace(/[^0-9\.]/g,'');
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+    function isNumberKey(event) {
+        document.getElementById('PercentageValue').onkeypress = function (e) {
+            if (e.keyCode === 46 && this.value.split('.').length === 2) {
+                return false;
+            }
+            if (this.value > 100) {
+                return false;
+            }
+        }
+    }
+</script>

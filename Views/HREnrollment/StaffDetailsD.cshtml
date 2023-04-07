@@ -1,0 +1,665 @@
+﻿@model AsteriskBrowserAL.Models.StaffRegistrationViewModel
+@{
+    ViewBag.Title = "Staff Details";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Enrollment
+        </li>
+        <li class="active">Employee Details</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<style>
+    #tabs {
+        overflow: auto;
+        width: 100%;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        #tabs li {
+            margin: 0;
+            padding: 0;
+            float: left;
+        }
+
+        #tabs a {
+            -moz-box-shadow: -4px 0 0 rgba(0, 0, 0, .2);
+            -webkit-box-shadow: -4px 0 0 rgba(0, 0, 0, .2);
+            box-shadow: -4px 0 0 rgba(0, 0, 0, .2);
+            background: #3c8dbc;
+            background: -moz-linear-gradient(220deg, transparent 10px, #3c8dbc 10px);
+            background: -webkit-linear-gradient(220deg, transparent 10px, #3c8dbc 10px);
+            background: -o-linear-gradient(220deg, transparent 10px, #3c8dbc 10px);
+            background: linear-gradient(220deg, transparent 10px, #3c8dbc 10px);
+            text-shadow: 0 1px 0 rgba(0,0,0,.5);
+            color: #fff;
+            float: left;
+            font: bold 12px/35px 'Lucida sans', Arial, Helvetica;
+            height: 35px;
+            padding: 0 30px;
+            text-decoration: none;
+        }
+
+
+
+
+
+        #tabs #current a {
+            background: #fff;
+            background: -moz-linear-gradient(220deg, transparent 10px, #fff 10px);
+            background: -webkit-linear-gradient(220deg, transparent 10px, #fff 10px);
+            background: -o-linear-gradient(220deg, transparent 10px, #fff 10px);
+            background: linear-gradient(220deg, transparent 10px, #fff 10px);
+            text-shadow: none;
+            color: #333;
+        }
+
+    #content {
+        background-color: white;
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+        background-image: -webkit-linear-gradient(top, white, #d8e8f7);
+        background-image: -moz-linear-gradient(top, white, #d8e8f7);
+        background-image: -o-linear-gradient(top, white, #d8e8f7);
+        background-image: linear-gradient(top, white, #d8e8f7);
+        -moz-border-radius: 0 2px 2px 2px;
+        -webkit-border-radius: 0 2px 2px 2px;
+        border-radius: 0 2px 2px 2px;
+        -moz-box-shadow: 0 2px 2px #000, 0 -1px 0 white inset;
+        -webkit-box-shadow: 0 2px 2px #000, 0 -1px 0 white inset;
+        box-shadow: 0 2px 2px #000, 0 -1px 0 #fff inset;
+        padding: 30px;
+    }
+
+    /* Remove the rule below if you want the content to be "organic" */
+</style>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.css" />
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2-bootstrap.min.css" />
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.js"></script>
+
+
+<!--Main Content-->
+<section class="content">
+    <br/>
+    @if (null != Model)
+    {
+
+        <div class="page-header">
+            <h1>
+              Employee Details
+                <small style="float:right;">
+                    @Html.ActionLink("Back to details", "StaffDetails", new { DepartmentId = Model.SearchDepartment, CategoryId = Model.SearchCategory, nDivisionId = Model.DivisionId, nBranchId = Model.BranchId })
+                </small>
+            </h1>
+        </div><!-- /.page-header -->
+        <br />
+        <form class="form-horizontal" role="form">
+            <ul id="tabs">
+                <li>
+                    <a data-toggle="tab" href="#profile" class="tab1">
+                        <i class="green ace-icon fa fa-user bigger-120"></i>
+                        Profile
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#qualification" class="tab2">
+                        <i class="blue ace-icon fa fa-users bigger-120"></i>
+                        Qualification and other Details
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#performanceIndicator" class="tab3">
+                        <i class="blue ace-icon fa fa-users bigger-120"></i>
+                        Performance Indicator
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#Permissions" class="tab4">
+                        <i class="blue ace-icon fa fa-users bigger-120"></i>
+                        Permissions
+                    </a>
+                </li>
+            </ul>
+
+            @using (Html.BeginForm("StaffDetailsD", "HREnrollment", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+            {
+                <div id="content">
+
+                    <div id="tab1" class="tabContent">
+                        <div id="profile" class="tab-pane">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Personal Information</h3>
+                            </div><!-- /.box-header -->
+                        </div><!-- /.box-header -->
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <span class="profile-picture">
+                                    @if (ViewBag.ImageData != null)
+                                    {
+                                        <img src="@ViewBag.ImageData" width="120" height="130" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/Content/images/NoPhoto.jpg" width="120" height="130" />
+                                    }
+                                </span>
+
+                                <div class="space space-6"></div>
+
+                                <div class="full-width-chart label label-info label-xlg arrowed-in arrowed-in-right">
+                                    <div class="inline position-relative">
+                                        <span class="white">@Model.FirstName @Model.LastName</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-9">
+                                <!-- #section:pages/profile.info -->
+                                <table class="table" style="font-size:14px;">
+                                    <tr>
+                                        <th style="width:30%">Employee #</th>
+                                        <td>@Model.EmployeeNumber</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Branch</th>
+                                        <td>@Model.BranchName</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Date of Birth")</td>
+                                        <td>
+                                            @if (Model.DateofBirth.HasValue)
+                                            {
+                                                @Model.DateofBirth.Value.ToString("dd-MMM-yyyy")
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Blood Group")</td>
+
+                                        <td>
+                                            @if (Model.BloodGroup != null)
+                                            {
+                                                @Model.BloodGroup
+                                            }
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Joining Date")</td>
+                                        @if (Model.JoiningDate.HasValue)
+                                        {
+                                            <td>@Model.JoiningDate.Value.ToString("dd - MMM - yyyy")</td>
+                                        }
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Mobile #")</td>
+                                        <td>@Model.MobileNumber</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Alternate Mobile #")</td>
+                                        <td>@Model.AlternateContact</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Address Line 1")</td>
+                                        <td>@Model.AddressLineOne</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Address Line 2")</td>
+                                        <td>@Model.AddressLineTwo</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("City")</td>
+                                        <td>@Model.City</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("State")</td>
+                                        @if (null != Model.State)
+                                        {
+                                            <td>@Model.State</td>
+                                        }
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("EMail")</td>
+                                        <td>@Model.EMail</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@Html.Label("Personal Email")</td>
+                                        <td>@Model.EMailPersonal</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Father Name")</td>
+                                        <td>@Model.FatherName</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Mother Name")</td>
+                                        <td>@Model.MotherName</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@Html.Label("City")</td>
+                                        <td>@Model.City</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@Html.Label("State")</td>
+                                        <td>@Model.State</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@Html.Label("PIN Code")</td>
+                                        <td>@Model.PINCode</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("City")</td>
+                                        <td>@Model.City</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Nominee")</td>
+                                        <td>@Model.NomineeName</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@Html.Label("Nominee Relation")</td>
+                                        <td>@Model.NomineeReleation</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Marital Status")</td>
+                                        <td>@Model.MaritalStatus</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Spouse Name")</td>
+                                        <td>@Model.SpouseName</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Child One")</td>
+                                        <td>@Model.ChildOne</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Child Two")</td>
+                                        <td>@Model.ChildTwo</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Child Three")</td>
+                                        <td>@Model.ChildThree</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@Html.Label("Legacy Number")</td>
+                                        <td>@Model.LegacyNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@Html.Label("Employee Status")</td>
+                                        <td>@Model.EmployeeStatus</td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="tab2" class="tabContent">
+                        <div id="qualification" class="tab-pane">
+                            <div class=" box-header with-border">
+                                <h3 class="box-title">Other Information</h3>
+
+                            </div><!-- /.box-header -->
+
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <span class="profile-picture">
+                                        @if (ViewBag.ImageData != null)
+                                        {
+                                            <img src="@ViewBag.ImageData" width="120" height="130" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/Content/images/NoPhoto.jpg" width="120" height="130" />
+                                        }
+                                    </span>
+
+                                    <div class="space space-4"></div>
+
+                                    <div class="width-80 label label-info label-xlg arrowed-in arrowed-in-right">
+                                        <div class="inline position-relative">
+                                            <span class="white">@Model.FirstName @Model.LastName</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-9">
+                                    <!-- #section:pages/profile.info -->
+                                    <table class="table" style="font-size:14px;">
+                                        <tr>
+                                            <td style="width:30%;">@Html.Label("Qualification")</td>
+                                            <td>@Model.Qualification</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:30%;">@Html.Label("Additional Qualification")</td>
+                                            <td>@Model.AdditionalQualification</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("Experience Info")</td>
+                                            <td>@Model.ExperienceInfo</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("Department")</td>
+                                            <td>@Model.Department</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("Category")</td>
+                                            <td>@Model.CategoryName</td>
+                                        </tr>
+                                        <tr>
+                                            <td>@Html.Label("Access Level")</td>
+                                            <td>@Model.Designation</td>
+                                        </tr>
+                                        <tr>
+                                            <td>@Html.Label("Additional Access Level")</td>
+                                            <td>@Model.AdditionalDesignation</td>
+                                        </tr>
+                                        <tr>
+                                            <td>@Html.Label("Designation")</td>
+                                            <td>@Model.Position</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("Reporting Manager")</td>
+                                            <td>@Model.ReportingManager</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("Manager to Manager")</td>
+                                            <td>@Model.ManagerToManger</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("Aadhar Card Number")</td>
+                                            <td>@Model.AadharCardNumber</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("Bank")</td>
+                                            <td>@Model.Bank</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("Account Number")</td>
+                                            <td>@Model.AccountNo</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("IFSC Code")</td>
+                                            <td>@Model.IFSCCode</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>@Html.Label("License Number")</td>
+                                            <td>@Model.LicenceNumber</td>
+                                        </tr>
+
+                                        <br />
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="tab3" class="tabContent" style="height:400px">
+                        <div id="performanceIndicator" class="tab-pane">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Performance Indicator</h3>
+                            </div><!-- /.box-header -->
+                            <br />
+                            <div class="pull-right">
+                                <button name="Save" id="save" class="btn btn-success btn-sm" onclick="return SavePeformanceIndication(@Model.StaffId);">
+                                    <i class="ace-icon fa fa-check bigger-50"></i>
+                                    Save
+                                </button>
+                            </div>
+                            <br /><br />
+                            <div class="row">
+                                <label id="msg" style="color:green;"></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Performance")</label>
+                                        <div class="col-sm-3">
+                                            @Html.DropDownListFor(model => model.PerformanceIndicatorId, new SelectList(Model.ListPerformanceIndicator, "Value", "Name"), new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Remarks Given By")</label>
+                                        <div class="col-sm-6">
+                                            <label id="lblUserName" class="control-label no-padding-right">@Model.UserName</label>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Date")</label>
+                                        <div class="col-sm-3">
+                                            @if (Model.LastUpdated.HasValue)
+                                            {
+                                                <label class="lablLastUpdated control-label no-padding-right" id="lablLastUpdated">@Model.LastUpdated.Value.ToString("dd-MMM-yyyy")</label>
+                                            }
+                                            else
+                                            {
+                                                <label class="lablLastUpdated control-label no-padding-right" id="lablLastUpdated"></label>
+                                            }
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="tab4" class="tabContent">
+                        <div id="Permissions" class="tab-pane">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Permissions</h3>
+                            </div><!-- /.box-header -->
+                            <br />
+                            <label id="SubMsg" style="color:green"></label>
+                            <label id="SubMsg1" style="color:red"></label>
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <div class="pull-right">
+                                            <button name="Save1" id="save1" class="btn btn-success btn-sm" onclick="return SaveSubscriptions();">
+                                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Select Subscriptions")</label>
+                                        <div class="col-sm-6">
+                                            @Html.ListBoxFor(model => model.ListSelectedSubscriptions, new SelectList(Model.ListAccessibleBranches, "DataBaseName", "Institute", Model.ListSelectedSubscriptions), new { @class = "form-control select2", @multiple = "multiple", id = "SubscriptionId" })
+                                        </div>
+                                        <div class="col-xs-1">
+                                            <label> <input type="checkbox" id="checkbox"> All</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    @if (null != Model)
+                    {
+                        <input type="hidden" id="StaffId" value="@Model.StaffId" />
+                        <input type="hidden" id="StateId" value="@Model.State" />
+                        <input type="hidden" value="@Model.EmployeeNumber" id="empNo" />
+                        <input type="hidden" value="@Model.StaffId" id="empNo1" />
+                    }
+
+                </div>
+            }
+        </form>
+    }
+</section>
+
+
+<script>
+
+    $(".select2").select2();
+
+    $(document).ready(function () {
+        $("#content .tabContent").hide(); //Hide all content
+
+        $("#tabs li:first").attr("id", "current"); // Activate first tab
+
+        $("#tab1").show(); // Show first tab content
+
+        $('#tabs a').click(function (e) {
+            e.preventDefault();
+            $("#content .tabContent").hide(); //Hide all content
+
+            $("#tabs li").attr("id", ""); //Reset id's
+
+            $(this).parent().attr("id", "current"); // Activate this
+            var title = $(this).attr('class');
+            $('#' + title).show(); // Show content for current tab
+        });
+    });
+
+
+
+
+    $("#checkbox").click(function () {
+        document.getElementById('SubMsg1').innerHTML = "";
+        document.getElementById('SubMsg').innerHTML = "";
+
+
+        if ($("#checkbox").is(':checked')) {
+            $("#SubscriptionId > option").prop("selected", "selected");
+            $("#SubscriptionId").trigger("change");
+        } else {
+            $("#SubscriptionId > option").removeAttr("selected");
+            $("#SubscriptionId").trigger("change");
+        }
+    });
+
+
+    function GetStaffPhoto() {
+        var StaffID = $("#StaffId").val();
+        $.ajax({
+            url: '/HREnrollmet/GetStaffPhoto',
+            Data: { StaffId: StaffID },
+            success: function (data) {
+                $('#image').attr("src", data);
+            }
+        })
+    }
+    function GetStateName() {
+        var StateId = $("#StateId").val();
+        $.ajax({
+            url: '/MStudent/GetStateName',
+            data: { StateId: StateId },
+            success: function (data) {
+                document.getElementById("statename").innerHtml = data
+            }
+        })
+    }
+    window.onload = onloadData();
+
+    window.onload = GetStaffPhoto();
+
+
+    function SavePeformanceIndication(value) {
+        var Performance = $('#PerformanceIndicatorId').val();
+        if (Performance == 0)
+            return false;
+
+        $.ajax({
+            url: "/HREnrollment/SavePerformance",
+            data: { nStaffId: value, nPerformance: Performance },
+            success: function (data) {
+                document.getElementById('msg').innerHTML = "Data saved";
+                document.getElementById('lblUserName').innerHTML = data.userName;
+                document.getElementById('lablLastUpdated').innerHTML = data.date;
+
+            },
+            error: function () {
+                return false;
+            }
+        });
+
+        return false;
+    }
+
+    function SaveSubscriptions() {
+        var value = $('#empNo').val();
+        var value1 = $('#empNo1').val();
+        var Subscriptions = $('#SubscriptionId').val();
+
+        if (Subscriptions != null && Subscriptions != undefined) {
+            var sub = Subscriptions.toLocaleString();
+            $.ajax({
+                url: "/HREnrollment/SaveSubscriptions",
+                data: { strEmpNo: value, nStaffId: value1, strSubscriptions: sub },
+                success: function (data) {
+                    if (data == "T") {
+                        document.getElementById('SubMsg1').innerHTML = "";
+                        document.getElementById('SubMsg').innerHTML = "Subscriptions added successfully";
+
+                    }
+                    if (data == "F") {
+                        document.getElementById('SubMsg1').innerHTML = "Something went wrong, please try again";
+                        document.getElementById('SubMsg').innerHTML = "";
+
+                    }
+                },
+                error: function () {
+                    return false;
+                }
+            });
+        } else {
+            document.getElementById('SubMsg').innerHTML = "";
+            document.getElementById('SubMsg1').innerHTML = "Select subscriptions to add";
+
+        }
+        return false;
+    }
+</script>

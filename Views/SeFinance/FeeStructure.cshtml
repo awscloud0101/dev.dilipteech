@@ -1,0 +1,228 @@
+﻿@model List<AsteriskBrowserAL.Models.FeeStructureViewModel>
+@{
+    ViewBag.Title = "Fee Structure";
+
+    int sno = 1;
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Fee Structure</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@if (Model != null)
+{    @Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })}
+
+
+<link href="~/Content/tooltip.css" rel="stylesheet" />
+
+<!--Main Content-->
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+
+
+            @using (Html.BeginForm("FeeStructure", "SeFinance", FormMethod.Post))
+            {
+                <input type="hidden" id="SelAyId" value="@ViewBag.AcademicYearId" />
+         
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Tution Fee Structure</span>
+
+
+                </div>
+
+
+
+                    <div class="widget-box">
+
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 ">Academic Year</label>
+                                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                <select id="CboAcademicYear" name="AcademicYearId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    if (Model != null && Model.Count() > 0)
+                    {
+
+                    <br />
+                    <div class="row" id="divStructure">
+                        <div class="col-xs-12">
+                            <div class="table-header">
+                                Records Found(@Model.Count)
+                                <div style="float:right;margin-right:10px;">
+                                    <button type="submit" class="btncustom P2">
+                                       Save
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <table class="table tbhover table-striped table-bordered dynamic-table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                S.No.
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Branch")
+                                            </th>
+
+                                            @foreach (var obj in Model.FirstOrDefault().ListClassAndAmount)
+                                            {
+                                                <th>
+                                                    @obj.ClassNumberDisplay
+                                                </th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.Count(); i++)
+                                        {
+
+                                            <tr>
+                                                <td>
+                                                    @Html.Hidden("FeeStructureList.Index", (@i + 10))
+                                                    @sno
+                                                </td>
+                                                <td>
+                                                    @Model.ElementAt(i).BranchName
+                                                    @Html.Hidden("FeeStructureList[" + (@i + 10) + "].BranchName", Model.ElementAt(i).BranchName)
+                                                    @Html.Hidden("FeeStructureList[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                                </td>
+
+                                                @for (int j = 0; j < Model.ElementAt(i).ListClassAndAmount.Count(); j++)
+                                                {
+                                                    <td data-tip="@Model.ElementAt(i).ListClassAndAmount.ElementAt(j).ClassNumberDisplay">
+                                                        @Html.TextBox("FeeStructureList[" + (@i + 10) + "].ListClassAndAmount[" + (@j) + "].FeeAmount", Model.ElementAt(i).ListClassAndAmount.ElementAt(j).FeeAmount, new { @class = "textlength txtboxNum", @id = "nrAmount", @min = "0", @Maxlength = "7", @style = "width:120px" })
+                                                        @Html.Hidden("FeeStructureList[" + (@i + 10) + "].ListClassAndAmount[" + (@j) + "].FeeMasterCategoryId", Model.ElementAt(i).ListClassAndAmount.ElementAt(j).FeeMasterCategoryId)
+                                                        @Html.Hidden("FeeStructureList[" + (@i + 10) + "].ListClassAndAmount[" + (@j) + "].FeeAmountId", Model.ElementAt(i).ListClassAndAmount.ElementAt(j).FeeAmountId)
+                                                    </td>
+                                                }
+
+                                            </tr>
+                                            sno++;
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                    }
+
+                </div>
+
+    </div>
+</section>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        LoadAcademicYearCombo();
+    });
+
+
+    function LoadAcademicYearCombo() {
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                $('#imagemodal').hide();
+
+                var ObjAyYear = $("#CboAcademicYear")
+                ObjAyYear.children().remove();
+                //ObjAyYear.append($("<option>").val(-1).text("--Select--"))
+
+                $.each(result, function (i, elm) {
+                    ObjAyYear.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(ObjAyYear)
+
+                if ($('#SelAyId').val() > 0) {
+                    $('#CboAcademicYear').val($('#SelAyId').val());
+                }
+                else 
+                    PopulateData();
+
+            },
+            async: false
+        })
+
+    }
+
+    $('#CboAcademicYear').change(function () {
+        PopulateData();
+    });
+
+    function PopulateData() {
+
+        if ($('#CboAcademicYear').val() < 1) {
+
+            if ($('#divStructure') != "undefined")
+                $('#divStructure').html('');
+
+            return;
+        }
+
+        window.location.href = '/SeFinance/FeeStructure?AcademicYearId=' + $('#CboAcademicYear').val();
+    }
+
+
+
+    $('#plan1').keypress(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    function submitForm() {
+        return true;
+    };
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

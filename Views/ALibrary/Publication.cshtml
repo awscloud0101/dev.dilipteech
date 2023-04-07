@@ -1,0 +1,150 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Publication>
+
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+        Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Publication</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+
+    @if (null != Model)
+    {
+        @Html.Action("DataTableScripts", "Base")
+        <span style="color:red;font-weight:bold" id="Validation"></span>
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    Publication
+                    <div style="float:right">
+                        <a class="btn btn-info btn-xs" href="@Url.Action("ExcelSheetForPublication", "ALibrary")" role="button" id="New" name="New" style="margin-left:10px;"><i class="ace-icon fa fa-download"> | Download</i></a>
+                    </div>
+                    <div style="float:right">
+                        <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("PublicationC", "ALibrary")" role="button" id="New" name="New"><i class="fa fa-plus"> | Add</i></a>
+                    </div>
+                </div><!-- /.box-header -->
+                <table id="dynamic-table" class="table table-hover table-bordered table-striped nowrap dynamic-table" style="font-size:14px;">
+
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Publication Name")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Short Description")
+                            </th>
+                            <th>
+                                @Html.DisplayName("EMail")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Address")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Contact Number")
+                            </th>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @item.PublicationName
+                                </td>
+                                <td>
+                                    @item.ShortName
+                                </td>
+                                <td>
+                                    @item.EmailId
+                                </td>
+                                <td>
+                                    @item.Address
+                                </td>
+                                <td>
+                                    @item.ContactNumber
+                                </td>
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="green" href="@Url.Action("PublicationE", "ALibrary", new { id = item.PublicationId })" >
+                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                        </a>
+                                        <a class="red" onclick="btnConfirm(@item.PublicationId)">
+                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    }
+    else
+    {
+        <div class="table-header">
+            Publication
+            <div style="float:right">
+                <a class="view-header-btn btn btn-info btn-xs" href="@Url.Action("PublicationC", "ALibrary")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+            </div>
+        </div>
+        <span style="color: red;"><b>   Records Not Found (0) </b></span>
+    }
+</section>
+
+<script>
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/ALibrary/ValidationForPublicationD',
+                data: { id: Value },
+                success: function (data) {
+
+                    var url = '/ALibrary/PublicationD?id=' + Value;
+                    var title = "Publication";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

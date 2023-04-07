@@ -1,0 +1,2002 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionData
+@{
+    DateTime TodayDate = DateTime.Today;
+    bool bIsCostal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+
+    List<SelectListItem> lstAdmittedYear = new List<SelectListItem>();
+
+    lstAdmittedYear.Add(new SelectListItem { Value = "0", Text = "--- Select ---" });
+
+    for (int i = 2000; i <= 2050; i++)
+    {
+        lstAdmittedYear.Add(new SelectListItem { Value = i.ToString(), Text = i.ToString() });
+    }
+}
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-database"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Student Details</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+@*<script src="~/script/jquery-2.0.3.js"></script>
+    <script src="~/script/jquery-ui.js"></script>
+    <script src="~/js/jquery-1.10.2.js"></script>
+    <script src="~/js/jquery-ui.js"></script>*@
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<!--Main Content-->
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            @*@if (null != Model)
+                {
+                <h3>@Html.ActionLink("<< Student Details", "StudentDetails", new { ClassId = Model.SelClassId, Studentname = Model.SelName, AdmissionNo = Model.SelAdmissionNo, FatherName = Model.SelFatherName, BranchId = Model.SelBarnch, DivisionId = Model.SelDivision, Status = Model.SelStatus })</h3>
+                }
+                else
+                {
+                <h3>@Html.ActionLink("<< Student Details", "StudentDetails")</h3>
+                }*@
+        </div>
+    </div>
+    <br />
+
+    @using (Html.BeginForm("StudentDetailsE", "AStudent", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="table-header">
+      
+                Student Details
+                <small style="float:right;" class="textheader">
+                    @Html.ActionLink("Back to details", "StudentDetails", new { CategoryId = Model.SectionId })
+                </small>
+
+        </div>
+
+        if (null != TempData["SaveMessage"])
+        {
+            <label style="color:green;">@TempData["SaveMessage"]</label>
+        }
+        @*<div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <span style="color:red;font-weight:bold" id="ErrorId">
+                        </span>*@
+        @*<button class="btn btn-primary col-xs-1 pull-right" name="Create" value="Create" type="submit" onclick="return submitForm()">
+                Save
+            </button>*@
+        @*<button class="btn btn-primary pull-right" style="width:80px;" name="save" value="Save" id="save" type="submit" onclick="return submitForm();">
+                Save
+            </button>*@
+        @*</div>
+
+                    </div>
+                </div>
+            </div>*@
+
+        <input type="hidden" id="SelClassId" name="SelClassId" value="@Model.SelClassId" />
+        <input type="hidden" id="SelAdmissionNo" name="SelAdmissionNo" value="@Model.SelAdmissionNo" />
+        <input type="hidden" id="SelName" name="SelName" value="@Model.SelName" />
+        <input type="hidden" id="SelFatherName" name="SelFatherName" value="@Model.SelFatherName" />
+        <input type="hidden" id="SelDivisionId" name="SelDivisionId" value="@Model.SelDivision" />
+        <input type="hidden" id="SelBranchId" name="SelBranchId" value="@Model.SelBarnch" />
+        <input type="hidden" id="SelStatus" name="SelStatus" value="@Model.SelStatus" />
+
+        <input type="hidden" id="StudentId" name="StudentId" value="@Model.StudentId" />
+        <input type="hidden" id="ParentId" name="ParentId" value="@Model.ParentId" />
+        <input type="hidden" id="isSaved" name="isSaved" value="@Model.isSaved" />
+        <input type="hidden" id="ProvisionalAdmission" name="ProvisionalAdmission" value="@Model.ProvisionalAdmission" />
+        <input type="hidden" id="SiblignsCount" name="SiblignsCount" value="@Model.SiblignsCount" />
+        <!--Personal Information-->
+        <div class="row">
+            <div class="col-xs-12">
+                @*<div class="box">*@
+                @*<div class="box-header">
+
+                        <div class="pull-right box-tools">
+                        </div>
+                        <div class="box-body">
+                            @Html.AntiForgeryToken()
+
+                        </div>
+                        <h3 class="box-title">
+                            Personal Information
+                            <br />
+
+                        </h3>
+                        <span style="color: red;font-weight:bold" id="PersonalVal"></span>
+
+                    </div>*@
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Personal Information
+                        </h5>
+
+
+                    </div>
+
+                    @*<div class="box-body">*@
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Admission Number")</label>
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.AdmissionNumber, new { @class = "form-control TextBox ", @Value = @Model.AdmissionNumber, @disabled = "disabled", @maxlength = "10" })
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Registration Number")</label>
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.DispalyApplicationNumber, new { @class = "form-control TextBox ", @Value = Model.DispalyApplicationNumber, @disabled = "disabled" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Admission Date</label>
+
+                                        <div class="col-sm-6">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div id="datepicker" class="input-group date">
+
+                                                        @if (Model.AdmissionDate.HasValue)
+                                                        {
+                                                            <input class="form-control" type="text" id="AdmissionDate" name="AdmissionDate" value="@Model.AdmissionDate.Value.ToString("MM/dd/yyyy")" autocomplete="off" disabled="disabled" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-control" type="text" id="AdmissionDate" name="AdmissionDate" autocomplete="off" disabled="disabled" />
+                                                        }
+
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+
+                                                    </div>
+                                                </div>
+                                                @*</div>*@
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*First Name</label>
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control TextBox", @readonly = "readonly", @id = "FirstName", placeholder = "First Name" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Last Name</label>
+
+                                            <div class="col-sm-6">
+
+                                                @Html.TextBoxFor(model => model.LastName, new { @class = "form-control TextBox", @readonly = "readonly", placeholder = "Last Name", @id = "LastName", title = "Please Select Last name" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Class</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.CourseId, new SelectList(Model.ListClassNumber, "ClassNumber", "ClassNumberDisplay"), "--- Select ---", new { @class = "form-control", id = "CourseId" , disabled = "disabled" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Section</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.StudentBatchId, new SelectList(Model.ListSection, "SectionId", "SectionName"), "--- Select ---", new { @class = "form-control", id = "StudentBatchId" , disabled = "disabled" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Date of Birth</label>
+
+                                            <div class="col-sm-6">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div id="Classdatepicker" class="input-group date">
+                                                            @if (@Model.DateofBirth.HasValue)
+                                                            {
+                                                                <input class="form-control" type="text" id="DateofBirth" name="DateofBirth" value="@Model.DateofBirth.Value.ToShortDateString()" autocomplete="off" />
+                                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <input class="form-control" type="text" id="DateofBirth" name="DateofBirth" autocomplete="off" placeholder="DateofBirth" />
+                                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+
+                                                            }
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right " for="form-field-1">Important Date</label>
+
+                                            <div class="col-sm-6">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div id="Classdatepicker" class="input-group date">
+                                                            @if (Model.ImportantDate.HasValue)
+                                                            {
+                                                                <input class="form-control" type="text" id="ImportantDate" name="ImportantDate" value="@Model.ImportantDate.Value.ToShortDateString()" autocomplete="off" />
+                                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <input class="form-control" type="text" id="ImportantDate" name="ImportantDate" autocomplete="off" placeholder="Important Date" />
+                                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+
+                                                            }
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Admitted Year</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.AdmittedYear, new SelectList(lstAdmittedYear, "Value", "Text"), new { @class = "form-control", id = "CourseId" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Admitted Class</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.AdmittedClassId, new SelectList(Model.ListClassNumber, "ClassNumber", "ClassNumberDisplay"), "--- Select ---", new { @class = "form-control", id = "AdmittedClassId" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Roll Number")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.RollNumber, new { @class = "form-control", @id = "RollNumber", @readonly = "readonly", @placeholder = "Roll Number" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Gender")</label>
+                                            <div class="col-sm-6">
+                                                <div class="row">
+                                                    <div class="col-xs-6">
+                                                        <label>@Html.RadioButtonFor(m => m.Gender, 0, new { @name = "Male", @id = "Male", @checked = "checked" }) Male</label>
+                                                    </div>
+                                                    <div class="col-xs-6">
+                                                        <label>@Html.RadioButtonFor(m => m.Gender, 1, new { @name = "Female", @id = "Female" }) Female</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right " for="form-field-1">Blood Group</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.BloodGroup, new SelectList(Model.ListBloodGroup, "BloodGroupId", "BloodGroupName"), "--- Select ---", new { @class = "form-control", id = "BloodGroup" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Birth Place")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.BirthPlace, new { @class = "form-control TextBox", @id = "BirthPlace", placeholder = "Birth Place" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Mother Tongue")</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.MotherTongue, new SelectList(Model.ListLanguages, "LanguageId", "LanguageName"), "--- Select ---", new { @class = "form-control", id = "MotherTongue" })
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Nationality</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.Nationality, new SelectList(Model.ListNationality, "NationalityId", "Nationality1"), "--- Select ---", new { @class = "form-control", id = "NationalityId" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Religion")</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.Religion, new SelectList(Model.ListReligion, "ReligionId", "ReligionName"), "--- Select ---", new { @class = "form-control", id = "Religion" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Caste</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.Caste, new SelectList(Model.ListCaste, "CasteId", "CasteName"), "--- Select ---", new { @class = "form-control", id = "Caste" })
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Aadhar card No</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.AadharCardNo, new { @class = "form-control TextBox", @id = "AadharCardNo", placeholder = "Aadhar Card Number", @title = "Enter Aadhar Card Number" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if (bIsCostal)
+                                    {
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Registration Number</label>
+
+                                                <div class="col-sm-6">
+                                                    @Html.TextBoxFor(model => model.OMRNumber, new { @class = "form-control TextBox", @id = "RegistrationNumber", placeholder = "Registration Number", @title = "Enter Registration Number" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    @*<div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-5 control-label no-padding-right ">@Html.Label("Student Photo")</label>
+                                                @if (Model.Photo != null)
+                                                {
+                                                    <img class="col-sm-4 control-label no-padding-right" id="image1" width="60" height="150" src="@Model.Photo" />
+                                                }
+                                                else
+                                                {
+                                                    <img class="col-sm-4 control-label no-padding-right" id="image1" width="60" height="150" src="~/Content/images/NoPhoto.jpg" />
+                                                }
+
+                                                <input type="file" name="stPhoto" id="1" accept="image/x-png, image/jpeg" onchange="readURL(this, 1);" />
+                                            </div>
+                                        </div>*@
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-5">@Html.Label("Student Photo")</label>
+                                        <div class="col-xs-6">
+                                            @if (Model.StudentPhotoPath != null && Model.StudentPhotoPath != "")
+                                            {
+                                                <img width="100" height="100" id="image1" src="@Model.StudentPhotoPath" />
+                                            }
+                                            else
+                                            {
+                                                <img width="100" height="100" id="image1" />
+                                            }
+
+                                            <input type="file" name="StudentPhotoDocs" style="margin-top:0.5em" onchange="readURL(this,1);" />
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-5">@Html.Label("Aadhar Card")</label>
+                                        <div class="col-xs-6">
+                                            @if (Model.AadhaarPhotoPath != null && Model.AadhaarPhotoPath != "")
+                                            {
+                                                <img width="100" height="100" id="image2" src="@Model.AadhaarPhotoPath" />
+                                            }
+                                            else
+                                            {
+                                                <img width="100" height="100" id="image2" />
+                                            }
+                                            <input type="file" name="AadhaarPhotoDocs" style="margin-top:0.5em" onchange="readURL(this,2);" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+                    </div>
+                </div>
+                <br />
+
+
+            </div>
+        </div>
+
+
+        <!--Parent Information-->
+        <div class="row">
+            <div class="col-xs-12">
+                @*<div class="box">
+                    <div class="box-header">
+
+                        <div class="pull-right box-tools">
+                        </div>
+
+                        <h3 class="box-title">
+                            Parent Information
+                        </h3>
+
+                        <br />
+                        <span style="color: red;font-weight:bold" id="ParentVal"></span>
+                    </div>*@
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Parent Information
+                        </h5>
+
+
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Father's Name</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FatherName, new { @class = "form-control TextBox", @readonly = "readonly", @id = "FatherName", placeholder = "Father's Name", @title = "Please enter Father Name" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Mother's Name</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.MotherName, new { @class = "form-control TextBox", @id = "MotherName", placeholder = "Mother's Name", title = "Please Select Mother's Name" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Marriage Anniversary</label>
+
+                                            <div class="col-sm-6">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div id="datepicker" class="input-group date">
+                                                            @if (@Model.ParentAnniversaryDate.HasValue)
+                                                            {
+                                                                <input class="form-control" type="text" id="ParentAnniversaryDate" name="ParentAnniversaryDate" value="@Model.ParentAnniversaryDate.Value.ToShortDateString()" autocomplete="off" />
+                                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <input class="form-control" type="text" id="ParentAnniversaryDate" name="ParentAnniversaryDate" autocomplete="off" placeholder="Anniversary Date" />
+                                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Father Qualification</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FatherQualification, new { @class = "form-control TextBox", @id = "FatherQualification", placeholder = "Father Qualification", title = "Please Select Father Qualification" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Mother Qualification")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.MotherQualification, new { @class = "form-control TextBox", @id = "MotherQualification", placeholder = "Mother Qualification", title = "Please Select Father Qualification" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Father Occupation</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FatherOccupation, new { @class = "form-control TextBox", @id = "FatherOccupation", placeholder = "Father Occupation", title = "Please Select Father Occupation" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Mother Occupation")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.MotherOccupation, new { @class = "form-control TextBox", @id = "MotherOccupation", placeholder = "Mother Occupation", title = "Please Select Father Occupation" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Father Company Name")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FCompanyName, new { @class = "form-control TextBox", @id = "FCompanyname", placeholder = "Father Company Name", title = "Please Select Father Company Name" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Mother Company Name")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.MCompanyName, new { @class = "form-control TextBox", @id = "MCompanyname", placeholder = "Mother Company Name", title = "Please Select Mother Company Name" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Father Designation</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FDesignation, new { @class = "form-control TextBox", @id = "FDesignation", placeholder = "Father Designition", title = "Please Select Mother Company Name" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Mother Designation")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.MDesignation, new { @class = "form-control TextBox", @id = "MDesignation", placeholder = "Mother Designition", title = "Please Select Mother Designition" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Father Office Address")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FOfficeAddress, new { @class = "form-control TextBox", @id = "FOfficeAddress", placeholder = "Father Office Address", title = "Please Select Father Office Address" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Mother Office Address")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.MOfficeAddress, new { @class = "form-control TextBox", @id = "MOfficeAddress", placeholder = "Mother Office Address", title = "Please Select Mother Office Address" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Annual Income")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.AnnualIncome, new { @class = "form-control txtboxNum", @id = "AnnualIncome", placeholder = "Annual Income", title = "Please Select Annual Income" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-5">@Html.Label("Father Photo")</label>
+                                            <div class="col-xs-6">
+                                                @if (Model.ParentPhotoPath != null && Model.ParentPhotoPath != "")
+                                                {
+                                                    <img width="100" height="100" id="image3" src="@Model.ParentPhotoPath" />
+                                                }
+                                                else
+                                                {
+                                                    <img width="100" height="100" id="image3" />
+                                                }
+                                                <input type="file" name="ParentPhotoDocs" style="margin-top:0.5em" onchange="readURL(this,3);" />
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-5">@Html.Label("Mother Photo")</label>
+                                            <div class="col-xs-6">
+                                                @if (Model.MotherPhotoPath != null && Model.MotherPhotoPath != "")
+                                                {
+                                                    <img width="100" height="100" id="image4" src="@Model.MotherPhotoPath" />
+                                                }
+                                                else
+                                                {
+                                                    <img width="100" height="100" id="image4" />
+                                                }
+                                                <input type="file" name="MotherPhotoDocs" style="margin-top:0.5em" onchange="readURL(this,4);" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-5">@Html.Label("Gaurdian Photo")</label>
+                                            <div class="col-xs-6">
+                                                @if (Model.GaurdianPhotoPath != null && Model.GaurdianPhotoPath != "")
+                                                {
+                                                    <img width="100" height="100" id="image5" src="@Model.GaurdianPhotoPath" />
+                                                }
+                                                else
+                                                {
+                                                    <img width="100" height="100" id="image5" />
+                                                }
+                                                <input type="file" name="GaurdianPhotoDocs" style="margin-top:0.5em" onchange="readURL(this,5);" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+
+
+                            </div>
+                        </div>
+                        <br />
+
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+
+        <!--siblings Information-->
+        @*< class="row">*@
+        <div class="row">
+            <div class="col-xs-12">
+                @*<div class="box">
+                    <div class="box-header">
+
+                        <div class="pull-right box-tools">
+                        </div>
+
+                        <h3 class="box-title">
+                            Siblings Information
+                        </h3>
+
+                        <br />
+                        <span style="color: red;font-weight:bold" id="siblingsVal"></span>
+                    </div>*@
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Siblings Information
+                        </h5>
+                        <br />
+                        <span style="color: red;font-weight:bold" id="siblingsVal"></span>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right " for="form-field-1">Belongs To</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.BelongsTo, new SelectList(Model.ListBelongsTo, "BelongsToInstituteId", "BelongsToInstitute"), "--- Select ---", new { @class = "form-control", id = "BelongsTo" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Count</label>
+
+                                            <div class="col-sm-6">
+                                                @if (null != Model)
+                                                {
+                                                    <input name="SiblingCount" id="SiblingCount" class="form-control" value="@Model.SiblignsCount" />
+
+                                                }
+                                                else
+                                                {
+                                                    <input name="SiblingCount" id="SiblingCount" class="form-control" />
+
+                                                }
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                                @*<div class="row">
+                                        <div class="col-xs-12">
+                                            <div id="SiblingsList"></div>
+                                        </div>
+                                    </div>*@
+                                <br />
+
+
+                                <br />
+
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!--Contact Information-->
+        <div class="row">
+            <div class="col-xs-12">
+                @*<div class="box">
+                    <div class="box-header">
+
+                        <div class="pull-right box-tools">
+                        </div>
+
+                        <h3 class="box-title">
+                            Contact Information
+                        </h3>
+
+                        <span style="color: red;font-weight:bold" id="ContactVal"></span>
+                    </div>*@
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Contact Information
+                        </h5>
+
+
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Address Line 1</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.AddressLineOne, new { @class = "form-control TextBox", @id = "AddressLineOne", placeholder = "Address Line 1", title = "Please Select Address Line 1", @autocomplete = "off" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Address Line 2")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.AddressLineTwo, new { @class = "form-control TextBox", @id = "AddressLineTwo", placeholder = "Address Line 2", title = "Please Select Address Line 1", @autocomplete = "off" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*State</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.State, new SelectList(Model.ListState, "StateId", "StateName"), "--- Select ---", new { @class = "form-control", id = "State" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*City</label>
+
+                                            <div class="col-sm-6">
+                                                @*  @Html.TextBoxFor(model => model.City, new { @class = "form-control TextBox", @id = "City", placeholder = "City", title = "Please Select City", @autocomplete = "off" })*@
+                                                @Html.DropDownListFor(model => Model.City, new SelectList(Model.ListCity, "CityName", "CityName"), "--- Select ---", new { @class = "form-control", id = "City" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*PIN Code</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.PINCode, new { @class = "form-control TextBox", @id = "PINCode", placeholder = "PIN Code", title = "Please Select Category Name", @autocomplete = "off" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Father Mobile Number</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FatherMobileNumber, new { @class = "form-control txtboxNum", @id = "FatherMobileNumber",  @autocomplete = "off", placeholder = "Father Mobile Number" }) <!--onchange = "IsMobileNumber()" -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">Father Mobile Number2</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FatherMobileNumber2, new { @class = "form-control txtboxNum", @id = "FatherMobileNumber", @autocomplete = "off", placeholder = "Father Mobile Number" }) <!--onchange = "IsMobileNumber()" -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Mother Mobile Number")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.MotherMobileNumber, new { @class = "form-control TextBox", @id = "MotherMobileNumber", placeholder = "Mother Mobile Number", title = "Please Enter Characters Between 10 and 12", @autocomplete = "off" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+
+
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right required" for="form-field-1">*Contact Person</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => Model.ContactPerson, new SelectList(Model.ListContanctPerson, "ContactPersonId", "ContactPersonName"), "--- Select ---", new { @class = "form-control", id = "ContactPerson" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Father EMail")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.FatherEmail, new { @class = "form-control TextBox", @id = "FatherEmail", placeholder = "Father EMail", @type = "email", @title = "Please enter Father EMail ", @autocomplete = "off" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Mother EMail")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.MotherEmail, new { @class = "form-control TextBox", @id = "MotherEmail", placeholder = "Mother EMail", title = "Please Select Mother EMail", @autocomplete = "off" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Guardian Information-->
+        <div id="GaurdianInfo">
+            @if (Model.ContactPerson == 4)
+            {
+                Html.RenderPartial("ContactPersonDetails", Model);
+            }
+        </div>
+        <input type="hidden" id="SelCourseId" value="@Model.CourseId" />
+
+        <!--Footer Information-->
+        @*<div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <button class="btn btn-primary col-xs-1 col-xs-offset-0 pull-right" name="Create" value="Create" type="submit" onclick="return submitForm();">
+                                Save
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>*@
+        <div class="hr hr-18 dotted hr-double"></div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h5 class="widget-title"></h5>
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <button class="btn btn-info btn-xs" type="submit" onclick="return SubmitForm()">
+                                    <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="SyblingCoutStudents" />
+    }
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script>
+
+
+    $('#SiblingCount').keyup(function (e) {
+        var Studentval = $("#SiblingCount").val();
+        if (e.keyCode == 8 || e.keyCode == 46) {
+            if (Studentval == "" || Studentval == null || Studentval == "null") {
+                $("#SiblingsList").html("");
+            }
+
+        }
+    });
+
+    window.onload = GetOnloadData();
+
+    function GetOnloadData() {
+        var BelongsTo = $('#BelongsTo').val();
+        var nStudentId = $('#StudentId').val();
+        var nSiblignsCount = $('#SiblignsCount').val();
+
+
+        $.ajax({
+            url: "/AStudent/GetSiblingListByStudent",
+            data: { strValue: nSiblignsCount, SiblingType: BelongsTo, nStudentId: nStudentId },
+            success: function (result) {
+                $("#SiblingsList").html(result)
+            },
+            async: false
+        })
+
+    }
+
+    function readURL(input, number) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#image' + number)
+                    .attr('src', e.target.result)
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+
+    $(document).on('focus', '#Classdatepicker', function () {
+        //var classNumber = $("#SelCourseId").val();
+        //var today = new Date();
+        //var StartDate = new Date();
+        //var DispalyStartDate = new Date();
+        //var DispalyEndDate = new Date();
+
+        //debugger
+        //var today = new Date();
+        //var StartDate = new Date();
+        //var dd = today.getDate();
+        //var mm = today.getMonth() + 1; //January is 0!
+        //var yyyy = today.getFullYear();
+
+        //if (dd < 10) {
+        //    dd = '0' + dd
+        //}
+
+        //if (mm < 10) {
+        //    mm = '0' + mm
+        //}
+
+        //today = mm + '/' + dd + '/' + yyyy;
+        //var backdate = new Date(yyyy - 3, mm, 1)
+        //var StartDate = new Date(yyyy - 10, mm, 1)
+        $(this).datepicker({
+            // startDate: StartDate,
+            //  endDate: backdate,
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+    $('#AnnualIncome').keypress(function (e) {
+        $("#AnnualIncome").attr('maxlength', '6');
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+
+    //function showGaurdianImage(input) {
+    //    if (input.files && input.files[0]) {
+    //        var filerdr = new FileReader();
+    //        filerdr.onload = function (e) {
+    //            $('#Gimage').attr('src', e.target.result);
+    //        }
+    //        filerdr.readAsDataURL(input.files[0]);
+    //    }
+    //}
+
+
+    $('#RollNumber').keypress(function (e) {
+        $("#RollNumber").attr('maxlength', '3');
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+
+
+    $('#AadharCardNo').keypress(function (e) {
+        $("#AadharCardNo").attr('maxlength', '12');
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+    $('#FatherMobileNumber').keypress(function (e) {
+        $("#FatherMobileNumber").attr('maxlength', '10');
+
+
+
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+    $('#MotherMobileNumber').keypress(function (e) {
+        $("#MotherMobileNumber").attr('maxlength', '10');
+
+
+
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+
+    $('#PINCode').keypress(function (e) {
+        $("#PINCode").attr('maxlength', '6');
+
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+
+
+    $('#GuardianMobile').keypress(function (e) {
+        $("#GuardianMobile").attr('maxlength', '10');
+
+
+
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+    $('#AccountNumber').keypress(function (e) {
+        $("#AccountNumber").attr('maxlength', '20');
+
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+    function PopulateFeepayments() {
+        $.ajax({
+            url: '/AFrontOffice/GetFeepayments'
+        })
+    }
+
+    function GetSectionDropDown() {
+        var ClassNumber = $("#CourseId").val();
+        alert(ClassNumber)
+        $.ajax({
+            url: '/AFrontOffice/GetSectionDropDown',
+            data: { nClassNumber: ClassNumber },
+            success: function (Data) {
+                var SectionDRP = $('#StudentBatchId')
+                SectionDRP.children().remove();
+                SectionDRP.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+                $('#StudentBatchId').append(SectionDRP);
+            }
+        })
+    }
+
+
+    $("#CourseId").change(function () {
+        var CourseVal = $("#CourseId").val()
+        if (CourseVal > 0) {
+            GetSectionDropDown();
+        }
+    })
+
+    $('#State').change(function () {
+        var StateId = $('#State').val();
+        if (StateId > 0)
+            GetCityDrpDwn(StateId);
+    })
+
+    function GetCityDrpDwn(StateId) {
+        $.ajax({
+            url: '/AFrontOffice/GetCityDrp',
+            data: { StateId: StateId },
+            success: function (Data) {
+                var CityId = $('#City')
+                CityId.children().remove();
+                CityId.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    CityId.append($("<option>").val(record.CityName).text(record.CityName));
+                });
+            }
+        })
+    }
+
+
+    $("#StudentBatchId").change(function () {
+        var nBatch = $("#StudentBatchId").val()
+        if (nBatch > 0)
+            $.ajax({
+                url: '/AStudent/GetMaxRollNumber',
+                data: { nBatchId: nBatch },
+                success: function (Data) {
+                    document.getElementById("RollNumber").value = Data.Maxroll
+                }
+            })
+    })
+
+
+    function RollVal() {
+        var CourseId = $("#CourseVal").val();
+        var RollNumber = $('#RollNumber').val();
+        var isvalid = true;
+        $.ajax({
+            url: '/MStudent/GetMaxRollNumber',
+            data: { CourseId: CourseId },
+            success: function (result) {
+
+
+                if (result.Maxroll > 0) {
+
+                    if (RollNumber <= result.Maxroll) {
+                        document.getElementById("RollNumberVal").innerHTML = "Roll number exist upto" + result.Maxroll;
+                        isvalid = false;
+                    }
+                }
+
+            },
+            async: false
+        })
+        return isvalid;
+    }
+
+    function readURLF(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#Fimage')
+                    .attr('src', e.target.result)
+
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+
+
+
+    $("#ContactPerson").change(function () {
+        var ContactPerson = $("#ContactPerson").val();
+        if (ContactPerson > 0) {
+            if (ContactPerson == 4) {
+                $.ajax({
+                    url: '/AStudent/ContactPersonDetails',
+                    success: function (data) {
+                        $('#GaurdianInfo').html(data);
+                    },
+                    error: function (data) {
+
+                    }
+                })
+            }
+            else {
+                $('#GaurdianInfo').html("");
+            }
+        }
+        else {
+            $('#GaurdianInfo').html("");
+        }
+    })
+
+
+    $('#SiblingCount').keypress(function (e) {
+        $("#SiblingCount").attr('maxlength', '1');
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+    $("#BelongsTo").change(function () {
+        $("#SiblingsList").html("")
+        document.getElementById("SiblingCount").value = ""
+    })
+
+    $("#SiblingCount").autocomplete({
+        source: function (request, response) {
+            var BelongsTo = $("#BelongsTo").val();
+            document.getElementById("SyblingCoutStudents").value = ""
+            document.getElementById("siblingsVal").innerHTML = "";
+            if (request.term.length > 0 && BelongsTo > 0) {
+                $.ajax({
+                    url: "/AFrontOffice/GetSiblingList",
+                    data: { strValue: request.term, SiblingType: BelongsTo },
+                    success: function (result) {
+                        $("#SiblingsList").html(result)
+                    },
+                    async: false
+                })
+            }
+            else {
+                document.getElementById("SyblingCoutStudents").value = ""
+                $("#SiblingsList").html("")
+            }
+        },
+
+    });
+
+
+    //Personal
+    $("#AdmissionDate").click(function () {
+        document.getElementById("PersonalVal").innerHTML = "";
+
+    });
+    $("#FirstName").click(function () {
+        document.getElementById("PersonalVal").innerHTML = "";
+
+    });
+    $("#CourseId").click(function () {
+        document.getElementById("PersonalVal").innerHTML = "";
+
+    });
+    $("#StudentBatchId").click(function () {
+        document.getElementById("PersonalVal").innerHTML = "";
+
+    });
+    $("#DateofBirth").click(function () {
+        document.getElementById("PersonalVal").innerHTML = "";
+
+    });
+
+    $("#BloodGroup").click(function () {
+        document.getElementById("PersonalVal").innerHTML = "";
+
+    });
+
+    $("#NationalityId").click(function () {
+        document.getElementById("PersonalVal").innerHTML = "";
+
+    });
+
+    $("#Caste").click(function () {
+        document.getElementById("PersonalVal").innerHTML = "";
+
+    });
+
+
+
+
+
+    //Parent
+    $("#FatherName").click(function () {
+        document.getElementById("ParentVal").innerHTML = "";
+
+    });
+    $("#MotherName").click(function () {
+        document.getElementById("ParentVal").innerHTML = "";
+
+
+    });
+    $("#ParentAnniversaryDate").click(function () {
+        document.getElementById("ParentVal").innerHTML = "";
+
+
+    });
+    $("#FatherOccupation").click(function () {
+        document.getElementById("ParentVal").innerHTML = "";
+
+
+    });
+
+
+
+    //Contact
+    $("#State").click(function () {
+        document.getElementById("ContactVal").innerHTML = "";
+    });
+
+    $("#City").click(function () {
+        document.getElementById("ContactVal").innerHTML = "";
+    });
+
+    $("#PINCode").click(function () {
+        document.getElementById("ContactVal").innerHTML = "";
+    });
+
+    $("#FatherMobileNumber").click(function () {
+        document.getElementById("ContactVal").innerHTML = "";
+    });
+
+    $("#MotherMobileNumber").click(function () {
+        document.getElementById("ContactVal").innerHTML = "";
+    });
+
+
+
+
+
+    //Gaurdian
+
+    $("#GuardianName").click(function () {
+        document.getElementById("GuardianVal").innerHTML = "";
+    });
+    $("#GuardianMobile").click(function () {
+        document.getElementById("GuardianVal").innerHTML = "";
+    });
+    $("#GardianOccupation").click(function () {
+        document.getElementById("GuardianVal").innerHTML = "";
+    });
+    $("#GuardianAddress").click(function () {
+        document.getElementById("GuardianVal").innerHTML = "";
+    });
+
+</script>
+
+
+
+<script>
+    $(document).keypress(function (e) {
+        if (e.which == 13) {
+            return false;
+        }
+    });
+
+    function submitForm() {
+        var validation = true;
+        validation = Validate()
+        if (validation == true) {
+            return true;
+        }
+        validation = false
+
+        return validation;
+    }
+
+    function Validate() {
+        var isvalid = true
+        var PersonalInfoVal = " "
+        var ParentInfoVal = " "
+        var ContactInfoVal = ""
+        var GaurdianInfoVal = " "
+        var SiblingsData = ""
+        var regex = /^[789]\d{9}$/;
+
+
+        //Personal
+        var AdmissionDate = $("#AdmissionDate").val();
+        var FirstName = $("#FirstName").val();
+        var LastName = $("#LastName").val();
+        var CourseId = $("#CourseId").val();
+        var StudentBatchId = $("#StudentBatchId").val();
+        var DateofBirth = $("#DateofBirth").val();
+        var AddressLineOne = $("#AddressLineOne").val();
+        var Nationality = $("#NationalityId").val();
+        var Caste = $("#Caste").val();
+        var AadharCardNo = $("#AadharCardNo").val();
+
+
+
+        //Parent
+        var FatherName = $("#FatherName").val();
+        var MotherName = $("#MotherName").val();
+        var ParentAnniversaryDate = $("#ParentAnniversaryDate").val();
+        var FatherOccupation = $("#FatherOccupation").val();
+
+
+        //Sibling
+
+        var BelogsTo = $("#BelongsTo").val();
+        var SiblingCount = $("#SiblingCount").val()
+
+        //Contact
+        var State = $("#State").val();
+        var City = $("#City").val();
+        var PINCode = $("#PINCode").val();
+        var FatherMobileNumber = $("#FatherMobileNumber").val();
+        var MotherMobileNumber = $("#MotherMobileNumber").val();
+
+        //Gaurdian
+        var GuardianName = $("#GuardianName").val();
+        var GuardianMobile = $("#GuardianMobile").val();
+        var GardianOccupation = $("#GardianOccupation").val();
+        var GuardianAddress = $("#GuardianAddress").val();
+
+        var ContactPerson = $("#ContactPerson").val();
+
+
+        //Personal Validation
+
+        if (AdmissionDate == "" || AdmissionDate == null || AdmissionDate == "null") {
+            if (PersonalInfoVal == "") {
+                PersonalInfoVal += "Please fill the mandatory fields : Admission Date,"
+
+            }
+            else {
+                PersonalInfoVal += "Admission Date,"
+
+            }
+            isvalid = false
+        }
+
+        if (FirstName == "" || FirstName == null || FirstName == "null") {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+
+                PersonalInfoVal += "Please fill the mandatory fields : First Name,"
+
+            }
+            else {
+                PersonalInfoVal += "First Name,"
+            }
+            isvalid = false
+        }
+
+        if (LastName == "" || LastName == null || LastName == "null") {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Last Name,"
+
+            }
+            else {
+                PersonalInfoVal += "Last Name,"
+            }
+
+            isvalid = false
+        }
+        if (CourseId == "" || CourseId == null || CourseId == "null" || CourseId == 0) {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Class,"
+
+            }
+            else {
+                PersonalInfoVal += "Class,"
+            }
+
+            isvalid = false
+        }
+
+        if (StudentBatchId == "" || StudentBatchId == null || StudentBatchId == "null" || StudentBatchId == 0) {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Section,"
+
+            }
+            else {
+                PersonalInfoVal += "Section,"
+            }
+            isvalid = false
+        }
+
+        if (DateofBirth == "" || DateofBirth == null || DateofBirth == "null") {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Date of Birth,"
+
+            }
+            else {
+                PersonalInfoVal += "Date of Birth,"
+            }
+
+            isvalid = false
+        }
+
+        if (AddressLineOne == "" || AddressLineOne == null || AddressLineOne == "null") {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Address Line ,"
+
+            }
+            else {
+                PersonalInfoVal += "Address Line,"
+            }
+
+            isvalid = false
+        }
+
+        if (Nationality == "" || Nationality == null || Nationality == "null" || Nationality == 0) {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Nationality,"
+
+            }
+            else {
+                PersonalInfoVal += "Nationality,"
+            }
+            isvalid = false
+        }
+
+
+        if (Caste == "" || Caste == null || Caste == "null" || Caste == 0) {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Caste,"
+
+            }
+            else {
+                PersonalInfoVal += "Caste,"
+            }
+            isvalid = false
+        }
+
+
+        if (AadharCardNo == "" || AadharCardNo == null || AadharCardNo == "null" || AadharCardNo == 0) {
+            if (PersonalInfoVal == "" || PersonalInfoVal == null || PersonalInfoVal == "null") {
+                PersonalInfoVal += "Please fill the mandatory fields : Aadhar Card No,"
+
+            }
+            else {
+                PersonalInfoVal += "Aadhar Card No,"
+            }
+            isvalid = false
+        }
+
+        //Sibling
+        //if (SiblingCount > 0)
+        //{
+        //    var SyblingCoutStudents = $("#SyblingCoutStudents").val();
+        //    //Iterate all td's in second column
+        //    if (SyblingCoutStudents != SiblingCount)
+        //    {
+        //        SiblingsData = "Please Enter sibling information"
+        //        isvalid = false
+        //    }
+        //}
+
+
+
+
+        //Parent Validation
+        if ((FatherName == "" || FatherName == null || FatherName == "null") && (MotherName == "" || MotherName == null || MotherName == "null") && (GuardianName == "" || GuardianName == null || GuardianName == "null")) {
+            if (ParentInfoVal == "" || ParentInfoVal == null || ParentInfoVal == "null") {
+                ParentInfoVal += "Please fill the mandatory fields : Father name,"
+
+            }
+            else {
+                ParentInfoVal += "Father name,"
+            }
+            isvalid = false
+        }
+
+
+
+        if (ParentAnniversaryDate == "" || ParentAnniversaryDate == null || ParentAnniversaryDate == "null") {
+            if (ParentInfoVal == "" || ParentInfoVal == null || ParentInfoVal == "null") {
+                ParentInfoVal += "Please fill the mandatory fields : Anniversary Date,"
+
+            }
+            else {
+                ParentInfoVal += "Anniversary Date,"
+            }
+
+            isvalid = false
+        }
+
+
+        if (FatherOccupation == "" || FatherOccupation == null || FatherOccupation == "null") {
+            if (ParentInfoVal == "" || ParentInfoVal == null || ParentInfoVal == "null") {
+                ParentInfoVal += "Please fill the mandatory fields : Occupation,"
+
+            }
+            else {
+                ParentInfoVal += "Occupation,"
+            }
+            isvalid = false
+        }
+
+
+
+
+
+        //Contact Validation
+
+        if (State == "" || State == null || State == "null" || State == 0) {
+
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : State,"
+
+            }
+            else {
+                ParentInfoVal += "State,"
+            }
+            isvalid = false
+        }
+
+        if (City == "" || City == null || City == "null" || City == 0) {
+
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : City,"
+
+            }
+            else {
+                ContactInfoVal += "City,"
+            }
+            isvalid = false
+        }
+
+        if ((FatherMobileNumber == "" || FatherMobileNumber == null || FatherMobileNumber == "null") && (MotherMobileNumber == "" || MotherMobileNumber == null || MotherMobileNumber == "null") && (GuardianMobile == "" || GuardianMobile == null || GuardianMobile == "null")) {
+
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : Father Mobile No,"
+
+            }
+            else {
+                ContactInfoVal += "Father Mobile No,"
+            }
+
+            isvalid = false
+        }
+
+        if (FatherMobileNumber != "") {
+            debugger
+            if (!regex.test(FatherMobileNumber)) {
+                ContactInfoVal += "Father Mobile Number is not valid,"
+                isvalid = false;
+            }
+        }
+
+        if (MotherMobileNumber != "") {
+            if (!regex.test(MotherMobileNumber)) {
+                ContactInfoVal += "Mother Mobile Number is not valid,"
+                isvalid = false;
+            }
+        }
+
+
+
+        if (PINCode == "" || PINCode == null || PINCode == "null" || PINCode == 0) {
+
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : PIN code,"
+
+            }
+            else {
+                ContactInfoVal += "PIN code,"
+            }
+            isvalid = false
+        }
+
+        if (ContactPerson < 1) {
+            if (ContactInfoVal == "" || ContactInfoVal == null || ContactInfoVal == "null") {
+                ContactInfoVal += "Please fill the mandatory fields : Contact Person,"
+
+            }
+            else {
+                ContactInfoVal += "Contact Person,"
+            }
+        }
+        if (ContactPerson > 0) {
+            if (ContactPerson < 4) {
+                if ((FatherMobileNumber == "" || FatherMobileNumber == null || FatherMobileNumber == "null")) {
+                    isvalid = false
+                }
+            }
+            else if (ContactPerson == 4) {
+                if ((GuardianName == "" || GuardianName == null || GuardianName == "null")) {
+                    GaurdianInfoVal += "Please fill the mandatory fields :  Guardian Name,"
+                    isvalid = false
+                }
+
+
+                if ((GuardianMobile == "" || GuardianMobile == null || GuardianMobile == "null")) {
+                    GaurdianInfoVal += "Guardian Mobile,"
+                    isvalid = false
+                }
+
+                if ((GardianOccupation == "" || GardianOccupation == null || GardianOccupation == "null")) {
+                    GaurdianInfoVal += "Guardian Occupation"
+                    isvalid = false
+                }
+
+
+            }
+        }
+
+
+        if (isvalid == false) {
+            document.getElementById("PersonalVal").innerHTML = PersonalInfoVal;
+            document.getElementById("ParentVal").innerHTML = ParentInfoVal;
+            document.getElementById("ContactVal").innerHTML = ContactInfoVal;
+            document.getElementById("GuardianVal").innerHTML = GaurdianInfoVal;
+            document.getElementById("GuardianVal").innerHTML = GaurdianInfoVal;
+            document.getElementById("siblingsVal").innerHTML = SiblingsData;
+        }
+        return isvalid;
+    }
+
+    function phonenumber(inputtxt) {
+        var isvalid = true;
+
+        var phoneno = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+        if (inputtxt.value.match(phoneno)) {
+            isvalid = true;
+        }
+        else {
+            isvalid = false;
+        }
+        return isvalid;
+    }
+
+</script>
+

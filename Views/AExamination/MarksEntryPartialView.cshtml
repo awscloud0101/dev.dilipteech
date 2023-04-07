@@ -1,0 +1,202 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> lstExamPapers = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+    if (null != Model && Model.lstExamResults.Count() > 0)
+    {
+        var data = Model.lstExamResults.FirstOrDefault();
+
+        if (null != data)
+        {
+            lstExamPapers = data.lstExamResultsPaperWise.ToList();
+        }
+    }
+    int nMaxMarks = 0;
+
+    string UserRole = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+@*@Html.Action("FreezeHeader", "Base", new { IsPaging = false, AllowScroll = true })*@
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (lstExamPapers.Count() > 0)
+{
+    if (null != Model && null != Model.lstExamResults && Model.lstExamResults.Count() > 0)
+    {
+        <span id="Valid" style="color:red;"></span>
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    Records Found (@Model.lstExamResults.Count())
+
+                    <div style="float:right;">
+                        <button type="submit" onclick="return submitform()" name="Save" class="btn btn-info btn-xs P2">
+                            <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="MovableTable">
+                    <table class="table tbhover table-striped table-bordered dynamic-table" id="tbTimeTable">
+                        <thead>
+
+                            <tr class="title">
+                                @*<th>
+                                       S.No.
+                                    </th>*@
+                                <th class="title">
+                                    @Html.DisplayName("Student Name")
+                                </th>
+                                <th class="title">
+                                    @Html.DisplayName("Roll Number")
+                                </th>
+                                @if (bIsCoastal)
+                                {
+                                    <th class="title">
+                                        @Html.DisplayName("Registration Number")
+                                    </th>
+                                }
+                                <th class="title">
+                                    @Html.DisplayName("Legacy Number")
+                                </th>
+                                @if (null != lstExamPapers)
+                                {
+                                    foreach (var type in lstExamPapers)
+                                    {
+                                        @*<th>
+                                                @Html.DisplayName("Max Marks")
+                                            </th>*@
+
+                                        <th class="title">
+                                            @type.PaperName
+                                            (@type.MaxMarks)
+                                        </th>
+                                    }
+                                    <th>Total</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.lstExamResults.Count(); i++)
+                            {
+                                <tr>
+                                    @Html.Hidden("lstExamResults.Index", (@i + 10))
+                                    @*<td>
+                                            @(nsno++)
+                                        </td>*@
+                                    <th class="time">
+                                        @Html.Hidden("lstExamResults[" + (@i + 10) + "].StudentId", Model.lstExamResults.ElementAt(i).StudentId)
+                                        @Model.lstExamResults.ElementAt(i).DisplayName
+                                    </th>
+                                    <td>
+                                        @Model.lstExamResults.ElementAt(i).RollNumber
+                                    </td>
+                                    @if (bIsCoastal)
+                                    {
+                                        <td>
+                                            @Model.lstExamResults.ElementAt(i).OMRNumber
+                                        </td>
+                                    }
+                                    <td>
+                                        @Model.lstExamResults.ElementAt(i).LegacyNumber
+                                    </td>
+
+                                    @if (Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Count() > 0)
+                                    {
+                                        for (int j = 0; j < Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Count(); j++)
+                                        {
+                                            nMaxMarks = Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks.HasValue ? Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks.Value : 0;
+                                            @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].MaxMarks", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks)
+
+                                            //if (Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored != "")
+                                            //{
+                                            @*<td>
+                                                    @if (Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored != "")
+                                                    {
+                                                        @Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks
+                                                    }
+                                                </td>*@
+                                            <td>
+
+                                                <input type="hidden" value="@nMaxMarks" class="MaxMarks" />
+                                                <input type="hidden" value="@Model.lstExamResults.ElementAt(i).DisplayName" class="DisplayName" />
+                                                <input type="hidden" value="@Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).PaperName" class="Paper" />
+
+                                                @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].ExaminationPaperId", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).ExaminationPaperId)
+                                                @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].PaperName", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).PaperName)
+
+                                                @if (Model.lstExamResults.ElementAt(i).IsVisible == true || UserRole == "FOE" || UserRole == "PR")
+                                                {
+                                                    if (Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored != "")
+                                                    {
+
+                                                        @Html.TextBox("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].DisplayMarksScored", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored, new { @class = "form-control textlength Scored", @maxlength = "5", @min = "0", onkeypress = "return isNumberKey(event)", @max = "nMaxMarks", @style = "width:50px" })
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored != "")
+                                                    {
+                                                        @Html.TextBox("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].DisplayMarksScored", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored, new { @class = "form-control textlength Scored", @maxlength = "5", @min = "0", @max = nMaxMarks, onkeypress = "return isNumberKey(event)", @style = "width:50px" })
+                                                    }
+                                                }
+
+                                                @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].DisplayMarksScored", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored)
+                                            </td>
+                                            //}
+                                            //else
+                                            //{
+                                            //    <td></td>
+                                            //    <td></td>
+                                            //}
+                                        }
+
+                                            <td> @Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Where(r=>r.DisplayMarksScored!=null &&r.DisplayMarksScored!="A" &&r.DisplayMarksScored!="").Sum(r=>Convert.ToDouble(r.DisplayMarksScored))</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+    }
+    else
+    {
+        <span style="color: red;"><b>No exam papers available to display</b></span>
+    }
+}
+else
+{
+    <span style="color: red;"><b>No exam papers available to display</b></span>
+}
+
+
+
+<script>
+
+
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+
+
+
+</script>
+

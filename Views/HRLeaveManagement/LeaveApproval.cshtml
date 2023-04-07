@@ -1,0 +1,71 @@
+﻿@model AsteriskBrowserAL.Models.LeaveApprovalData
+@{
+    ViewBag.Title = "LeaveApproval";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Leave Management
+        </li>
+        <li class="active">Leave Approval</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+        </div>
+    </div>
+    <br />
+    @using (Html.BeginForm("LeaveApproval", "HRLeaveManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+
+        @Html.ValidationSummary(true)
+        <span style="color: red;">@Html.ValidationMessage("LeaveApproval")</span>
+
+        <div class="form-group">
+            <div class="col-xs-7">
+                <input type="hidden" id="reportToStaffId" value="@Model.StaffId" />
+
+            </div>
+        </div>
+
+        <div id="SearchDiv">
+        </div>
+    }
+
+</section>
+
+<script type="text/javascript">
+
+
+
+    function GetLeaveApprovalData() {
+        var RptStaffId = $('#reportToStaffId').val();
+        
+        if (RptStaffId > 0) {
+            $.ajax({
+                url: '/HRLeaveManagement/LeaveApprovalData',
+                data: { reportToStaffId: RptStaffId },
+                success: function (Data) {
+                    $('#SearchDiv').html(Data)
+                }
+            });
+        }
+        else {
+            $('#SearchDiv').html("")
+        }
+
+    }
+    window.onload = GetLeaveApprovalData();
+</script>

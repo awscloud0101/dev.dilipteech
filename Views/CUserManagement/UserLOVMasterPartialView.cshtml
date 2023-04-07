@@ -1,0 +1,109 @@
+﻿@model List<AsteriskBrowserAL.Models.LayoutLOV>
+
+
+
+  
+       <div class="row">
+            <div class="tree">
+                @if (null != Model)
+                {
+                    var Module = Model.GroupBy(p => p.ModuleId).ToList();
+
+                    if (Module.Count() > 0)
+                    {
+
+
+                        <ul class="nav-menu">
+                            @foreach (var m in Module)
+                            {
+                                <li id="@m.Key" value="@m.Key" class="menu-item">
+                                    <a class="toggle">@m.FirstOrDefault().ModuleName</a>
+                                    @{
+                                var page = m.GroupBy(s => s.PageId).ToList();
+
+                                    }
+                                    <ul class="sub-menu">
+                                        @foreach (var SP in page)
+                                        {
+
+                                            <li class="menu-item Page" id="@(SP.Key)" onclick="SetSelectedPage(@SP.Key+'Page' ,@m.Key+'Module')"><span class="SpanMenu" id="@(SP.Key)Page">@SP.FirstOrDefault().PageName</span></li>
+                                        }
+
+                                    </ul>
+                                </li>
+                            }
+
+                        </ul>
+                    }
+
+                }
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+<script>
+    $(document).ready(function () {
+        ////tree view
+        //debugger
+        //$('.tree li').each(function () {
+        //    if ($(this).children('ul').length > 0) {
+        //        $(this).addClass('parent');
+        //    }
+        //});
+
+
+        //$('.tree li').each(function () {
+        //    $(this).toggleClass('active');
+        //    $(this).children('ul').slideToggle('fast');
+
+        //});
+
+        //$('.tree li.parent > a').click(function () {
+        //    $(this).parent().toggleClass('active');
+        //    $(this).parent().children('ul').slideToggle('fast');
+        //});
+
+        var $container = $('.nav-menu');
+        $container.find('.sub-menu').hide();
+
+        $container.find('.toggle').click(function (e) {
+            var $menu = $(this).next('.sub-menu').slideToggle();
+            $('ul.sub-menu', $container).not($menu).slideUp();
+    
+            e.preventDefault();
+        });
+
+    });
+
+    function SetSelectedPage(Page,Module)
+    {
+        document.getElementById("Error").innerHTML = "";
+        document.getElementById("SelPage").value = Page
+        $( ".SpanMenu" ).css( "background-color", '#FFFFFF' );
+        $("#"+Page).css("background-color", '#1E90FF');
+        var SelectedPage = Page.replace("Page", "");
+        GetContentData(SelectedPage)
+
+    }
+
+    function GetContentData(PageId)
+    {
+        var DesignationId = $("#RoleId").val();
+        $.ajax({
+            url: '/CUserManagement/GetContentBypageId',
+            data:{strpageId :PageId,DesignationId:DesignationId},
+            success:function(result)
+            {
+                $("#PageContents").html(result)
+            }
+        })
+    }
+</script>

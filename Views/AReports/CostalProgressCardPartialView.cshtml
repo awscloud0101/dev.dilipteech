@@ -1,0 +1,188 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentAdmissionData>
+@{
+    ViewBag.Title = "Exam Results";
+    int SNO = 1;
+}
+
+
+
+
+
+@if (null != Model)
+{
+    <div class="hr hr-18 dotted hr-double"></div>
+   
+    if (Model.Count() > 0)
+    {
+        <div class="box">
+            <div class="box-body">
+                <div class="box-header">
+                    @*<h3 class="box-title">Generate HallTickets</h3>*@
+                    @*<button class="btn btn-info btn-xs pull-right" id="Generate" name="Generate"value="Generate" style="width:80px">
+        Generate
+    </button>*@
+                </div>
+                <input type="button" name="Generate" value="Generate" id="Generate" class="btn btn-info btn-xs pull-right" />
+
+                </div>
+                    <div class="box-body">
+                        <div class="table-header">
+                            Records Found (@Model.Count())
+                        </div>
+                        <div style="overflow:auto;height:300px">
+                            <table  class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="Selectall" class="checkbox" />  
+                                         @Html.DisplayName("Select")</th>
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Admission Number")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Legacy Number")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Name")
+                                        </th>
+
+                                        <th>
+                                            @Html.DisplayName("Class")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Father Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Mobile No")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Admission Date")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Institute")
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td><input type="checkbox" id="Check" value="@item.StudentId " class="checkbox"></td>
+                                            <td>
+                                                @SNO
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.AdmissionNumber)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.AccreditationNumber)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.FirstName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.ClassName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.FatherName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.MobileNumber)
+                                            </td>
+
+
+                                            <td>
+                                                @if (item.AdmissionDate.HasValue)
+                                                {
+                                                    @item.AdmissionDate.Value.ToString("dd-MMM-yyyy")
+
+                                                }
+                                                else
+                                                {
+
+
+                                                }
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Institute)
+                                            </td>
+
+
+                                        </tr>
+                                                SNO++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+             
+            </div>
+     
+
+    }
+    else
+    {
+        <span style="color: red;"><b>Data is not available</b></span>
+    }
+
+
+
+}
+@Html.Action("DataTableScripts", "Base")
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $("#Generate").click(function () {
+        GenerateProgressCard()
+    })
+
+    function GenerateProgressCard()
+    {
+        var BranchId = $("#BranchId").val();
+        var DivisionId = $("#DivisionId").val()
+        var ClassNumber = $("#ClassNumber").val();
+        var ExamId = $("#ExamId").val();
+        var SectionId = $("#SectionId").val();
+        var Ids = " ";
+        var result = $('#Check:checked');
+
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+
+        });
+        if(Ids != "")
+        {
+            window.location.href = '/AReports/ProgressCardGeneration?StIds=' + Ids + "&Emd=" + ExamId + "&IdB=" + BranchId + "&IdDn=" + DivisionId + "&ClNb=" + ClassNumber + "&secId=" + SectionId
+           
+        }
+
+    }
+
+    function UploadProgressCard() {
+
+    }
+
+</script>
+
+
+
+
+
+
+
+
+

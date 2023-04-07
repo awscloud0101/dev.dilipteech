@@ -1,0 +1,700 @@
+﻿@model AsteriskBrowserAL.Models.KittingViewModel
+@{
+    ViewBag.Title = "Kitting";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Master Data
+        </li>
+        <li class="active">Kitting</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialogConfirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="kValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+<style>
+    tr {
+        display: table-row;
+        vertical-align: inherit;
+        border-color: inherit;
+    }
+
+    .selected {
+        background-color: #808080;
+    }
+
+
+    input[type=checkbox].ace.ace-checkbox-2:checked + .lbl::before, input[type=radio].ace.ace-checkbox-2:checked + .lbl::before {
+        background-color: #87B87F;
+    }
+</style>
+
+<section class="content">
+    <br />
+    <form id="myForm" method="post">
+        <div class="row">
+            <div class=col-xs-12>
+                @using (Html.BeginForm("Kitting", "SMasterData", FormMethod.Post))
+                {
+                    if (null != Model)
+                    {
+                        <input type="hidden" id="Status" value="@Model.Status" />
+                    }
+                    else
+                    {
+                        <input type="hidden" id="Status" value="false" />
+                    }
+
+                    <input type="hidden" id="IsNew" name="IsNew" />
+                    <input type="hidden" id="IsEdit" name="IsEdit" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <input type="hidden" id="IsLang" name="IsLang" />
+                    <input type="hidden" id="IsBook" name="IsBook" />
+
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <div class="row">
+
+                                <div class="col-xs-12">
+                                    <div class="widget-box">
+                                        <div class="widget-header widget-header-flat widget-header-small">
+                                            <h5 class="widget-title">
+                                                Kitting
+                                            </h5>
+
+                                            <div class="widget-toolbar no-border">
+                                                <div class="inline action-buttons">
+                                                    <a class="blue P2" id="btnNew" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <label class="col-xs-4">Kit Name</label>
+                                                        <div class="col-xs-6">
+                                                            <input type="text" id="KitName" name="KitName" class="form-control textlength" readonly="readonly" />
+                                                            <span>
+                                                                <label>
+                                                                    <input name="IsCheck" id="IsCheck" class="ace ace-checkbox-2" type="checkbox">
+                                                                    <span class="lbl"> Is Stock</span>
+                                                                </label>
+                                                                &nbsp;  &nbsp;  &nbsp;  &nbsp;
+                                                                <label>
+                                                                    <input name="IsForBook" id="IsForBook" class="ace ace-checkbox-2" type="checkbox">
+                                                                    <span class="lbl"> Is Book</span>
+                                                                </label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <br />
+                                                    <br />
+                                                    <div class="col-xs-12">
+                                                        <label class="col-xs-4">Item Group</label>
+                                                        <div class="col-xs-6">
+                                                            <select id="ItemGroup" name="ItemGroup" style="width:240px;" class="form-control"></select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                        <div class="col-sm-6">
+
+
+                            <div class="widget-box">
+
+                                <div class="widget-header widget-header-flat widget-header-small">
+                                    <h5 class="widget-title">
+                                        Kitting
+                                    </h5>
+
+                                    <div class="widget-toolbar no-border">
+                                        <div class="inline action-buttons">
+                                            <a class="green P2" id="btnEdit" name="Edit"><i class="ace-icon fa fa-pencil  bigger-130"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <label class="col-xs-4"></label>
+                                                <div class="col-xs-6">
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <br />
+                                            <br />
+
+                                            <div class="col-xs-12">
+                                                <label class="col-xs-4">Kit</label>
+                                                <div class="col-xs-6">
+                                                    <select id="Kit" name="Kit" style="width:200px;" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                }
+
+                <div id="ValidationMsg" title="Kitting" style="display:none"></div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div id="ItemGroupDetails"></div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="KitDetails"></div>
+                    </div>
+                </div>
+
+
+                <div class="hr hr-18 dotted hr-double"></div>
+
+
+
+                <div style="float:right;">
+                    <button class="btn btn-success btn-sm P2" disabled="disabled" name="Save" id="btnSave" type="button">
+                        <i class="ace-icon fa fa-check bigger-50"></i>
+                        Save
+                    </button>
+
+                    &nbsp; &nbsp; &nbsp;
+                    <button class="btn btn-sm P2" name="Reset" id="btnReset" type="button">
+                        <i class="ace-icon fa fa-undo bigger-50"></i>
+                        Reset
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</section>
+
+<script type="text/javascript">
+
+    var IsNew = false;
+    var IsEdit = false;
+    var Content = "";
+    var AssingedItems = "";
+    var RemoveItemId = 0;
+    var tb1Selindex = 0;
+    var tb2Selindex = 0;
+
+    $('#IsCheck').change(function () {
+        if ($(this).is(":checked")) {
+            $('#IsLang').val(true);
+        }
+        else {
+            $('#IsLang').val(false);
+        }
+    });
+
+    $('#IsForBook').change(function () {
+        if ($(this).is(":checked")) {
+            $('#IsBook').val(true);
+        }
+        else {
+            $('#IsBook').val(false);
+        }
+    });
+
+    $(document).ready(function () {
+
+
+        //$('#button').click(function () {
+        //    table.row('.selected').remove().draw(false);
+        //});
+
+        var Status = $('#Status').val();
+
+        if (Status == "value") {
+            Content = "Data Saved"
+            dialog();
+            window.location.href = '/SMasterData/Kitting'
+        }
+
+        LoadItemGroups();
+        LoadKits();
+    });
+
+    function LoadItemGroups() {
+        $.ajax({
+            url: '/SMasterData/LoadItemGroupsForKitting',
+            success: function (data) {
+
+                var Groups = $('#ItemGroup');
+
+                Groups.children().remove();
+
+                Groups.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    Groups.append($("<option>").val(record.ClassNumberForKit).text(record.DisplayName));
+                });
+
+                $('#ItemGroup').append(Groups);
+            },
+            aync: false
+        });
+    }
+
+
+
+    function LoadKits() {
+        $.ajax({
+            url: '/SMasterData/LoadKits',
+            success: function (data) {
+
+                var Kits = $('#Kit');
+
+                Kits.children().remove();
+
+                Kits.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    Kits.append($("<option>").val(record.InventoryKitId).text(record.KitName));
+                });
+
+                $('#Kit').append(Kits);
+            },
+            aync: false
+        });
+    }
+
+    $('#btnNew').click(function () {
+
+        IsNew = true;
+        IsEdit = false;
+
+        $('#Kit').val("");
+        $('#KitDetails').html("");
+
+        $('#IsNew').val(IsNew);
+        $('#IsEdit').val(IsEdit);
+        $("#KitName").prop('readonly', false);
+        $("#IsLang").prop('disabled', false);
+        $("#IsBook").prop('disabled', false);
+        $("#btnNew").prop('disabled', true);
+        $("#btnEdit").prop('disabled', true);
+        $('#KitName').focus();
+        $("#btnNew").val("!Oops");
+        $('#Kit').prop('disabled', true);
+        $('#btnSave').prop('disabled', false);
+
+        var Code = $('#ItemGroup').val();
+
+        if (Code != "null" && Code > 0) {
+            PopulateItemsTable();
+        }
+    });
+
+    $('#btnEdit').click(function () {
+
+        $('#Kit').prop('disabled', false);
+
+        var KitId = $('#Kit').val();
+
+        if (KitId < 1 || KitId == "null") {
+            Content = "Please select kit";
+            dialog();
+        }
+
+        IsNew = false;
+        IsEdit = true;
+        $('#IsNew').val(IsNew);
+        $('#IsEdit').val(IsEdit);
+        $("#btnEdit").val("!Oops");
+        $("#btnNew").prop('disabled', true);
+        $("#KitName").prop('readonly', true);
+        $("#IsLang").prop('disabled', true);
+        $("#IsBook").prop('disabled', true);
+        $('#btnSave').prop('disabled', false);
+        $('#btnEdit').prop('disabled', true);
+        $('#btnAssign').prop('disabled', false);
+
+
+        var Code = $('#ItemGroup').val();
+
+        if (KitId > 0) {
+            PopulateKitItems();
+        }
+
+    });
+
+
+
+    $('#btnReset').click(function () {
+        window.location.href = '/SMasterData/Kitting';
+    });
+
+    $('#ItemGroup').change(function () {
+        PopulateItemsTable();
+    });
+
+    $('#Kit').change(function () {
+        PopulateKitItems();
+    });
+
+    function PopulateItemsTable() {
+        $.ajax({
+            url: '/SMasterData/PopulateItemsTable',
+            data: { ClassNumber: $('#ItemGroup').val(), IsNew: IsNew, IsEdit: IsEdit },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#ItemGroupDetails').html(data);
+
+                if (IsEdit == true) {
+                    $('#btnAssign').prop('disabled', false);
+                }
+
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function PopulateKitItems() {
+        $.ajax({
+            url: '/SMasterData/PopulateKitItemsForKitting',
+            data: { KitId: $('#Kit').val(), IsNew: IsNew, IsEdit: IsEdit },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#KitDetails').html(data);
+
+                if (IsEdit == true) {
+                    $('#btnRemove').prop('disabled', false);
+                }
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function dialog() {
+
+
+        $('#kValidation').html(" <i class='ace-icon fa fa-hand-o-right blue bigger-120'></i>&nbsp; " + Content);
+
+        $("#dialogConfirm").removeClass('hide').dialog({
+            resizable: false,
+            draggable: false,
+            width: '320',
+            modal: true,
+            title: 'Kitting',
+            title_html: true,
+            buttons: [
+                {
+                    html: "OK",
+                    "class": "btn btn-info btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+
+        return false;
+    }
+
+    $(document).on("click", "#Tab1 tr", function (e) {
+
+        if (IsEdit == true) {
+            var val = $(this).find('#HiddenId').val();
+            tb2Selindex = $(this).index();
+
+            if (tb2Selindex > 0) {
+                $("#Tab1 tbody tr").children('td,th').css('background-color', 'transparent');
+                $(this).children('td,th').css('background-color', '#c4e2d1');
+                //$("#Tab1 tbody tr").removeClass('selected');
+                //$(this).addClass('selected');
+                //$(this).toggleClass('selected');
+            }
+
+        }
+    });
+
+
+    $(document).on("click", "#KitDetailsTable tr", function (e) {
+
+
+
+        if (IsEdit == true) {
+
+            var val = $(this).find('#HiddenItemId').val();
+
+            tb1Selindex = $(this).index();
+
+            if (tb1Selindex > 0) {
+                $("#KitDetailsTable tbody tr").children('td,th').css('background-color', 'transparent');
+                $(this).children('td,th').css('background-color', '#c4e2d1');
+                //$("#KitDetailsTable tbody tr").removeClass('selected');
+                //$(this).addClass('selected');
+            }
+
+            //$(this).toggleClass('selected');
+        }
+    });
+
+    $("#myForm").on('click', '#btnAssign', function () {
+
+        if (tb2Selindex == 0) {
+            Content = "Select item";
+            dialog();
+            return;
+        }
+
+        var row = $('#Tab1 tr:eq(' + tb2Selindex + ')');
+
+        var id = row.find('#HiddenId').val();
+
+        var KitItemIds = $("#KitDetailsTable tr").each(function (index) {
+            if (index != 0) {
+                var itemId = $(this).find("#HiddenItemId").val();
+                if (itemId == id) {
+                    Content = "Item already exists";
+                    dialog();
+                    return;
+                }
+            }
+        });
+
+        var IDs = "";
+
+        $("#KitDetailsTable tr").each(function (index) {
+            if (index != 0) {
+
+                var detailId = $(this).find("#HiddenDetailsId").val();
+
+                //if (detailId == id)
+                //{
+                //    Content = "Item already exists";
+                //    dialog();
+                //    return;
+                //}
+
+                IDs += detailId + ",";
+            }
+        });
+
+        $.ajax({
+
+            url: '/SMasterData/AssignItemsToKit',
+            data: { ItemIdToAssign: id, KitDetailIds: IDs },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#KitDetails').html(data);
+
+                if (IsEdit == true) {
+                    $('#btnRemove').prop('disabled', false);
+                }
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+
+    });
+
+    function RemoveItems() {
+
+        if (tb1Selindex > 0) {
+            var row = $('#KitDetailsTable tr:eq(' + tb1Selindex + ')');
+            var id = row.find('#HiddenItemId').val();
+
+            $('#KitDetailsTable tr:eq(' + tb1Selindex + ')').remove();
+            tb1Selindex = 0;
+
+            //CheckItemQty(id);
+        }
+        else {
+            Content = "Select item";
+            dialog();
+            return;
+        }
+
+        $("#KitDetailsTable tr").each(function (index) { // traverse through all the rows
+            if (index != 0) { // if the row is not the heading one
+                $(this).find("td:first").html(index + ""); // set the index number in the first 'td' of the row
+            }
+        });
+    }
+
+    function CheckItemQty(SelItemId) {
+        $.ajax({
+
+            url: '/SMasterData/IsQuantityExistsById',
+            data: { id: SelItemId },
+            success: function (data) {
+                if (data != "") {
+                    Content = "Item quantity exists, can't remove";
+                    dialog();
+                    return;
+                }
+                else {
+                    $('#KitDetailsTable tr:eq(' + tb1Selindex + ')').remove();
+                    tb1Selindex = 0;
+                }
+            }
+        });
+    }
+
+    $("#myForm").on('click', '#btnSave', function () {
+
+        var valid = ValidateForm();
+
+        if (valid == true) {
+            $('#myForm').submit();
+        }
+    });
+
+    function ValidateForm() {
+        var validation = true;
+
+        if (IsNew == true) {
+
+            if ($('#KitName').val() == "") {
+                validation = false;
+                Content = "Enter kit name"
+                dialog();
+                return false;
+            }
+
+            var ItemGroupId = $('#ItemGroupId').val();
+
+            if (ItemGroupId == "null" || ItemGroupId < 1) {
+                validation = false;
+                Content = "Select item group"
+                dialog();
+                return false;
+            }
+
+
+
+            var Quantity = 0;
+
+            $("#Tab1 tr").each(function (index) { // traverse through all the rows
+                if (index != 0) { // if the row is not the heading one
+                    var dVal = $(this).find('#GroupItemValue').val(); //  'td' of the row
+                    Quantity += dVal;
+                }
+            });
+
+            if (Quantity == 0) {
+                validation = false;
+                Content = "Enter quantity"
+                dialog();
+                return false;
+            }
+
+            validation = IsKitNameExists();
+
+            if (validation == false) {
+                Content = "Kit name already exists";
+                dialog();
+                return false;
+            }
+        }
+
+        if (IsEdit == true) {
+
+            var length = $('#KitDetailsTable tbody tr').length;
+
+            var myTable = document.getElementById("KitDetailsTable");
+
+            if (length < 2) {
+                validation = false;
+                Content = "No items in the kit";
+                dialog();
+                return false;
+            }
+
+            $("#KitDetailsTable tr").each(function (index) { // traverse through all the rows
+                if (index != 0) { // if the row is not the heading one
+                    var dVal = $(this).find('#KitItemValue').val(); //  'td' of the row
+                    if (dVal == 0) {
+                        validation = false;
+                        Content = "Quantity should not be zero";
+                        dialog();
+                        return false;
+                    }
+                }
+            });
+        }
+
+        return validation;
+    }
+
+    function IsKitNameExists() {
+
+        var val = true;
+        $.ajax({
+
+            url: '/SMasterData/IsKitNameExists/',
+            data: { KitName: $('#KitName').val() },
+            success: function (data) {
+
+                if (data != "") {
+                    //document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            },
+            async: false
+        });
+
+        return val;
+    }
+
+</script>
+

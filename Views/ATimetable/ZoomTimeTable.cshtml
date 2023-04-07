@@ -1,0 +1,130 @@
+﻿
+@model AsteriskBrowserAL.Models.ZoomTimeTableModel
+
+@{
+    ViewBag.Title = "ZoomTimeTable";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Time Table
+        </li>
+        <li class="active">Zoom Time Table</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm("ZoomTimeTable", "ATimeTable", FormMethod.Post))
+    {
+        @Html.ValidationMessage("ExamSchedules")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Zoom Time Table
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <a href="http://demoservice.campuswhiz.com/Createmeeting.aspx" target="_blank"><b>Create Zoom Link</b></a>
+                        </div>
+
+                    </div>
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4">Staff</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.StaffId, new SelectList(Model.lstStaff, "StaffId", "FirstName"), new { @class = "form-control", id = "StaffId" })
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div id="SearchData" class="row">
+        </div>
+
+
+        if (null != Model)
+        {
+            <input style="display:none" id="SelClass" value="@Model.StaffId" />
+        }
+        else
+        {
+
+            <input style="display:none" id="SelClass" value="0" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        //var SelClass = $('#SelClass').val();
+        //var SelTerm = $('#SelTerm').val();
+        //var SelSubId = $('#SelSubId').val();
+
+        if (SelClass > 0 && SelTerm > 0) {
+            // GetExaminationSchedules();
+        }
+    });
+
+    $('#StaffId').change(function () {
+        $("#SearchData").html("");
+        GetSchedules();
+    });
+
+    function GetSchedules() {
+        $("#SearchData").html("");
+        var StaffId = $('#StaffId').val();
+        $('#imagemodal').show();
+        if (StaffId > 0) {
+            $.ajax({
+                url: '/ATimeTable/ZoomtimeTableReport1',
+                data: { StaffId: StaffId },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchData").html(Data);
+                }
+            });
+        }
+    }
+
+</script>
+
+
+
+
+
+
+

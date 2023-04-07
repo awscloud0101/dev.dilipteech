@@ -1,0 +1,504 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.Payroll>
+@{
+    AsteriskBrowserAL.Models.Payroll ModelData = new AsteriskBrowserAL.Models.Payroll();
+    if (null != Model)
+    {
+        ModelData = Model.FirstOrDefault();
+    }
+    int sno = 1;
+
+    List<SelectListItem> PayrollStatus = new List<SelectListItem>()
+{
+new SelectListItem(){ Text ="Live", Value="1"},
+new SelectListItem(){ Text ="Hold", Value="2"},
+new SelectListItem(){ Text ="Zero Paid", Value="3"},
+new SelectListItem(){ Text ="New Joinee", Value="4"},
+};
+}
+
+<style>
+    .contrlHeight {
+        height: 30px;
+    }
+</style>
+<script src="~/assets/js/jquery.2.1.1.min.js"></script>
+<script src="~/assets/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+@using (Html.BeginForm("Payroll", "HRPayroll", FormMethod.Post))
+{
+    <input type="hidden" value="@ViewBag.Branch" name="nBranchId" id="nBranchId" />
+    <input type="hidden" value="@ViewBag.MonthYear" name="strPayrollMonthYear" id="strPayrollMonthYear" />
+    <input type="hidden" value="@ViewBag.DevisionId" name="selDevisionId" id="selDevisionId" />
+    <input type="hidden" value="@ViewBag.Month" name="selMonth" id="selMonth" />
+    <input type="hidden" value="@ViewBag.Year" name="selyear" id="selyear" />
+    <input type="hidden" value="@ViewBag.LoginStaffId" name="LoginStaffId" id="LoginStaffId" />
+    <input type="hidden" value="@ViewBag.PositionId" name="PositionId" id="PositionId" />
+    if (Model != null)
+    {
+        <div class="hr hr-18 dotted hr-double"></div>
+        if (Model.Count() > 0)
+        {
+            <div class="row">
+                <div class="col-xs-12">
+                    <span id="datasucess" style="color:green ;display:none">Freeze pay sheet successful </span>
+                    <span id="dataenablesucess" style="color:green ;display:none">Unfreeze pay sheet successful </span>
+                    <span id="UnFreezeRequestSucess" style="color:green ;display:none">Un frezee request sent sucessfully</span>
+                    <div style="float:right;">
+
+                        @if (@ViewBag.IsFreeze == false)
+                        {
+                            <button class="btn btn-success btn-minier pull-left" id="btnPayroll" type="submit">Run Payroll</button>
+                        }
+                    </div>
+                    <div style="float:left;">
+                        @if (@ViewBag.PositionId == 51)
+                        {
+                            if (@ViewBag.IsFreeze == false)
+                            {
+                                <button class="btn btn-success btn-minier pull-right" style="margin-right:16px" id="freezePaySheet" name="freezePaySheet" onclick="return false">Freeze Pay Sheet</button>
+                            }
+                            if (@ViewBag.IsFreeze == true)
+                            {
+                                <button class="btn btn-success btn-minier pull-right" style="margin-right:16px" id="EnablePaysheet" name="EnablePaysheet" onclick="return false">Unfreeze Pay sheet</button>
+                            }
+
+                        }
+                        else
+                        {
+                            if (@ViewBag.IsFreeze == true)
+                            {
+                                <button class="btn btn-success btn-minier pull-right" style="margin-right:16px" id="UnfreezeRequest" name="UnfreezeRequest">Unfreeze Request</button>
+                            }
+                        }
+                    </div>
+                    <div style="float:right">
+                        @*<button class="btn btn-success btn-minier pull-right" type="submit">Pay</button>*@
+                        <button class="btn btn-success btn-minier pull-right" onclick="ExportExcel()" type="button" style="margin-right:2em">Export Excel</button>
+                    </div>
+                    @if (@ViewBag.IsFreeze == true)
+                    {
+                        <div style="float:right">
+                            <button class="btn btn-success btn-minier pull-right" onclick="BankformExportExcel()" type="button" style="margin-right:2em">Bank Upload download</button>
+                        </div>
+                    }
+
+                </div>
+            </div>
+            <div class="table-header">
+                Records Found (@Model.Count())
+
+            </div>
+
+            <table id="dynamic-table" class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayName("SNo")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Employee Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Employee Number")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Gross")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Net Payable")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Paid Days")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Arrear Days")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Pay")
+                            <input type="checkbox" id="checkAll" class="checkbox" />
+                        </th>
+                        <th>
+                            Is Transfered
+                        </th>
+                        @*<th>
+                                @Html.DisplayName("Status")
+                            </th>*@
+                        @*<th>
+                                @Html.DisplayName("Advance")
+                            </th>*@
+                        @foreach (var res in ModelData.ListVCData)
+                        {
+                            <th>@res.ComponentName</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        string style = "";
+
+                        if (Model.ElementAt(i).IsFreeze == true)
+                        {
+                            style = "background-color:darkgray";
+                        }
+                        <tr style="@style">
+                            <td>
+                                @(sno++)
+                                @Html.Hidden("lstPayrollData.Index", (@i + 10))
+                                @Html.Hidden("lstPayrollData[" + (@i + 10) + "].StaffId", @Model.ElementAt(i).StaffId)
+                                @Html.Hidden("lstPayrollData[" + (@i + 10) + "].IsNewJoinee", @Model.ElementAt(i).IsNewJoinee)
+                                @Html.Hidden("lstPayrollData[" + (@i + 10) + "].PayrollId", @Model.ElementAt(i).PayrollId)
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).EmployeeName
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).EmployeeNumber
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).ActualNetAmount
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).PaidNetAmount
+                            </td>
+                            @if (Model.ElementAt(i).IsFreeze == true)
+                            {
+
+                                <td>
+                                    @Html.TextBox("lstPayrollData[" + (@i + 10) + "].PaidDays", @Model.ElementAt(i).PaidDays, new { @class = "txtboxNum", @style = "width:40px;", @disabled = "disabled" })
+                                </td>
+                                <td>
+                                    @Html.TextBox("lstPayrollData[" + (@i + 10) + "].ArrearDays", @Model.ElementAt(i).ArrearDays, new { @class = "txtboxNum form-control textlength contrlHeight", @style = "width:40px;", @disabled = "disabled" })
+                                </td>
+
+                                <td>
+                                    @Html.CheckBox("lstPayrollData[" + (@i + 10) + "].IsTransfer", Model.ElementAt(i).IsTransfer, new { @name = "IsTransfer", @class = "checkbox", @disabled = "disabled" })
+                                </td>
+                                <td>
+                                    @if (Model.ElementAt(i).IsTransfer == true)
+                                    {
+                                        <lable>Yes</lable>
+                                    }
+                                    else
+                                    {
+                                        <lable>No</lable>
+                                    }
+                                </td>
+                                @*<td>
+                                        @Html.DropDownList("lstPayrollData[" + (@i + 10) + "].PayrollStatus", new SelectList(PayrollStatus, "Value", "Text", Model.ElementAt(i).PayrollStatus), new { @class = "form-control contrlHeight", @style = "width:109px;", @disabled = "disabled" })
+                                    </td>*@
+                                @*<td>
+                                        @if (null != Model.ElementAt(i).AdvanceSalary)
+                                        {
+                                            @Html.DisplayFor(model => model.ElementAt(i).AdvanceSalary.EMIAmount)
+                                        }
+                                        else
+                                        {
+                                            @Html.Display("0")
+                                        }
+                                    </td>*@
+
+                                for (int k = 0; k < Model.ElementAt(i).ListVCData.Count(); k++)
+                                {
+                                    <td>
+                                        @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].VariablePayrollComponentId", @Model.ElementAt(i).ListVCData.ElementAt(k).VariablePayrollComponentId)
+                                        @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].IsDeduction", @Model.ElementAt(i).ListVCData.ElementAt(k).IsDeduction)
+                                        @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].Amount", @Model.ElementAt(i).ListVCData.ElementAt(k).Amount)
+                                        @Html.TextBox("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].Amount", @Model.ElementAt(i).ListVCData.ElementAt(k).Amount, new { @class = "txtboxNum form-control textlength contrlHeight", @style = "width:70px;", @disabled = "disabled" })
+                                    </td>
+                                }
+
+                            }
+                            else
+                            {
+
+                                <td>
+                                    @Html.Hidden("lstPayrollData[" + (@i + 10) + "].PaidDays", @Model.ElementAt(i).PaidDays)
+                                    @Html.TextBox("lstPayrollData[" + (@i + 10) + "].PaidDays", @Model.ElementAt(i).PaidDays, new { @class = "txtboxNum", @style = "width:40px;", @disabled = "disabled" })
+                                </td>
+                                <td>
+                                    @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ArrearDays", @Model.ElementAt(i).ArrearDays)
+                                    @Html.TextBox("lstPayrollData[" + (@i + 10) + "].ArrearDays", @Model.ElementAt(i).ArrearDays, new { @class = "txtboxNum form-control textlength contrlHeight", @style = "width:40px;", @disabled = "disabled" })
+                                </td>
+                                <td>
+                                    @Html.CheckBox("lstPayrollData[" + (@i + 10) + "].IsTransfer", Model.ElementAt(i).IsTransfer, new { @name = "IsTransfer", @class = "checkbox case" })
+                                </td>
+                                <td>
+                                    @if (Model.ElementAt(i).IsTransfer == true)
+                                    {
+                                        <lable>Yes</lable>
+                                    }
+                                    else
+                                    {
+                                        <lable>No</lable>
+                                    }
+                                </td>
+                                @*<td>
+                                        @if (Model.ElementAt(i).PaidDays < 1)
+                                        {
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].PayrollStatus", new SelectList(PayrollStatus, "Value", "Text", 3))
+                                            @Html.DropDownList("lstPayrollData[" + (@i + 10) + "].PayrollStatus", new SelectList(PayrollStatus, "Value", "Text", 3), new { @class = "form-control contrlHeight", @style = "width:109px;", @disabled = "disabled" })
+
+                                        }
+                                        else if (Model.ElementAt(i).IsNewJoinee)
+                                        {
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].PayrollStatus", new SelectList(PayrollStatus, "Value", "Text", 4))
+                                            @Html.DropDownList("lstPayrollData[" + (@i + 10) + "].PayrollStatus", new SelectList(PayrollStatus, "Value", "Text", 4), new { @class = "form-control contrlHeight", @style = "width:109px;", @disabled = "disabled" })
+
+                                        }
+                                        else
+                                        {
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].PayrollStatus", new SelectList(PayrollStatus, "Value", "Text", Model.ElementAt(i).PayrollStatus))
+                                            @Html.DropDownList("lstPayrollData[" + (@i + 10) + "].PayrollStatus", new SelectList(PayrollStatus, "Value", "Text", Model.ElementAt(i).PayrollStatus), new { @class = "form-control contrlHeight clscheckall", @style = "width:109px;", @disabled = "disabled" })
+                                        }
+
+                                    </td>*@
+                                @*if (null != Model.ElementAt(i).AdvanceSalary)
+                                    {
+                                        <td>
+                                            @Html.TextBox("lstPayrollData[" + (@i + 10) + "].AdvanceSalary.EMIAmount", Model.ElementAt(i).AdvanceSalary.EMIAmount, new { @class = "txtboxNum form-control textlength contrlHeight", @style = "width:40px;", @readonly = "readonly" })
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].AdvanceSalary.AdvanceSalaryDetailsId", Model.ElementAt(i).AdvanceSalary.AdvanceSalaryDetailsId)
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].AdvanceSalary.IsPaid", Model.ElementAt(i).AdvanceSalary.IsPaid)
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        @Html.Display("0");
+                                    }*@
+                                if (@ViewBag.PositionId != 51)
+                                {
+                                    for (int k = 0; k < Model.ElementAt(i).ListVCData.Count(); k++)
+                                    {
+                                        <td>
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].VariablePayrollComponentId", @Model.ElementAt(i).ListVCData.ElementAt(k).VariablePayrollComponentId)
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].IsDeduction", @Model.ElementAt(i).ListVCData.ElementAt(k).IsDeduction)
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].Amount", @Model.ElementAt(i).ListVCData.ElementAt(k).Amount)
+                                            @Html.TextBox("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].Amount", @Model.ElementAt(i).ListVCData.ElementAt(k).Amount, new { @class = "txtboxNum form-control textlength contrlHeight", @style = "width:70px;", @disabled = "disabled" })
+                                        </td>
+                                    }
+                                }
+                                else
+                                {
+                                    for (int k = 0; k < Model.ElementAt(i).ListVCData.Count(); k++)
+                                    {
+                                        <td>
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].VariablePayrollComponentId", @Model.ElementAt(i).ListVCData.ElementAt(k).VariablePayrollComponentId)
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].IsDeduction", @Model.ElementAt(i).ListVCData.ElementAt(k).IsDeduction)
+                                            @Html.Hidden("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].Amount", @Model.ElementAt(i).ListVCData.ElementAt(k).Amount)
+                                            @Html.TextBox("lstPayrollData[" + (@i + 10) + "].ListVCData[" + (@k) + "].Amount", @Model.ElementAt(i).ListVCData.ElementAt(k).Amount, new { @class = "txtboxNum form-control textlength contrlHeight", @style = "width:70px;", @disabled = "disabled" })
+                                        </td>
+                                    }
+                                }
+                            }
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <label style="color:red;">Set salary to employees to Run Payroll</label>
+        }
+    }
+}
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<div id="modal-container" class="modal fade" role="dialog" style="height:200px;width:500px;margin-left:400px;margin-bottom:200px">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">Un Freeze Request</h4>
+            </div>
+            <div class="box-body">
+                <span id="ReqiredMsg" style="color:red;display:none">Please Write Reason for Request</span>
+                <span style="font-weight:bold; font-size:14px">Request Reason</span>   <input type="text" id="RequestReason" name="RequestReason" style="height:30px;" />
+                <button onclick="onsave();">Save</button>
+                <button onclick="closeDialog();">Close</button>
+                <span id="errspan" style="color:red;"></span>
+            </div>
+
+        </div>
+    </div>
+</div>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true, strHeight = "300px" })
+
+<div id="imagemodal1" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+    <p style="position:absolute; top: 50%; left:50%;">
+        <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+    </p>
+</div>
+
+<script type="text/javascript">
+    $('#btnPayroll').click(function () {
+        $('#imagemodal1').show();
+    })
+
+    function ExportExcel() {
+        //$('#imagemodal1').show();
+        var strMonthYear = $('#MonthYear').val();
+        var nBranchId = $('#BranchId').val();
+        var nDivision = $('#DivisionId').val();
+        window.location = '/HRPayroll/RunPayrollExport?strPayrollMonthYear=' + strMonthYear + '&nBranchId=' + nBranchId + '&nDivisionId=' + nDivision;
+    }
+    function BankformExportExcel() {
+        var strMonthYear = $('#MonthYear').val();
+        var nBranchId = $('#BranchId').val();
+        var nDivision = $('#DivisionId').val();
+        window.location = '/HRPayroll/BankformlExport?strPayrollMonthYear=' + strMonthYear + '&nBranchId=' + nBranchId + '&nDivisionId=' + nDivision;
+    }
+
+    $('#checkAll').click(function () {
+        debugger
+        $(".case").prop('checked', $(this).prop('checked'));
+
+        if ($(this).prop('checked')) {
+            $("select option").filter(function () {
+                return $(this).val() == 1;
+            }).prop('selected', true);
+        } else {
+            $("select option").filter(function () {
+                return $(this).val() == 2;
+            }).prop('selected', true);
+        }
+
+
+    })
+
+
+    function SetMaxValue(id, max) {
+        debugger
+        var value = $('#' + id).val();
+        if ((value !== '') && (value.indexOf('.') === -1)) {
+            $('#' + id).val(Math.min(value, max));
+        }
+    };
+
+    $(".txtboxNum").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+            // Allow: Ctrl+A
+            (e.keyCode == 65 && e.ctrlKey === true) ||
+            // Allow: Ctrl+C
+            (e.keyCode == 67 && e.ctrlKey === true) ||
+            // Allow: Ctrl+X
+            (e.keyCode == 88 && e.ctrlKey === true) ||
+            // Allow: home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $('#UnfreezeRequest').click(function () {
+        debugger
+        $('#modal-container').modal('show');
+        return false;
+    });
+
+</script>
+<script>
+    function closeDialog() {
+        $('#RequestReason').val('');
+        $('#modal-container').modal('hide');
+        return false;
+    }
+    function onsave() {
+        debugger
+        var BranchId = $('#BranchId').val();
+        var selMonth = $('#selMonth').val();
+        var selDevisionId = $('#selDevisionId').val();
+        var selyear = $('#selyear').val();
+        var RequestReason = $('#RequestReason').val();
+        var LoginStaffId = $('#LoginStaffId').val();
+        if (RequestReason != "") {
+            $.ajax({
+                url: '/HRPayroll/SaveUnFreezeRequest',
+                Type: 'POST',
+                data: { BranchId: BranchId, Month: selMonth, selDevisionId: selDevisionId, Year: selyear, LoginStaffId: LoginStaffId, RequestReason: RequestReason },
+                success: function (data) {
+                    debugger
+                    if (data == true) {
+                        $('#modal-container').modal('hide');
+                        $('#UnFreezeRequestSucess').show();
+                    }
+                },
+                asyn: false,
+            });
+        } else {
+            $('#ReqiredMsg').show();
+        }
+
+    }
+    $('#RequestReason').click(function () {
+        $('#ReqiredMsg').hide();
+    })
+    $('#freezePaySheet').click(function () {
+
+
+        debugger
+        BranchId = $('#BranchId').val();
+        selMonth = $('#selMonth').val();
+        selDevisionId = $('#selDevisionId').val();
+        selyear = $('#selyear').val();
+        LoginStaffId = parseInt($('#LoginStaffId').val());
+        strPayrollMonthYear = $('#strPayrollMonthYear').val();
+        if (LoginStaffId > 0) {
+            $.ajax({
+                url: '/HRPayroll/SaveFreezePaySheet',
+                Type: 'POST',
+                data: { BranchId: BranchId, Month: selMonth, selDevisionId: selDevisionId, Year: selyear, LoginStaffId: LoginStaffId, strPayrollMonthYear: strPayrollMonthYear },
+                success: function (data) {
+                    debugger
+                    if (data == true) {
+                        $('#datasucess').show();
+                        $('#freezePaySheet').hide();
+                        $('#imagemodal1').show();
+                        LoadInformation(selyear + "-" + selMonth, selDevisionId, BranchId);
+                    }
+                },
+                asyn: false,
+            });
+        }
+
+    })
+
+
+
+
+
+    $('#EnablePaysheet').click(function () {
+        BranchId = $('#BranchId').val();
+        selMonth = $('#selMonth').val();
+        selDevisionId = $('#selDevisionId').val();
+        selyear = $('#selyear').val();
+        LoginStaffId = parseInt($('#LoginStaffId').val());
+        strPayrollMonthYear = $('#strPayrollMonthYear').val();
+        if (LoginStaffId > 0) {
+            $.ajax({
+                url: '/HRPayroll/SaveFreezePaySheet',
+                Type: 'POST',
+                data: { BranchId: BranchId, Month: selMonth, selDevisionId: selDevisionId, Year: selyear, LoginStaffId: LoginStaffId, strPayrollMonthYear: strPayrollMonthYear, IsFreeze: false },
+                success: function (data) {
+                    debugger
+                    if (data == true) {
+                        $('#dataenablesucess').show();
+                        $('#freezePaySheet').hide();
+                        $('#imagemodal1').show();
+                        LoadInformation(selyear + "-" + selMonth, selDevisionId, BranchId);
+                    }
+                },
+                asyn: false,
+            });
+        }
+
+    })
+</script>

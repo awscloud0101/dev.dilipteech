@@ -1,0 +1,115 @@
+﻿@model AsteriskBrowserAL.Models.ItemGroupViewModel
+
+@{
+    ViewBag.Title = "Delete Item Group";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Master Data
+        </li>
+        <li class="active">Item Group</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Item Group Details", "ItemGroup", new { CategoryId = (null != Model) ? Model.CategoryId : 0, SubCategoryId = (null != Model) ? (Model.InventorySubCategoryId.HasValue ? Model.InventorySubCategoryId.Value : 0) : 0 })</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ItemGroupD", "SMasterData", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(model => model.CategoryId)
+    @Html.HiddenFor(model => model.InventorySubCategoryId)
+    @Html.HiddenFor(model => model.InventorySubCategoryItemTypeId)
+                <input type="hidden" name="id" id="id" value="@Model.InventorySubCategoryItemTypeId" />
+               
+                <br/>
+    <div>
+        <span style="color: red;">
+            <b>Are you sure you want to delete this?</b>
+        </span>
+    </div>
+                <div class="box">
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="box-header">
+                        <h3 class="box-title">Item Group</h3>
+                        <button class="btn btn-primary pull-right" type="submit" style="width:80px;" onclick="return submitForm()">
+                            Delete
+                        </button>
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+
+                    <div class="box-body">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("Code")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Item Group")
+                                    </th>
+
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(model => model.Description)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(model => model.ItemTypeName)
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+    function submitForm()
+    {
+        var valid = true;
+
+        var Id = $('#id').val();
+
+        if(Id > 0)
+        {
+            $.ajax({
+
+                url: '/SMasterData/ValidationForItemGroupD',
+                data: { Id: Id },
+                success: function (data) {
+                    if (data != "") {
+                        document.getElementById('Validation').innerHTML = data;
+                        valid = false;
+                    }
+                },
+                async: false
+            });
+        }
+
+        return valid;
+    }
+</script>

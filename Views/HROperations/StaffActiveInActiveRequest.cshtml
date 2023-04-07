@@ -1,0 +1,237 @@
+﻿@model AsteriskBrowserAL.Models.StaffActiveInActiveData
+@{
+    ViewBag.Title = "ActiveInActiveRequest";
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">StaffActive/InActive Request</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<section class="content">
+
+    <div class="row">
+        <div class=" col-xs-12">
+           
+                @using (Html.BeginForm("StaffActiveInActiveRequest", "HROperations", FormMethod.Post))
+            {
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Staff Active InActive Request</span>
+                    </div>
+                    <div class="widget-box">
+                
+                       
+                        <input type="hidden" id="IsCentral" value="@Model.isCentral" />
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                @if (Model.isCentral == true)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Division")</label>
+                                                <div class="col-sm-6">
+                                                    <select id="DivisionId" name="DivisionId" class="form-control"><option>-- Select --</option></select>
+                                                </div>
+                                                @*<div class="col-sm-6">
+                                                <select id="DivisionId" class="form-control" onchange="GetStaffList"></select>
+
+                                            </div>*@
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="SelBranchId" name="BranchId" value="@Model.SubscriptionId" />
+                    <input type="hidden" id="SelDivId" name="DivisionId" value="@Model.DivisionId" />
+
+                    <div id="SearchDiv"></div>
+
+
+                }
+            </div>
+
+    </div>
+</section>
+<script>
+
+    function onloadLoadData() {
+            LoadDivisionDropdown();
+    }
+
+    window.onload = onloadLoadData();
+    function LoadDivisionDropdown() {
+        $.ajax({
+            url: '/HROperations/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+
+                var SelDivision = $("#SelDivId").val();
+                if (SelDivision > 0 && SelDivision!="")
+                {
+                    document.getElementById('DivisionId').value = SelDivision
+                    LoadBranchDropdown()
+                }
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        var Division = $("#DivisionId").val();
+        if (Division >= 0) {
+            LoadBranchDropdown();
+        }
+        else {
+            document.getElementById("BranchId").value = "";
+            document.getElementById("SearchDiv").style.display = "inline"
+            //document.getElementById("buttonId").style.display = "none"
+            $("#BranchId").html("")
+            $("#SearchDiv").html("")
+        }
+    })
+
+    function LoadBranchDropdown() {
+        var DivisionId = $("#DivisionId").val()
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: true },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+
+                    var SelBranchId = $("#SelBranchId").val();
+                    if (SelBranchId > 0 && SelBranchId != "") {
+                        document.getElementById('BranchId').value = SelBranchId
+                        GetStaff()
+                    }
+                },
+                async: false
+            })
+        }
+        else {
+            document.getElementById("BranchId").value = ""
+            $("#BranchId").html("")
+            $("#SearchDiv").html("")
+        }
+    }
+    $("#BranchId").change(function () {
+        debugger
+        var BranchId = document.getElementById("BranchId").value;
+        if (BranchId >= 0) {
+        GetStaff();
+        }
+        else {
+            //document.getElementById("SearchDiv").style.display = "inline"
+            $('#SearchDiv').html("");
+        }
+    })
+
+    function GetStaff() {
+            var DivisionId = $('#DivisionId').val();
+            var branchId = $('#BranchId').val();
+            var IsCentral = $("#IsCentral").val()
+            if (IsCentral == "False") {
+                var DivisionId = 0;
+                var branchId = 0;
+            }
+            $("#imagemodal").show()
+            $.ajax({
+                url: '/HROperations/GetStaffForRequest',
+                data: { nDivisionId: DivisionId, nBranchId: branchId, isCentral: IsCentral },
+                success: function (data) {
+                   // $('#imagemodal').hide();
+                    //document.getElementById("SearchDivHead").style.display = "inline"
+                    $('#SearchDiv').html(data);
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

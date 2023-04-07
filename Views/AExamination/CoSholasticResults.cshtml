@@ -1,0 +1,266 @@
+﻿@model AsteriskBrowserAL.Models.CoScholasticsResultsData
+
+@{
+    ViewBag.Title = "Student Profile";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+             <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Co-Sholastic Results</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+        </div>
+    </div>
+ 
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("CoSholasticResults", "AExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" id="Status" />
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">FA Marks Entry</span>
+
+
+                </div>
+                <div class="widget-box">
+       
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                    <div class="col-sm-6">
+                                        <select id="Sectionid" name="Sectionid" class="form-control"></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Examination</label>
+                                    <div class="col-sm-6">
+                                        <select id="ExaminationId" name="ExaminationId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Subjects</label>
+                                    <div class="col-sm-6">
+                                        <select id="SubjectId" name="SubjectId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ExaminationResults"></div>
+            }
+           
+            <input type="hidden" id="SelSectionId" name="SectionId" value="@Model.SectionId" />
+            <input type="hidden" id="SelExamId" name="ExamId" value="@Model.ExamId" />
+            <input type="hidden" id="SelSubjectId" name="SubjectId" value="@Model.SubjectId" />
+        </div>
+    </div>
+
+</section>
+
+
+<script>
+
+    function OnloadData() {
+        LoadClassDropdown();
+    }
+
+    function LoadClassDropdown() {
+        var SelClassId = $("#SelSectionId").val();
+        $.ajax({
+            url: '/AExamination/GetSectionDropDown',
+            success: function (result) {
+
+                var ClassNumberItems = $("#Sectionid")
+                ClassNumberItems.children().remove();
+                ClassNumberItems.append($("<option>").val("null").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    ClassNumberItems.append($("<option>").val(record.SectionId).text(record.SectionCode))
+                });
+
+                $("#Sectionid").append(ClassNumberItems);
+
+                var SelClassId = $("#SelSectionId").val();
+                if (SelClassId > 0 && SelClassId != "") {
+                    document.getElementById('Sectionid').value = SelClassId
+                    GetExaminations()
+                }
+            },
+            async: false
+        })
+    }
+
+    $('#Sectionid').change(function () {
+        $('#ExaminationResults').html("");
+        $('#ExaminationId').empty();
+        $('#SubjectId').empty();
+
+        var Sectionid = $('#Sectionid').val();
+
+        if (Sectionid < 1) {
+            $('#ExaminationResults').html("");
+        }
+        else {
+            GetExaminations();
+            $('#ExaminationResults').html("");
+        }
+    });
+
+    $('#SubjectId').change(function () {
+        $('#ExaminationResults').html("");
+        var ExamId = $('#ExaminationId').val();
+        var Sectionid = $('#Sectionid').val();
+        var SubjectId = $('#SubjectId').val();
+
+        if (SubjectId > 0 && Sectionid > 0 && ExamId > 0) {
+            GetStudentsExaminationsData();
+        }
+    });
+
+    function GetExaminations() {
+        var Sectionid = $('#Sectionid').val();
+
+        if (Sectionid > 0) {
+            $.ajax({
+
+                url: '/AExamination/GetExaminationsForCoSholasticGrades',
+                data: { Sectionid: Sectionid },
+                success: function (data) {
+
+                    var ExaminationItems = $('#ExaminationId');
+
+                    ExaminationItems.children().remove();
+
+                    ExaminationItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        if (record.IsUnitTest == 1) {
+                            ExaminationItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+                        }
+                    });
+
+                    $('#ExaminationId').append(ExaminationItems);
+
+                    
+                    var SelExamination = $("#SelExamId").val();
+                    if (SelExamination > 0 && SelExamination != "") {
+                        document.getElementById('ExaminationId').value = SelExamination
+                        LoadSubjects()
+                    }
+
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    $('#ExaminationId').change(function () {
+        //GetStudentsExaminationsData()
+        $('#ExaminationResults').html("");
+        $('#SubjectId').children().remove();
+        var ExamId = $('#ExaminationId').val();
+        var Sectionid = $('#Sectionid').val();
+        if (ExamId > 0) {
+            LoadSubjects()
+        }
+
+        });
+        function LoadSubjects()
+        {
+       
+            var ExamId = $('#ExaminationId').val();
+            var Sectionid = $('#Sectionid').val();
+            if (ExamId > 0) {
+                $.ajax({
+
+                    url: '/AExamination/GetSubjectsCoScholasticResults',
+                    data: { SectionId: Sectionid, ExamId: ExamId },
+                    success: function (data) {
+
+                        var SubjectItems = $('#SubjectId');
+
+                        SubjectItems.children().remove();
+
+                        SubjectItems.append($("<option>").val("null").text("--- Select ---"));
+
+                        $.each(data.lst, function (i, record) {
+
+                            SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+
+                        });
+
+                        $('#SubjectId').append(SubjectItems);
+
+                        $('#Status').val(data.Status);
+
+                        var SelSubjectId = $("#SelSubjectId").val();
+                        if (SelSubjectId > 0 && SelSubjectId != "") {
+                            document.getElementById('SubjectId').value = SelSubjectId
+                            GetStudentsExaminationsData()
+                        }
+                    },
+                    aync: false
+
+                });
+            }
+        }
+
+   
+
+    function GetStudentsExaminationsData() {
+        $('#ExaminationResults').html("");
+        var ExamId = $("#ExaminationId").val();
+        var SectionId = $("#Sectionid").val();
+        var SubjectId = $("#SubjectId").val();
+        var Status = $("#Status").val();
+
+        if (ExamId < 0 || SectionId < 0 || SubjectId < 0)
+            return;
+
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AExamination/GetStudentsForCoSholasticResults',
+            data: { SectionId: SectionId, ExamId: ExamId, SubjectId: SubjectId, Status: Status },
+            success: function (Data) {
+                $('#imagemodal').hide();
+                $('#ExaminationResults').html(Data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    window.onload = OnloadData();
+</script>

@@ -1,0 +1,239 @@
+﻿@model List<AsteriskBrowserAL.Models.PettyCashOpeningBalancesViewModel>
+@{
+    ViewBag.Title = "Petty Cash Opening Balances";
+    int sno = 1;
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Petty Cash Opening Balance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="table-header">
+                Petty Cash Opening Balances 
+                    <small style="float:right;" class="textheader">
+                        @Html.ActionLink("Back To Opening Balances ", "OpeningBalances")
+                    </small>
+          
+            </div>
+           
+            @using (Html.BeginForm("PettyCashOpeningBalance", "SeFinance", FormMethod.Post))
+            {
+
+                <span id="Validation" style="color:red;font-weight:bold;"></span>
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="table-header">
+                               &nbsp; &nbsp; <b>@Model.ElementAt(0).BranchName</b>
+                                <div style="float:right;margin-right:10px;">
+                                    <button type="submit" class="btncustom" onclick="return submitForm()">
+                                       save
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="hideScrolling">
+                                <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;" id="tbOpeningBalances">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                               S.No.
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Head Name")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Cash Card")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Cash In Bank")
+                                            </th>
+
+                                            <th>
+                                                @Html.DisplayName("Cash In Hand")
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.Count(); i++)
+                                        {
+
+                                            <tr>
+                                                @Html.Hidden("LstOpeningBalances.Index", (@i))
+                                                @Html.Hidden("LstOpeningBalances[" + (@i) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                                @Html.Hidden("LstOpeningBalances[" + (@i) + "].HeadName", Model.ElementAt(i).HeadName, new { @id = "HeadName" + i + "" })
+                                                @Html.Hidden("LstOpeningBalances[" + (@i) + "].HeadId", Model.ElementAt(i).HeadId, new { @id = "HeadId" + i + "" })
+                                                @Html.Hidden("LstOpeningBalances[" + (@i) + "].FeePaymentsOpeningBalancesViewModelId", Model.ElementAt(i).PettyCashOpeningBalancesViewModelId)
+                                                <td>
+                                                    @(sno++)
+                                                </td>
+                                                <td>
+                                                    @Model.ElementAt(i).HeadName
+                                                    <input type="hidden" id="HeadName" value="@Model.ElementAt(i).HeadName" />
+                                                </td>
+                                                <td>
+                                                    @{
+                                            int? val = Model.ElementAt(i).CashCardId;
+                                            @Html.DropDownList("LstOpeningBalances[" + (@i) + "].CashCardId", new SelectList(Model.ElementAt(i).LstCashCards, "CashCardId", "DisplayCashCard", val), new { @class = "form-control", @id = "CashCardId" + i + "", @name = "CashCardId" + i + "", @required = "required", @onchange = "GetHeadCashCardAmount(" + i + ")", style = "width:200px;height:auto;" })
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    @*@Html.TextBox("LstOpeningBalances[" + (@i) + "].CashInBank", Model.ElementAt(i).CashInBank, new { @class = "form-control textlength allownumeric", @min = "0", @maxlength = "17", @style = "width:220px;text-align:right", @id = "CashInBank" + i + "", onkeypress = "return isNumberKey(event)", name = @Model.ElementAt(i).CashInBank })
+                                                    @Html.Hidden("LstOpeningBalances[" + (@i) + "].CashInBank", Model.ElementAt(i).CashInBank)*@
+                                                    @Model.ElementAt(i).CashInBank
+                                                </td>
+
+                                                <td>
+                                                    @*@Html.TextBox("LstOpeningBalances[" + (@i) + "].CashInHand", Model.ElementAt(i).CashInHand, new { @class = "form-control textlength allownumeric", @min = "0", @maxlength = "17", @style = "width:220px;text-align:right", @id = "CashInHand" + i + "", onkeypress = "return isNumberKey(event)", name = @Model.ElementAt(i).CashInHand })
+                                                    @Html.Hidden("LstOpeningBalances[" + (@i) + "].CashInHand", Model.ElementAt(i).CashInHand)*@
+                                                    @Model.ElementAt(i).CashInHand
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            @Html.Action("DataTableScripts", "Base")
+
+                        </div>
+                    </div>
+
+                }
+            }
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    function Load() {
+        document.getElementById("Validation").innerHTML = "";
+    }
+
+    window.onload()
+    {
+        Load();
+    }
+
+
+    function GetHeadCashCardAmount(value) {
+
+        var tableindex = parseInt(value + 1);
+
+        $('#tbOpeningBalances').find('tr:eq(' + tableindex + ')').find('td:eq(3) input').val("0");
+        $('#tbOpeningBalances').find('tr:eq(' + tableindex + ')').find('td:eq(4) input').val("0");
+        var nHeadId = $("#HeadId" + value + "").val();
+        var nCashCardId = $("#CashCardId" + value + "").val();
+        var nSubsnId = $("#nSubscriptionId").val();
+
+        if (nCashCardId < 0)
+            return;
+
+        $.ajax
+          ({
+              error: function (jqXHR, textStatus, errorThrown) {
+                  alert(errorThrown);
+                  $('#imagemodal').hide();
+              },
+
+              url: '/SeFinance/GetPettyCashOpeningBalanceByCashCardId',
+              data: { nSubscriptionId: nSubsnId, nPettyCashHeadId: nHeadId, nCardId: nCashCardId },
+              beforeSend: function () {
+                  $('#imagemodal').show();
+              },
+              success: function (data) {
+
+                  $('#tbOpeningBalances').find('tr:eq(' + tableindex + ')').find('td:eq(3) input').val(data.CashInBank);
+                  $('#tbOpeningBalances').find('tr:eq(' + tableindex + ')').find('td:eq(4) input').val(data.CashInHand);
+
+              }, async: false
+
+          }).done(function () {
+              $('#imagemodal').hide();
+          });
+    }
+
+    function ValidateData() {
+        var nCashCardId = 0;
+        var CashInBank = 0;
+        var CashInHand = 0;
+        var HeadName = "";
+
+        var isvalid = true;
+
+        $('#tbOpeningBalances tr').each(function (index) {
+
+            nCashCardId = $("#CashCardId" + index + "").val();
+            CashInHand = $("#CashInBank" + index + "").val();
+            CashInBank = $("#CashInBank" + index + "").val();
+            HeadName = $("#HeadName" + index + "").val();
+
+            if ((parseFloat(CashInHand) > 0 || parseFloat(CashInBank) > 0) && parseInt(nCashCardId) < 1) {
+
+                $('#Validation').html("select cash card for the head of (" + HeadName + ")");
+                isvalid = false;
+                return isvalid;
+            }
+        })
+
+        return isvalid;
+    }
+
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+
+    $(".allownumeric").on("keypress keyup", function (event) {
+        $(this).val($(this).val().replace(/[^\d].+/, ""));
+        if ((event.which < 48 || event.which > 57 || event.which != 110)) {
+            event.preventDefault();
+        }
+    });
+    function submitForm() {
+
+        var IsValid = ValidateData();
+
+        if (IsValid == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+</script>

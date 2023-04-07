@@ -1,0 +1,175 @@
+﻿@model AsteriskBrowserAL.PayrollCategoryComponents
+
+@{
+    ViewBag.Title = "Edit Payroll Category Components";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Payroll Components</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<section class="content">
+
+  
+        <div class="col-xs-12">
+            <span style="color: red;">@Html.ValidationMessage("PayrollCategoryComponents")</span>
+
+            <div class="box">
+                <!-- form start -->
+                @using (Html.BeginForm("PayrollCategoryComponentsE", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.ValidationSummary(true)
+                    <div class="table-header">
+
+                        Edit Payroll Component
+                        <small style="float:right;" class="textheader">
+                            @Html.ActionLink("Back to details", "PayrollCategoryComponents", new { CategoryId = Model.PayrollCategoryComponentsId })
+                        </small>
+
+                    </div><!-- /.page-header -->
+
+
+
+                    @Html.HiddenFor(model => model.PayrollCategoryComponentsId)
+
+                    <div class="widget-box">
+                        <br />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Component Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.CategoryName, new { @class = "form-control col-sm-5 textlength", placeholder = "CategoryName", @id = "CategoryName", @onchange = "removeError();" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="categoryname">
+                                <label style="color:red;font-weight:bold;"> Please Enter The Category Name </label>
+                            </div>
+                            @*<div class="col-sm-3">
+                <span style="color: red;font-weight: bold;">@Html.ValidationMessage("CategoryName")</span>
+            </div>*@
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right"></label>
+
+                            <div class="col-sm-3">
+                                <div class="col-sm-2">
+                                    @Html.CheckBoxFor(model => model.IsEmployerContribute.Value, new { Name = "IsEmployerContribute" })
+                                    <input name="IsEmployerContribute" type="hidden" value="false" />
+                                </div>
+
+                                <span>Employer Contribution</span>
+                            </div>
+
+
+                        </div>
+
+                        <div class="hr hr-18 dotted hr-double"></div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                    <i class="ace-icon fa fa-check bigger-50"></i>
+                                    Save
+                                </button>
+
+                                &nbsp; &nbsp; &nbsp;
+                                <button class="btn btn-sm" type="reset">
+                                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                        <br />
+                    </div>
+                   
+
+                }
+            </div>
+        </div>
+
+        <input type="hidden" id="count" name="count" value="0" />
+    </section>
+
+    <script type="text/javascript">
+        function validateEmployeeCategory() {
+
+            document.getElementById("count").value = "1";
+            var CategoryName = document.getElementById("CategoryName").value;
+
+
+            validate = true;
+
+            if (CategoryName == "") {
+                document.getElementById("categoryname").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("categoryname").style.display = "none";
+            }
+
+
+
+
+            return validate;
+        };
+
+        function submitForm() {
+
+            var validatestatus = validateEmployeeCategory();
+            if (validatestatus == false) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+
+        function removeError() {
+
+            var count = document.getElementById("count").value;
+
+            var CategoryName = document.getElementById("CategoryName").value;
+
+
+
+            if (count != 0) {
+                if (CategoryName != "") {
+                    document.getElementById("categoryname").style.display = "none";
+                } else {
+                    document.getElementById("categoryname").style.display = "inline";
+                }
+
+
+
+            }
+        };
+
+        $('#CategoryName').click(function () {
+            document.getElementById('categoryname').style.display = "none"
+        })
+
+
+
+    </script>

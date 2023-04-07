@@ -1,0 +1,394 @@
+﻿@model AsteriskBrowserAL.Models.FundsTransferViewModel
+@{
+    ViewBag.Title = "Funds Withdrawal";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Petty Cash Withdrawal</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("FundsWithdrawalC", "FPettyCash", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" id="EndDate" value="@Model.TransactionDate" />
+                <input type="hidden" id="DivisionId" name="DivisionId" value="@Model.DivisionId" />
+                <input type="hidden" id="FromBranch" name="FromBranch" value="@Model.FromBranch" />
+                <div class="table-header">
+                    <span style="font-family:calibri;">Petty Cash Withdrawal</span>
+
+
+                    <div class=" "  style="float:right;margin-right:10px;">
+                        <button class="btncustom" onclick="return submitForm();" type="submit">
+                            Withdraw
+                        </button>
+                     
+
+                        </div>
+
+                    <div class=" " style="float:right;margin-right:10px;">
+                        <small style="float:right;font-weight:bold;" class="textheader">
+                            @Html.ActionLink("Back to details", "FundsWithdrawal", new { DivisionId = Model.DivisionId, nBranchId = Model.FromBranch })
+                        </small>
+                    </div>
+                </div>
+
+
+
+
+
+                    <div class="widget-box">
+                        <span style="color:red;font-weight:bold;">@Html.ValidationMessage("FundsWithdrawalC")</span>
+
+                        <!-- form start -->
+                        <form class="form-horizontal" role="form">
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Select Date</label>
+
+                                                <div class="col-sm-6">
+                                                    <div id="datepicker" class="input-group date">
+                                                        <input class="form-control" type="text" value="@Model.TransactionDate.Value.ToShortDateString()" id="dtTransactionDate" name="WithdrawalDate" autocomplete="off" placeholder="Select Date" />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6" style="display:none;" id="TDateVal">
+                                                <label style="color:red;font-weight:bold;"> Select Date</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                 
+                                 
+
+                                    <div class="row" style="padding-top:3px;">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Cash Card</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.CashCardId, new SelectList(Model.LstCashCards, "CashCardId", "DisplayCashCard"), new { @class = "form-control", id = "CboCashCard" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-12" for="form-field-1">
+                                                    <span style="font-weight:bold" id="CashCardAmount"> </span>
+                                                </label>
+                                            </div>
+
+                                            <div class="col-sm-6" style="display:none;" id="CashCardIdVal">
+                                                <label style="color:red;font-weight:bold;"> Select Cash Card</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                 
+                                 
+
+                                    <div class="row">
+
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Head Name</label>
+                                                <div class="col-xs-6">
+                                                    <select id="CboPettyCashHead" name="PettyCashHeadId" class="form-control"></select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6" style="display:none;" id="HeadVal">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-12" for="form-field-1">
+                                                    <span style="font-weight:bold" id="AmountInBank"> </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                 
+                                 
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Amount")</label>
+                                                <div class="col-xs-6">
+                                                    @Html.TextBoxFor(model => model.Amount, new { autocomplete = "off", @class = "form-control txtboxNum", id = "Amount", placeholder = "Amount" })
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5" style="display:none;" id="withdrawValidation">
+                                                <label style="color:red;font-weight:bold;">In sufficient funds in bank</label>
+                                            </div>
+                                            <div class="col-sm-6" style="display:none;" id="AmountVal">
+                                                <label style="color:red;font-weight:bold;"> Required</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </form>
+                    </div>
+
+                    }
+                </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+<script type="text/javascript">
+
+    $(document).on('focus', '#datepicker', function () {
+        $("#datepicker").datepicker({
+            endDate: $('#EndDate').val(),
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+
+    function PopulateCashCardAmount(CashCardId) {
+
+        var FromBranch = $('#FromBranch').val();
+
+        document.getElementById('AmountInBank').innerHTML = "";
+
+        if (CashCardId < 1) {
+            $('#CashCardAmount').html('');
+            $('#CashCardAmount').val('0');
+            return;
+        }
+
+        $.ajax({
+
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+            },
+            url: '/FPettyCash/GetCashInBankByHeadIdByCardIdandSubscriptionId',
+            data: { nCardId: CashCardId, SubscriptionId: FromBranch },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+
+                debugger
+                document.getElementById('CashCardAmount').innerHTML = data.Message;
+                document.getElementById('CashCardAmount').value = data.CashInBank;
+
+            },
+            aync: false
+
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    $('#CboCashCard').change(function () {
+
+        $('#AmountInBank').html('');
+        var nCashCardId = $('#CboCashCard').val();
+
+        if (nCashCardId != 0) {
+
+            PopulateHeads(nCashCardId);
+            PopulateCashCardAmount(nCashCardId);
+        }
+        else {
+
+            var HeadItems = $('#CboPettyCashHead');
+            HeadItems.children().remove();
+            HeadItems.append($("<option>").val(0).text(""));
+        }
+    });
+
+    function PopulateHeads(nCashCardId) {
+
+        var FromBranch = $('#FromBranch').val();
+
+        $.ajax({
+
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+            },
+
+            url: '/FPettyCash/GetPettyCashHeadsByCashCardId',
+            data: { nCashCardId: nCashCardId, SubscriptionId: FromBranch },
+            success: function (data) {
+                debugger
+                var HeadItems = $('#CboPettyCashHead');
+                HeadItems.children().remove();
+                HeadItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    HeadItems.append($("<option>").val(record.PettyCashHeadId).text(record.Name));
+                });
+
+                $('#CboPettyCashHead').append(HeadItems);
+            },
+            aync: false
+        });
+    }
+
+
+    $('#CboPettyCashHead').change(function () {
+
+        $('#withdrawValidation').hide();
+
+        var HeadId = $('#CboPettyCashHead').val();
+        var FromBranch = $('#FromBranch').val();
+        var nCashCardId = $('#CboCashCard').val();
+
+
+        if (HeadId > 0) {
+
+            $('#imagemodal').show();
+
+            $.ajax({
+
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    $('#imagemodal').hide();
+                },
+
+                url: '/FPettyCash/GetCashinBankByHeadIdBySubscriptionId',
+                data: { nHeadId: HeadId, SubscriptionId: FromBranch, nCardId: nCashCardId },
+                success: function (data) {
+
+                    debugger
+                    document.getElementById('AmountInBank').innerHTML = data.Message;
+                    document.getElementById('AmountInBank').value = data.CashInBank;
+                },
+                aync: false
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+
+            $('#AmountInBank').html('');
+            $('#AmountInBank').val('0');
+        }
+    });
+
+
+
+    $('#dtTransactionDate').focus(function () {
+        $('#TDateVal').hide();
+    });
+
+    $('#CboCashCard').focus(function () {
+        $('#CashCardIdVal').hide();
+    });
+
+    $('#CboPettyCashHead').focus(function () {
+        $('#DesVal').hide();
+    });
+
+    $('#PettyCashHeadId').focus(function () {
+        $('#HeadVal').hide();
+    });
+
+    $('#Amount').focus(function () {
+        $('#AmountVal').hide();
+        $('#withdrawValidation').hide();
+    });
+
+    function validateWithDrawControls() {
+
+        var dtDate = $('#dtTransactionDate').val();
+        var CashCardId = $('#CboCashCard').val();
+        var HeadId = $('#CboPettyCashHead').val();
+        var bankAmount = $('#AmountInBank').val();
+        var withdramAmount = $('#Amount').val();
+
+        validate = true;
+
+        if (dtDate == "") {
+            document.getElementById("TDateVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("TDateVal").style.display = "none";
+        }
+
+        if (CashCardId == "null" || CashCardId < 1) {
+            document.getElementById("CashCardIdVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("CashCardIdVal").style.display = "none";
+        }
+
+        if (withdramAmount == "null" || withdramAmount < 1) {
+            document.getElementById("AmountVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("AmountVal").style.display = "none";
+        }
+
+        if (HeadId == "null" || HeadId < 1) {
+            document.getElementById("HeadVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("HeadVal").style.display = "none";
+        }
+
+
+        if (bankAmount < withdramAmount) {
+            document.getElementById('withdrawValidation').style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById('withdrawValidation').style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateWithDrawControls();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+</script>   

@@ -1,0 +1,162 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.FinanceIncomeViewData>
+@{
+    ViewBag.Title = "MiscellaneousFeePartialView";
+    int nSno = 1;
+
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@Html.Action("DataTableScripts", "Base")
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            @if (null != Model && Model.Count() > 0)
+            {
+                <div class="hr hr-18 dotted hr-double"></div>
+                <div class="table-header">
+                    Records Found (@Model.Count())
+                </div>
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Title")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Description")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Amount")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Transaction Date")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Receipt")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Payment Mode")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Transaction Details")
+                            </th>
+                            <th>
+
+                            </th>
+                            <th>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    @foreach (var item in Model)
+                    {
+                        <tbody>
+                            <tr>
+                                <td>
+                                    @(nSno++)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Title)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Amount)
+                                </td>
+                                <td>
+                                    @if (null != item.TransactionDate)
+                                    {
+                                        @item.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Receipt)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DisplayPaymentMode)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BankName)
+                                </td>
+
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="green P2" href="@Url.Action("MiscellaneousFeePrint", "FOperations", new { id = item.FinanceIncomeId,CategoryId = item.CategoryId})">
+                                            <i class="ace-icon fa fa-print  bigger-130"></i>
+                                        </a>
+                                    </div>
+
+                                </td>
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="red P2" onclick="btnConfirm(@item.FinanceIncomeId,@item.CategoryId)">
+                                            <i class="ace-icon fa fa-trash  bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    }
+                </table>
+
+            }
+            else
+            {
+                <span style="font-weight:bold;color:red">Data not available to display</span>
+            }
+        </div>
+    </div>
+</section>
+<script>
+
+    function btnConfirm(Value, Value1) {
+        debugger
+        if (Value > 0) {
+           
+            var url = "/FOperations/MiscellaneousFeeD?" + "id=" + Value + "&CategoryId=" + Value1;
+
+            var title = "MiscellaneousFee";
+
+            OpenDialog("", url, title);
+        }
+
+        //if (Value > 0) {
+        //    $.ajax({
+        //        url: '/FOperations/ValidationForMiscellaneousFeeD',
+        //        data: { id: Value },
+        //        success: function (data) {
+
+        //            var url = '/FOperations/MiscellaneousFeeD?id=' + Value;
+        //            var title = "MiscellaneousFee";
+
+        //            OpenDialog(data, url, title);
+        //        },
+        //        async: false
+        //    });
+        //}
+    }
+
+</script>
+

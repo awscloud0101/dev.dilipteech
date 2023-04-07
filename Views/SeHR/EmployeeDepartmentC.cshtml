@@ -1,0 +1,254 @@
+﻿@model AsteriskBrowserAL.Department
+
+@{
+    ViewBag.Title = "Create Employee Department";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Employee Department</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+   
+
+  
+        <div class="col-xs-12">
+            <span style="color: red;" id="Validation"></span>
+            <div class="box">
+    @using (Html.BeginForm("EmployeeDepartmentC", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        @Html.ValidationSummary(true)
+
+        <div class="table-header">
+            <span style="font-family:calibri;font-weight:bold;"> Employee Department</span>
+
+            <small style="float:right;" class="textheader">
+                @Html.ActionLink("Back to details", "EmployeeDepartment")
+            </small>
+
+        </div>
+
+
+        <div class="widget-box" style="padding:10px;padding-bottom:30px;">
+            <form class="form-horizontal" role="form">
+
+              
+                <div class="box-body">
+          
+
+                    <div class="row">
+
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Department Name")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.DepartmentName, new { @class = "form-control col-sm-5 textlength", placeholder = "DepartmentName", @id = "DepartmentName", @onchange = "removeError();" })
+                                </div>
+
+
+                                <div class="col-sm-1" style="display:none;" id="departmentName">
+                                    <label style="color:red;font-weight:bold;"> Please Enter The Department Name </label>
+                                </div>
+                                @*<div class="col-sm-3">
+                                        <span style="color: red;font-weight: bold;">@Html.ValidationMessage("DepartmentName")</span>
+                                    </div>*@
+                            </div>
+                        </div>
+
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Department Code")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.DepartmentCode, new { @class = "form-control col-sm-5 textlength", placeholder = "DepartmentCode", @id = "DepartmentCode", @onchange = "removeError();" })
+                                </div>
+
+
+                                <div class="col-sm-1" style="display:none;" id="departmentCode">
+                                    <label style="color:red;font-weight:bold;"> Please Enter The Department Code </label>
+                                </div>
+                                @*<div class="col-sm-3">
+                                        <span style="color: red;font-weight: bold;">@Html.ValidationMessage("DepartmentCode")</span>
+                                    </div>*@
+                            </div>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right"></label>
+
+                                <div class="col-sm-8">
+                                    @Html.CheckBoxFor(model => model.Status)
+                                    <span class="lbl bigger-110">Is Active</span>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    @Html.ValidationMessageFor(model => model.Status)
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+
+                    <div class="row"></div>
+                    <div class="hr hr-18 dotted hr-double"></div>
+                    <div class=" col-md-12" align="left" >
+
+                        <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                            <i class="ace-icon fa fa-check bigger-50"></i>
+                            Save
+                        </button>
+                        &nbsp; &nbsp; &nbsp;
+                        <button class="btn btn-sm" type="reset">
+                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                            Reset
+                        </button>
+                    </div>
+
+
+                    <br />
+
+                
+
+
+                </div>
+
+            </form>
+        </div>
+    }
+</div>
+        </div>
+        <input type="hidden" id="count" name="count" value="0" />
+    
+</section>
+
+<script type="text/javascript">
+    function validateEmployeeDepartment() {
+
+         document.getElementById("count").value = "1";
+         var DepartmentName = document.getElementById("DepartmentName").value;
+         var DepartmentCode = document.getElementById("DepartmentCode").value;
+
+        validate = true;
+
+        if (DepartmentName == "") {
+            document.getElementById("departmentName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("departmentName").style.display = "none";
+        }
+
+        if (DepartmentCode == "") {
+            document.getElementById("departmentCode").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("departmentCode").style.display = "none";
+        }
+
+        if (validate == true)
+        {
+            var IsValidate = ValidateNameAndCode();
+            validate = IsValidate;
+        }
+
+
+        return validate;
+    };
+
+
+    function ValidateNameAndCode()
+    {
+        var valid = true;
+        $.ajax({
+
+            url : '/SeHR/ValidateEmployeeDepartment',
+            data : {Type : "New" , DepartmentName : $('#DepartmentName').val() , DepartmentCode : $('#DepartmentCode').val() , Id : 0},
+            success : function(data){
+
+                if(data.Validation != "")
+                {
+                    document.getElementById("Validation").innerHTML = data.Validation;
+                    valid = false;
+                }
+
+            },
+            async:false
+
+        });
+
+        return valid;
+    }
+
+
+    function submitForm() {
+
+        var validatestatus = validateEmployeeDepartment();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var DepartmentName = document.getElementById("DepartmentName").value;
+        var DepartmentCode = document.getElementById("DepartmentCode").value;
+
+
+        if (count != 0) {
+            if (DepartmentName != "") {
+                document.getElementById("departmentName").style.display = "none";
+            } else {
+                document.getElementById("departmentName").style.display = "inline";
+            }
+
+            if (DepartmentCode != "") {
+                document.getElementById("departmentCode").style.display = "none";
+            } else {
+                document.getElementById("departmentCode").style.display = "inline";
+            }
+
+
+        }
+    };
+
+    $('#DepartmentName').click(function () {
+        document.getElementById('departmentName').style.display = "none"
+    })
+
+
+    $('#DepartmentCode').click(function () {
+        document.getElementById('departmentCode').style.display = "none"
+    })
+
+</script>
+
+
+
+
+

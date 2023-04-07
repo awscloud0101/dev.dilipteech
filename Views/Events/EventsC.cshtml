@@ -1,0 +1,237 @@
+﻿@model AsteriskBrowserAL.Models.EventsDetails
+
+@{
+    Layout = null;
+}
+
+@*@Html.Action("DatePickerScripts", "Base")*@
+
+
+@if (@Model.EventId != null)
+{
+    <input type="hidden" id="EventId" value="@Model.EventId" />
+}
+@if (Model.EventDate != null)
+{
+    <input type="hidden" id="StartDate" value="@Model.EventDate" />
+}
+@*<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<style>
+    .ui-widget.ui-widget-content {
+        border: 1px solid #c5c5c5;
+        width: 19em;
+    }
+</style>
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>*@
+<input type="hidden" id="SlotNo" />
+
+<span style="color:red;font-weight:bold" id="Validation"></span>
+<br />
+<br />
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="color:red;font-weight:bold">*C</span>lass</label>
+                    <div class="col-sm-6">
+                        @Html.DropDownList("CourseId", null, "--Select--", new { @class = "form-control", @id = "CourseId", required = "required" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="color:red;font-weight:bold">*S</span>ubject</label>
+                    <div class="col-sm-6">
+                        @Html.TextBoxFor(model => model.Subject, new { @class = "form-control", id = "Subject", required = "required" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="font-weight:bold"></span>Student</label>
+                    <div class="col-sm-6">
+                        <select id="StudentId" name="StudentId" class="form-control"></select>
+                        @*<input type="text" name="StudentName" id="StudentId" spellcheck="false" oninput="removeError();" class="form-control" />*@
+                        @*<input type="text" id="StudentId" name="StudentId" class="form-control" />*@
+                        @*@Html.TextBoxFor(model => model.StudentId, new { @class = "form-control", id = "Subject", required = "required" })*@
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="font-weight:bold"></span>Remarks</label>
+                    <div class="col-sm-6">
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", id = "Description" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*S</span>tart Time </label>
+                    <div class="col-sm-6">
+                        @*<div class="input-group bootstrap-timepicker timepicker">
+                <input id="timepicker" name="StartTime" type="text" value="00:00:00" class="form-control input-small" placeholder="Schedule Time">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+            </div>*@
+                        @*<input id="StartTime" name="StartTime" type="text" value="00:00:00" class="form-control input-small" placeholder="Schedule Time">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>*@
+                        @*<input class="form-control" id="StartTime" name="StartTime" placeholder="HH:MM AM/PM" type="text" required />*@
+                        <div class="input-group bootstrap-timepicker">
+                            <input id="StartTime" name="StartTime" type="time" class="form-control input-small" value="@Model.StartTime" placeholder="Start Time">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                        </div>
+                    </div>
+                    <label>eg: 09:00 AM</label>
+                    @*<a onclick="OpenModel(@i.SlotId)">
+                        <b style="color:navy">Select Student</b>
+                    </a>*@
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*E</span>nd Time </label>
+                    <div class="col-sm-6">
+                        <div class="input-group bootstrap-timepicker">
+                            <input id="EndTime" name="EndTime" type="time" class="form-control input-small" value="@Model.EndTime" placeholder="End Time">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                        </div>
+                        @*<input class="form-control" id="EndTime" name="EndTime" placeholder="HH:MM AM/PM" type="text" required />*@
+                    </div>
+                    <label>eg: 09:00 PM</label>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="font-weight:bold"></span>Slot Time (Minutes)</label>
+                    <div class="col-sm-6">
+                        @Html.TextBoxFor(model => model.SlotTime, new { @class = "form-control", id = "SlotTime", required = "required" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="font-weight:bold"></span>Break Time (Minutes) </label>
+                    <div class="col-sm-6">
+                        @Html.TextBoxFor(model => model.BreakTime, new { @class = "form-control", id = "BreakTime", required = "required" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            @*<div class="row">
+                    <div class="col-sm-12">
+                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">No Of Slots</label>
+                        <div class="col-sm-6">
+                            <label id="SlotNumber" style="font-weight:bold"></label> <a onclick="GetSlotsCount()">No. Of Slots</a>
+                        </div>
+                    </div>
+                </div>*@
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        SetDepositTimePicker();
+    });
+
+    function SetDepositTimePicker() {
+
+        $('#StartTime').timepicker({
+            showMeridian: false,
+            minuteStep: 1,
+            showSeconds: true,
+        })
+        $('#EndTime').timepicker({
+            showMeridian: false,
+            minuteStep: 1,
+            showSeconds: true,
+        })
+
+    }
+
+    //$("#StudentId").autocomplete({
+
+    //    source: function (request, response) {
+    //        var BranchId = 0;
+    //        var SectionId = $('#CourseId').val();
+    //        debugger
+    //        if (SectionId >= 0) {
+    //            $('#imagemodal').show();
+    //            $.ajax({
+    //                url: "/AReports/GetStudentsForOverallReport",
+    //                type: "POST",
+    //                dataType: "json",
+    //                data: { strVal: request.term, nBranchId: BranchId, nSectionId: SectionId },
+    //                success: function (json) {
+    //                    response($.map(json, function (data, id) {
+    //                        return {
+    //                            label: data.FullName,
+    //                            value: data.FullName,
+    //                            Id: data.StudentId,
+    //                            valueAsNumber: data.StudentId,
+    //                        };
+    //                    }));
+    //                },
+    //                error: function () {
+    //                    $('#imagemodal').hide();
+    //                },
+    //            }).done(function () {
+    //                $('#imagemodal').hide();
+    //            });
+    //        }
+    //    },
+    //    minLength: 3,
+
+    //    select: function SelectEvent(event, ui) {
+    //        StudentId = ui.item.Id;
+
+    //    }
+    //});
+
+    $('#CourseId').change(function () {
+        debugger
+        var CourseId = $('#CourseId').val();
+        if (CourseId != 0) {
+            $.ajax({
+
+                url: '/Events/GetStudents',
+                data: { CourseId: CourseId },
+                success: function (data) {
+
+                    var BranchItems = $('#StudentId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.StudentId).text(record.FullName));
+                    });
+
+                    $('#StudentId').append(BranchItems);
+
+                },
+                aync: false
+            });
+        }
+    });
+
+</script>
+

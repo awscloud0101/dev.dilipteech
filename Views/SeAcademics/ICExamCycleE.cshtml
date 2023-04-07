@@ -1,0 +1,195 @@
+﻿@model AsteriskBrowserAL.Models.ICExaminationCycleModel
+@{
+    ViewBag.Title = "ICExamCycleE";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">IC Exam Cycle</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<style>
+    .checkbox {
+        position: relative;
+        top: -0.379rem;
+        margin: 0 1rem 0 0;
+        cursor: pointer;
+    }
+
+        .checkbox:before {
+            -webkit-transition: all 0.3s ease-in-out;
+            -moz-transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease-in-out;
+            content: "";
+            position: absolute;
+            top: 0.7rem;
+            left: 0;
+            z-index: 1;
+            width: 1.7rem;
+            height: 1.7rem;
+            border: 2px solid #d9d9d9;
+        }
+
+        .checkbox:checked:before {
+            -webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -ms-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+            height: .9rem;
+            border-color: #a82682;
+            border-top-style: none;
+            border-right-style: none;
+        }
+
+        .checkbox:after {
+            content: "";
+            position: absolute;
+            top: 0.7rem;
+            left: 0;
+            width: 1.7rem;
+            height: 1.7rem;
+            background: #fff;
+            cursor: pointer;
+        }
+</style>
+
+<section class="content">
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("ICExamCycleE", "SeAcademics", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <div class="box">
+                    <span style="color:red;" id="Validationmsg"></span>
+                    <div class="page-header">
+                        <br />
+                        <h1>
+                            IC Category
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "ICExaminationCycles")
+                            </small>
+                        </h1>
+                    </div>
+                    @Html.HiddenFor(model=>model.ICExaminationCycleId,new { @id= "ICExaminationCycleId" })
+                    <br />
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label no-padding-right" for="form-field-1">@Html.Label("Category Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.CycleName, new { @class = "form-control col-sm-5 textlength", placeholder = "IC Exam Cycle Name", @id = "CycleName" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="ErrCycleName">
+                                <label style="color:red;font-weight:bold;"> Please Enter Cycle Name </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label no-padding-right" for="form-field-1">@Html.Label(" IC Exam Cycle Type")</label>
+
+                            <div class="col-sm-3">
+                                @Html.DropDownList("CycleNumber", null, "--Select--", new { @class = "form-control col-sm-5 textlength", placeholder = "Select Cycle Type", @id = "CycleNumber" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="ErrCycleNumber">
+                                <label style="color:red;font-weight:bold;"> Please Select Cycle Type </label>
+                            </div>
+                        </div>
+                        <div class="hr hr-18 dotted hr-double"></div>
+
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm()" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    function submitForm() {
+        var validatestatus = validation();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function validation() {
+        var CycleName = document.getElementById("CycleName").value;
+        var CycleNumber = document.getElementById("CycleNumber").value;
+        var validatestatus = true;
+        if (CycleName != "") {
+            document.getElementById("ErrCycleName").style.display = "none";
+            } else {
+            document.getElementById("ErrCycleName").style.display = "inline";
+            validatestatus = false;
+            }
+
+        if (CycleNumber == "" || CycleNumber == null || CycleNumber=="null") {
+            document.getElementById("ErrCycleNumber").style.display = "inline";
+            validatestatus = false;
+        } else {
+            document.getElementById("ErrCycleNumber").style.display = "none";
+        }
+
+        if (validatestatus == true) {
+        debugger
+        var status = IsIcCycleExisted();
+            validatestatus = status;
+        }
+        return validatestatus;
+    };
+    $('#CycleName').click(function () {
+        document.getElementById('ErrCycleName').style.display = "none";
+        document.getElementById("Validationmsg").innerHTML = "";
+    })
+    $('#CycleNumber').click(function () {
+        document.getElementById('ErrCycleNumber').style.display = "none";
+        document.getElementById("Validationmsg").innerHTML = "";
+    })
+    function IsIcCycleExisted() {
+        var Status = true;
+        var CycleNumber = document.getElementById("CycleNumber").value;
+        var CycleId = document.getElementById("ICExaminationCycleId").value;
+        $.ajax({
+            url: '/SeAcademics/IsIcCycleExisted',
+            data: { type: "Edit", id: CycleId, CycleName: $('#CycleName').val(), CycleNumber: CycleNumber },
+            success: function (Data) {
+                if (Data != "") {
+                    Status = false;
+                    document.getElementById("Validationmsg").innerHTML = Data;
+                }
+            },
+            async: false
+        });
+        return Status;
+    }
+</script>

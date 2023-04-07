@@ -1,0 +1,180 @@
+﻿@model AsteriskBrowserAL.Models.TimeTableViewModel
+
+@{
+
+    ViewBag.Title = "Student Profile";
+
+}
+
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<link rel="shortcut icon" href="../favicon.ico">
+<link href="~/assets/css/demo.css" rel="stylesheet" />
+<link href="~/assets/css/component.css" rel="stylesheet" />
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+<script src="~/assets/js/jquery.stickyheader.js"></script>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Timetable
+        </li>
+        <li class="active">Timetable Today</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+    
+<section class="content">
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("TimeTableToday", "ATimeTable", FormMethod.Post))
+            {
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Timetable Today</span>
+          
+                        <div class="inline action-buttons" style="float:right;">
+                            <a class="btn btn-info btn-minier P2" id="ViewData">View Data</a>
+                        </div>
+                 
+
+                </div>
+                <div class="widget-box">
+             
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-4">
+                                            <label for="form-field-1">Select Date</label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" placeholder="Select Date" required="required" title="Please select the date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="TimeTableToday">
+
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+<script>
+
+    $('#Date').change(function () {
+        $('#TimeTableToday').html("");
+    })
+
+    function OnloadData() {
+
+        $("#ViewData").css("display", "none");
+
+        //LoadClassDropdown();
+    }
+
+
+    function LoadClassDropdown() {
+        $.ajax({
+            url: '/AFrontOffice/GetClassData',
+            success: function (result) {
+                CourseList = $("#ClassId")
+                CourseList.children().remove();
+                CourseList.append($("<option>").val("").text("--select--"))
+                $.each(result, function (e, record) {
+                    CourseList.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(CourseList)
+
+
+            }
+        })
+    }
+
+    //$("#ClassId").change(function () {
+    //    $("#TimeTableToday").html("")
+
+    //    if ($("#ClassId").val() > 0) {
+    //        $("#Date").prop('disabled', false);
+
+    //    }
+    //    else
+    //    {
+    //        $("#Date").prop('disabled', true);
+    //        $("#ViewData").css("display", "none");
+
+
+    //    }
+    //})
+
+
+    $("#Date").change(function () {
+        //$("#TimeTableToday").html("")
+        $("#ViewData").css("display", "inline");
+
+    })
+
+    $("#ViewData").click(function () {
+
+        GetTimeTableTodayData()
+    })
+
+    function GetTimeTableTodayData() {
+
+        var Date = $("#Date").val();
+        //var ClassNumber = $("#ClassId").val();
+
+        $("#TimeTableToday").html("")
+        $("#imagemodal").show();
+        $.ajax({
+            url: '/ATimetable/GetTodayTimeTable',
+            data: { Date: Date },
+            success: function (result) {
+                $("#TimeTableToday").html(result)
+                $("#imagemodal").hide();
+
+
+            },
+
+        })
+
+    }
+    window.onload = OnloadData();
+</script>
+

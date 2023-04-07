@@ -1,0 +1,167 @@
+﻿@model List<AsteriskBrowserAL.Models.AdmissionTargetViewModel>
+@{
+    ViewBag.Title = "Admission Target";
+
+    int sno = 1;
+
+    List<AsteriskBrowserAL.Models.AdmissionTargetViewModel> lstMonths = new List<AsteriskBrowserAL.Models.AdmissionTargetViewModel>();
+    if (null != Model && Model.Count() > 0)
+    {
+        var data = Model.FirstOrDefault();
+
+        if (null != data)
+        {
+            lstMonths = data.lstTargetAdmissionMonthWise.ToList();
+        }
+    }
+}
+
+<!--Main Content-->
+<section class="content">
+
+
+
+    <div class="row">
+
+        @using (Html.BeginForm("AdmissionTargets", "COthers", FormMethod.Post))
+        {
+            if (Model != null && Model.Count() > 0)
+            {
+                <div class="col-sm-12">
+
+                    <div class="table-header">
+                        Admission Targets Vs Acheived
+
+                        <div style="float:right;margin-right:10px;">
+                            <button class="btncustom" id="btnExport">
+                                Download
+
+                            </button>
+                        </div>
+                   </div>
+                   
+
+                    <table id="AdmissiontragetData" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">
+                                   S.No.
+                                </th>
+                                <th rowspan="2">
+                                    @Html.DisplayName("Branch")
+                                </th>
+
+                                @foreach (var m in lstMonths)
+                                {
+                                    <th colspan="2" style="text-align:center">
+                                        @m.MonthName
+                                    </th>
+                                }
+                            </tr>
+                            <tr>
+                                @for (int i = 0; i < lstMonths.Count(); i++)
+                                {
+
+                                    <th style="text-align:center" align="center">
+                                        Target
+                                    </th>
+                                    <th style="text-align:center" align="center">
+                                        Acheived
+                                    </th>
+
+                                }
+                            </tr>
+
+
+
+                        </thead>
+                        <tbody>
+
+                            @for (int i = 0; i < Model.Count(); i++)
+                            {
+                                <tr>
+                                    <td align="center">
+                                        @(sno++)
+                                    </td>
+
+                                    <td>
+                                        @Model.ElementAt(i).BranchName
+                                    </td>
+                                    @if (Model.ElementAt(i).lstTargetAdmissionMonthWise.Count() > 0)
+                                    {
+
+                                        for (int j = 0; j < Model.ElementAt(i).lstTargetAdmissionMonthWise.Count(); j++)
+                                        {
+                                            <td>
+                                                @Model.ElementAt(i).lstTargetAdmissionMonthWise.ElementAt(j).TargetCount
+                                            </td>
+                                            <td>
+                                                @Model.ElementAt(i).lstTargetAdmissionMonthWise.ElementAt(j).AcheivedCount
+                                            </td>
+                                        }
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            }
+        }
+
+    </div>
+
+</section>
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+
+    function submitform() {
+        $.ajax({
+            url: '/COthers/AdmissionTargets',
+            data: {},
+            success: function (result) {
+            }
+        })
+    };
+
+    $('#btnExport').click(function () {
+        ExportToExcel("AdmissiontragetData")
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,287 @@
+﻿@model List<AsteriskBrowserAL.Models.TemplateRangeViewData>
+@{
+    ViewBag.Title = "Template Range";
+    int sno = 1;
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Template Range</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+    hideScrolling:hover {
+        overflow: auto;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+        </div>
+    </div>
+   
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("TemplateRange", "SeFinance", FormMethod.Post))
+            {
+
+                if (null != TempData["TemplateRange"])
+                {
+
+
+                    <p align="center">
+                        <span class="savedinfo">
+
+
+
+                            <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                            <br />
+                      @Html.Raw(TempData["TemplateRange"])
+
+                            <br />
+
+                            <a href="" class="cls1 btncustom">Close</a>
+                            <script>
+
+                                $(document).ready(function () {
+                                    $(".cls1").click(function () {
+
+                                        $(".savedinfo").css("display", "none")
+                                    });
+
+
+
+                            </script>
+                        </span>
+                    </p>
+
+                          }
+                @Html.ValidationMessage("TemplateRange")
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    <span id="Validation" style="color:red;font-weight:bold"></span>
+
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;"> Template Range</span>
+                        <div  style="float:right;margin-right:10px;">
+                            <button name="Save" class="btncustom P2" onclick="return submitForm()">
+                               Save
+                            </button>        </div>
+
+                    </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                            
+                            </div>
+                        </div>
+
+                        <div style="overflow:auto;height:500px">
+                            <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;" id="mytab1">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" style="vertical-align:middle">
+                                           S.No.
+                                        </th>
+                                        <th rowspan="2" style="vertical-align:middle">
+                                            @Html.DisplayName("Branch")
+                                        </th>
+                                        <th colspan="2" style="vertical-align:middle">
+                                            @Html.DisplayName("Current Range")
+                                        </th>
+
+                                        <th rowspan="2" style="vertical-align:middle">
+
+                                        </th>
+                                        <th colspan="2" style="vertical-align:middle">
+                                            @Html.DisplayName("Next Range")
+                                        </th>
+                                        <th rowspan="2" style="vertical-align:middle">
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size:14px;">I Start Number</th>
+                                        <th style="font-size:14px;">I End Number</th>
+                                        <th style="font-size:14px;">II Start Number</th>
+                                        <th style="font-size:14px;">II End Number</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+
+                                    @for (int i = 0; i < Model.Count(); i++)
+                                    {
+                                        <tr>
+                                            @Html.Hidden("TemplateRangeList.Index", (@i + 10))
+                                            @Html.Hidden("TemplateRangeList[" + (@i + 10) + "].TemplateRangeId", Model.ElementAt(i).TemplateRangeId)
+                                            @Html.Hidden("TemplateRangeList[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                            @Html.Hidden("TemplateRangeList[" + (@i + 10) + "].BranchName", Model.ElementAt(i).BranchName)
+
+                                            <td>
+
+                                                @(sno++)
+                                            </td>
+                                            <td>
+                                                @Model.ElementAt(i).BranchName
+
+
+                                            </td>
+                                            <td>
+                                                @Html.TextBox("TemplateRangeList[" + (@i + 10) + "].StartNumber", Model.ElementAt(i).StartNumber, new { @class = "form-control textlength txtboxNum", @min = "0", @maxlength = "15", @style = "width:140px", @id = "startnumber", name = @Model.ElementAt(i).SubscriptionId })
+                                                @Html.Hidden("TemplateRangeList[" + (@i + 10) + "].StartNumber", Model.ElementAt(i).StartNumber)
+
+                                            </td>
+
+
+                                            <td>
+                                                @Html.TextBox("TemplateRangeList[" + (@i + 10) + "].EndNumber", Model.ElementAt(i).EndNumber, new { @class = "form-control textlength txtboxNum", min = "0", @maxlength = "15", @style = "width:140px", @id = "endnumber", name = @Model.ElementAt(i).SubscriptionId })
+                                                @Html.Hidden("TemplateRangeList[" + (@i + 10) + "].EndNumber", Model.ElementAt(i).EndNumber)
+
+                                            </td>
+                                            <td>
+                                                @*@Html.ActionLink("Make In-Active", "MakeTemplateInActive", )*@
+                                                <div class="widget-toolbar no-border">
+                                                    <div class="inline action-buttons">
+                                                        <a class="P2" href="@Url.Action("MakeTemplateInActive", "SeFinance",new { id = Model.ElementAt(i).TemplateRangeId, nSubscriptionId = @Model.ElementAt(i).SubscriptionId })"><span class="btn btn-info btn-minier">Make In-Active</span></a>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+
+                                            <td>
+                                                @if (Model.ElementAt(i).StartNumber == 0)
+                        {
+                                                    @Html.TextBox("TemplateRangeList[" + (@i + 10) + "].SecStartNumber", Model.ElementAt(i).SecStartNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "15", @style = "width:140px", @id = "secStartNumber", name = @Model.ElementAt(i).SubscriptionId, @disabled = "disabled" })
+                                                    @Html.Hidden("TemplateRangeList[" + (@i + 10) + "].SecStartNumber", Model.ElementAt(i).SecStartNumber)
+                                                }
+                                                else
+                                                {
+                                                    @Html.TextBox("TemplateRangeList[" + (@i + 10) + "].SecStartNumber", Model.ElementAt(i).SecStartNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "15", @style = "width:140px", @id = "secStartNumber", name = @Model.ElementAt(i).SubscriptionId })
+                                                    @Html.Hidden("TemplateRangeList[" + (@i + 10) + "].SecStartNumber", Model.ElementAt(i).SecStartNumber)
+                                                }
+
+                                            </td>
+
+                                            <td>
+                                                @if (Model.ElementAt(i).EndNumber == 0)
+                        {
+                                                    @Html.TextBox("TemplateRangeList[" + (@i + 10) + "].SecEndNumber", Model.ElementAt(i).SecEndNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "15", @style = "width:140px", @id = "secEndNumber", name = @Model.ElementAt(i).SubscriptionId, @disabled = "disabled" })
+                                                    @Html.Hidden("TemplateRangeList[" + (@i + 10) + "].SecEndNumber", Model.ElementAt(i).SecEndNumber)
+                                                }
+                                                else
+                                                {
+                                                    @Html.TextBox("TemplateRangeList[" + (@i + 10) + "].SecEndNumber", Model.ElementAt(i).SecEndNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "15", @style = "width:140px", @id = "secEndNumber", name = @Model.ElementAt(i).SubscriptionId })
+                                                    @Html.Hidden("TemplateRangeList[" + (@i + 10) + "].SecEndNumber", Model.ElementAt(i).SecEndNumber)
+                                                }
+
+                                            </td>
+
+                                            <td>
+                                                @if (Model.ElementAt(i).StartNumber > 0 && Model.ElementAt(i).EndNumber > 0)
+                        {
+                                                    @*@Html.ActionLink("Details", "TemplateRangeDetails", new { nSubscriptionId = @Model.ElementAt(i).SubscriptionId })*@
+                                                    <a class="blue P2" href="@Url.Action("TemplateRangeDetails", "SeFinance", new { nSubscriptionId = @Model.ElementAt(i).SubscriptionId })">
+                                                        <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                                                    </a>
+                                                }
+                                            </td>
+
+                                        </tr>
+
+                                    }
+
+
+                                </tbody>
+                            </table>
+
+                        </div>
+
+
+                }
+            }
+        </div>
+
+    </div>
+
+
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+</section>
+
+
+
+<script type="text/javascript">
+
+    var valid;
+
+    function getvalue() {
+        var StartNumber = 0;
+        var EndNumber = 0;
+        var SecondStartNumber = 0;
+        var SecondEndNumber = 0;
+        var isvalid = true;
+
+        $('#mytab1 tr').each(function (index) {
+            StartNumber = $(this).find('#startnumber').val();
+            EndNumber = $(this).find('#endnumber').val();
+
+            SecondStartNumber = $(this).find('#secStartNumber').val();
+            SecondEndNumber = $(this).find('#secendNumber').val();
+
+            if ((parseInt(StartNumber) > parseInt(EndNumber)) || (parseInt(SecondStartNumber) > parseInt(SecondEndNumber))) {
+                document.getElementById("Validation").innerHTML = "please enter less than  end number";
+                isvalid = false;
+                return isvalid;
+            }
+        })
+
+
+        return isvalid;
+    }
+    function submitForm() {
+        var validApplicationRange = getvalue();
+        if (validApplicationRange == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //function ValidateStartAndEndNumber(id) {
+    //    document.getElementById('Active').checked = true;
+    //    var n2start = $("#TemplateRangeList" + id + ".SecStartNumber").val();
+    //    var n2End = $("#TemplateRangeList" + id + ".SecEndNumber").val();
+
+    //    if (n2start == undefined || n2End == undefined) {
+    //        document.getElementById("Validation").innerHTML = "please set startnumber and endnumber";
+    //        return false;
+    //    }
+
+    //}
+
+</script>

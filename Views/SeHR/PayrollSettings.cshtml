@@ -1,0 +1,217 @@
+﻿@model AsteriskBrowserAL.Models.PayrollCategoryData
+@using AsteriskBrowserAL
+@{
+    ViewBag.Title = "PayrollSettings";
+    int Sno = 1;
+    @*<div class="hr hr-18 dotted hr-double"></div>*@
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Payroll Settings</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+    <section class="content">
+
+        @*<div class="hr hr-18 dotted hr-double"></div>*@
+        @using (Html.BeginForm("PayrollSettings", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+            <div class="row">
+                <div class="col-xs-12">
+
+                    <div class="table-header">
+                        Payroll Settings @*Records Found (@Model.Count())*@
+                        <div style="float:right;margin-right:10px;">
+                            <button type="submit" name="Save" class="btncustom P2">
+                                Save
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div style="overflow:auto;height:400px">
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+
+                    <thead>
+
+                        <tr>
+                            <th rowspan="2" style="vertical-align:middle">
+                                S.No.
+                            </th>
+                            <th rowspan="2" style="vertical-align:middle">
+                                @Html.DisplayName("Component")
+                            </th>
+                            <th colspan="2">
+                                @Html.DisplayName("Deduction/ Allowance")
+                            </th>
+                            <th colspan="2">
+                                @Html.DisplayName("Percentage/ Fixed")
+                            </th>
+                            <th rowspan="2" style="vertical-align:middle">
+                                @Html.DisplayName("Percentage")
+                            </th>
+                            <th rowspan="2" style="vertical-align:middle">
+                                @Html.DisplayName("Percentage On")
+                            </th>
+
+                            @*<th rowspan="2" style="vertical-align:middle">
+                                @Html.DisplayName("Fixed Amount")
+                            </th>
+                            <th rowspan="2" style="vertical-align:middle">
+                                @Html.DisplayName("Amount Limit")
+                            </th>*@
+                        </tr>
+                        <tr>
+                            <th style="font-size:14px;">Deduction</th>
+                            <th style="font-size:14px;">Allowance</th>
+                            <th style="font-size:14px;">Percentage</th>
+                            <th style="font-size:14px;">Fixed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.ListPayrollCategoryData.Count(); i++)
+                        {
+
+                            <tr>
+                                <td>
+                                    @Html.Hidden("ListPayrollCategoryData.Index", (@i + 10))
+                                    @(Sno++)
+                                </td>
+                                <td>
+                                    @Html.Label("ListPayrollCategoryData[" + (@i + 10) + "].CategoryName", Model.ListPayrollCategoryData.ElementAt(i).CategoryName)
+                                    @Html.Hidden("ListPayrollCategoryData[" + (@i + 10) + "].CategoryName", Model.ListPayrollCategoryData.ElementAt(i).CategoryName)
+                                    @Html.Hidden("ListPayrollCategoryData[" + (@i + 10) + "].ComponentId", Model.ListPayrollCategoryData.ElementAt(i).ComponentId)
+                                    @Html.Hidden("ListPayrollCategoryData[" + (@i + 10) + "].PayrollCategoryId", Model.ListPayrollCategoryData.ElementAt(i).PayrollCategoryId)
+                                </td>
+                                <td>
+                                    @Html.RadioButton("ListPayrollCategoryData[" + (@i + 10) + "].IsDeductable", true, Model.ListPayrollCategoryData.ElementAt(i).IsDeductable, new { @required = "required" })
+                                </td>
+                                <td>
+                                    @Html.RadioButton("ListPayrollCategoryData[" + (@i + 10) + "].IsDeductable", false, Model.ListPayrollCategoryData.ElementAt(i).IsAllowance)
+                                </td>
+
+
+                                @if (Model.ListPayrollCategoryData.ElementAt(i).PercentageOf != null)
+                                {
+                                    <td>
+                                        @Html.RadioButton("ListPayrollCategoryData[" + (@i + 10) + "].IsPercentage", true, Model.ListPayrollCategoryData.ElementAt(i).IsPercentage, new { @name = "IsPercentage", id = "IsPercentage" + i + "", @onclick = "DisableFixedAmountControls(" + i + ")", @required = "required" })
+                                    </td>
+                                    <td>
+                                        @Html.RadioButton("ListPayrollCategoryData[" + (@i + 10) + "].IsPercentage", false, Model.ListPayrollCategoryData.ElementAt(i).IsFixed, new { @id = "IsFixed" + i + "", @onclick = "DisableFixedPercentageControls(" + i + ")" })
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        @Html.RadioButton("ListPayrollCategoryData[" + (@i + 10) + "].IsPercentage", false, Model.ListPayrollCategoryData.ElementAt(i).IsPercentage, new { @name = "IsPercentage", id = "IsPercentage" + i + "", @onclick = "DisableFixedAmountControls(" + i + ")", @required = "required" })
+                                    </td>
+                                    <td>
+                                        @Html.RadioButton("ListPayrollCategoryData[" + (@i + 10) + "].IsPercentage", true, Model.ListPayrollCategoryData.ElementAt(i).IsFixed, new { @id = "IsFixed" + i + "", @onclick = "DisableFixedPercentageControls(" + i + ")" })
+                                    </td>
+                                }
+                                @if (Model.ListPayrollCategoryData.ElementAt(i).IsPercentage == true)
+                                {
+                                    <td>
+                                        @Html.TextBox("ListPayrollCategoryData[" + (@i + 10) + "].PercentageValue", Model.ListPayrollCategoryData.ElementAt(i).PercentageValue, new { @class = "form-control allownumericwithdecimal", @id = "PercentageValue" + i + "", @maxlength = "5", onkeyup = "this.value = minmax(this.value, 0, 100)", @required = "required", style = "width:100px;height:30px;" })
+                                    </td>
+                                    <td>
+                                        @{
+                                            byte? val = Model.ListPayrollCategoryData.ElementAt(i).PercentageOf;
+
+                                            @Html.DropDownList("ListPayrollCategoryData[" + (@i + 10) + "].PercentageOf", new SelectList(Model.ListPayrollCategoryComponents, "PayrollCategoryComponentsId", "CategoryName", val), "--- Select ---", new { @class = "form-control", @id = "PercentageOf" + i + "", @name = "PercentageOf" + i + "", @required = "required", style = "width:100px;height:30px;" })
+                                        }
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        @Html.TextBox("ListPayrollCategoryData[" + (@i + 10) + "].PercentageValue", Model.ListPayrollCategoryData.ElementAt(i).PercentageValue, new { @class = "form-control allownumericwithdecimal", @id = "PercentageValue" + i + "", @disabled = "true", @maxlength = "5", onkeyup = "this.value = minmax(this.value, 0, 100)", @required = "required", style = "width:100px;height:30px;" })
+                                    </td>
+                                    <td>
+                                        @{
+                                            byte? val = Model.ListPayrollCategoryData.ElementAt(i).PercentageOf;
+                                            @Html.DropDownList("ListPayrollCategoryData[" + (@i + 10) + "].PercentageOf", new SelectList(Model.ListPayrollCategoryComponents, "PayrollCategoryComponentsId", "CategoryName", val), "--- Select ---", new { @class = "form-control", @id = "PercentageOf" + i + "", @name = "PercentageOf" + i + "", @disabled = "true", @maxlength = "5", @required = "required", style = "width:100px;height:30px;" })
+                                        }
+                                    </td>
+                                }
+                                
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false})
+
+    </section>
+
+<script type="text/javascript">
+    function DisableFixedPercentageControls(value) {
+        debugger
+        // document.getElementById("FixedAmount" + value + "").disabled = false;
+        document.getElementById("PercentageOf" + value + "").disabled = true;
+        document.getElementById("PercentageValue" + value + "").disabled = true;
+
+        document.getElementById("PercentageOf" + value + "").value = '';
+        document.getElementById("PercentageValue" + value + "").value = null;
+    }
+
+    function DisableFixedAmountControls(value) {
+        debugger
+        document.getElementById("PercentageOf" + value + "").disabled = false;
+        document.getElementById("PercentageValue" + value + "").disabled = false;
+        //  document.getElementById("FixedAmount" + value + "").disabled = true;
+
+        //  document.getElementById("FixedAmount" + value + "").value = null;
+    }
+
+    $(".allownumericwithdecimal").on("keypress keyup", function (event) {
+        debugger
+        //this.value = this.value.replace(/[^0-9\.]/g,'');
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+
+
+    $(".allownumeric").on("keypress keyup", function (event) {
+        $(this).val($(this).val().replace(/[^\d].+/, ""));
+        if ((event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+
+    function minmax(value, min, max) {
+        debugger
+        if (parseFloat(value) < min || isNaN(value))
+            return 0;
+        else if (parseFloat(value) > max)
+            return 100;
+        else return value;
+    }
+
+
+
+    //var table = document.getElementById("mytab1");
+    //for (var i = 0, row; row = table.rows[i]; i++) {
+    //    //iterate through rows
+    //    //rows would be accessed using the "row" variable assigned in the for loop
+    //    for (var j = 0, col; col = row.cells[j]; j++) {
+    //        //iterate through columns
+    //        //columns would be accessed using the "col" variable assigned in the for loop
+    //    }
+    //}
+</script>
+

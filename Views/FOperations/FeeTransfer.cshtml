@@ -1,0 +1,457 @@
+﻿@model AsteriskBrowserAL.Models.FeePaymentsData
+@using AsteriskBrowserAL.Helpers
+
+@{
+    ViewBag.Title = "Fee Transfer";
+
+    bool bIsCentral = Utility.IsCentral();
+
+    List<FeeParticulars> lstParticulars = new List<FeeParticulars>() {
+          new FeeParticulars { ParticularName = "Old Due" },
+        new FeeParticulars { ParticularName = "Admission Fee" },
+          new FeeParticulars { ParticularName = "Tution Fee" },
+            new FeeParticulars { ParticularName = "Transport Fee" },
+    };
+
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            <a href="#">Finance</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Fee Transfer</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+
+<section>
+    <div class="row">
+        <div class="col-xs-12">
+
+            @if (TempData["Message"] != null)
+            {
+                <span id="Message" style="color:green">@TempData["Message"].ToString()</span>
+            }
+            else
+            {
+                <span id="Message"></span>
+            }
+
+            @using (Html.BeginForm("FeeTransfer", "FOperations", FormMethod.Post))
+            {
+
+                <span style="color:red;" id="FeePaymentsMsg"></span>
+
+                <input type="hidden" value="@bIsCentral" id="IsCentral" />
+
+
+
+                <div class="table-header">
+                    
+                        Fee Transfer
+                  
+                </div>
+
+
+                <div class="widget-box">
+                 
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            @if (bIsCentral)
+                            {
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                        <div class="col-sm-6">
+                                            <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="SubscriptionId" name="SubscriptionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                            }
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Class</label>
+                                    <div class="col-sm-6">
+                                        <select id="ClassNumber" name="ClassNumber" class="form-control"></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Student Name</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" id="StudentId" name="StudentId" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="dvRemarks" style="display:none;height:250Px" role="dialog">
+
+                                <span id="Validate" style="color:red;"></span>
+
+                                <div class="row">
+                                    @Html.Label("Enter Remarks")
+                                    @Html.TextAreaFor(model => model.Remarks, new { autocomplete = "off", @class = "form-control textlength", @id = "ActionDescription", placeholder = "Enter Remarks", @maxlength = 248, @height = "200Px" })
+                                    <br />
+                                    @Html.Label("Transfer Amount To")
+                                    @Html.DropDownList("ParticularName", new SelectList(lstParticulars, "ParticularName", "ParticularName"), "--- Select ---", new { @class = "form-control textlength", @id = "ParticularName", @height = "200Px" })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="FeePaymentsHistory"></div>
+            }
+        </div>
+    </div>
+</section>
+
+
+<script>
+
+    $(document).ready(function () {
+        debugger
+        var bIsCentral = $('#IsCentral').val();
+
+        if (bIsCentral == "value") {
+            LoadDivisions();
+        }
+        else {
+            LoadClasses();
+        }
+    })
+
+    function LoadDivisions() {
+        $.ajax({
+
+            url: '/Common/GetDivisions',
+            data: { IsAll: false },
+            success: function (data) {
+                var DivisionItems = $('#DivisionId');
+
+                DivisionItems.children().remove();
+
+                $.each(data, function (e, record) {
+                    DivisionItems.append($('<option>').val(record.DivisionId).text(record.DivisionName));
+                });
+
+                $('#DivisionId').append(DivisionItems);
+            }
+        })
+    }
+
+    $('#DivisionId').change(function () {
+        $('#SubscriptionId').children().remove();
+        $('#ClassNumber').children().remove();
+        $('#StudentId').html("");
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId > 0) {
+            LoadBranches();
+
+        }
+
+    })
+
+    $('#ClassNumber').change(function () {
+        $('#StudentId').val('');
+        $('#StudentId').text('');
+        $('#FeePaymentsHistory').html("");
+    });
+
+    function LoadBranches() {
+        $.ajax({
+
+            url: '/Common/GetBranchesByDivision',
+            data: { DivisionId: $('#DivisionId').val(), IsAll: false },
+            success: function (data) {
+
+                var BranchItems = $('#SubscriptionId');
+
+                BranchItems.children().remove();
+
+                $.each(data, function (e, record) {
+                    BranchItems.append($('<option>').val(record.SubscriptionId).text(record.Institute));
+                });
+
+                $('#SubscriptionId').append(BranchItems);
+            }
+        })
+    }
+
+    $('#SubscriptionId').change(function () {
+        LoadClasses();
+    })
+
+    function LoadClasses() {
+        $.ajax({
+
+            url: '/Common/GetAllClasses',
+            data: { IsAll: false },
+            success: function (data) {
+                var ClassNumberItems = $('#ClassNumber');
+
+                ClassNumberItems.children().remove();
+
+                ClassNumberItems.append($('<option>').val("-1").text("--- Select ---"));
+                ClassNumberItems.append($('<option>').val("0").text("All"));
+                $.each(data, function (e, record) {
+                    ClassNumberItems.append($('<option>').val(record.ClassNumber).text(record.ClassNumberDisplay));
+                });
+
+                $('#ClassNumber').append(ClassNumberItems);
+            }
+        })
+    }
+
+    $("#StudentId").autocomplete(
+    {
+
+
+
+        source: function (request, response) {
+
+            debugger
+
+            $('#Message').html("");
+
+            $('#FeePaymentsHistory').html("");
+
+            var value = $('#IsCentral').val();
+
+            if ($('#IsCentral').val() == "value" && ($('#DivisionId').val() < 1 || $('#SubscriptionId').val() < 1)) {
+                return;
+            }
+
+            if (request.term.length < 3 || $('#ClassNumber').val() < 0) {
+                return;
+            }
+
+
+            $('#imagemodal').show();
+            var ClassNumber = document.getElementById("ClassNumber").value;
+
+            $.ajax({
+                url: "/FOperations/GetStudentName",
+                data: { SubscriptionId: $('#SubscriptionId').val(), nClassNumber: ClassNumber, strVal: request.term },
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.FirstName,
+                            value: data.FirstName,
+                            id: data.StudentId,
+                        };
+                    }));
+
+                    $('#imagemodal').hide();
+                }
+            });
+        },
+        minLength: 3,
+        select: function SelectEvent(event, ui) {
+
+            $('#imagemodel').show();
+
+            GetFeePaymentsHistory(ui.item.id);
+        }
+    });
+
+
+    $("#StudentId").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            $('#StudentId').val('');
+            $('#FeePaymentsHistory').html("");
+        };
+    });
+
+    function GetFeePaymentsHistory(id) {
+        $('#imagemodal').show();
+        $.ajax
+           ({
+               error: function (jqXHR, textStatus, errorThrown) {
+                   alert(errorThrown);
+                   $('#imagemodal').hide();
+               },
+
+               url: '/FOperations/GetAllFeepaymentsByStudentId/',
+               data: { SubscriptionId: $('#SubscriptionId').val(), StudentId: id },
+               beforeSend: function () {
+                   $('#imagemodal').show();
+               },
+               success: function (data) {
+                   $('#FeePaymentsHistory').html(data);
+                   $('#imagemodal').hide();
+               }
+           }).done(function () {
+               $('#imagemodal').hide();
+           });
+    }
+
+    function ValidateFeeTransfer(SubscriptionId, StudentId, DebitAmount, Particular) {
+        var valide = true;
+
+        $.ajax({
+            url: '/FOperations/ValidateFeeTransfer/',
+            data: { SubscriptionId: SubscriptionId, StudentId: StudentId, DebitAmount: DebitAmount, ParticularName: Particular },
+            success: function (data) {
+                if (data == true) {
+                    valide = true;
+
+                }
+                else
+                    valide = false;
+            },
+            async: false,
+        })
+
+        return valide;
+    }
+
+    function TransferClick(FeePaymentId, SubscriptionId, StudentId, SNo) {
+        debugger
+        document.getElementById('FeePaymentsMsg').innerHTML = "";
+
+        var TransferAmount = 0;
+        var dDebitAmount = 0;
+
+        var table = document.getElementById('mytable');
+
+        for (var r = 1, n = table.rows.length; r < n; r++) {
+            debugger
+            var sno = table.rows[r].cells[0].innerHTML;
+            if (sno == SNo) {
+                TransferAmount = $(table.rows[r].cells[5]).find('input').val();
+                dDebitAmount = table.rows[r].cells[4].innerHTML;
+                break;
+            }
+        }
+
+        if (parseInt(TransferAmount) < 1) {
+            document.getElementById('FeePaymentsMsg').innerHTML = "Please enter transfer amount.";
+            return false;
+        }
+        else {
+            if (parseInt(TransferAmount) > parseInt(dDebitAmount)) {
+                document.getElementById('FeePaymentsMsg').innerHTML = "Transfer amount exceeds debit amount";
+                return false;
+            }
+        }
+
+
+        if (FeePaymentId < 1)
+            return;
+
+        var $dialog = $('#dvRemarks')
+
+             .dialog({
+                 resizable: false,
+                 draggable: false,
+                 width: '450',
+                 modal: true,
+                 title: 'Fee Transfer Request',
+                 open: function (event, ui) {
+                     $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                 },
+                 title_html: true,
+                 buttons: [
+                     {
+                         html: "OK",
+                         "class": "btn btn-success btn-minier",
+                         click: function () {
+
+                             debugger
+
+                             var Description = $('#ActionDescription').val();
+                             var ToParticularName = $('#ParticularName').val();
+
+                             if (Description == "") {
+                                 $('#Validate').html("Please enter Remarks");
+                                 return;
+                             }
+                             else if (ToParticularName == null || ToParticularName == "") {
+                                 $('#Validate').html("Please select Transfer To Particular");
+                                 return;
+                             }
+                             else {
+
+                                 var res = ValidateFeeTransfer(SubscriptionId, StudentId, TransferAmount, ToParticularName);
+
+                                 if (res == true) {
+                                     document.getElementById('Validate').innerHTML = "Transfer amount exceeds particuar due amount";
+                                     return;
+                                 }
+
+                                 $(this).dialog("close");
+                                 var VrMessage = SaveStatus(FeePaymentId, SubscriptionId, Description, TransferAmount, ToParticularName);
+                                 $('#Validation').val(VrMessage);
+                             }
+                         }
+                     },
+                     {
+                         html: "Cancel",
+                         "class": "btn btn-danger btn-minier",
+                         click: function () {
+                             $(this).dialog("close");
+                         }
+                     }
+                 ]
+             });
+
+        return false;
+    }
+
+    function SaveStatus(FeePaymentId, SubscriptionId, Description, TransferAmount, ToParticularName) {
+        debugger
+        $('#imagemodal').show();
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+            },
+
+            url: '/FOperations/SaveFeeTransferRequest/',
+            data: { FeePaymentId: FeePaymentId, SubscriptionId: SubscriptionId, Description: Description, TransferAmount: TransferAmount, ToParticularName: ToParticularName },
+            success: function (data) {
+                window.location.href = "/FOperations/FeeTransfer?Status=" + true;
+            },
+            aync: false
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+</script>

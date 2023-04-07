@@ -1,0 +1,509 @@
+﻿@model AsteriskBrowserAL.Models.EventsData
+
+@{
+    ViewBag.Title = "Create New Event";
+    List<SelectListItem> Priority = new List<SelectListItem>()
+    {
+        new SelectListItem(){ Text = "Normal" , Value="Normal" },
+        new SelectListItem(){ Text = "High" , Value= "High" },
+        new SelectListItem(){ Text ="Low" , Value = "Low" }
+
+    };
+
+    List<SelectListItem> ItemsSeclection = new List<SelectListItem> {
+        new SelectListItem() {Text = "Send to Class", Value = "1"},
+        new SelectListItem(){Text = "Send to  Staff Departments",Value = "2"}
+        };
+}
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+@Html.Action("DatePickerScripts", "Base")
+
+<link rel="stylesheet" type="text/css" href="editor_style.css">
+<script src="//cdn.ckeditor.com/4.5.5/standard/ckeditor.js"></script>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Calendar
+        </li>
+        <li class="active">Notices</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+@Html.Action("DatePickerScripts", "Base")
+
+<link rel="stylesheet" type="text/css" href="editor_style.css">
+<script src="//cdn.ckeditor.com/4.5.5/standard/ckeditor.js"></script>
+<section class="content">
+ <div class="row">
+        <div class="col-xs-12">
+            <span style="color:red;" id="Validation"></span>
+            <div class="table-header">
+          
+                    Notices/circular
+                    <small style="float:right;font-weight:bold;" class="textheader">
+                        @Html.ActionLink("Back to details", "Notice")
+                    </small>
+            
+            </div>
+            @using (Html.BeginForm("NoticeC", "ACalendar", FormMethod.Post))
+            {
+			
+
+                <div class="widget-box row overflowscroll" style="padding:10px;height:450px;overflow-x:hidden;">
+
+                    <form class="form-horizontal" role="form">
+                        <div class="row">
+                         
+
+
+                            <div class="col-sm-6">
+
+                                <div class="col-sm-4">
+                                    <label>Select Recipient </label>
+                                </div>
+                                <div class="col-sm-7">
+                                    @Html.DropDownList("ReceiptGroupId", new SelectList(ItemsSeclection, "Value", "Text"), "--Select--", new { @class = "form-control", name = "ItemId", id = "ItemId", required = "required" })
+                                    <div class="" style="display:none;" id="EItemId">
+                                        <label style="color:red;font-weight:bold;"> Required </label>
+                                    </div>
+                                
+                                </div>
+                               
+                            </div>
+
+
+
+                            
+                        </div>
+
+                        @*<div class="row" id="wingDisplya" style="display:none">
+                <div class="col-sm-12">
+                    <label class="col-sm-2 control-label no-padding-right" for="form-field-1">@Html.Label("Wing")</label>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("ClassNumber", null, "--Select--", new { @class = "form-control", id = "ClassNumber" })
+                    </div>
+                    <span class="col-sm-3" id="VDiscription" style="color:red;font-weight:bold;display:none">
+                        *Required
+                    </span>
+                </div>
+            </div>*@
+
+                        <div class="row">
+                           
+                            <div class="col-sm-6">
+
+                                <div class="col-sm-4">
+                                    <label>Notice Name</label>
+                                </div>
+                                <div class="col-sm-7" style="padding-left:15px;">
+                                    @Html.TextBoxFor(model => model.Notices, new { @class = "form-control col-sm-2", @id = "NoticeName", placeholder = "NoticeName", @required = "required" })
+                                    <div class="" style="display:none;" id="EEventName">
+                                        <label style="color:red;font-weight:bold;"> Required </label>
+                                    </div>
+
+                                </div>
+
+                            </div>                
+                                <div class="col-sm-6">
+                                    <div id="Receipents" class="col-sm-12">
+                                        <div class="col-sm-7">
+                                            <select name="ReceipentsList" id="ReceipentsList" multiple="multiple" class="form-control select2"></select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <label> <input class="checkbox" type="checkbox" id="checkbox"> All</label>
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="EReceipentsList">
+                                            <label style="color:red;font-weight:bold;"> Required </label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            
+                            
+                            
+                        </div>
+                        <hr style="margin:10px"/>
+<div class="row">
+
+
+    <div class="col-sm-6">
+        <div class="col-sm-4">
+            <label>Start Date</label>
+        </div>
+        <div class="col-sm-6">
+            <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                <input class="form-control" type="text" id="StartDate" name="StartDate" autocomplete="off" placeholder="Select Date" />
+                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+            </div>
+            <div class="" style="display:none;" id="EStartDate">
+                <label style="color:red;font-weight:bold;"> Required </label>
+            </div>
+        </div>
+     
+    </div>
+
+
+
+    <div class="col-sm-6">
+        <div class="col-sm-4">
+            <label>End Date</label>
+        </div>
+        <div class="col-sm-6">
+
+            <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+
+                <input class="form-control" type="text" id="EndDate" name="EndDate" autocomplete="off" placeholder="Select Date" />
+                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+            </div>
+            <div class="" style="display:none;" id="EEndDate">
+                <label style="color:red;font-weight:bold;"> Required </label>
+            </div>
+            <div class="" style="display:none;" id="CompareDate">
+                <label style="color:red;font-weight:bold;"> End date Must greater than Start date </label>
+            </div>
+        </div>
+      
+    </div>
+</div>
+
+                        <hr style="margin:10px" />
+                        <div class="row">
+                            <div class="col-sm-12">
+                               <div class="col-sm-2">
+                                   <label class="col-sm-12 control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+                                 
+                                   <span class="col-sm-12" id="VDiscription" style="color:red;font-weight:bold;display:none">
+                                       *Required
+                                   </span>
+                                   <label class="col-sm-2 control-label no-padding-right" for="form-field-1"></label>
+                               </div>
+
+                       
+                                <div class="col-sm-12">
+                                    <textarea name="Discription" id="Discription" ></textarea>
+                                </div>
+                            </div>
+                          
+                        </div>
+
+                        <script type="text/javascript">
+                            CKEDITOR.replace('Discription');
+                        </script>
+                        @*<div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Upload")</label>
+                    <div class="form-group">
+                        <a href="javascript:void(0)" id="upload" class="btn-sm btn btn-info">
+                            <i class="fa fa-cloud-upload fa-fw"></i>Upload
+                        </a>
+                        <input id="UploadFile" type="file" name="UploadFile" style="display:none" onchange="readURL(this);"/>
+                        <input id="filename" style="display:none" type="text" readonly="readonly" />
+                    </div>
+                    <span class="col-sm-3" id="VUploadFile" style="color:red;font-weight:bold;display:none">
+                        *Required
+                    </span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"></label>
+                    <div class="col-sm-9">
+                        <span>
+                            <img width="100" height="100" id="DisplayImage" />
+                        </span>
+                    </div>
+                </div>
+            </div>*@
+
+                  
+
+                        <div class=" col-md-9">
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" id="Save" name="Save" onclick="return OnSubmit();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+    //function readURL(input) {
+    //    debugger
+    //    if (input.files && input.files[0]) {
+    //        var reader = new FileReader();
+
+    //        reader.onload = function (e) {
+    //            $('#DisplayImage')
+    //                .attr('src', e.target.result)
+    //        };
+    //        reader.readAsDataURL(input.files[0]);
+    //    }
+    //}
+
+    //$("#upload").click(function () {
+    //    $("#UploadFile").trigger('click');
+    //});
+
+    //$("#UploadFile").change(function () {
+    //    debugger
+    //    var filename = $("#UploadFile").val();
+    //    var lastIndex = filename.lastIndexOf("\\");
+    //    if (lastIndex >= 0) {
+    //        filename = filename.substring(lastIndex + 1);
+    //    }
+    //});
+
+    //function FtpUpload() {
+    //    debugger
+    //    var result = true;
+    //    var dpimg = $('#UploadFile').val();
+    //    var fileUpload2 = $("#UploadFile").get(0);
+    //    var files2 = fileUpload2.files;
+    //    var fileData = new FormData();
+    //    for (var i = 0; i < files2.length; i++) {
+    //        fileData.append('Notice_' + files2[i].name, files2[i]);
+    //    }
+    //    $.ajax({
+    //        url: '/ACalendar/UploadFilesMultiple',
+    //        type: "POST",
+    //        contentType: false,
+    //        processData: false,
+    //        data: fileData,
+    //        success: function (result) {
+    //        }
+    //    });
+    //}
+</script>
+<script>
+    $(".select2").select2();
+    $('#ItemId').change(function () {
+        debugger
+        $('#ReceipentsList').html("");
+        $('#ReceipentsList').val("");
+        $('checkbox').html("");
+        $('checkbox').is(':unchecked');
+        $(".select2").select2("val", "");
+        $('#ReceipentsList').children().remove();
+
+       // var itemId = $(this).val();
+
+        //if (itemId == 1 || itemId == 0) {
+        //    $('#wingDisplya').show();
+        //}
+        //if (itemId == 2) {
+        //    $('#wingDisplya').hide();
+        //}
+        GetReceipents();
+    });
+
+    //$('#ItemId').change(function () {
+    //    $('#WingId').val("");
+    //})
+    //$('#WingId').change(function () {
+    //    debugger
+    //    $('#ReceipentsList').html("");
+    //    $('#ReceipentsList').val("");
+    //    $('.checkbox').attr('checked', false);
+    //    $(".select2").select2("val", "");
+    //    $('#ReceipentsList').children().remove();
+    //})
+
+    function GetReceipents() {
+        var itemId = $("#ItemId").val();
+        if (itemId != 1) {
+            debugger
+            var divisionId = 0;
+            var branchId = 0;
+
+            var IsCentral = $('#IsCentral').val();
+
+            if (IsCentral == "Value") {
+                divisionId = $('#DivisionId').val();
+            }
+
+            branchId = $('#BranchId').val();
+            $('#imagemodal').show();
+
+            $.ajax({
+
+                url: '/CSMSMail/GetReceipentsList',
+                data: { GroupId: itemId, DivisionId: divisionId, BranchId: branchId },
+                success: function (data) {
+
+                    var ReceipentsListItems = $('#ReceipentsList');
+
+                    ReceipentsListItems.children().remove();
+
+                    $.each(data, function (i, record) {
+                        ReceipentsListItems.append($("<option>").val(record.Value).text(record.Text));
+                    });
+
+                    $("#ReceipentsList").append(ReceipentsListItems);
+                    $('#imagemodal').hide();
+
+                }
+            })
+        }
+        else {
+			GetClassNumbers()
+        }
+    }s
+
+	function GetClassNumbers() {		
+			$.ajax({
+				url: '/ACalendar/GetWingClass',
+				data: { nWingId: 0 },
+				success: function (data) {
+					var ReceipentsListItems = $('#ReceipentsList');
+
+					ReceipentsListItems.children().remove();
+
+					$.each(data, function (i, record) {
+						ReceipentsListItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+					});
+
+					$("#ReceipentsList").append(ReceipentsListItems);
+				}
+			})		
+	}
+
+    $("#checkbox").click(function () {
+        if ($("#checkbox").is(':checked')) {
+            $("#ReceipentsList > option").prop("selected", "selected");
+            $("#ReceipentsList").trigger("change");
+        } else {
+            $("#ReceipentsList > option").removeAttr("selected");
+            $("#ReceipentsList").trigger("change");
+        }
+    });
+</script>
+
+<script>
+
+    $('#Save').click(function () {
+        debugger
+        var result = validationM();
+        debugger
+        if (result == false) {
+            return false;
+        }
+        else {
+            FtpUpload()
+        }
+
+    })
+
+    function validationM() {
+        debugger
+        var validation = true;
+        var ReceiptGroupId = $('#ItemId').val()
+        var NoticeName = $('#NoticeName').val()
+        var ReceipentsList = $('#ReceipentsList').val()
+        var EndDate = $('#EndDate').val()
+        var date = $('#StartDate').val()
+        var Discription = CKEDITOR.instances.Discription.getData();
+        // var UploadFile = $('#UploadFile').val()
+        var ReceipentsList = $('#ReceipentsList').val()
+
+
+        if (ReceipentsList == "" || ReceipentsList == null) {
+            $('#EReceipentsList').show()
+            validation = false;
+        }
+        if (ReceiptGroupId == "" || ReceiptGroupId == null) {
+            $('#EItemId').show()
+            validation = false;
+        }
+        if (NoticeName == "" || NoticeName == null) {
+            $('#EEventName').show()
+            validation = false;
+        }
+        if (date == "" || date == null) {
+            $('#EStartDate').show()
+            validation = false;
+        }
+		if (EndDate == "" || EndDate == null) {
+			$('#EEndDate').show()
+			validation = false;
+		}
+		else {
+			if (new Date(date)> new Date(EndDate)) {
+				$('#CompareDate').show()
+				validation=false
+			}
+		}
+        if (Discription == "" || Discription == null) {
+            $('#VDiscription').show()
+            validation = false;
+        }
+        if (ReceipentsList == "" || ReceipentsList == null) {
+            $('#EReceipentsList').show()
+            validation = false;
+        }
+        //if (UploadFile == "" || UploadFile == null) {
+        //    $('#VUploadFile').show()
+        //    validation = false;
+        //}
+        return validation;
+    }
+
+    $('#ReceiptGroupId').focus(function () {
+        $('#EItemId').hide()
+    })
+    $('#NoticeName').focus(function () {
+        $('#EEventName').hide()
+    })
+    $('#StartDate').focus(function () {
+        $('#EStartDate').hide()
+    })
+    $('#EndDate').focus(function () {
+        $('#EEndDate').hide()
+    })
+    $('#Discription').focus(function () {
+        $('#VDiscription').hide()
+    })
+    $('#ReceipentsList').click(function () {
+        $('#EReceipentsList').hide()
+    })
+    //$('#UploadFile').focus(function () {
+    //    $('#VUploadFile').hide()
+    //})
+
+</script>
+

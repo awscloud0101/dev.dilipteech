@@ -1,0 +1,255 @@
+﻿
+@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+
+    ViewBag.Title = "Marks Entry";
+
+}
+
+@*@Html.Action("FreezeHeader", "Base", new { IsPaging = false, AllowScroll = true }*@
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Marks Entry</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("MarksEntry", "AExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                if (null != TempData["MarksEntry"])
+                {
+                    <input type="hidden" id="Status" value="@TempData["MarksEntry"]" />
+                }
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Marks Entry</span>
+
+
+                </div>
+                <div class="widget-box">
+               
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                        <div class="col-sm-6">
+                                            <select id="Sectionid" name="Sectionid" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Examination</label>
+                                        <div class="col-sm-6">
+                                            <select id="ExaminationId" name="ExamId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ExaminationResults"></div>
+                if (null != Model)
+                {
+
+                    @*<input type="hidden" name="selBranchId" value="@Model.BranchId" />
+                        <input type="hidden" name="selDivisionId" value="@Model.DivisionId" />*@
+                    <input type="hidden" id="selClassNumber" name="selClassNumber" value="@Model.SectionId" />
+                    <input type="hidden" id="selExamId" name="selExamId" value="@Model.ExaminationId" />
+                }
+            }
+        </div>
+    </div>
+    <div id="ValidationMsg" title="Kitting" style="display:none"></div>
+
+</section>
+
+
+<script>
+
+    function OnloadData() {
+
+        var Status = $('#Status').val();
+
+        if (Status != undefined) {
+            dialog(Status);
+        }
+
+        LoadClassDropdown();
+    }
+
+    function LoadClassDropdown() {
+        debugger
+        var SelClassId = $("#selClassNumber").val();
+        $.ajax({
+            url: '/AExamination/GetSectionDropDown',
+            success: function (result) {
+                debugger
+                var ClassNumberItems = $("#Sectionid")
+                ClassNumberItems.children().remove();
+                ClassNumberItems.append($("<option>").val("null").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    ClassNumberItems.append($("<option>").val(record.SectionId).text(record.SectionCode))
+                });
+
+                $("#Sectionid").append(ClassNumberItems);
+                var SelClassNumber = $("#selClassNumber").val();
+                if (SelClassNumber > 0 && SelClassNumber != "") {
+                    document.getElementById("Sectionid").value = SelClassNumber;
+                    GetExaminations();
+               }
+            },
+            async: false
+        })
+    }
+
+    $('#Sectionid').change(function () {
+        $('#ExaminationId').empty();
+
+        var Sectionid = $('#Sectionid').val();
+
+        if (Sectionid < 1) {
+            $('#ExaminationResults').html("");
+        }
+        else {
+            GetExaminations();
+            $('#ExaminationResults').html("");
+        }
+    });
+
+    function GetExaminations() {
+        var Sectionid = $('#Sectionid').val();
+
+        if (Sectionid > 0) {
+            $.ajax({
+
+                url: '/AExamination/GetExaminationsByClassNumber',
+                data: { Sectionid: Sectionid },
+                success: function (data) {
+
+                    var ExaminationItems = $('#ExaminationId');
+
+                    ExaminationItems.children().remove();
+
+                    ExaminationItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        ExaminationItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+
+                    });
+
+                    $('#ExaminationId').append(ExaminationItems);
+
+                    var ExaminationItems = $('#selExamId').val();
+                    if (ExaminationItems > 0 && ExaminationItems != "") {
+                        document.getElementById("ExaminationId").value = ExaminationItems;
+                        GetStudentsExaminationsData();
+                    }
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    $('#ExaminationId').change(function () {
+        GetStudentsExaminationsData()
+    });
+
+    function GetStudentsExaminationsData() {
+
+        var ExamId = $("#ExaminationId").val();
+        var SectionId = $("#Sectionid").val();
+
+        $('#ExaminationResults').html("");
+
+        if (parseInt(ExamId) < 1 || parseInt(SectionId) < 1)
+            return;
+
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AExamination/GetStudentsExaminationsByClass',
+            data: { SectionId: SectionId, Examid: ExamId },
+            success: function (Data) {
+                $('#ExaminationResults').html(Data);
+                $('#imagemodal').hide();
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    window.onload = OnloadData();
+
+
+    function submitform() {
+        
+        var valid = true;
+        document.getElementById("Valid").innerHTML = "";
+
+        $('#myTab tbody tr').each(function () {
+            debugger
+
+            var allCells = $(this).find('td');
+
+            if (allCells.length != 0) {
+
+                allCells.each(function (index , td) {
+                    debugger
+
+                    if (index > 3) {
+                        var Scored = $(td).find(".Scored").val();
+
+                        var MaxMarks = $(td).find('.MaxMarks').val();
+
+                        if (parseFloat(Scored) > parseFloat(MaxMarks)) {
+                            var DisplayName = $(td).find('.DisplayName').val();
+                            var Paper = $(td).find('.Paper').val();
+
+                            document.getElementById("Valid").innerHTML = "Scored marks are greater than max marks for " + DisplayName + " (" + Paper + ")";
+                            valid = false;
+                            return valid;
+                        }
+
+                    }
+
+                    if (valid == false)
+                        return valid;
+                });
+
+            }
+
+            if (valid == false)
+                return valid;
+
+        });
+
+        return valid;
+    };
+
+
+
+</script>

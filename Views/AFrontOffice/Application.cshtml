@@ -1,0 +1,126 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionData
+@{
+
+}
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Front Office
+        </li>
+        <li class="active">Registration Fill Up</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
+<style type="text/css">
+    .ui-autocomplete {
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<section class="content">
+    @using (Html.BeginForm("Application", "AFrontOffice", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        if (null != TempData["EMessage"])
+        {
+            <span style="color:red;font-weight:bold;" id="tempMSg">@TempData["EMessage"]</span>
+        }
+
+        if (null != TempData["Message"])
+        {
+            <span style="color:green;font-weight:bold;" id="tempMSg">@TempData["Message"]</span>
+
+        }
+
+
+        <div id="ApplicationFillup">
+            @{Html.RenderPartial("ApplicationFillUp", Model);}
+
+        </div>
+        <div id="ApplicationFee"></div>
+    }
+
+
+</section>
+
+<div id="mydiv" style="display:none;"></div>
+<script type="text/javascript">
+
+
+
+
+    function LoadApplicationFeepayments(objStudent) {
+        $('#ApplicationFillup').hide();
+
+        $.ajax({
+            url: '/AFrontOffice/ApplicationFeePayment',
+            success: function (data) {
+                $('#ApplicationFee').html(data);
+                document.getElementById("AFStudentName").innerHTML = objStudent.FirstName;
+                document.getElementById("AFClass").innerHTML = objStudent.Class;
+                document.getElementById("AFStudentId").innerHTML = objStudent.StudentId;
+                document.getElementById("AFParticularName").innerHTML = "Registration Fee";
+                document.getElementById("AFAmount").innerHTML = objStudent.Amount;
+
+            },
+            async: false,
+        })
+    }
+
+
+    //var studentId = $('#StudentId').val();
+    //function PrintFeePayments() {
+    //    //studentId = 663;
+    //    document.body.style.cursor = 'wait';
+    //    $.ajax({
+    //        url: '/AFrontOffice/PrintApplicationFeePayment',
+    //        data: { n_StudentId: studentId },
+    //        success: function (data) {
+    //            $('#mydiv').html(data);
+    //            PrintElem();
+    //        },
+    //        error: function () {
+    //            document.body.style.cursor = 'default';
+
+    //        }
+    //    }).done(function () {
+    //        document.body.style.cursor = 'default';
+
+    //    });
+
+
+    //    function PrintElem() {
+    //        Popup($('#mydiv').html());
+    //    }
+
+    //    function Popup(data) {
+    //        var mywindow = window.open('', 'my div', 'height=300,width=600');
+    //        mywindow.document.write('<p></p>');
+    //        mywindow.document.write(data);
+    //        mywindow.document.write('<p></p>');
+
+    //        mywindow.document.close();
+    //        mywindow.focus();
+
+    //        mywindow.print();
+    //        mywindow.close();
+    //        return true;
+    //    }
+    //};
+</script>
+

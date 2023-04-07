@@ -1,0 +1,129 @@
+﻿@model List<AsteriskBrowserAL.Models.KittingViewModel>
+
+@{
+    ViewBag.Title = "Obsolete Stock";
+    int nSno = 1;
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Kits Entry</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<br />
+<section class="content">
+    @using (Html.BeginForm("KitsEntry", "SOperations", FormMethod.Post))
+    {
+
+        if (null != Model)
+        {
+            if (null != TempData["Status"])
+            {
+                <span style="color:forestgreen">@Html.Raw(TempData["Status"])</span>
+            }
+            <span style="color:red;font-weight:bold;" id="Validation"></span>
+
+            <div class="row">
+                <div class="col-xs-12">
+
+                    <div class="table-header">
+                        Kits Entry
+                        <div style="float:right;">
+                            <button type="submit" name="Save" onclick="return SubmitForm()" class="btn btn-info btn-xs P2">
+                                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="overflow:auto;height:400px">
+
+                        <table id="mytab1" class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+                                <tr>
+                                    <th>@("S.No")</th>
+                                    <th>
+                                        @Html.DisplayName("Kit Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Entered Kits")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Number Of Kits")
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Count(); i++)
+                                {
+                                    <tr>
+                                        @Html.Hidden("lstKits.Index", (@i))
+                                        @Html.Hidden("lstKits[" + @i + "].InventoryKitId", Model.ElementAt(i).InventoryKitId)
+                                        @Html.Hidden("lstKits[" + @i + "].KitName", Model.ElementAt(i).KitName)
+                                        <td>
+                                            @(nSno++)
+                                        </td>
+                                        <td>
+                                            @Model.ElementAt(i).KitName
+                                        </td>
+                                        <td>
+                                            @Model.ElementAt(i).Quantity
+                                        </td>
+                                        <td>
+                                            @Html.TextBox("lstKits[" + @i + "].NumberOfKits", Model.ElementAt(i).NumberOfKits, new { @class = "form-control textlength txtboxNum", @maxlength = "7", @style = "width:180px" })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        }
+        else
+        {<span style="color: red;"><b>Data not available</b></span> }
+
+    }
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+</section>
+
+<script>
+    function SubmitForm() {
+        var valid = true;
+        var Quantity = 0;
+
+        // Get table object
+        var myTable = document.getElementById("mytab1");
+
+        // loop for each row
+        for (var r = 1, n = myTable.rows.length; r < n; r++) {
+            var dValue = myTable.rows[r].cells[3].children[0].value;
+            Quantity += dValue;
+        }
+
+        if (Quantity == 0) {
+            valid = false;
+            document.getElementById('Validation').innerHTML = "Please enter number of kits to save";
+        }
+
+        return valid;
+    }
+
+
+</script>
+
+
+
+

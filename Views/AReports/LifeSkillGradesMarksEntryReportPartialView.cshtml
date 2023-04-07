@@ -1,0 +1,408 @@
+﻿
+@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    int[] nStudentAry;
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> lstLifeskillGrades = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+    if (null != Model && Model.lstExamResults.Count() > 0)
+    {
+        var data = Model.lstExamResults.FirstOrDefault();
+
+        if (null != data)
+        {
+            lstLifeskillGrades = data.lstExamLifeSkillsGrades.ToList();
+        }
+    }
+
+    string UserRole = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+
+    List<IGrouping<int, AsteriskBrowserAL.Models.ExaminationResultsData>> GroupedDataBySubId = new List<IGrouping<int, AsteriskBrowserAL.Models.ExaminationResultsData>>();
+
+    if (null != Model && null != Model.lstMarksEntryStatus && Model.lstMarksEntryStatus.Count() > 0)
+    {
+        GroupedDataBySubId = Model.lstMarksEntryStatus.GroupBy(p => p.BranchId).ToList();
+    }
+
+    AsteriskGMSEntities _dbCentral = new AsteriskGMSEntities(AsteriskBrowserAL.Helpers.Utility.GetCentralDatabase());
+
+    int nSubjectId = 0;
+    int nEntryCount = 0;
+    int nNonEntryCount = 0;
+    int nAbsentCount = 0;
+
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> lstStudentsWithMarks = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+
+
+}
+
+
+@if (lstLifeskillGrades.Count() > 0)
+{
+    if (null != Model && null != Model.lstExamResults && Model.lstExamResults.Count() > 0)
+    {
+        int nsno = 1;
+     
+
+        <div class="table-header">
+
+            Records Found (@Model.lstExamResults.Count)
+
+            <div style="float:right;margin-right:10px;">
+
+                <button class="btncustom" id="btnExport">
+          Download
+
+                </button>
+
+
+            </div>
+        </div>
+
+        <table id="tab1" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    @if (Model.IsCentral)
+                    {
+                        <th>
+                            @Html.DisplayName("Branch Name")
+                        </th>
+                    }
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Roll Number")
+                    </th>
+                    @if (bIsCoastal)
+                    {
+                        <th>
+                            @Html.DisplayName("Registration Number")
+                        </th>
+                    }
+                    <th>
+                        @Html.DisplayName("Legacy Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Class Name")
+                    </th>
+
+                    @if (null != lstLifeskillGrades)
+                    {
+                        foreach (var type in lstLifeskillGrades)
+                        {
+                            <th>
+                                @type.PaperName
+                            </th>
+                        }
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.lstExamResults.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        @if (Model.IsCentral)
+                        {
+                            <td>
+                                @Model.lstExamResults.ElementAt(i).BranchName
+                            </td>
+                        }
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).DisplayName
+                        </td>
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).RollNumber
+                        </td>
+                        @if (bIsCoastal)
+                        {
+                            <td>
+                                @Model.lstExamResults.ElementAt(i).OMRNumber
+                            </td>
+                        }
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).LegacyNumber
+                        </td>
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).ClassNumberName
+                        </td>
+
+                        @if (Model.lstExamResults.ElementAt(i).lstExamLifeSkillsGrades.Count() > 0)
+                        {
+                            for (int j = 0; j < Model.lstExamResults.ElementAt(i).lstExamLifeSkillsGrades.Count(); j++)
+                            {
+                                <td>@Model.lstExamResults.ElementAt(i).lstExamLifeSkillsGrades.ElementAt(j).DisplayGrade</td>
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        if (GroupedDataBySubId.Count() > 0)
+        {
+            foreach (var gs in GroupedDataBySubId)
+            {
+                <div class="widget-box">
+
+                    <div class="table-header">
+                        @gs.FirstOrDefault().BranchName
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            @{AsteriskGMSEntities _db = new AsteriskGMSEntities(AsteriskBrowserAL.Helpers.Utility.GetDatabasebySubscriptionId(gs.Key));
+                                var GroupByPaper = gs.GroupBy(s => s.PaperName);
+                            }
+
+                            @foreach (var g in GroupByPaper)
+                            {
+                                var groupBySection = g.GroupBy(p => p.SectionName).ToList();
+                                var Paper = g.FirstOrDefault();
+
+                                if (null != Paper)
+                                {
+                                    nSubjectId = Paper.SubjectId;
+                                }
+
+                                <div class="widget-box">
+
+                                    <div class="widget-header widget-header-flat widget-header-small">
+                                        <h5 class="widget-title">
+                                            @g.Key
+                                        </h5>
+                                    </div>
+
+                                    <div class="widget-body">
+                                        <div class="widget-main">
+
+                                            <input type="hidden" value="@Model.lstMarksEntryStatus.FirstOrDefault().ClassNumberId" />
+                                            <input type="hidden" value="@Model.lstMarksEntryStatus.FirstOrDefault().GradeExamsId" />
+                                            <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;">
+                                                <tr>
+                                                    <th>
+                                                        Section Name
+                                                    </th>
+                                                    <th>
+                                                        Entry
+                                                    </th>
+                                                    <th>
+                                                        No Entry
+                                                    </th>
+
+                                                    <th>
+                                                        Absent
+                                                    </th>
+                                                </tr>
+                                                <thead></thead>
+                                                <tbody>
+                                                    @foreach (var c in groupBySection)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                @c.Key
+                                                            </td>
+                                                            <td>
+                                                                @{
+                                                                    nEntryCount = c.Where(p => AsteriskBrowserAL.Helpers.Utility.IsDouble(p.DisplayGrade) == true).Count();
+                                                                }
+
+
+                                                                @if (nEntryCount > 0)
+                                                                {
+                                                                    <a href=@Url.Action("LifeSkillGradeEntryReportStatus", "AReports", new { Status = "E", SubjectId = nSubjectId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber, nExamId = @Model.lstMarksEntryStatus.FirstOrDefault().GradeExamsId })>
+                                                                    @nEntryCount
+                                                                    </a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    @nEntryCount
+                                                                }
+
+
+                                                            </td>
+                                                            <td>
+                                                                @{
+                                                                    bool bIsElective = c.Select(p => p.IsElective).FirstOrDefault();
+                                                                    int SubjectId = c.Select(p => p.SubjectId).FirstOrDefault();
+
+                                                                }
+
+                                                                @if (bIsElective)
+                                                                {
+                                                                    var Subjects = _dbCentral.Subjects.FirstOrDefault(s => s.SubjectId == SubjectId);
+
+                                                                    if (null != Subjects)
+                                                                    {
+                                                                        if (Subjects.SubjectName.Replace(" ", "").ToUpper().StartsWith("ILANGUAGE"))
+                                                                        {
+                                                                            var StudentElectives = _db.StudentElective.Where(se => se.FirstLanguage == SubjectId).ToList();
+                                                                            nStudentAry = StudentElectives.Select(s => s.StudentId.HasValue ? s.StudentId.Value : 0).ToArray();
+
+                                                                            nNonEntryCount = c.Where(n => nStudentAry.Contains(n.StudentId.Value) && !(AsteriskBrowserAL.Helpers.Utility.IsDouble(n.DisplayGrade) || n.DisplayGrade == "")).Count();
+
+                                                                            if (nNonEntryCount > 0)
+                                                                            {
+                                                                                <a href=@Url.Action("MarksEntryReportStatus", "AReports", new { Status = "NE", SubjectId = nSubjectId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber, nExamId = @Model.lstMarksEntryStatus.FirstOrDefault().GradeExamsId })>
+                                                                                @nNonEntryCount
+                                                                                </a>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                @nNonEntryCount
+                                                                            }
+                                                                        }
+                                                                        else if (Subjects.SubjectName.Replace(" ", "").ToUpper().StartsWith("IILANGUAGE"))
+                                                                        {
+
+                                                                            var StudentElectives = _db.StudentElective.Where(se => se.SecondLanguage == SubjectId).ToList();
+                                                                            nStudentAry = StudentElectives.Select(s => s.StudentId.HasValue ? s.StudentId.Value : 0).ToArray();
+                                                                            nNonEntryCount = c.Where(n => nStudentAry.Contains(n.StudentId.Value) && (n.DisplayGrade == "")).Count();
+
+                                                                            if (nNonEntryCount > 0)
+                                                                            {
+                                                                                <a href=@Url.Action("MarksEntryReportStatus", "AReports", new { Status = "NE", SubjectId = nSubjectId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber, nExamId = @Model.lstMarksEntryStatus.FirstOrDefault().GradeExamsId })>
+                                                                                @nNonEntryCount
+                                                                                </a>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                @nNonEntryCount
+                                                                            }
+                                                                        }
+                                                                        else if (Subjects.SubjectName.Replace(" ", "").ToUpper().StartsWith("IIILANGUAGE"))
+                                                                        {
+                                                                            var StudentElectives = _db.StudentElective.Where(se => se.ThirdLanguage == SubjectId).ToList();
+                                                                            nStudentAry = StudentElectives.Select(s => s.StudentId.HasValue ? s.StudentId.Value : 0).ToArray();
+                                                                            nNonEntryCount = c.Where(n => nStudentAry.Contains(n.StudentId.Value) && (n.DisplayGrade == "")).Count();
+
+                                                                            if (nNonEntryCount > 0)
+                                                                            {
+                                                                                <a href=@Url.Action("LifeSkillGradeEntryReportStatus", "AReports", new { Status = "NE", SubjectId = nSubjectId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber, nExamId = @Model.lstMarksEntryStatus.FirstOrDefault().GradeExamsId })>
+                                                                                @nNonEntryCount
+                                                                                </a>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                @nNonEntryCount
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @(0)
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+
+                                                                    nNonEntryCount = c.Where(n => (n.DisplayGrade == "")).Count();
+
+                                                                    if (nNonEntryCount > 0)
+                                                                    {
+                                                                        <a href=@Url.Action("LifeSkillGradeEntryReportStatus", "AReports", new { Status = "NE", SubjectId = nSubjectId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber, nExamId = @Model.lstMarksEntryStatus.FirstOrDefault().GradeExamsId })>
+                                                                        @nNonEntryCount
+                                                                        </a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @nNonEntryCount
+                                                                    }
+                                                                }
+
+                                                            </td>
+
+
+
+                                                            <td>
+
+                                                                @if (nAbsentCount > 0)
+                                                                {
+                                                                    <a href=@Url.Action("LifeSkillGradeEntryReportStatus", "AReports", new { Status = "A", SubjectId = nSubjectId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber, nExamId = @Model.lstMarksEntryStatus.FirstOrDefault().GradeExamsId })>
+                                                                    @c.Where(p => p.DisplayGrade == "").Count()
+                                                                    </a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    @nAbsentCount
+                                                                }
+
+
+                                                            </td>
+                                                        </tr>
+                                                                    }
+                                                </tbody>
+
+
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                                                    }
+
+                        </div>
+                    </div>
+                </div>
+                                                                                }
+
+
+
+
+                                                                            }
+
+
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span style="color: red;"><b>No exam papers available to display</b></span>
+                                                                    }
+
+@Html.Action("DataTableScripts", "Base")
+<script>
+
+    function submitform() {
+        $.ajax({
+            url: '/AReports/ExaminationMark',
+            data: {},
+            success: function (result) {
+            }
+        })
+    };
+
+    $('#btnExport').click(function () {
+        debugger
+        window.location.href = "/AReports/LifeSkillGradeMarksEntryReportExportExcell"
+        var Data = $("#CoScholasticsMarksReport").html();
+    });
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+
+
+
+
+
+
+
+

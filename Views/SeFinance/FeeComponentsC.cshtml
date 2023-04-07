@@ -1,0 +1,201 @@
+﻿
+@model AsteriskBrowserAL.FeeComponent
+@{
+    ViewBag.Title = "FeeComponent";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+
+    label {
+        font-weight: 400;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 0.60;
+        padding: 2px;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Fee Components</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="table-header">
+           
+                    Fee Components
+                    <small style="float:right;font-weight:bold;" class="textheader">
+                        @Html.ActionLink("Back to details", "FeeComponents")
+                    </small>
+               
+            </div>
+           
+            @using (Html.BeginForm("FeeComponentsC", "SeFinance", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(model => model.FeeComponentId)
+                @Html.HiddenFor(model => model.AcademicYearId)
+
+                <input type="hidden" name="IsSpecial" id="FeeType" />
+                <span style="color:red;font-weight:bold;">@Html.ValidationMessage("Component")</span>
+           <!-- /.box-header -->
+                    <!-- form start -->
+             
+                <div class="widget-box row">
+                    <br />
+                        <!-- PAGE CONTENT BEGINS -->
+                        <form class="form-horizontal" role="form">
+
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Component Name")</label>
+
+                                    <div class="col-sm-8">
+                                  
+                                            @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @id = "Name", placeholder = "Enter Name" })
+                                       
+                                            <div style="display:none;" id="lblComponentName">
+                                                <label style="color:red;font-weight:bold;"> Enter component name </label>
+                                            </div>
+                                      
+
+                                       
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Display Name")</label>
+
+                                    <div class="col-sm-8">
+                                        <div class="col-sm-12">
+                                            @Html.TextBoxFor(model => model.TypeName, new { @class = "form-control", @id = "TypeName", placeholder = "Enter Display Name" })
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+
+
+                                
+
+                            
+
+                   
+                                <div class="col-md-offset-5" id="divQuantity" style="display:none">
+
+                                    <div class="col-sm-3">
+                                        <input type="radio" id="rbQuantity" value="true" name="IsQuantity" checked="checked"><b> &nbsp; &nbsp; Quantity</b>
+                                    </div>
+
+                                    <div class="col-sm-3">
+                                        <input type="radio" id="rbAmount" name="IsQuantity" value="false"><b> &nbsp; &nbsp; Amount</b>
+                                    </div>
+                                </div>
+
+                               
+                   
+                                <div class="col-md-9" align="left">
+                                    <div class="hr hr-25 dotted hr-double"></div>
+                                    <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                        <i class="ace-icon fa fa-check bigger-50"></i>
+                                        Save
+                                    </button>
+
+                                    &nbsp; &nbsp; &nbsp;
+                                    <button class="btn btn-sm" type="reset">
+                                        <i class="ace-icon fa fa-undo bigger-50"></i>
+                                        Reset
+                                    </button>
+                                    <br />
+                                    <br />
+                                </div>
+</form>
+                    
+                </div>
+            }
+
+            <input type="hidden" id="count" name="count" value="0" />
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function validateCategory() {
+
+        document.getElementById("count").value = "1";
+        var CategoryName = document.getElementById("Name").value;
+
+        validate = true;
+
+        if (CategoryName == "") {
+            document.getElementById("lblComponentName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("lblComponentName").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateCategory();
+        if (validatestatus == false) {
+            return false;
+        } else {
+
+            return true;
+        }
+    };
+
+    $('#Name').focus(function () {
+        $('#lblComponentName').hide();
+    });
+
+    $('#Prefix').focus(function () {
+        $('#lblprefix').hide();
+    });
+
+    $('#Regular').click(function () {
+        var Value = false;
+        $('#FeeType').val(Value);
+        $('#divQuantity').hide();
+
+    });
+
+    $('#Special').click(function () {
+        var Value = true;
+        $('#FeeType').val(Value);
+
+        $('#divQuantity').show();
+    });
+
+
+
+</script>
+
+
+
+
+
+

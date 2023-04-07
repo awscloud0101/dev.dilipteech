@@ -1,0 +1,130 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Notices>
+@{
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+@{
+    ViewBag.Title = "Notice";
+}
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="widget-box">
+            <div class="widget-header widget-header-flat widget-header-small">
+                <h5 class="widget-title">
+                    Notice
+                </h5>
+                <div class="widget-toolbar no-border">
+                    <div class="inline dropdown-hover">
+                    </div>
+                </div>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-sm-6">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+                                <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                    <div id="datepicker" class="input-group date">
+                                        @if (ViewBag.StartDate != null)
+                                        {
+                                            <input class="form-control" type="text" id="StartDate" name="StartDate" autocomplete="off" value="@ViewBag.StartDate.ToShortDateString()" placeholder="Select Date" />
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" type="text" id="StartDate" name="StartDate" autocomplete="off" placeholder="Select Date" />
+                                        }
+                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (null != Model)
+{
+    if (null != Model && Model.Count() > 0)
+    {
+        int Sno = 1;
+
+        <div class="table-header">
+            <div class="txtTableHeader">
+                Records Found (@Model.Count())
+            </div>
+            <div style="float:right">
+            </div>
+        </div>
+        <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                        @*@Html.DisplayName("SNo")*@
+                        S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Description")
+                    </th>
+                    <th>
+                        @Html.DisplayName("StartDate")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Date")
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(Sno++)
+                        </td>
+                        <td>
+                            @item.Name
+                        </td>
+
+                        <td>
+                            @Html.Raw(item.Discription)
+                        </td>
+                        <td>
+                            @item.NoticeDate.Value.ToString("dd - MMM - yyyy")
+                        </td>
+                        <td>
+                            @item.NoticeEndDate.Value.ToString("dd - MMM - yyyy")
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div style="color:red;font-weight:bold">Data not available to display</div>
+    }
+}
+else
+{
+    <div style="color:red;font-weight:bold">Data not available to display</div>
+}
+
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+
+    $('#StartDate').change(function () {
+
+        window.location.href = "/Parent/Notice?StartDate=" + $('#StartDate').val();
+    })
+</script>

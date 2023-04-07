@@ -1,0 +1,192 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    ViewBag.Title = "IC Marks Entry";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">IC Marks Alerts</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            @if (null != Model)
+            {
+                using (Html.BeginForm("ExportICMarksWeeklyAnalysis", "AReports", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                               IC Marks Weekly Analysis
+                            </h5>
+                            @*<div class="widget-toolbar no-border">
+                                <div class="inline dropdown-hover">
+                                    <div class="inline action-buttons">
+                                        <a id="btnViewData"><span class="btn btn-info btn-minier">View Data</span></a>
+                                    </div>
+                                </div>
+                            </div>*@
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.lstSections)
+                                            {
+                                                @Html.DropDownListFor(model => model.SectionId, new SelectList(Model.lstSections, "SectionId", "SectionCode"), new { @class = "form-control", @id = "SectionId" })
+                                            }
+                                            else
+                                            {
+                                                <select id="SectionId" name="SectionId" class="form-control"></select>
+                                            }
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Category</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.lstICCategory)
+                                            {
+                                                @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.lstICCategory, "CategoryId", "CategoryName"), "-- Select --", new { @class = "form-control", id = "CategoryId" })
+                                            }
+                                            else
+                                            {
+                                                <select id="CategoryId" name="CategoryId" class="form-control"></select>
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Week</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.lstWeeks)
+                                            {
+                                                @Html.DropDownListFor(model => model.lstWeeks, new SelectList(Model.lstWeeks, "Value", "Text"), "-- Select --", new { @class = "form-control", @id = "Week" })
+                                            }
+                                            else
+                                            {
+                                                <select id="Week" name="Week" class="form-control"></select>
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="ExaminationResults"></div>
+                }
+            }
+        </div>
+    </div>
+
+</section>
+
+
+<script>
+
+    $('#CategoryId').change(function () {
+        $('#ExaminationResults').html("");
+        GetStudentsExamResultsData();
+    });
+
+    $('#Week').change(function () {
+        $('#ExaminationResults').html("");
+        GetStudentsExamResultsData();
+    })
+
+    $('#SectionId').change(function () {
+        $('#ExaminationResults').html("");
+
+        var SelText = $("#SectionId option:selected").text();
+
+        if (SelText != "--Select--")
+        {
+            GetStudentsExamResultsData();
+        }
+    })
+
+    function GetStudentsExamResultsData() {
+        debugger
+        var SectionId = $("#SectionId").val();
+        var CategoryId = $("#CategoryId").val();
+        var Week = $("#Week").val();
+
+        var SelWeek = $("#Week option:selected").text();
+
+        if (parseInt(CategoryId) < 1 || SelWeek == "-- Select --")
+            return;
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/AReports/GetICMarksByWeek',
+            data: { SectionId: SectionId, CategoryId: CategoryId, Week: Week },
+            success: function (Data) {
+                $('#imagemodal').hide();
+                $('#ExaminationResults').html(Data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    window.onload = OnloadData();
+
+
+    function dialog(Content) {
+
+        var $dialog = $('#ValidationMsg').html(Content)
+
+        .dialog({
+            autoOpen: false,
+            title: 'IC Marks Entry',
+            modal: true,
+            show: "slide",
+            buttons: {
+                "OK": function () {
+                    $dialog.dialog('close');
+                    $('#Status').val("");
+                    window.location.reload();
+                    window.location.href = '/AExamination/ICMarksEntry'
+                }
+                //Cancel: function () {
+                //    $(this).dialog("close");
+                //}
+            },
+            height: 150
+        });
+
+        $dialog.dialog('open');
+        e.preventDefault();
+        return false;
+
+    }
+
+</script>
+

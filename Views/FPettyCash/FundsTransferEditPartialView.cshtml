@@ -1,0 +1,124 @@
+﻿@model AsteriskBrowserAL.Models.PettyCashViewModelData
+@{
+}
+
+
+        @if (null != Model)
+        {
+            <div class="table-header">
+                Records Found (@Model.FundsTransferReportData.Count())
+                </div>
+            int sno = 1;
+            if (null != Model.FundsTransferReportData && Model.FundsTransferReportData.Count() > 0)
+            {
+
+                <div class="overflowscroll">
+
+                    <table id="FunTransfer" class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Branch Name")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Cash Card")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Transaction Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Head Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Amount")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Description")
+                                </th>
+                                <th></th>
+
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+                            @foreach (var item in Model.FundsTransferReportData)
+                            {
+                                <tr>
+                                    <td>
+                                        @(sno++)
+                                    </td>
+                                    <td>
+                                        @item.BranchName
+                                    </td>
+
+                                    <td>
+                                        @item.DisplayCashCard
+                                    </td>
+
+                                    <td>
+                                        @item.TransactionDate.GetValueOrDefault().ToString("dd-MMM-yyyy")  @item.LastUpdated.GetValueOrDefault().ToString("hh:mm tt")
+                                    </td>
+                                    <td>
+                                        @item.HeadName
+                                    </td>
+                                    <td>
+                                        @item.Amount
+                                    </td>
+                                    <td>
+                                        @item.Description
+                                    </td>
+
+                                    <td>
+                                        <div class="hidden-sm hidden-xs action-buttons">
+                                            <a class="green P2" href="@Url.Action("FundsTransferEditView", "FPettyCash", new { id = item.PettyCashId, dtStartDate = item.FromDate, dtEndDate = item.ToDate })">
+                                                <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+
+            }
+            else
+            {
+                <div style="color:red;font-weight:bold">Data is not available</div>
+            }
+        }
+        else
+        {
+            <div style="color:red;font-weight:bold">Data is not available</div>
+        }
+
+
+
+
+
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+
+
+
+    //var table = $('#example').dataTable({
+    //var table = $('#FunTransfer').DataTable({
+    //    "sScrollY": "200px",
+    //    "bPaginate": false
+    //});
+
+    $(window).bind('resize', function () {
+        //table.fnAdjustColumnSizing();
+        table.columns.adjust().draw();
+    });
+
+</script>
+

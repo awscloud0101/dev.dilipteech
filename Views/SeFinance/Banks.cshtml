@@ -1,0 +1,121 @@
+﻿
+@model IEnumerable<AsteriskBrowserAL.Banks>
+
+@{
+    ViewBag.Title = "Banks";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Banks</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<!--Main Content-->
+<section class="content">
+
+
+
+    @if (null != TempData["Banks"])
+    {
+        @Html.Raw(TempData["Banks"])
+    }
+
+
+    @if (Model != null)
+    {
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Banks</span>
+                    <div style="float:right;margin-right:10px;">
+                        <a class="btncustom P2" href="@Url.Action("BanksC", "SeFinance" )" role="button" id="New" name="New">
+                        Add</a>
+        </div>
+
+                </div>
+
+
+
+
+                
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Bank Name")
+                                </th>
+
+
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @(nsno++)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.BankName)
+                                    </td>
+
+                                    <td>
+
+                                        <div>
+                                            <a class="green P2" href="@Url.Action("BanksE", "SeFinance", new { id = item.BankId })">
+                                                <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                            </a>
+
+                                        </div>
+
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                
+            </div>
+        </div>
+
+    }
+    else
+    {
+        <span style="color: red;"><b>Data is not available </b></span>
+    }
+</section>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })

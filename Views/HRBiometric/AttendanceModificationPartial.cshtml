@@ -1,0 +1,192 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.BiometricStaffAttendance>
+@{
+    var result = Model.GroupBy(s => s.AttendanceDate).ToList();
+    var result1 = result.FirstOrDefault();
+    int sno = 1;
+}
+
+@if (result1 != null)
+{
+  <span style="color:red;font-weight:bold" id="Msg"></span>  
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <div>
+                    <input class="btn btn-primary" type="button" value="Export To Excel" id="btnExport" />
+                </div>
+            </div><!-- /.box-header -->
+            <div class="box-body">
+                <input type="hidden" value="@ViewBag.DateRange" name="DateRange" id="DateRange" />
+                <div style="overflow:auto; height:500px;">
+                    <div id="dvData">
+                        <table class="table table-hover table-striped table-bordered">
+                            <thead id="theadId" style="font-weight:bold;">
+                                <tr>
+                                    <td>SNo</td>
+                                    <td>Staff Name</td>
+                                    <td>Employee Number</td>
+                                    <td>Analysis</td>
+                                    @foreach (var item in result)
+                                    {
+                                        <td>@item.FirstOrDefault().AttendanceDate.ToString("dd-MMM-yyyy")<br /> @item.FirstOrDefault().AttendanceDate.DayOfWeek</td>
+                                    }
+                                </tr>
+                            </thead>
+                            @*<tbody id="tbodyId">
+                                    @foreach (var element in result1)
+                                    {
+                                        <tr>
+                                            <td>@(sno++)</td>
+                                            <td>@element.StaffName</td>
+                                            <td>@element.EmployeeNumber</td>
+                                            <td>@element.Analysis</td>
+                                            @foreach (var item in result)
+                                            {
+                                                <td>@(sno++)</td>
+                                                <td>@item.StaffName</td>
+                                                <td>@item.EmployeeNumber</td>
+                                                <td>@item.Analysis</td>
+                                            <td>@item.Status</td>
+
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>*@
+                            <tbody id="tbodyId">
+                                @foreach (var element in result1)
+                                {
+                                    string Analysis = string.Empty;
+                                    string Analysis1 = string.Empty;
+                                    <tr>
+                                        <td>@(sno++)</td>
+                                        <td>@element.StaffName</td>
+                                        <td>@element.EmployeeNumber</td>
+                                        @{
+                                    var data = Model.Where(e => e.EmployeeNumber == element.EmployeeNumber).ToList();
+                                    var lt = data.Where(s => s.Status.Contains("LT")).ToList();
+                                    var ab = data.Where(a => a.Status.Contains("A")).ToList();
+                                    var el = data.Where(e => e.Status.Contains("EL")).ToList();
+                                    if (null != lt)
+                                    {
+                                        if (lt.Count() > 0)
+                                        {
+                                            Analysis = "LT-" + lt.Count();
+                                        }
+                                    }
+                                    if (null != ab)
+                                    {
+                                        if (!string.IsNullOrWhiteSpace(Analysis) && ab.Count() > 0)
+                                        {
+                                            Analysis += " <br/> A-" + ab.Count();
+                                        }
+                                        else if (ab.Count() > 0)
+                                        {
+                                            Analysis = "A-" + ab.Count();
+                                        }
+                                    }
+                                    if (null != el)
+                                    {
+                                        if (!string.IsNullOrWhiteSpace(Analysis) && el.Count() > 0)
+                                        {
+                                            Analysis += "<br/> EL-" + el.Count();
+                                        }
+                                        else if (el.Count() > 0)
+                                        {
+                                            Analysis = "EL-" + el.Count();
+                                        }
+                                    }
+
+                                    <td> @Html.Raw(Analysis) </td>
+                                    for (int k = 0; k < data.Count(); k++)
+                                    {
+                                        string status1 = string.Empty;
+                                        string status2 = string.Empty;
+                                        status1 = data[k].Status;
+                                        string tooltip = string.Empty;
+                                        tooltip = data[k].AttendanceDate.ToString("dd-MMM-yyyy") + "\n" + data[k].StaffName + "\nIn-Time : " + data[k].Intime + "\nOut-Time : " + data[k].OutTime;
+                                        if (data[k].Status.Contains("<br/>"))
+                                        {
+                                            status1 = data[k].Status.Replace("<br/>", "\n");
+                                            status2 = data[k].Status.Replace("<br/>", "");
+                                            status2 = status2.Replace("&", "_");
+                                        }
+                                        else
+                                        {
+                                            status2 = status1;
+                                        }
+                                        <td title="@tooltip">
+                                            @if (data[k].IsFreezingAllowed && !data[k].Status.Contains("WO") && !data[k].Status.Contains("A") && !data[k].Status.Contains("Perfect"))
+                                            {
+                                                @Html.Raw(data[k].Status);
+                                                
+                                                    string emp = data[k].EmployeeNumber;
+                                                    var dt = data[k].AttendanceDate;
+                                                    <a onclick="ModifyTime('@emp', '@dt','@status2','@data[k].EarlyLeavingBy','@data[k].Intime','@data[k].OutTime','@data[k].LateBy','@data[k].ShiftId','@data[k].StaffId','@data[k].OutTime');" style="cursor:pointer"><i class="glyphicon glyphicon-edit pull-right top"></i></a>
+                                               
+                                            }
+                                            else
+                                            {
+                                                @Html.Raw(data[k].Status)
+                                            }
+                                        </td>
+                                    }
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <p><b>A</b>-Absent &nbsp;&nbsp;&nbsp; <b>EL</b>-Early Leaving &nbsp;&nbsp;&nbsp; <b>L</b>-Leave &nbsp;&nbsp;&nbsp; <b>WO</b>-Sunday  &nbsp;&nbsp;&nbsp; <b>H</b>-Holiday</p>
+            </div>
+        </div>
+    </div>
+</div>
+}
+    
+
+<script type="text/javascript">
+
+    function ModifyTime(empNo, date, status, EarlyLeavingBy, Intime, OutTime, LateBy, ShiftId, StaffId, outTime) {
+        debugger
+        $('#Msg').hide();
+        if (outTime == "" || null == outTime) {
+            $('#Msg').show();
+            $('#Msg').text('Modification is not possible, the Employee has not signed-out for the day');
+            return;
+        }
+        var d1 = Date.parse(date);
+        var date1 = date.toString('dd/mm/yyyy');
+        var branchName = $("#Branch").val();
+        if (branchName == undefined || branchName == 0 || branchName == null)
+            branchName = "";
+        var dateRange = $('#DateRange').val();
+        var url = "/HRBiometric/ModifyAttendace?strEmployeeNumber=" + empNo + "&dtAttendanceDate=" + date1 + "&strBranch=" + branchName + "&strSelStatus=" + status + "&EarlyLeavingBy=" + EarlyLeavingBy + "&Intime=" + Intime + "&OutTime=" + OutTime + "&LateBy=" + LateBy + "&ShiftId=" + ShiftId + "&StaffId=" + StaffId + "&dateRange=" + dateRange;
+        window.location.href = url;
+    };
+
+
+    $(document).ready(function () {
+        $("#btnExport").click(function (e) {
+            $('#Msg').hide();
+            var shiftName = $("#ShiftId option:selected").text();
+            var daterange = $('#daterange').val().replace(' - ',' To ');
+            var filename = "Biometric Staff Attendance_" + shiftName + " Shift_" + daterange;
+            //creating a temporary HTML link element (they support setting file names)
+            var a = document.createElement('a');
+            //getting data from our div that contains the HTML table
+            var data_type = 'data:application/vnd.ms-excel';
+            var table_div = document.getElementById('dvData');
+            var table_html = table_div.outerHTML.replace(/ /g, '%20');
+            a.href = data_type + ', ' + table_html;
+            //setting the file name
+            a.download = filename + '.xls';
+            //triggering the function
+            a.click();
+            //just in case, prevent default behaviour
+            e.preventDefault();
+        });
+    });
+</script>

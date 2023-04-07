@@ -1,0 +1,177 @@
+﻿@model AsteriskBrowserAL.Models.AttendanceShifts
+
+@{
+
+    ViewBag.Title = "Shift Alter Time";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Biometric
+        </li>
+        <li>
+            <i class=""></i>
+            Staff
+        </li>
+        <li class="active">Shift Alter Time</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+   
+    <br />
+    @using (Html.BeginForm("ShiftAlterTime", "HRBiometric", FormMethod.Post))
+    {
+        
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header"></div>
+
+                    <div class="box-body">
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-3 control-label no-padding-right">@Html.Label("Select Shift")</label>
+
+                                    <div class="col-sm-6">
+
+                                        @Html.DropDownListFor(model => model.ShiftsId,new SelectList(Model.lstStaffShift,"StaffShiftId","StaffShiftName"), "--Select Shift--", new { @id ="ShiftId",@class = "form-control", @onchange = "GetData()" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="Data" style="display:none">
+            <div id="SearchData" class="row">
+            </div>
+
+        </div>
+
+    }
+</section>
+
+<script>
+    function GetData() {
+        var ShiftId = $('#ShiftId').val();
+
+        if (ShiftId > 0) {
+
+            $.ajax({
+                url: '/MStaff/StaffTimingsByShiftId',
+                data: { ShiftId: ShiftId },
+                success: function (Data) {
+                    document.getElementById("Data").style.display = "inline";
+                    $("#SearchData").html(Data);
+                }
+            });
+        }
+        else {
+            document.getElementById("Data").style.display = "none";
+        }
+    };
+    window.onload = GetData();
+
+    function submitForm() {
+        var validatestatus = ValidateCT();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function ValidateCT() {
+        var BatchId = $('#BatchId').val();
+        validate = true;
+        if (BatchId == "")
+        {
+            validate=false;
+            document.getElementById("CTCombo").innerHTML = "Please select the Class";
+        }
+
+        return validate;
+
+    }
+
+</script>
+
+
+@*<script>
+
+        function GetData() {
+            var BatchId = $('#BatchId').val();
+
+            if (BatchId > 0) {
+
+                $.ajax({
+
+                    url: '/TTimetable/ClassTimingsData',
+                    data: { BatchId: BatchId },
+                    contentType: "application/json; charset=utf-8",
+                    success: successFunc,
+                    error: errorFunc
+                });
+            }
+            else {
+                document.getElementById("display_box").style.display = "none";
+
+            }
+
+            function successFunc(data) {
+
+                if (data.length < 1) {
+                    alert('Data not available to display');
+                    document.getElementById("display_box").style.display = "none";
+                }
+                else {
+                    document.getElementById("display_box").style.display = "inline";
+                    var row = "";
+                    $.each(data, function (index, item) {
+                        row += "<tr>" +
+                        "<td>" + item.ItemName + "</td>" +
+                        "<td>" + item.ItemStartTime + "</td>" +
+                        "<td>" + item.ItemEndTime + "</td>";
+
+                        if (item.IsBreak == true)
+                        {
+                            alert('Helooo');
+                            row += "<td><input type='checkbox' disabled='disabled' checked='checked' /></td>";
+                        }
+                        else
+                        {
+                            row += "<td><input type='checkbox' disabled='disabled' /></td>";
+                        }
+
+                        row +="<td>" + '<a href="/TTimetable/ClassTimingsE?id=' + item.ClassTimingsId + ' ">' + "Edit" + '</a>' + " | " +
+                        '<a href="/TTimetable/ClassTimingsD?id=' + item.ClassTimingsId + ' ">' + "Delete" + '</a>' + " </td> " +
+                        "</tr>";
+                    });
+
+                    $("#tbody").html(row);
+                }
+            }
+
+            function errorFunc() {
+                document.getElementById("display_box").style.display = "none";
+            }
+
+        };
+
+        window.onload = GetData;
+
+    </script>*@

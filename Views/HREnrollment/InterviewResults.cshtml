@@ -1,0 +1,391 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StaffInterviewsData>
+@{
+    ViewBag.Title = "InterviewResults";
+    int Sno = 1;
+    int Sno1 = 1;
+    string color = "";
+    var results = Model.Where(m => m.InteriviewStatus == 2).ToList();
+    var results1 = Model.Where(m => m.InteriviewStatus != 2 && m.InteriviewStatus != 1 && m.InteriviewStatus != 6).ToList();
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Enrollment
+        </li>
+        <li class="active">Interview Results</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<style type="text/css">
+    .nowrap {
+        white-space:nowrap;
+    }
+
+    th{
+        text-align:center;
+    }
+
+    .hideScrolling { 
+        overflow:hidden;
+        height:400px;
+
+    }
+
+div:hover { 
+    overflow:auto;
+}
+</style>
+<br/>
+<section class="content">
+   
+
+    <div class="row">
+        <div class="col-xs-12">
+            
+            @if (null != TempData["Message"])
+            {
+                <span style="color:green;font-weight:bold;"> @TempData["Message"]</span>
+            }
+
+            @if (results.Count() > 0)
+            {
+
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Scheduled Interviews
+
+                        </h5>
+                        <!-- tools box -->
+
+
+                    </div><!-- /.box-header -->
+
+                    <div class="widget-body">
+                        <div class="table-header">
+                            Records Found (@results.Count())
+
+                        </div>
+                        <div class="hideScrolling">
+                            <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;">
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Reference Number")
+                                        </th>
+                                        <th>
+                                            Action
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Interviewer")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Father Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Mobile Number")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Email Id")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Scheduled Date")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Qualifications")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Additional Qualifications")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Experience")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Branch Interested")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Subjects can Handle")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Classes can Handle")
+                                        </th>
+
+
+                                    </tr>
+
+                                    @foreach (var item in results)
+                                    {
+                                        <tr>
+                                            <td style="text-align:right">
+                                                @(Sno++)
+                                            </td>
+                                            <td>
+                                                @item.DisplayName
+                                            </td>
+                                            <td>
+                                                @item.InterviewNumber
+                                            </td>
+                                            <td>
+                                                @Html.ActionLink("Enter Results", "InterviewResultC", new { id = item.StaffInterviewsId },new { Class="P2"})
+                                            </td>
+                                            <td>
+                                                @item.InterviewerName
+                                            </td>
+                                            <td>
+                                                @item.FatherName
+                                            </td>
+                                            <td>
+                                                @item.MobileNumber
+                                            </td>
+                                            <td>
+                                                @item.EmailId
+                                            </td>
+                                            <td>
+                                                @if (item.ScheduledDate.HasValue)
+                                                {
+                                                    @item.ScheduledDate.Value.ToString("dd-MMM-yyyy")
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.Qualifications
+                                            </td>
+                                            <td>
+                                                @item.AdditionalQualifications
+                                            </td>
+                                            <td>
+                                                @item.TotalExperience
+                                            </td>
+                                            <td>
+                                                @item.BranchName
+                                            </td>
+                                            <td>
+                                                @item.Subjects
+                                            </td>
+                                            <td>
+                                                @item.ClassesCanHandle
+                                            </td>
+
+
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <span style="color:red;font-weight:bold;">There are no Interview Schedules</span>
+            }
+
+
+            <br />
+
+
+            @if (results1.Count() > 0)
+            {
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Interview Results</h5>
+                        <!-- tools box -->
+                            
+                    </div><!-- /.box-header -->
+
+                    <div class="widget-body">
+                        <div class="table-header">
+                            Records Found (@results1.Count())
+                        </div>
+                        <div class="hideScrolling">
+                            <table class="table table-bordered table-striped table-hover nowrap" >
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Reference Number")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Result")
+                                        </th>
+                                        <th>
+                                            Action
+                                        </th>
+                                        @*<th>
+                                @Html.DisplayName("Result Date")
+                            </th>*@
+                                        <th>
+                                            @Html.DisplayName("Interviewer")
+                                        </th>
+                                        <th>
+                                            Marks
+                                        </th>
+                                        <th>
+                                            Subject Knowledge
+                                        </th>
+                                        <th>
+                                            Teaching Ability
+                                        </th>
+                                        <th>
+                                            Communication
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Father Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Mobile Number")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Email Id")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Qualifications")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Additional Qualifications")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Experience")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Branch Interested")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Subjects can Handle")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Classes can Handle")
+                                        </th>
+
+                                    </tr>
+
+                                    @foreach (var item in results1)
+                                    {
+                                        string status = "";
+                                        color = "";
+                                        if (item.InteriviewStatus == 3)
+                                        {
+                                            color = "#FA5252";
+                                            status = "label label-danger";
+                                        }
+                                        else if (item.InteriviewStatus == 4)
+                                        {
+                                            status = "label label-warning";
+                                            color = "lightyellow";
+                                        }
+                                        else if (item.InteriviewStatus == 5)
+                                        {
+                                            color = "lightgreen";
+                                            status = "label label-success";
+                                        }
+
+                                        <tr>
+                                            <td>
+                                                @(Sno1++)
+                                            </td>
+                                            <td>
+                                                @item.DisplayName
+                                            </td>
+                                            <td>
+                                                @item.InterviewNumber
+                                            </td>
+                                            <td>
+                                                <label class="@status"><text style="width:70px;">@item.InterviewStatusName</text></label>
+                                            </td>
+
+                                            <td>
+                                                @if (item.InteriviewStatus != 3)
+                                                {
+                                                    @Html.ActionLink("Appointment", "EmployeeAppointment", new { strInterviewRefNo = item.InterviewNumber },new { Class="P2"})
+                                                }
+                                            </td>
+                                            @*<td>
+                                    @if (item.LastUpdated.HasValue)
+                                    {
+                                        @item.LastUpdated.Value.ToString("dd-MMM-yyyy")
+                                    }
+                                </td>*@
+                                            <td>
+                                                @item.InterviewerName
+                                            </td>
+                                            <td>
+                                                @item.Marks
+                                            </td>
+                                            <td>
+                                                @item.SubjectKnowledge
+                                            </td>
+                                            <td>
+                                                @item.TeachingAbility
+                                            </td>
+                                            <td>
+                                                @item.Communication
+                                            </td>
+                                            <td>
+                                                @item.FatherName
+                                            </td>
+                                            <td>
+                                                @item.MobileNumber
+                                            </td>
+                                            <td>
+                                                @item.EmailId
+                                            </td>
+                                            <td>
+                                                @item.Qualifications
+                                            </td>
+                                            <td>
+                                                @item.AdditionalQualifications
+                                            </td>
+                                            <td>
+                                                @item.TotalExperience
+                                            </td>
+                                            <td>
+                                                @item.BranchName
+                                            </td>
+                                            <td>
+                                                @item.Subjects
+                                            </td>
+                                            <td>
+                                                @item.ClassesCanHandle
+                                            </td>
+
+
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <span style="color:red;font-weight:bold;">There is no Interview results data</span>
+            }
+
+        </div>
+    </div>
+</section>
+
+

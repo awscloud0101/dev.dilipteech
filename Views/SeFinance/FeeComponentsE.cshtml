@@ -1,0 +1,210 @@
+﻿
+@model AsteriskBrowserAL.FeeComponent
+@{
+    ViewBag.Title = "Edit Fee Component";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Fee Component Edit</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("FeeComponentsE", "SeFinance", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" value="@Model.IsSpecial" id="FeeType" />
+                <input type="hidden" name="Prefix" value="@Model.Prefix" />
+              
+
+                @Html.HiddenFor(t => t.AcademicYearId);
+
+                <label id="lblComponentValue" class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.HiddenFor(model => model.FeeComponentId) </label>
+
+
+                <span style="color:red;font-weight:bold;">@Html.ValidationMessage("Component")</span>
+
+
+                <div class="page-header">
+                    <h1>
+                        Fee Component
+                        <small style="float:right;">
+                            @Html.ActionLink("Back to details", "FeeComponents")
+                        </small>
+                    </h1>
+                </div>
+
+                <form class="form-horizontal" role="form">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Component Name")</label>
+
+                        <div class="col-xs-8">
+                            <div class="col-sm-6">
+                                @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @id = "Name", placeholder = "Enter Name", Required = "Required" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Display Name")</label>
+
+                        <div class="col-xs-8">
+                            <div class="col-sm-6">
+                                @Html.TextBoxFor(model => model.TypeName, new { @class = "form-control", @id = "TypeName", placeholder = "Enter Display Name" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Type")</label>
+                        <div class="col-sm-3">
+                            <input type="radio" id="Regular" name="IsSpecial" checked="checked" value="false"><b> &nbsp; &nbsp; Regular</b>
+                        </div>
+                        <div class="col-sm-3">
+                            <input type="radio" id="Special" name="IsSpecial" value="true"><b> &nbsp; &nbsp; Special</b>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-offset-5" id="divQuantity" style="display:none">
+                        @if (Model.IsQuantity == true)
+                        {
+                            <div class="col-sm-3">
+                                <input type="radio" id="rbQuantity" value="true" checked="checked" name="IsQuantity"><b> &nbsp; &nbsp; Quantity</b>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <input type="radio" id="rbAmount" name="IsQuantity" value="false"><b> &nbsp; &nbsp; Amount</b>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-sm-3">
+                                <input type="radio" id="rbQuantity" value="false" name="IsQuantity"><b> &nbsp; &nbsp; Quantity</b>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <input type="radio" id="rbAmount" name="IsQuantity" value="true" checked="checked"><b> &nbsp; &nbsp; Amount</b>
+                            </div>
+                        }
+
+                    </div>
+
+                    <br />
+                    <br />
+
+                    <div class="hr hr-18 dotted hr-double"></div>
+                    <div class="col-md-offset-3 col-md-9">
+                        <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                            <i class="ace-icon fa fa-check bigger-50"></i>
+                            Save
+                        </button>
+
+                        &nbsp; &nbsp; &nbsp;
+                        <button class="btn btn-sm" type="reset">
+                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+            }
+        </div>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+
+    function setType() {
+        var Value = $('#FeeType').val();
+
+        if (Value == false) {
+            $('#Regular').prop('checked', true);
+            $('#Special').prop('checked', false);
+        }
+        else {
+            $('#Regular').prop('checked', false);
+            $('#Special').prop('checked', true);
+
+            $('#divQuantity').show();
+        }
+    }
+
+
+    window.onload = setType();
+
+
+    $('#Regular').click(function () {
+        var Value = false;
+        $('#FeeType').val(Value);
+        $('#divQuantity').hide();
+
+    });
+
+    $('#Special').click(function () {
+        var Value = true;
+        $('#FeeType').val(Value);
+        $('#divQuantity').show();
+    });
+
+
+    function validateCategory() {
+
+        var CategoryName = document.getElementById("Name").value;
+        var CategoryName = document.getElementById("TypeName").value;
+
+        validate = true;
+
+        if (CategoryName == "") {
+            document.getElementById("Des").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("Des").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateCategory();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#CategoryName').focus(function () {
+        $('#descrCategoryName').hide();
+    });
+
+</script>
+
+
+
+
+
+
+

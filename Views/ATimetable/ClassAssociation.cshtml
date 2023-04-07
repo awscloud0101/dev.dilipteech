@@ -1,0 +1,361 @@
+﻿@model  AsteriskBrowserAL.Models.StaffData
+@{
+    ViewBag.Title = "StaffDetails";
+  
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Accademics
+        </li>
+        <li>
+            <i class=""></i>
+            TimeTable
+        </li>
+        <li class="active">Class Association</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="~/script/jquery-2.0.3.js"></script>
+<script src="~/script/jquery-ui.js"></script>
+<script src="~/js/jquery-1.10.2.js"></script>
+<script src="~/js/jquery-ui.js"></script>
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+<!--Main Content-->
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+      
+                <span style="color:red;font-weight:bold;" id="Validation"></span>
+    <span style="color:green;font-weight:bold;" id="Success"></span>
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Class Association</h3>
+                    
+
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Division")</label>
+                                        <div class="col-sm-6">
+                                            <select class="form-control" id="DivisionId" name="DivisionId"><option value="">--- Select ---</option></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Branch")</label>
+                                        <div class="col-sm-6">
+                                            <select class="form-control" id="BranchId" name="BranchId"><option value="">--- Select ---</option></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Staff")</label>
+                                        <div class="col-sm-6">
+                                            <select class="form-control" id="StaffId" name="StaffId"><option value="">--- Select ---</option></select>
+                                        </div>
+                                    </div>
+                                </div>
+                         
+
+                                    <div class="col-xs-6">
+
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label no-padding-right">@Html.Label("Class Number")</label>
+                                            <div class="col-sm-6">
+                                                <select class="form-control" id="ClassId" name="ClassId"><option value="">--- Select ---</option></select>
+
+                                            </div>
+                                            <div class="col-sm-2">
+                                       
+                                                <button onclick="submitform()" class="btn btn-primary">save</button>
+                                            </div>
+                                        </div>
+                                    </div>                           
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="SearchDiv"></div>
+                <div id="Search"></div>
+   
+        </div>
+    </div>
+
+        <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+            <p style="position:absolute; top: 50%; left:50%;">
+                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+            </p>
+        </div>
+
+
+</section>
+
+<script type="text/javascript">
+
+    window.onload = onloadeddata();
+
+    function onloadeddata()
+    {
+        document.getElementById("Validation").innerHTML = "";
+        document.getElementById("Success").innerHTML = "";
+        LoadDivision();
+    }
+
+    function LoadDivision()
+    {
+
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+                var SelDivisionId = $("#SelDivisionId").val();
+                if (SelDivisionId >= 0) {
+                    document.getElementById("DivisionId").value = SelDivisionId;
+                    LoadBranchDropdown();
+                }
+
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        var Division = $("#DivisionId").val();
+
+        document.getElementById("Validation").innerHTML = "";
+        document.getElementById("Success").innerHTML = "";
+        $("#StaffId").html("");
+        $("#ClassId").html("");
+        $("#Search").html("");
+
+        if (Division > 0) {
+            LoadBranchDropdown();
+
+        }
+        else {
+            $("#Student").val("");
+            $("#AdmissionNumber").val("");
+            $("#FatherName").val("");
+            document.getElementById("BranchId").value = "";
+            $("#BranchId").html("")
+     
+            $("#Search").html("");
+            $("#StaffId").html("");
+            $("#ClassId").html("");
+        }
+
+
+
+    })
+
+    function submitform()
+    {
+        var Validate;
+        var nStaffid = $("#StaffId").val();
+        var nClassNumber = $("#ClassId").val();
+        var nBranchId = $("#BranchId").val();
+        if ((nStaffid > 0) && (nClassNumber > 0))
+        {
+            $.ajax({
+                url: '/ATimetable/SaveClassAssociation',
+                data: { StaffId: nStaffid, ClassNumber: nClassNumber, BranchId: nBranchId },
+                success: function (data) {
+             
+                    if(data.Validation != "")
+                    {
+                        document.getElementById("Validation").innerHTML = data.Validation;
+                    }
+                    else
+                    {
+                        document.getElementById("Success").innerHTML = data.strMsg;
+                        $("#StaffId").val("");
+                        $("#ClassId").val("");
+                        GetAssignedStaff();
+                    }
+                }
+            })
+
+        }
+   
+    }
+    function LoadBranchDropdown() {
+        var DivisionId = $("#DivisionId").val()
+        var isall = true;
+        if (DivisionId > 0) {
+            isall = false
+        }
+        if (DivisionId > 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: isall },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                    var SelBranchid = $("#SelBranchId").val();
+
+                    if (SelBranchid >= 0) {
+                        document.getElementById("BranchId").value = SelBranchid
+                        LoadClassDropdown()
+                    }
+                },
+                async: false
+            })
+        }
+        else {
+            document.getElementById("BranchId").value = ""
+            $("#BranchId").html("")
+            document.getElementById("SearchDivHead").style.display = "none"
+
+            $("#SearchDiv").html("");
+       
+        }
+    }
+
+    $("#BranchId").change(function () {
+
+        document.getElementById("Validation").innerHTML = "";
+        document.getElementById("Success").innerHTML = "";
+
+        var BranchId = document.getElementById("BranchId").value;
+        if (BranchId > 0) {
+            GetAssignedStaff();
+            AllStaffLoading();
+        }
+        else {
+            $("#Search").html("");
+            $("#StaffId").html("");
+            $("#ClassId").html("");
+        }
+    })
+
+    function GetAssignedStaff() {
+
+        var BranchId = $('#BranchId').val();
+
+        if (BranchId > 0) {
+            $.ajax({
+                url: '/ATimetable/GetStaffDetails',
+                data: { BranchId: BranchId },
+                success: function (data) {
+                    $("#Search").html(data);
+                }
+            });
+        }
+    }
+   
+    function AllStaffLoading() {
+        var BranchId = document.getElementById("BranchId").value;
+        $.ajax({
+            url: '/ATimetable/GetAllStaff',
+            data: { BranchId: BranchId },
+            success: function (result) {
+                Section = $("#StaffId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.StaffId).text(record.FirstName))
+                })
+                $("#StaffId").append(Section)
+
+
+             
+
+            },
+            async: false
+        })
+    }
+
+    $("#StaffId").change(function(){
+
+        document.getElementById("Validation").innerHTML = "";
+        document.getElementById("Success").innerHTML = "";
+
+        var nStaffId = $("#StaffId").val();
+        if(nStaffId>0)
+        {
+            loadClassDropDown();
+
+        }
+        else {
+
+            $("#ClassId").html("")
+        }
+    })
+
+
+    function loadClassDropDown()
+    {
+        $.ajax({
+            url: '/ATimetable/GetClasses',
+            success: function (result) {
+                Section = $("#ClassId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(Section)
+
+
+            },
+            async: false
+        })
+    }
+
+    $("#ClassId").change(function(){
+        document.getElementById("Validation").innerHTML = "";
+        document.getElementById("Success").innerHTML = "";
+    })
+</script>
+

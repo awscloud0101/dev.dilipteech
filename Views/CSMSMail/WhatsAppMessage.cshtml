@@ -1,0 +1,274 @@
+﻿@model AsteriskBrowserAL.Models.SendSMSViewModel
+@{
+    ViewBag.Title = "SendMessage";
+
+    List<SelectListItem> ItemsSeclection = new List<SelectListItem> {
+        new SelectListItem() {Text = "Welcome", Value = "1"},
+        new SelectListItem(){Text = "Today Overall Information",Value = "2"},
+        new SelectListItem(){Text = "Other",Value = "3"},
+        new SelectListItem(){Text = "DaySheet", Value = "4"},
+        new SelectListItem(){Text = "DaySheet_1", Value = "5"},
+        new SelectListItem(){Text = "DaySheet_logo", Value = "6"}
+        };
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-key"></i>
+            Controls
+        </li>
+        <li>
+            <i class=""></i>
+            SMS&Mail
+        </li>
+        <li class="active">Send Message</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<!--Main Content-->
+<section class="content">
+
+    @*@using (Html.BeginForm("SendMessage", "TSMS", new { StudentId = 0, CCEExamId = 0, FinanceCollection = 1, Accounts = 0 }))*@
+    @using (Html.BeginForm("WhatsAppMessage", "CSMSMail", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        if (null != Model)
+        {
+            if (Model.BranchId == 1)
+            {
+                <span style="color:green;" id="bIsSent">Message(s) Sent Successfully</span>
+            }
+            else if (Model.BranchId == 2)
+            {
+                <span style="color:red;" id="bIsSent">Message(s) Not Sent Successfully</span>
+            }
+        }
+        <div class="row">
+            <div class="col-xs-12">
+                <span style="color: red;">@Html.ValidationMessage("Send SMS")</span>
+
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Send Message</span>
+                    <div class="" style="float:right;margin-right:10px;">
+                        <button class="btncustom P2" onclick="return SubmitForm()" value="Send" name="send" type="submit">
+                            Send Message
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="widget-box" style="padding:10px">
+
+                    <form id="id-message-form" class="form-horizontal message-form col-xs-12">
+                        <div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-2 control-label " style="padding:0px;">
+                                        <label>Select Recipient </label>
+                                    </div>
+                                    <div class="col-sm-3">
+
+                                        @Html.DropDownList("ReceiptGroupId", new SelectList(ItemsSeclection, "Value", "Text"), "--Select--", new { @class = "form-control", id = "ItemId", required = "required" })
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-sm-12">
+
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label " style="padding:0px;">
+
+                                            Message <small>( Only Text )</small>:
+                                        </label>
+
+                                        <div class="col-sm-3">
+                                            @Html.TextAreaFor(model => model.Message, 10, 20, new { @class = "form-control", id = "Message",  style = "line-height:inherit" })
+                                        </div>
+
+                                        <div class="col-sm-4">
+
+
+                                            <div id="Others">
+
+                                                <div class="col-sm-6">
+                                                    @Html.TextAreaFor(model => model.RecipientsListText, 10, 20, new { @class = "form-control", @placeholder = "Enter Contacts", id = "MobNumText" , style = "line-height:inherit"})
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+    }
+
+
+</section>
+<script>
+
+    function SubmitForm()
+    {
+        var itemid = $('#ItemId').val();
+
+        if (itemid == 1 || itemid == 2 || itemid == 3)
+        {
+            $('#ReceipentsList').attr('required', false);
+           $('#MobNumText').attr('required', true);
+        }
+        else
+        {
+            $('#MobNumText').attr('required', false);
+            $('#ReceipentsList').attr('required', true);
+        }
+    }
+
+    $(".select2").select2();
+
+    $(document).ready(function () {
+        LoadAllBranch();
+    })
+
+    $('#DivisionId').change(function () {
+        LoadAllBranch();
+    });
+
+
+    $('#BranchId').change(function () {
+
+        var itemId = $("#ItemId").val();
+
+        if (itemId == 3) {
+
+
+
+
+        }
+
+    })
+
+    function LoadAllBranch() {
+
+        var DivisionId = $("#DivisionId").val();
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: true },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+
+                    result.splice(0, 1);
+
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                }
+            })
+        }
+    }
+
+
+    $('#ItemId').change(function () {
+
+        $('#ReceipentsList').html("");
+        $('#ReceipentsList').val("");
+        $(".select2").select2("val", "");
+        $('#ReceipentsList').children().remove();
+
+        var itemId = $(this).val();
+
+        if (itemId == 0 || itemId == null || itemId == "null")
+            return;
+
+        if (itemId == 1 || itemId == 2 || itemid == 3) {
+            $('#Receipents').hide();
+
+            $('#Others').show();
+        }
+        else {
+            $('#Others').hide();
+            $('#Receipents').show();
+        }
+
+        //GetReceipents();
+    });
+
+    function GetReceipents() {
+        var itemId = $("#ItemId").val();
+
+        var divisionId = 0;
+        var branchId = 0;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "Value") {
+            divisionId = $('#DivisionId').val();
+        }
+
+        branchId = $('#BranchId').val();
+        $('#imagemodal').show();
+
+        $.ajax({
+
+            url: '/CSMSMail/GetReceipentsList',
+            data: { GroupId: itemId, DivisionId: divisionId, BranchId: branchId },
+            success: function (data) {
+
+                var ReceipentsListItems = $('#ReceipentsList');
+
+                ReceipentsListItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    ReceipentsListItems.append($("<option>").val(record.Value).text(record.Text));
+                });
+
+                $("#ReceipentsList").append(ReceipentsListItems);
+                $('#imagemodal').hide();
+
+            }
+        })
+    }
+
+    $("#checkbox").click(function () {
+        if ($("#checkbox").is(':checked')) {
+            $("#ReceipentsList > option").prop("selected", "selected");
+            $("#ReceipentsList").trigger("change");
+        } else {
+            $("#ReceipentsList > option").removeAttr("selected");
+            $("#ReceipentsList").trigger("change");
+        }
+    });
+
+</script>

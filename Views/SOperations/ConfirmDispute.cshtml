@@ -1,0 +1,382 @@
+﻿@model AsteriskBrowserAL.Models.InventoryDisputeData
+@{
+    ViewBag.Title = "Confirm Dispute";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Confirm Dispute</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<br />
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dvApprovalRemarks" class="hide">
+
+    <label class="col-sm-4">@Html.Label("Enter Description")</label>
+    <div>
+        @Html.TextArea("ActionDescription", "", new { autocomplete = "off", @class = "form-control textlength", @id = "ActionDescription", placeholder = "Description", @maxlength = 248, @height = "200Px" })
+
+        <div class="col-sm-12" style="display:none;" id="ActionDescriptionNull">
+            <label style="color:red;font-weight:bold;"> Required </label>
+        </div>
+    </div>
+</div>
+
+<style>
+    tr {
+        display: table-row;
+        vertical-align: inherit;
+        border-color: inherit;
+    }
+
+    .selected {
+        background-color: #ccc;
+    }
+</style>
+
+
+<section class="content">
+    <form id="myForm" method="post">
+
+        @*@if (null != TempData["Status"])
+            {
+                <span style="color:forestgreen">@Html.Raw(TempData["Status"])</span>
+            }*@
+        <div class="row">
+            <div class="col-xs-12">
+                @using (Html.BeginForm("ConfirmDispute", "SOperations", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" />
+
+                    <div class="row">
+                        <div class="col-xs-12">
+
+                            <div class="widget-box">
+
+                                <div class="widget-header widget-header-flat widget-header-small">
+                                    <h5 class="widget-title">
+                                        Confirm Dispute
+                                    </h5>
+
+                                    <div class="widget-toolbar no-border">
+                                        <div class="inline action-buttons">
+                                            <a class="btn btn-info btn-minier" id="ViewData" onclick="return submitForm();">View Data</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+
+                                        @if (Model.IsCentral)
+                                        {
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-xs-6">
+                                                        <label class="col-xs-4">Division</label>
+                                                        <div class="col-xs-6">
+                                                            @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-xs-6">
+                                                        <label class="col-xs-4">Branch</label>
+                                                        <div class="col-xs-6">
+                                                            <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br />
+
+                                        }
+                                        else
+                                        {
+                                            <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.SubscriptionId" />
+                                        }
+
+
+
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Status</label>
+                                                    <div class="col-sm-6">
+                                                        <select id="CboStatus" class="form-control"></select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-6">
+
+                                                    <input type="radio" name="rbReceivedType" checked="checked" value="Kit"><span style="margin-right:2em;">Kit Items</span>
+                                                    <input type="radio" name="rbReceivedType" value="Item" />Items
+
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+                <div id="Items"></div>
+
+
+
+            </div>
+        </div>
+    </form>
+
+</section>
+
+<script>
+    var rbReceivedType = "";
+
+    $('#ActionDescription').focusin(function () {
+        $('#ActionDescriptionNull').hide();
+    });
+
+    $(document).ready(function () {
+        LoadStatusCombo();
+    });
+
+    $('#DivisionId').change(function () {
+
+        $('#Items').html("");
+
+        var BranchItems = $('#BranchId');
+
+        BranchItems.children().remove();
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        if (record.IsCentral != true) {
+                            BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                        }
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    function LoadStatusCombo() {
+
+        var StatusItems = $('#CboStatus');
+
+        StatusItems.children().remove();
+        StatusItems.append($("<option>").val("-1").text("--- Select ---"));
+        StatusItems.append($("<option>").val("0").text("All"));
+        StatusItems.append($("<option>").val("1").text("Pending"));
+        StatusItems.append($("<option>").val("2").text("Accepted"));
+        StatusItems.append($("<option>").val("3").text("Rejected"));
+
+        $('#CboStatus').append(StatusItems);
+    }
+
+    $('#BranchId').change(function () {
+        $('#Items').html("");
+    })
+
+    $('#CboStatus').change(function () {
+        $('#Items').html("");
+    })
+
+    $('input[name="rbReceivedType"]').click(function radioButton() {
+        $('#Items').html("");
+    });
+
+    function submitForm() {
+        $('#Validation').val("");
+        $('#Items').html("");
+
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        var Validation = ValidateConfirmDispute();
+
+        if (Validation == false) {
+
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+            rbReceivedType = $('input[name=rbReceivedType]:checked', '#myForm').val();
+
+            if ($('#CboStatus').val() == -1)
+                return;
+
+            var IsCentral = $('#IsCentral').val();
+
+            if (IsCentral == "value")
+                IsCentral = "true";
+
+
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+
+                url: '/SOperations/GetDisputedStockForConfirmDispute',
+                data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), Type: rbReceivedType, Status: $('#CboStatus').val() },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $('#imagemodal').hide()
+                    $('#Items').html(Data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+
+
+        }
+    }
+
+
+    function ValidateConfirmDispute() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+        var CboStatus = $("#CboStatus").val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+
+
+        if (CboStatus == -1) {
+            DisplayValidation += "Status,"
+            valid = false
+        }
+
+        if (valid == false) {
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+
+        return valid;
+
+    };
+
+
+    function SaveStatus(Id, Type, Description) {
+        $('#imagemodal').show();
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+            },
+
+            url: '/SOperations/SaveConfirmDispute',
+            data: { Id: Id, Type: Type, strDescription: Description },
+            success: function (data) {
+                submitForm();
+            },
+            aync: false
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function UpdateStatus(Id, Type) {
+        debugger
+        if (Id < 1)
+            return;
+
+        $('#dvApprovalRemarks').removeClass('hide').dialog({
+            resizable: false,
+            draggable: false,
+            width: '450',
+            modal: true,
+            title: "Confirm Dispute",
+            title_html: true,
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            buttons: [
+                {
+                    html: "<i class='ace-icon bigger-110'></i>&nbsp; Yes",
+                    "class": "btn btn-info btn-minier",
+                    click: function () {
+                        debugger
+
+                        var Description = $('#ActionDescription').val();
+
+                        if (Description == "") {
+                            $('#ActionDescriptionNull').show();
+                            return;
+                        }
+                        else {
+                            debugger
+                            $(this).dialog("close");
+                            $('#ActionDescription').val("");
+                            var VrMessage = SaveStatus(Id, Type, Description);
+                            $('#Validation').val(VrMessage);
+                        }
+                    }
+                }
+                ,
+                {
+                    html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; No",
+                    "class": "btn btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+
+    }
+
+</script>

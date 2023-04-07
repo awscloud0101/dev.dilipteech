@@ -1,0 +1,147 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    ViewBag.Title = "IC Examination Papers";
+}
+
+@section BreadCrumb{
+
+<ul class="breadcrumb">
+    <li>
+        <i class="menu-icon fa fa-database"></i>
+        <a href="#">Academics</a>
+    </li>
+    <li>
+        <i class=""></i>
+     Examination
+    </li>
+    <li class="active">IC Examination Papers</li>
+</ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <div class="row">
+    
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ICExaminationPapers", "AExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <span style="color:red;" id="EPCombos"></span>
+
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            IC Examination Papers
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <a class="blue P2" id="NewPaper" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+                            </div>
+                        </div>
+
+                    </div>
+                  
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">IC Category</label>
+                                    <div class="col-sm-6">
+
+                                        @if (null != Model)
+                                        {
+                                            @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.lstICCategory, "CategoryId", "CategoryName"), "-- Select --", new { @class = "form-control", id = "CategoryId" })
+                                        }
+                                        else
+                                        {
+                                            <select id="CategoryId" name="CategoryId" class="form-control"></select>
+                                        }
+
+                                    </div>
+                                </div>
+                                   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="ExaminationPapersData"></div>
+            }
+        </div>
+    </div>
+
+</section>
+
+
+<script>
+
+
+    $('#CategoryId').change(function () {
+        OnChangeCategory();
+    });
+
+    $(document).ready(function () {
+        OnChangeCategory();
+    });
+
+    function OnChangeCategory()
+    {
+        document.getElementById("EPCombos").innerHTML = "";
+
+        var CategoryId = $('#CategoryId').val();
+        $('#ExaminationPapersData').html("");
+
+        if (CategoryId > 0) {
+            GetStudents();
+        }
+    }
+
+    function GetStudents() {
+
+        var CategoryId = $("#CategoryId").val();
+        if (CategoryId < 1)
+            return;
+
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AExamination/GetICExaminationPapersByCategoryId',
+            data: { CategoryId: CategoryId },
+            success: function (Data) {
+                $('#imagemodal').hide();
+                $('#ExaminationPapersData').html(Data);
+            }
+            
+        });
+    }
+
+    $('#NewPaper').click(function () {
+        return submitForm();
+    });
+
+    function submitForm() {
+        var validatestatus = ValidateEP();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function ValidateEP() {
+
+        var CategoryId = $('#CategoryId').val();
+
+        if (CategoryId == "" || CategoryId < 1) {
+            validate = false;
+            document.getElementById("EPCombos").innerHTML = "Please select the Category";
+        }
+        else {
+
+            window.location.href = '/AExamination/ICExaminationPapersC?nCategoryId=' + CategoryId;
+        }
+
+        return validate;
+    }
+
+</script>

@@ -1,0 +1,160 @@
+﻿@model AsteriskBrowserAL.Models.HDCategoryModelView
+@{
+    ViewBag.Title = "Category";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Settings
+        </li>
+        <li>
+            <i class=""></i>
+            Help Desk
+        </li>
+        <li class="active">Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+ 
+    @if (null != Model)
+    {
+        <input type="hidden" id="SelGroupId" value="@Model.PriorityId" />
+    }
+    else
+    {
+        <input type="hidden" id="SelGroupId" value="0" />
+
+    }
+
+
+
+    <div class="table-header">
+        <span style="font-family:calibri;"> Category</span>
+        <div  style="float:right;margin-right:10px;">
+
+            <a onclick="NewCategory()" class=" btncustom P2" id="New" name="New">
+       Add</a>
+            @*<a href="@Url.Action("CategoryC", "SMasterData")" style="color:#811761;margin-bottom:-1em;margin-top:0.2em;" class="blue" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+       </div>
+
+    </div>
+
+
+
+    <div class="widget-box">
+
+        <span id="Error" style="color:red"></span>
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Group</label>
+                        <div class="col-sm-6">
+                            <select id="GroupId" name="GroupId" class="form-control"></select>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="SearchDiv">
+
+    </div>
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+
+</section>
+
+
+<script>
+    function onloadData() {
+      
+        var priortyid = $('#SelGroupId').val();
+        GetGroupsDropDown();
+    }
+
+    function GetGroupsDropDown() {
+       
+        $.ajax({
+            url: '/SeHelpDesk/GetGroupsDropDown',
+            success: function (Data) {
+                var Group = $('#GroupId')
+                Group.children().remove();
+                Group.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    Group.append($("<option>").val(record.HDExecutiveGroupId).text(record.GroupName));
+                });
+                $('#GroupId').append(Group);
+                var SelGroupId = $("#SelGroupId").val();
+
+                if (SelGroupId > 0) {
+                    document.getElementById("GroupId").value = SelGroupId
+                    GetCatgeories()
+                }
+            }
+        })
+    }
+
+    $("#GroupId").change(function () {
+        GetCatgeories();
+    })
+
+    function GetCatgeories() {
+
+        $('#imagemodal').show();
+
+        document.getElementById("Error").innerHTML = ""
+        $("#SearchDiv").html("")
+        var GroupId = $("#GroupId").val();
+        if (GroupId > 0) {
+            $.ajax({
+                url: '/SeHelpDesk/GetCategories',
+                data: { GroupId: GroupId },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+
+                    $("#SearchDiv").html(Data);
+
+                }, error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+        else {
+
+        }
+    }
+
+    function NewCategory() {
+        var GroupId = $("#GroupId").val()
+        if (GroupId > 0) {
+            window.location.href = "/SeHelpDesk/CategoryC?GroupId=" + GroupId
+
+        }
+        else {
+            document.getElementById("Error").innerHTML = "Please select group"
+        }
+    }
+    window.onload = onloadData();
+
+
+</script>
+

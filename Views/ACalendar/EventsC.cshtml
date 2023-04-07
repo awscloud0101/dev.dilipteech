@@ -1,0 +1,663 @@
+﻿@model AsteriskBrowserAL.Models.EventsData
+@{
+    ViewBag.Title = "Create New Event";
+    List<SelectListItem> Priority = new List<SelectListItem>()
+{
+new SelectListItem(){ Text = "Normal" , Value="Normal" },
+new SelectListItem(){ Text = "High" , Value= "High" },
+new SelectListItem(){ Text ="Low" , Value = "Low" }
+
+};
+    List<SelectListItem> SendSMSOn = new List<SelectListItem>()
+    {
+        new SelectListItem(){Text="Now" , Value="1"},
+        new SelectListItem(){Text="1 Day Before" , Value="2"},
+        new SelectListItem(){Text="2 Days Before" , Value="3"},
+    };
+
+
+    List<SelectListItem> ItemsSeclection = new List<SelectListItem> {
+new SelectListItem() {Text = "Send to Class", Value = "1"},
+new SelectListItem(){Text = "Send to  Staff Departments",Value = "2"},
+new SelectListItem(){Text = "Send to  Staff Designation",Value = "6"}
+};
+    ViewBag.SendSMSTo = ItemsSeclection;
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Calendar
+        </li>
+        <li class="active">Events</li>
+    </ul><!-- /.breadcrumb -->
+}
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<style>
+    select.form-control {
+        height: 28px;
+        margin-bottom: 0px;
+    }
+</style>
+
+
+
+<section class="content">
+    @*<div class="row">
+        <div class=col-xs-3>
+            @*<h3>@Html.ActionLink("<< Events Details", "Events")</h3>
+        </div>
+    </div>*@
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("EventsC", "ACalendar", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <div class="table-header" >
+             
+                   
+                        Events
+                        <small style="float:right;font-weight:bold;font-weight:bold;" class="textheader">
+                            @Html.ActionLink("Back to Events", "Events")
+                        </small>
+                   
+                </div><!-- /.page-header -->
+
+                <div class="widget-box row" style="padding:10px;">
+                    <form class="form-horizontal" role="form">
+
+                        <span id="errorEve" style="color:red;font-weight:bold;"></span>
+             
+                        <div class="row" style="padding:2px;">
+
+                            <div class="col-sm-6 ">
+
+                                <div class="row">
+
+                                    @if (Model.IsCentral == true)
+                                    {
+                                        <div class="col-sm-4">
+                                            <label>Select Branch </label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            @*@Html.DropDownListFor(model => model.SubscriptionId, new SelectList(Model.lstBranches, "SubscriptionId", "Institute"), new { @class = "form-control", id = "SubscriptionId" })*@
+
+                                            @Html.ListBoxFor(model => model.SubscriptionId, new SelectList(Model.lstBranches, "SubscriptionId", "Institute", 0), new { @class = "form-control select2", id = "SubscriptionId", @multiple = "multiple" })
+                                            <div class="" style="display:none;" id="ESubscriptionId">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <label> <input type="checkbox" id="checkboxClass"> All</label>
+                                            @*<label> <input type="checkbox" id="checkbox"> All</label>*@
+                                        </div>
+
+                                    }
+                                    else
+                                    {
+                                        <div class="col-sm-3">
+                                            <input type="hidden" value="@Model.SubscriptionId" id="BranchId" name="BranchId" class="form-control" />
+                                        </div>
+                                    }
+
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="col-sm-6 ">
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Event Name</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(model => model.Event, new { @class = "form-control col-sm-5", @id = "EventName", placeholder = "EventName", @required = "required" })
+                                        <div class="" style="display:none;" id="EEventName">
+                                            <label style="color:red;font-weight:bold;"> Required </label>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+
+
+
+
+
+                            </div>
+                        </div>
+
+
+              <div class="row" style="padding:2px;">
+                  <div class="col-sm-6">
+
+
+                      <div class="row">
+                          <div class="col-sm-4">
+                              <label>Select Recipient </label>
+                          </div>
+                          <div class="col-sm-6">
+
+                              @Html.DropDownList("ReceiptGroupId", new SelectList(ItemsSeclection, "Value", "Text"), "--Select--", new { @class = "form-control", name = "ItemId", id = "ItemId", required = "required" })
+                              <div class="" style="display:none;" id="EItemId">
+                                  <label style="color:red;font-weight:bold;"> Required </label>
+                              </div>
+                          </div>
+
+                          <div style="display:none" id="Status">
+                              <div class="col-sm-4"></div>
+                              <div class="col-sm-2">
+                                  <input type="radio" checked="checked" name="CategoryId" value="0" /> <b>All</b>
+                              </div>
+                              <div class="col-sm-2">
+                                  <input type="radio" name="CategoryId" value="1" /> <b>Active</b>
+                              </div>
+                              <div class="col-sm-3">
+                                  <input type="radio" name="CategoryId" value="2" /> <b>In-Active</b>
+                              </div>
+                          </div>
+
+                      </div>
+
+                      
+                  </div>
+
+                  <div class="col-sm-6">
+                  <div class="row">
+
+                      <div class="col-sm-4">
+                          <label>Receipents</label>
+                      </div>
+                      <div class="col-sm-6">
+
+
+                          <div id="Receipents" class="col-sm-12" style="    margin-left: -12px;">
+
+
+                              <select name="ReceipentsList" id="ReceipentsList" multiple="multiple" size="10" class="form-control select2" style="height:21px;width:100%;"></select>
+
+                              <div class="" style="display:none;" id="EReceipentsList">
+                                  <label style="color:red;font-weight:bold;"> Required </label>
+                              </div>
+
+
+                              @*<div class="col-sm-2">
+                    <label> <input type="checkbox" id="checkbox"> All</label>
+                </div>*@
+                          </div>
+
+                      </div>
+                  </div>
+
+                  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+
+              </div>
+               
+                       
+
+
+                        <div class="row" style="padding:2px;;">
+                            <div class="col-sm-6 ">
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Start Date</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" id="StartDate" name="StartDate" autocomplete="off" placeholder="Select Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                        <div class="" style="display:none;" id="EStartDate">
+                                            <label style="color:red;font-weight:bold;"> Required </label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                            <div class="col-sm-6 ">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>End Date</label>
+                                    </div>
+                                    <div class="col-sm-6">
+
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+
+                                            <input class="form-control" type="text" id="EndDate" name="EndDate" autocomplete="off" placeholder="Select Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                        <div class="" style="display:none;" id="EEndDate">
+                                            <label style="color:red;font-weight:bold;"> Required </label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+
+                        <div class="row" style="padding:2px">
+
+                            <div class="col-sm-6">
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Subject</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <style>
+                                            textarea.form-control {
+                                                padding: 0px;
+                                            }
+                                        </style>
+                                        @Html.TextAreaFor(model => model.Subject, 10, 20, new { @class = "form-control", id = "Subject", @required = "required" })
+
+                                        <div class="" style="display:none;" id="ESubject">
+                                            <label style="color:red;font-weight:bold;"> Required </label>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+
+
+                            </div>
+
+
+                            <div class="col-sm-6 ">
+
+
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Send SMS On</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("SendSMSOn", SendSMSOn, "---Select---", new { @class = "form-control col-sm-6", @id = "SendSMSOn" })
+                                        <div class="" style="display:none;" id="ESendSMSOn">
+                                            <label style="color:red;font-weight:bold;"> Required </label>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+
+                            
+                        </div>
+
+                        <div class=" col-md-8">
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <div class="col-sm-5">
+                                <div class="row">
+
+                                    <div class="col-sm-1">
+                                        @Html.CheckBoxFor(model => Model.RequireAcknowledgement, new { @id = "RequireAcknowledgement" })
+
+                                        <div class="" style="display:none;" id="ESendSMSOn">
+                                            <label style="color:red;font-weight:bold;"> Required </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <label>Require Acknowledgement</label>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                            
+                  <div class="col-sm-4">
+                      <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                          <i class="ace-icon fa fa-check bigger-50"></i>
+                          Save
+                      </button>
+                      &nbsp; &nbsp; &nbsp;
+                      <button class="btn btn-sm" type="reset">
+                          <i class="ace-icon fa fa-undo bigger-50"></i>
+                          Reset
+                      </button>
+
+                  </div>
+                            
+                        </div>
+
+                    </form>
+</div>
+               
+                    
+                
+
+                    
+
+
+                  
+                    
+
+
+
+           
+            }
+
+        </div>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+
+</section>
+@*@section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }*@
+
+<script type="text/javascript">
+    function validateEvents() {
+
+        document.getElementById("count").value = "1";
+        //var StartDate = document.getElementById('#daterange').value();
+        var SubscriptionId = document.getElementById('SubscriptionId').value;
+        var StartDate = document.getElementById('StartDate').value;
+        var EndDate = document.getElementById('EndDate').value;
+        var EventName = document.getElementById('EventName').value;
+        var Subject = document.getElementById('Subject').value;
+        var SendSMSOn = document.getElementById('SendSMSOn').value;
+        var ItemId = document.getElementById('ItemId').value;
+        var ReceipentsList = document.getElementById('ReceipentsList').value;
+
+        validate = true;
+
+        if (SubscriptionId == "") {
+            document.getElementById("ESubscriptionId").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ESubscriptionId").style.display = "none";
+        }
+
+        if (StartDate == "") {
+            document.getElementById("EStartDate").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EStartDate").style.display = "none";
+        }
+
+        if (EndDate == "") {
+            document.getElementById("EEndDate").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EEndDate").style.display = "none";
+        }
+
+        if (EventName == "") {
+            document.getElementById("EEventName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EEventName").style.display = "none";
+        }
+
+        if (SendSMSOn == "") {
+            document.getElementById("ESendSMSOn").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ESendSMSOn").style.display = "none";
+        }
+
+        if (ItemId == "" || ItemId == null) {
+            document.getElementById("EItemId").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EItemId").style.display = "none";
+        }
+
+        if (Subject == "" || Subject == 0) {
+            document.getElementById("ESubject").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ESubject").style.display = "none";
+        }
+
+        if (ReceipentsList == "") {
+            document.getElementById("EReceipentsList").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EReceipentsList").style.display = "none";
+        }
+
+        if (validate) {
+            $.ajax({
+                async: false,
+                url: '/ACalendar/CheckEventExistance',
+                data: { strEventName: EventName, strDates: StartDate },
+                success: function (data) {
+                    if (data.Status == "true") {
+                        $('#errorEve').text('Event Already Exists');
+                        validate = false;
+                    }
+                    else if (data.Status == "false") {
+                        validate = true;
+                    }
+                }
+            });
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+        debugger
+        var validatestatus = validateEvents();
+        if (validatestatus == false) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+
+    $('#StartDate').focus(function () {
+        $('#EStartDate').hide();
+    });
+    $('#EndDate').focus(function () {
+        $('#EEndDate').hide();
+    });
+    $('#EventName').focus(function () {
+        $('#EEventName').hide();
+    });
+
+    $('#SendSMSOn').focus(function () {
+        $('#ESendSMSOn').hide();
+    });
+    $('#ItemId').focus(function () {
+        $('#EItemId').hide();
+    });
+    $('#ReceipentsList').focus(function () {
+        $('#EReceipentsList').hide();
+    });
+
+</script>
+<script>
+    $(document).ready(function () {
+        LoadAllBranch();
+    })
+
+    $('#DivisionId').change(function () {
+        LoadAllBranch();
+    });
+
+
+    $('#BranchId').change(function () {
+
+        var itemId = $("#ItemId").val();
+
+        if (itemId == 3) {
+
+
+
+
+        }
+
+    })
+
+    function LoadAllBranch() {
+
+        var DivisionId = $("#DivisionId").val();
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: true },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+
+                    result.splice(0, 1);
+
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                }
+            })
+        }
+    }
+
+    //$(".select2").select2();
+    $('#ItemId').change(function () {
+        debugger
+        $('#ReceipentsList').html("");
+        $('#ReceipentsList').val("");
+        //$('checkbox').html("");
+        //$('checkbox').is(':unchecked');
+        //$(".select2").select2("val", "");
+        $('#ReceipentsList').children().remove();
+
+        var itemId = $(this).val();
+
+        if (itemId == 0 || itemId == null || itemId == "null")
+            return;
+
+        if (itemId == 1) {
+            $('#Status').show();
+        }
+        else {
+            $('#Status').hide();
+        }
+
+        if (itemId == 5) {
+            $('#Receipents').hide();
+
+            $('#Others').show();
+        }
+        else {
+            $('#Others').hide();
+            $('#Receipents').show();
+        }
+
+        GetReceipents();
+    });
+
+    function GetReceipents() {
+        var itemId = $("#ItemId").val();
+        debugger
+        var divisionId = 0;
+        var branchId = 0;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "Value") {
+            divisionId = $('#DivisionId').val();
+        }
+
+        branchId = $('#BranchId').val();
+        $('#imagemodal').show();
+
+        $.ajax({
+
+            url: '/CSMSMail/GetReceipentsList',
+            data: { GroupId: itemId, DivisionId: divisionId, BranchId: branchId },
+            success: function (data) {
+
+                var ReceipentsListItems = $('#ReceipentsList');
+
+                ReceipentsListItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    ReceipentsListItems.append($("<option>").val(record.Value).text(record.Text));
+                });
+
+                $("#ReceipentsList").append(ReceipentsListItems);
+                $('#imagemodal').hide();
+
+            }
+        })
+    }
+
+    $("#checkbox").click(function () {
+        if ($("#checkbox").is(':checked')) {
+            $("#ReceipentsList > option").prop("selected", "selected");
+            $("#ReceipentsList").trigger("change");
+        } else {
+            $("#ReceipentsList > option").removeAttr("selected");
+            $("#ReceipentsList").trigger("change");
+        }
+    });
+</script>
+<script>
+
+    $(".select2").select2()
+
+
+    $("#checkboxClass").click(function () {
+        if ($("#checkboxClass").is(':checked')) {
+            $("#SubscriptionId > option").prop("selected", "selected");
+            $("#SubscriptionId").trigger("change");
+        } else {
+            $("#SubscriptionId > option").removeAttr("selected");
+            $("#SubscriptionId").trigger("change");
+        }
+    });
+
+
+</script>

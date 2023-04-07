@@ -1,0 +1,619 @@
+﻿@model AsteriskBrowserAL.Models.MicroScheduleData
+@{
+    ViewBag.Title = "Micro Plans Upload";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Micro Plan
+        </li>
+        <li class="active">Micro Plans Upload</li>
+    </ul>
+}
+
+
+<section class="content">
+ 
+    @Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+    @using (Html.BeginForm("Download_Bulk_MicroPlans", "AMicroSchedule", FormMethod.Post, new { id = "formMicroPlans", enctype = "multipart/form-data" }))
+    {
+        if (TempData["Message"] != null)
+        {
+            <div></div>
+            <span style="color:green;font-weight:bold">@TempData["Message"].ToString()</span>
+        }
+
+        <div class="">
+            <div class="col-sm-12">
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+               
+              
+                    <div class="table-header">
+
+     
+
+                            Micro Plans Upload
+                 
+                            
+
+
+                      
+                    </div><!-- /.box-header -->
+         
+                    <div class="widget-box row" style="padding:10px;">
+                        <div class="col-sm-7" style="font-size:15px;">
+
+                            <table>
+                                <tr>
+                                    <td style="color:black">
+                                        <input type="radio" id="rbDownload" name="Type" /> Download Format
+                                        <input type="radio" id="rbUpload" style="margin : 10px" name="Type" /> Upload
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="hr hr-18 dotted hr-double"></div>
+                        </div>
+
+                        <div class=""  id="divWidgetBody">
+             
+                            <div class="row" id="divDownload"  style="display:none">
+                                <input type="hidden" name="TypeName" id="SelType" />
+
+                                <input type="hidden" name="IsCentral" id="IsCentral" value="@Model.IsCentral" />
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                     
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+
+                                                    <div class="col-sm-6">
+                                                        <select class="form-control" id="SubscriptionId" name="SubscriptionId"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                                    <div class="col-sm-6">
+                                                        <select class="form-control" id="ClassNumberId" name="ClassNumberId"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                }
+
+                           
+
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Exam")</label>
+
+                                                <div class="col-sm-6">
+                                                    <select id="ExamId" name="ExamId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Subject")</label>
+
+                                                <div class="col-sm-6">
+                                                    <select id="SubjectId" name="SubjectId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                   
+                                                <label class="col-sm-3 control-label no-padding-right">Date Range</label>
+
+                                                <div class="col-sm-6">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="daterange" name="DateRange" autocomplete="off" />
+                                                        <div class="input-group-addon" style="position:relative;z-index:50">
+                                                            <i class="fa fa-calendar"></i>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class=" col-sm-6">
+                                         
+                                        </div>
+                                    </div>
+                                    <div class=" col-sm-12" >
+                                        <div class="col-sm-8" style="padding-left:20px;">
+
+                                            <div class="hr hr-18 dotted hr-double"></div>
+                                            <a class="btncustom" id="btnDownload">Download</a>
+                                        </div>
+                                    </div>
+                                </div>
+                              
+                          
+                                </div>
+
+                            <div class="row" id="divUpload" style="display:none">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        @*<div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Type</label>
+                                            <div class="col-sm-6">
+                                                <select id="CboUploadType" class="form-control">
+                                                    <option value="-1">--Select--</option>
+                                                    <option value="0">Tution Fee</option>
+                                                    <option value="1">Transport Fee</option>
+                                                    <option value="2">Admission</option>
+                                                </select>
+                                            </div>
+                                        </div>*@
+                                    </div>
+                                </div>
+
+                              
+                 
+
+                                <div class="row">
+                                    <div class="col-sm-10">
+                                  
+                                          
+                                         
+                                            <input style="margin-left:10px;margin-right:20px;" type="file" id="File" name="UploadedFile"  class="choose"/>
+                                       
+
+                                     
+                                    </div>
+                                    <div class="col-sm-10" align="center" style="margin-top:15px;">
+
+
+                                        <a class="btn btn-success" id="btnPreview" style="padding: 3px 10px 3px 10px;font-weight:bold">Preview</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <a class="btn btn-danger" id="btnCancel" style="padding: 3px 10px 3px 10px;font-weight:bold">Cancel</a>
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="divExcelView"> </div>
+            </div>
+       
+    }
+
+</section>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        $('#divDownload').hide();
+        $('#divUpload').hide();
+        $('#divWidgetBody').hide();
+
+        LoadBranchDropdown();
+    });
+
+
+    $('#rbDownload').click(function () {
+
+        $('#Validation').html('');
+
+        $('#divWidgetBody').show();
+        $('#divDownload').show();
+        $('#divUpload').hide();
+    });
+
+
+    $('#rbUpload').click(function () {
+
+        $('#Validation').html('');
+        $('#divWidgetBody').show();
+        $('#divDownload').hide();
+        $('#divUpload').show();
+    });
+
+    $('#btnCancel').click(function () {
+        $('File').val('');
+        $('#divExcelView').html('');
+    });
+
+
+    function LoadBranchDropdown() {
+        $.ajax({
+            url: '/AMicroSchedule/GetBranchesByDivisionDefineSchedule',
+            data: { DivisionId: 0, IsAll: true },
+            success: function (result) {
+                Branch = $("#SubscriptionId")
+                Branch.children().remove();
+                $.each(result, function (i, elm) {
+                    Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                })
+                $("#SubscriptionId").append(Branch)
+
+            },
+            async: false
+        })
+
+
+    }
+
+    $("#SubscriptionId").change(function () {
+        var BranchId = $("#SubscriptionId").val();
+        $("#ClassNumberId").html("")
+        $("#ExamId").html("")
+        $("#SubjectId").html("")
+        $("#divExcelView").html("");
+
+        if (BranchId > -2) {
+            LoadClassDropdown();
+
+        }
+    })
+
+
+    function LoadClassDropdown() {
+        var SelClassId = $("#SelClassId").val();
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                Section = $("#ClassNumberId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassNumberId").append(Section)
+                //if (SelClassId > 0) {
+                //    document.getElementById("ClassNumberId").value = SelClassId;
+                //    GetStudentData();
+                //}
+
+            },
+            async: false
+        })
+    }
+    $('#ClassNumberId').change(function () {
+        debugger
+        $("#ExamId").html("")
+        $("#SubjectId").html("")
+        $("#divExcelView").html("");
+
+
+        if ($("#ClassNumberId").val() > 0) {
+            GetExaminations();
+
+        }
+
+    });
+
+
+
+
+    function GetExaminations() {
+        var ClassNumberid = $('#ClassNumberId').val();
+        var BranchsId = $('#SubscriptionId').val();
+
+        if (ClassNumberid > 0) {
+            $.ajax({
+                url: '/AMicroSchedule/GetExaminationsByClassNumberBranchWise',
+                data: { nClassNumberId: ClassNumberid, SubscriptionId: BranchsId },
+                success: function (data) {
+
+                    var ExaminationItems = $('#ExamId');
+
+                    ExaminationItems.children().remove();
+
+                    ExaminationItems.append($("<option>").val("0").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        ExaminationItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+
+                    });
+
+                    $('#ExamId').append(ExaminationItems);
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    $("#ExamId").change(function () {
+
+        var Examid = $("#ExamId").val()
+        $("#SubjectId").html("")
+        $("#divExcelView").html("");
+
+        if (Examid > 0) {
+            GetSubjects();
+
+        }
+    })
+
+
+    function GetSubjects() {
+
+        var ClassNumberid = $('#ClassNumberId').val();
+
+        if (ClassNumberid > 0) {
+            $.ajax({
+
+                url: '/AMicroSchedule/GetSubjects',
+                data: { nClassNumberId: ClassNumberid },
+                success: function (data) {
+
+                    var SubjectItems = $('#SubjectId');
+
+                    SubjectItems.children().remove();
+
+                    SubjectItems.append($("<option>").val("").text("--- Select ---"));
+                    SubjectItems.append($("<option>").val("-1").text(" All "));
+
+                    $.each(data, function (i, record) {
+
+                        SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+
+                    });
+
+                    $('#SubjectId').append(SubjectItems);
+                },
+                aync: false
+            });
+        }
+    }
+
+    //$('#CboDivision').change(function () {
+
+    //    $('#Validation').html('');
+
+    //    document.getElementById("Validation").innerHTML = ""
+
+    //    var DivisionId = $('#CboDivision').val();
+
+
+    //    if (DivisionId != 0) {
+    //        $.ajax({
+    //            url: '/Common/GetBranchesByDivisionId',
+    //            data: { DivisionId: DivisionId, IsAll: true },
+    //            success: function (data) {
+    //                var BranchItems = $('#CboBranch');
+
+    //                BranchItems.children().remove();
+
+    //                BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+    //                $.each(data, function (i, record) {
+    //                    BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+    //                });
+
+    //                $('#CboBranch').append(BranchItems);
+    //            },
+    //            aync: false
+    //        });
+    //    }
+    //    else {
+    //        var BranchItems = $('#CboBranch');
+    //        BranchItems.children().remove();
+    //        BranchItems.append($("<option>").val(0).text(""));
+    //    }
+    //});
+
+
+    //$("#CboBranch").change(function () {
+
+    //    document.getElementById("Validation").innerHTML = ""
+
+    //    $('#dvStudents').html("");
+    //})
+
+    $('#btnDownload').click(function () {
+        DownloadFile();
+    });
+
+    function DownloadFile() {
+
+        debugger
+
+        var bValid = Validate_DownloadData();
+
+        if (bValid == false)
+            return;
+
+        //var TypeName = $("#CboType option:selected").text();
+
+       // $('#SelType').val(TypeName);
+        $('#formMicroPlans').submit();
+    }
+
+    function Validate_DownloadData() {
+        debugger
+        var SubscriptionId = $('#SubscriptionId').val();
+        var ClassNumberId = $('#ClassNumberId').val();
+        var ExamId = $('#ExamId').val();
+        var SubjectId = $('#SubjectId').val();
+        var daterange = $('#daterange').val();
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+       
+            if (SubscriptionId == "null" || SubscriptionId < 0 ) {
+                Message += "Branch";
+                isValid = false;
+            }
+
+            if (ClassNumberId == "null" || ClassNumberId < 1) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Class";
+                isValid = false;
+            }
+
+        if (ExamId < 1) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Exam";
+            isValid = false;
+        }
+
+
+        if (SubjectId < -1) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Subject";
+            isValid = false;
+        }
+
+        //if (daterange == null || daterange == undefined || daterange == "") {
+        //    if (!isValid)
+        //        Message += ",";
+
+        //    Message += " Date Range";
+        //    isValid = false;
+        //}
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+        }
+
+        return isValid;
+
+    }
+
+    $('#btnPreview').click(function () {
+        PerformPreview();
+    });
+
+    function PerformPreview() {
+
+        //var Type = $('#CboUploadType').val();
+
+        //if (Type < 0) {
+        //    $('#Validation').html('Please select type');
+        //    return;
+        //}
+
+        var files = $("#File").get(0).files;
+
+        if (files.length < 0) {
+            $('#Validation').html('Please upload a file');
+            return;
+        }
+
+        var extension = $("#File").val().split('.').pop().toUpperCase();
+        if (extension != "XLSX") {
+            $('#Validation').html('Please upload a downloaded excel file');
+            return;
+        }
+
+        var formData = new FormData();
+        var totalFiles = document.getElementById("File").files.length;
+
+        for (var i = 0; i < totalFiles; i++) {
+            var file = document.getElementById("File").files[i];
+            formData.append("FileUpload", file);
+        }
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/AMicroSchedule/PreviewUploadedFile',
+            data: formData,
+            type: "POST",
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                $('#imagemodal').hide();
+                $("#divExcelView").html(data);
+            },
+            async: false,
+            error: function (er) { $('#imagemodal').hide(); }
+
+        });
+    }
+
+    function Validate_Upload() {
+
+        var Type = $('#CboType').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            if (DivisionId == "null" || DivisionId <= 0 && DivisionId != -1) {
+                Message += "Division";
+                isValid = false;
+            }
+
+            if (SubscriptionId == "null" || SubscriptionId <= 0 && SubscriptionId != -1) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Branch";
+                isValid = false;
+            }
+        }
+
+        if (ClassId < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Class";
+            isValid = false;
+        }
+
+
+        if (Type < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Type";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+        }
+
+        return isValid;
+    }
+
+</script>
+

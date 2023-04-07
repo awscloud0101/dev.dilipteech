@@ -1,0 +1,189 @@
+﻿
+@model PagedList.IPagedList<AsteriskBrowserAL.Models.FeeDueReportViewModel>
+@using PagedList.Mvc;
+@using AsteriskBrowserAL.Helpers
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+@{
+
+    ViewBag.Title = "Fee Due Report";
+    Layout = null;
+}
+
+<style>
+    .Amount {
+        text-align: right;
+        min-width: 100Px;
+        padding-right: -20px;
+    }
+
+    .HeaderStyle {
+        min-width: 140Px;
+    }
+
+    .AmountHeaderStyle {
+        min-width: 110Px;
+        text-align: center;
+    }
+
+    .tblTitle {
+        position: absolute;
+    }
+</style>
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+
+@if (Model != null && Model.Count() > 0)
+{
+    int nsno = 1;
+
+
+    <div class="table-header">
+
+        Records Found (@Model.Count())
+
+
+        <div style="float:right">
+            <button class="btn btn-info btn-minier">
+                <i class="ace-icon fa fa-share bigger-160"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="box-body table-responsive no-padding">
+        <div style="overflow:auto;height:400px">
+            <table class="table table-striped table-bordered dynamic-table">
+                <thead>
+
+                    <tr>
+                        <th style="text-align:center;min-width:60px">
+                            @Html.DisplayName("SNo")
+                        </th>
+                        <th style="text-align:center;min-width:140px">
+                            @Html.DisplayName("Division Name")
+                        </th>
+                        <th style="text-align:center;min-width:150px">
+                            @Html.DisplayName("Branch Name")
+                        </th>
+                        <th class="HeaderStyle">
+                            @Html.DisplayName("Admission Number")
+                        </th>
+                        <th class="HeaderStyle">
+                            @Html.DisplayName("Student Name")
+                        </th>
+                        <th class="HeaderStyle">
+                            @Html.DisplayName("Father Name")
+                        </th>
+                        <th class="HeaderStyle">
+                            @Html.DisplayName("Mobile No")
+                        </th>
+                        <th style="text-align:center;min-width:120px">
+                            @Html.DisplayName("Class")
+                        </th>
+                        <th style="min-width:80px">
+                            @Html.DisplayName("Section")
+                        </th>
+                        <th style="min-width:80px">
+                            @Html.DisplayName("Agreed Fee")
+                        </th>
+                    </tr>
+
+
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td style="text-align:center;min-width:60Px">
+                                @(nsno++)
+                            </td>
+                            <td style="min-width:140Px">
+                                @item.DivisioName
+                            </td>
+                            <td>
+                                @item.BranchName
+                            </td>
+                            <td>
+                                @item.AdmissionNo
+                            </td>
+                            <td>
+                                @item.StudentDisplayName
+                            </td>
+                            <td>
+                                @item.FatherName
+                            </td>
+                            <td>
+                                @item.MobileNumber
+                            </td>
+                            <td>
+                                @item.ClassNumberDisplay
+                            </td>
+                            <td>
+                                @item.SectionName
+                            </td>
+                            <td class="Amount">
+                                @item.AFAF
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br />
+    // @Html.Action("DataTableScripts", "Base")
+    @*<div id='myPager' style="text-align: right">
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)
+            of @Model.PageCount
+
+            @Html.PagedListPager(Model, page => Url.Action("ReturnFeeArrivedReportPartialViewWithPaging", new { page }))
+        </div>*@
+
+}
+else
+{
+    <br />
+    <span style="color: red;"><b>Data is not available</b></span>
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = true, allowScroll = true })
+<script>
+
+    $('#myPager').on('click', 'a', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: this.href,
+            type: 'GET',
+            cache: false,
+            success: function (result) {
+                $('#TbFeeDueReport').html(result);
+            }
+        });
+    });
+
+
+    $('#search-btn').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/FReports/ReturnFeeArrivedReportPartialViewWithPaging/',
+            data: { page: 0, strSearch: $('#Search-txt').val() },
+            type: 'GET',
+            cache: false,
+            success: function (result) {
+                $('#TbFeeDueReport').html(result);
+            }
+        });
+    });
+
+
+    //$("#btnExport").click(function (e) {
+    //    debugger
+    //    var Data = $("#tbFeeDueReportData").html();
+    //});
+</script>
+
+
+
+

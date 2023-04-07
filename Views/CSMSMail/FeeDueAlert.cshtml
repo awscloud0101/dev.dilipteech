@@ -1,0 +1,281 @@
+﻿@model AsteriskBrowserAL.Models.FeeDueList
+@{
+
+    ViewBag.Title = "Pre Admission List";
+
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-key"></i>
+            Controls
+        </li>
+        <li>
+            <i class=""></i>
+            SMS Mail
+        </li>
+        <li class="active"> Fee Due Alerts</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+ 
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("FeeDueAlert", "CSMSMail", FormMethod.Post))
+            {
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                <span style="color:green;font-weight:bold" id="SaveVal">@Model.StudentDisplayName</span>
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Fee Due Alert</span>
+                 
+
+                </div>
+
+
+
+           <!-- /.box-header -->
+                <div class="widget-box">
+             
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 ">Division</label>
+                                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 ">Branch</label>
+                                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                <select id="BranchId" name="BranchId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                           
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 ">Class</label>
+                                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                            <select id="ClassId" name="ClassId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 pull-right">
+
+                                        <input type="radio" id="StatusAll" name="Status" value="0"><b> &nbsp;All  &nbsp;</b>
+
+                                        <input type="radio" id="StatusA" name="Status" value="1" checked="checked"><b> &nbsp;Active  &nbsp;</b>
+
+                                        <input type="radio" id="StatusI" name="Status" value="2"><b> &nbsp; In-Active&nbsp;</b>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    </div>
+                                </div>
+                            </div>
+                                   </div>
+                    </div>
+
+                                    <div id="SearchDiv">
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+
+
+
+                            <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+                                <p style="position:absolute; top: 50%; left:50%;">
+                                    <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+                                </p>
+                            </div>
+
+</section>
+
+
+
+<script>
+
+    function OnloadData() {
+        LoadDivisionDropdown();
+        //LoadClassDropdown()
+
+    }
+
+    function LoadDivisionDropdown() {
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+                var SelDivisionId = $("#SelDivisionId").val();
+                if (SelDivisionId >= 0) {
+                    document.getElementById("DivisionId").value = SelDivisionId;
+                    LoadBranchDropdown();
+                }
+
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        var Division = $("#DivisionId").val();
+        if (Division >= 0) {
+            LoadBranchDropdown();
+
+        }
+    })
+
+    $("#BranchId").change(function () {
+        var BranchId = document.getElementById("BranchId").value;
+        if (BranchId >= 0) {
+            LoadClassDropdown()
+        }
+
+    })
+
+
+
+
+    function LoadBranchDropdown() {
+        var DivisionId = $("#DivisionId").val()
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                    var SelBranchid = $("#SelBranchId").val();
+
+                    if (SelBranchid >= 0) {
+                        document.getElementById("BranchId").value = SelBranchid
+                        LoadClassDropdown()
+                    }
+                },
+                async: false
+            })
+        }
+        else {
+
+        }
+    }
+
+    window.onload = OnloadData();
+    function LoadClassDropdown() {
+        document.getElementById("SaveVal").innerHTML = "";
+
+
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            data: { SelClassNumber: 0, IsAll: true },
+            success: function (result) {
+                Section = $("#ClassId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(Section)
+
+
+            },
+            async: false
+        })
+
+
+    }
+
+
+
+
+
+    $("#ClassId").change(function () {
+        document.getElementById("SaveVal").innerHTML = "";
+
+        $("#SearchDiv").html("")
+
+        GetStudentsForFeeDue()
+    })
+
+    $("#StatusAll").change(function () {
+        document.getElementById("SaveVal").innerHTML = "";
+
+        $("#SearchDiv").html("")
+
+        GetStudentsForFeeDue()
+    })
+
+    $("#StatusA").change(function () {
+        document.getElementById("SaveVal").innerHTML = "";
+
+        $("#SearchDiv").html("")
+
+        GetStudentsForFeeDue()
+    })
+
+    $("#StatusI").change(function () {
+        document.getElementById("SaveVal").innerHTML = "";
+
+        $("#SearchDiv").html("")
+
+        GetStudentsForFeeDue()
+    })
+
+
+
+
+    function GetStudentsForFeeDue() {
+        var ClassId = $("#ClassId").val()
+        var Status = $("input[name=Status]:checked").val()
+        var BranchId = $("#BranchId").val()
+        $("#imagemodal").show();
+        if (ClassId >= 0) {
+            $.ajax({
+                url: '/CSMSMail/GetStudentsForFeeDue',
+                data: { ClassId: ClassId, Studentstype: Status, BranchId: BranchId },
+                success: function (Data) {
+                    $("#imagemodal").hide();
+
+                    $("#SearchDiv").html(Data)
+                }
+            }).done(function () {
+                $("#imagemodal").hide();
+            })
+        }
+
+    }
+
+
+
+
+</script>
+
+
+
+
+
+

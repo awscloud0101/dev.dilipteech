@@ -1,0 +1,172 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.MonthwiseWorkingDaysData>
+
+@{
+    ViewBag.Title = "WorkingDays";
+
+    List<AsteriskBrowserAL.Models.MonthwiseWorkingDaysData> lstWorkingDaysMonthWise = new List<AsteriskBrowserAL.Models.MonthwiseWorkingDaysData>();
+    if (null != Model && Model.Count() > 0)
+    {
+        var data = Model.FirstOrDefault();
+
+        if (null != data)
+        {
+            lstWorkingDaysMonthWise = data.lstWorkingDaysMonthWise.ToList();
+        }
+    }
+
+
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Working Days</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+  
+    <div class="row">
+        <div class=col-xs-12>
+            @if (lstWorkingDaysMonthWise.Count() > 0)
+            {
+                if (null != Model && Model.Count() > 0)
+                {
+                    using (Html.BeginForm("WorkingDays", "SeAcademics", FormMethod.Post))
+                    {
+                        if (ViewBag.IsSaved == true)
+                        {
+                           
+
+
+
+                            <p align="center">
+                                <span class="savedinfo">
+
+
+
+                                    <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                                    <br />
+                                    Data saved successfully.
+                                    <br />
+                                    
+                                    <span class="cls1 btncustom">Close</span>
+                                    <script>
+
+                                        $(document).ready(function () {
+                                            $(".cls1").click(function () {
+
+                                                $(".savedinfo").css("display", "none")
+                                            });
+
+                                        });
+
+                                    </script>
+                                </span>
+                            </p>
+                        }
+
+                        int nsno = 1;
+                        <div class="table-header">
+                            Working Days
+                            <div style="float:right;margin-right:10px;">
+                                <button type="submit" name="Save" class="btncustom P2">
+                                 Save
+                                </button>
+                            </div>
+
+                        </div>
+                        <table id="mytab1" class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                       S.No.
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Branch Name")
+                                    </th>
+
+                                    @if (null != lstWorkingDaysMonthWise)
+                                    {
+                                        foreach (var Month in lstWorkingDaysMonthWise)
+                                        {
+                                            <th>
+                                                @Month.MonthName
+                                            </th>
+                                        }
+                                    }
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @for (int i = 0; i < Model.Count(); i++)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.Hidden("lstWorkingDays.Index", (@i + 10))
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+                                            @Html.Hidden("lstWorkingDays[" + (@i + 10) + "].Subscriptionid", Model.ElementAt(i).SubscriptionId)
+                                            @Model.ElementAt(i).BranchName
+                                        </td>
+
+                                        @if (Model.ElementAt(i).lstWorkingDaysMonthWise.Count() > 0)
+                                        {
+                                            for (int j = 0; j < Model.ElementAt(i).lstWorkingDaysMonthWise.Count(); j++)
+                                            {
+                                                <td>
+                                                    @Html.Hidden("lstWorkingDays[" + (@i + 10) + "].lstWorkingDaysMonthWise[" + j + "].MonthId", Model.ElementAt(i).lstWorkingDaysMonthWise.ElementAt(j).MonthId)
+                                                    @Html.Hidden("lstWorkingDays[" + (@i + 10) + "].lstWorkingDaysMonthWise[" + j + "].MonthName", Model.ElementAt(i).lstWorkingDaysMonthWise.ElementAt(j).MonthName)
+
+                                                    @Html.TextBox("lstWorkingDays[" + (@i + 10) + "].lstWorkingDaysMonthWise[" + j + "].NoOfWorkingDays", Model.ElementAt(i).lstWorkingDaysMonthWise.ElementAt(j).NoOfWorkingDays, new { @class = "form-control textlength", @maxlength = "2", @min = "0", onkeypress = "return isNumberKey(event)", @max = 31, @style = "width:50px" })
+                                                </td>
+                                            }
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                              
+                        </table>
+                    }
+
+
+                }
+                else
+                {
+                    <span style="color: red;"><b>No data available to display</b></span>
+                }
+            }
+            else
+            {
+                <span style="color: red;"><b>No data available to display</b></span>
+            }
+        </div>
+    </div>
+</section>
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+</script>

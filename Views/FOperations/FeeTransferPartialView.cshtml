@@ -1,0 +1,144 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.FeePaymentsData>
+@{
+    Layout = null;
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+<div id="divPaymentDialogue" style="display:none">
+</div>
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+    <div class="table-header">
+        Records Found (@Model.Count())
+    </div>
+
+    <input type="hidden" name="SubscriptionId" id="hnSubscriptionId" value="@ViewBag.SubscriptionId" />
+    <input type="hidden" name="StudentId" id="StudentId" value="@ViewBag.StudentId" />
+
+    <table id="mytable" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Receipt No")
+                </th>
+                <th>
+                    @Html.DisplayName("Particular")
+                </th>
+                <th>
+                    @Html.DisplayName("Transaction Date")
+                </th>
+                <th>
+                    @Html.DisplayName("Debit Amount")
+                </th>
+                <th>
+                    @Html.DisplayName("Transfer Amount")
+                </th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{int n = 0;}
+            @foreach (var item in Model)
+            {
+                n = nsno++;
+                <tr>
+                    <td>
+                        @n
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReceiptNo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FeeParticularName)
+                    </td>
+                    <td>
+                        @if (item.TransactionDate.HasValue)
+                        {
+                            @item.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DebitAmount)
+                    </td>
+                    <td>
+                        <input type="text" value="@item.DebitAmount" id="ReqAmount" />
+                    </td>
+
+                    <td>
+                        @if (item.IsTransfer == true)
+                        {
+                            <span class="label label-danger">Approval Pending</span>
+                        }
+                        else
+                        {
+                            <a class="P2 btn btn-white btn-success btn-round btn-sm" onclick="return TransferClick(@item.FeePaymentId,@ViewBag.SubscriptionId,@ViewBag.StudentId,@n)" role="button"><span style="font-weight:bold">Send Request</span></a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @Html.Action("DataTableScripts", "Base")
+
+                }
+                else
+                {
+                    <span style="color: red;"><b>No transactions found</b></span>
+                }
+
+
+
+<script>
+
+    function OpenTransferDialog() {
+
+        var $dialog = $('#divPaymentDialogue')
+
+        .dialog({
+            resizable: false,
+            draggable: false,
+            width: '900',
+            modal: true,
+            title: 'Payment Heads',
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            title_html: true,
+            buttons: [
+                {
+                    html: "Save",
+                    "class": "btn btn-danger btn-minier",
+                    click: function () {
+
+                        SaveFeeTransfer();
+                        debugger
+
+                    }
+                },
+                {
+                    html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                    "class": "btn btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+    }
+
+
+</script>
+
+

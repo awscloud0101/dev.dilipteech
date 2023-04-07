@@ -1,0 +1,239 @@
+﻿@model AsteriskBrowserAL.Models.ItemGroupViewModel
+
+@{
+    ViewBag.Title = "Item Group";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Master Data
+        </li>
+        <li class="active">Item Group</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+<section class="content">
+
+    <br/>
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ItemGroup", "SMasterData", FormMethod.Post))
+            {
+                <span style="color:red;" id="Validation"></span>
+                <input type="hidden" value="@Model.InventorySubCategoryId" id="SelSubCatId"/>
+    <div class="widget-box">
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">
+                Item Group
+            </h5>
+            <div class="widget-toolbar no-border">
+                <div class="inline action-buttons">
+                    <a onclick="return SubmitForm()" class="blue P2"><i class="fa fa-plus-circle bigger-200"></i></a>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Category</label>
+                        <div class="col-sm-6">
+                            @if (null != Model)
+                            {
+                                if (null != Model.lstCategory)
+                                {
+                                    @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.lstCategory, "InventoryCategoryId", "CategoryName"), "--- Select ---", new { @class = "form-control", id = "CategoryId" })
+                                }
+                                else
+                                {
+                                    <select id="CategoryId" style="width:200px;" class="form-control"></select>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Sub Category</label>
+                        <div class="col-sm-6">
+                            <select id="SubCategoryId" style="width:200px;" class="form-control"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        
+
+        <div id="ItemGroups"></div>
+        }
+    </div>
+    </div>
+</section>
+
+
+<script>
+
+    $(document).ready(function () {
+        if ($('#CategoryId').val() > 0) {
+            GetSubCategories();
+        }
+    })
+
+    $('#CategoryId').change(function () {
+        document.getElementById("Validation").innerHTML = "";
+        var CategoryId = $(this).val();
+
+        if (CategoryId == "" || CategoryId < 1) {
+            $('#SubCategoryId').empty();
+            $('#ItemGroups').html("");
+        }
+        else
+        {
+            GetSubCategories();
+            $('#ItemGroups').html("");
+        }
+    });
+
+    $('#SubCategoryId').change(function () {
+        document.getElementById("Validation").innerHTML = "";
+        GetData();
+    });
+
+    function GetSubCategories() {
+        var CategoryId = $('#CategoryId').val();
+
+        if (CategoryId > 0) {
+            $.ajax({
+
+                url: '/SMasterData/GetSubCategoriesByCategoryId',
+                data: { CategoryId: CategoryId },
+                success: function (data) {
+
+                    var SubCategoryItems = $('#SubCategoryId');
+
+                    SubCategoryItems.children().remove();
+
+                    SubCategoryItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        SubCategoryItems.append($("<option>").val(record.InventorySubCategoryId).text(record.SubCategoryName));
+
+                    });
+
+                    $('#SubCategoryId').append(SubCategoryItems);
+
+                    if ($('#SelSubCatId').val() > 0) {
+
+                        document.getElementById("SubCategoryId").value = $('#SelSubCatId').val();
+                        GetData();
+                    }
+
+                },
+                aync: false
+            });
+        }
+    }
+
+   
+    function SubmitForm() {
+
+        var valid = true;
+
+        var CategoryId = $('#CategoryId').val();
+        var SubCategoryId = $('#SubCategoryId').val();
+
+
+        if (CategoryId == "" || CategoryId < 1) {
+            document.getElementById("Validation").innerHTML = "Please select category";
+            return false;
+        }
+
+        if (SubCategoryId == "" || SubCategoryId == "null" || SubCategoryId < 1 || SubCategoryId == null) {
+            document.getElementById("Validation").innerHTML = "Please select sub category";
+            return false;
+        }
+
+      
+
+        if (valid == true) {
+
+            window.location.href = '/SMasterData/ItemGroupC?CategoryId=' + CategoryId + '&SubCategoryId=' + SubCategoryId;
+
+        }
+    }
+
+
+    function GetData() {
+
+        var id = $('#SubCategoryId').val();
+
+        if(id > 0)
+        {
+            $.ajax({
+
+                url: '/SMasterData/GetItemGroups',
+                data: { SubCategoryId: $('#SubCategoryId').val() },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#ItemGroups').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else
+        {
+            $('#ItemGroups').html("");
+        }
+
+    }
+   
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeHR/ValidationForItemGroupD',
+                data: { Id: Value },
+                success: function (data) {
+                    debugger
+                    var url = '/SeHR/ItemGroupD?ivm=' + Value;
+                    var title = "Item Group";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+

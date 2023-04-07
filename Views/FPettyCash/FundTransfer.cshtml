@@ -1,0 +1,274 @@
+﻿@model AsteriskBrowserAL.Models.FundsTransferViewModel
+@{
+    ViewBag.Title = "Fund Transfer";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Petty Cash
+        </li>
+        <li class="active">Fund Transfer</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<section class="content">
+
+   
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("FundTransfer", "FPettyCash", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <input type="hidden" id="SelBranchId" value="@Model.ToBranch" />
+
+                    if (Model.IsCentral)
+                    {
+
+
+                        <div class="table-header">
+                            <span style="font-family:calibri;">Funds Transfer</span>
+                           <div class="" style="float:right;margin-right:10px;">
+
+                            <a class="  btncustom P2 " role="button" onclick="FundTransfer('true')">Add</a>
+                            <a class=" btncustom  P2" aria-hidden="true"  onclick="FundTransfer('false')">Edit</a>
+                        </div>
+
+                        </div>
+
+                        <div class="widget-box">
+
+                     
+
+
+                            <div class="widget-body">
+                                <div class="widget-main">
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                            <div class="col-sm-6">
+                                                <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                }
+                <div id="FundTransferDIV"></div>
+
+            }
+        </div>
+    </div>
+
+
+
+
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        if ($('#DivisionId').val() > 0) {
+            GetBranches();
+        }
+    });
+
+    var SelBranch = $("SelBranchId").val()
+
+    if (SelBranch > 0) {
+        document.getElementById("BranchId").value = SelBranch;
+        LoadFundTransferData();
+    }
+
+    $('#DivisionId').change(function () {
+        var DivisionId = $('#DivisionId').val();
+        $('#FundTransferDIV').html("");
+        $('#SelBranchId').val('0')
+
+        var BranchItems = $('#BranchId');
+        BranchItems.children().remove();
+
+        GetBranches();
+    });
+
+    function GetBranches() {
+        var DivisionId = $('#DivisionId').val();
+
+        $('#Controls').hide();
+
+        if (DivisionId > 0) {
+            $.ajax({
+
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    $('#imagemodal').hide();
+                },
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+
+                    var SelBranchId = $('#SelBranchId').val();
+
+                    if (SelBranchId > 0) {
+                        $('#BranchId').val(SelBranchId);
+                    }
+
+                    if ($('#BranchId').val() > 0) {
+
+                        LoadFundTransferData()
+                    }
+
+                },
+                aync: false
+            });
+        }
+    }
+
+    function LoadFundTransferData() {
+
+        $('#Controls').show();
+
+        $.ajax({
+
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+                document.getElementById("Controls").style = "display:none";
+            },
+
+            url: '/FPettyCash/FundTransferGridData',
+            data: { nBranchId: $('#BranchId').val() },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#FundTransferDIV').html(data);
+            },
+            aync: false
+
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    $('#BranchId').change(function () {
+
+        var resBranchId = $('#BranchId').val();
+        $('#Controls').hide();
+
+        if (resBranchId < 1 || resBranchId == "null") {
+            $('#FundTransferDIV').html("");
+            return;
+        }
+
+        LoadFundTransferData()
+
+    });
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function FundTransfer(IsNew) {
+
+        debugger
+        var DivisionId = $('#DivisionId').val()
+        var BranchId = $('#BranchId').val();
+
+        document.getElementById("Validation").innerHTML = "";
+
+        var DisplayValidation = "";
+
+        var valid = true;
+
+        if (DivisionId == 0) {
+            valid = false;
+            DisplayValidation += "Division, ";
+        }
+
+        var BranchId = $('#BranchId').val();
+        if (BranchId == null || BranchId == "null" || BranchId == 0) {
+            DisplayValidation += " and Branch";
+            valid = false;
+        }
+
+        if (valid == false) {
+            document.getElementById("Validation").innerHTML = "Select " + DisplayValidation;
+            return;
+        }
+
+        if (BranchId > 0 && IsNew == "true") {
+            window.location.href = '/FPettyCash/TransferFundToBranch?nBranchId=' + BranchId + '&DivisionId=' + DivisionId;
+        }
+
+        if (BranchId > 0 && IsNew == "false") {
+            window.location.href = '/FPettyCash/FundsTransferEdit?nBranchId=' + BranchId + '&nDivisionId=' + DivisionId;
+        }
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+    $('#DivisionId').focus(function () {
+        $('#Validation').hide();
+    });
+
+    $('#BranchId').focus(function () {
+        $('#Validation').hide();
+    });
+
+</script>

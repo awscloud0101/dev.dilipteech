@@ -1,0 +1,532 @@
+﻿@model AsteriskBrowserAL.Models.FundsTransferViewModel
+@{
+    ViewBag.Title = "Money Spent";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            PettyCash
+        </li>
+        <li class="active">Money Spent</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+<section class="content">
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("MoneySpentT", "FPettyCash", FormMethod.Post))
+            {
+                <input type="hidden" id="SelHeadId" name="PettyCashHeadId" value="@Model.PettyCashHeadId" />
+                <input type="hidden" id="visibilityDays" name="visibilityDays" value="@Model.AllowDays" />
+
+                <input class="form-control" type="hidden" value="@Model.FirstInserted.ToShortDateString()" id="dtStartDate" />
+                <input class="form-control" type="hidden" value="@Model.LastUpdated.ToShortDateString()" id="dtEndDate" />
+                <div class="page-header">
+                    <h1>
+                        <small style="float:right">
+
+                            @Html.ActionLink("Back to details", "MoneySpent")
+
+                        </small>
+                    </h1>
+                </div>
+                <div class="widget-box">
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("PettyCashHead")</span>
+
+                    <div class="widget-header widget-header-flat widget-header-small">
+
+                        <h5 class="widget-title">
+                            @Model.HeadName
+                        </h5>
+
+
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <button class="btn btn-info btn-minier" type="submit" onclick="return submitForm();">
+                                    <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+
+                                </button>
+                            </div>
+                        </div>
+
+                    </div><!-- /.box-header -->
+
+
+
+
+                    <br />
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+
+                                <div class="well">
+                                    <input type="hidden" id="cashInHand" name="cashInHand" value="@Model.CashInHand" />
+
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <h5 class="blue">Cash In Hand : </h5>
+                                                </td>
+                                                <td style="text-align:right">
+
+                                                    <h5 id="lblCashInHand"> :  @Model.CashInHand</h5>
+                                                </td>
+                                            </tr>
+
+
+                                        </tbody>
+                                    </table>
+
+
+
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5">@Html.Label("Petty cash Sub-Head")</label>
+                                        <div class="col-xs-6">
+                                            <select id="SubHeadId" name="SubHeadId" class="form-control"></select>
+                                            <div class="col-sm-12" style="display:none;" id="Nameval">
+                                                <label style="color:red;font-weight:bold;">Required</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Date")</label>
+                                        <div class="col-xs-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" disabled="disabled" type="text" value="@Model.TransactionDate.Value.ToShortDateString()" id="TransactionDateval" name="TransactionDate" autocomplete="off" placeholder="Transaction Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                            <div class="col-sm-12" style="display:none;" id="lessDatesReq">
+                                                <label style="color:red;font-weight:bold;"> Please select lesss than @Model.AllowDays days</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <br />
+                                </div>
+
+
+
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5">@Html.Label("Spent Amount")</label>
+                                        <div class="col-xs-6">
+                                            @Html.TextBoxFor(model => model.Amount, new { autocomplete = "off", @class = "form-control txtboxNum", id = "Amount", placeholder = "Amount" })
+                                            <div class="col-sm-12" style="display:none;" id="spendAmount">
+                                                <label style="color:red;font-weight:bold;"> In sufficient funds</label>
+                                            </div>
+                                            <div class="col-sm-12" style="display:none;" id="spendAmountNull">
+                                                <label style="color:red;font-weight:bold;">Required</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5">@Html.Label("Paid To")</label>
+                                        <div class="col-xs-6">
+                                            @Html.TextBoxFor(model => model.PaidTo, new { autocomplete = "off", @class = "form-control textlength", @id = "PaidTo", placeholder = "Paid To" })
+                                            <div class="col-sm-12" style="display:none;" id="PaidToNull">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <br />
+                                    <br />
+                                    <br />
+                                </div>
+                                <br />
+                                <br />
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Authorized By")</label>
+                                        <div class="col-xs-6">
+                                            @if (null != Model)
+                                            {
+                                                if (null != Model.lstDepartment)
+                                                {
+                                                    @Html.DropDownListFor(model => model.DepartmentId, new SelectList(Model.lstDepartment, "EmployeeDesignationId", "DesignationName"), new { @class = "form-control", id = "DepartmentId" })
+                                                }
+                                                else
+                                                {
+                                                    <select id="DepartmentId" class="form-control"></select>
+                                                }
+                                            }
+                                            <div class="col-sm-12" style="display:none;" id="authorizedByNull">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Employee")</label>
+
+                                        <div class="col-xs-6">
+                                            <input type="text" id="SearchEmployeeId" name="SearchEmployeeId" class="form-control" />
+                                            <input type="hidden" id="EmployeeId" name="EmployeeId" />
+                                            @* @Html.TextBoxFor(model => model.EmployeeId, new { @class = "form-control textlength", @id = "   ", placeholder = "EmployeeId" })>*@
+                                            <div class="col-sm-12" style="display:none;" id="EmployeeNull">
+                                                <label style="color:red;font-weight:bold;"> Search an employee </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br />
+                                    <br />
+                                    <br />
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Voucher #")</label>
+
+                                        <div class="col-xs-6">
+                                            @Html.TextBoxFor(model => model.VoucherNumber, new { @class = "form-control textlength", @id = "Voucher", @readonly = "readonly" })
+                                            <div class="col-sm-12" style="display:none;" id="vocherNull">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Narration")</label>
+                                        <div class="col-xs-6">
+                                            @Html.TextBoxFor(model => model.Narration, new { autocomplete = "off", @class = "form-control textlength", @id = "tbNarration", placeholder = "Narration" })
+                                            <div class="col-sm-12" style="display:none;" id="NarrationNull">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <br />
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+    var dateToday = new Date();
+    $(function () {
+        $("#Date").datepicker({
+            minDate: dateToday
+        });
+    });
+    var id;
+    $("#SearchEmployeeId").autocomplete({
+        source: function (request, response) {
+
+            $('#EmployeeId').val('0');
+
+            var DeptId = $('#DepartmentId').val();
+
+            debugger
+            $('#imagemodal').show();
+
+            $.ajax({
+                url: "/FPettyCash/GetStaffByDepartmentId",
+                type: "POST",
+                dataType: "json",
+                data: { nDepartmentId: DeptId, strVal: request.term },
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+
+                            label: data.FirstName + ' ' + data.LastName,
+                            value: data.FirstName + ' ' + data.LastName,
+                            id: data.StaffId,
+                        };
+                    }));
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        },
+        minLength: 3,
+
+        select: function SelectEvent(event, ui) {
+            //alert(ui.item.id);
+            document.getElementById('EmployeeId').value = ui.item.id
+
+        }
+    });
+
+    $(document).ready(function () {
+
+        if ($('#SelHeadId').val() > 0) {
+
+            var HeadId = $('#SelHeadId').val();
+
+            if (HeadId != 0) {
+
+                $.ajax({
+                    url: '/FPettyCash/GetSubHeadsByHeadIdforMoneySpent',
+                    data: { HeadId: HeadId },
+                    success: function (data) {
+
+                        var SubHeadItems = $('#SubHeadId');
+
+                        SubHeadItems.children().remove();
+
+                        SubHeadItems.append($("<option>").val("null").text("--- Select ---"));
+
+                        $.each(data, function (i, record) {
+                            SubHeadItems.append($("<option>").val(record.PettyCashSubHeadId).text(record.SubHeadName));
+                        });
+
+                        $('#SubHeadId').append(SubHeadItems);
+                    },
+                    aync: false
+                });
+            }
+        }
+    });
+
+    function validatePettycashHead() {
+
+        document.getElementById("count").value = "1";
+
+        var HeadName = $('#SubHeadId').val();
+        var cashInHand = parseInt($('#cashInHand').val());
+        var spendAmount = parseInt($('#Amount').val());
+        var paidTo = $('#PaidTo').val();
+        var authorizedBy = $('#DepartmentId').val();
+        var employee = $('#EmployeeId').val();
+        var vocher = $('#Voucher').val();
+        var Narr = $('#tbNarration').val();
+        var allowdays = $('#visibilityDays').val();
+
+        var pettyDate = $('#Date').val();
+        var d1 = new Date(pettyDate);
+        var d2 = new Date();
+
+        d2.setDate(d2.getDate() + parseInt(allowdays));
+
+        validate = true;
+
+        //Name validation
+        if (HeadName == "null" || HeadName == " ") {
+            document.getElementById("Nameval").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("Nameval").style.display = "none";
+        }
+
+        //Date checking
+        if (d1.getTime() > d2.getTime()) {
+            document.getElementById("lessDatesReq").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("lessDatesReq").style.display = "none";
+        }
+
+        //Checking for amount validation
+        if (isNaN(spendAmount) == true || parseInt(spendAmount) < 1) {
+            document.getElementById('spendAmountNull').style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById('spendAmountNull').style.display = "none";
+        }
+
+        if (validate == true) {
+
+            if (cashInHand < spendAmount) {
+                document.getElementById('spendAmount').style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById('spendAmount').style.display = "none";
+                validate = true;
+            }
+        }
+
+        //paid to validation
+        if (paidTo == "") {
+            document.getElementById("PaidToNull").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("PaidToNull").style.display = "none";
+        }
+
+        //Authorized By
+        if (authorizedBy == "" || authorizedBy == "0") {
+            document.getElementById("authorizedByNull").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("authorizedByNull").style.display = "none";
+        }
+
+        //Employee checking
+        if (employee == "" || parseInt(employee) < 1) {
+            document.getElementById("EmployeeNull").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EmployeeNull").style.display = "none";
+        }
+
+        //Vocher checking
+        if (vocher == "") {
+            document.getElementById("vocherNull").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("vocherNull").style.display = "none";
+        }
+
+        //Narration validation
+        if (Narr == "") {
+            document.getElementById("NarrationNull").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("NarrationNull").style.display = "none";
+        }
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validatePettycashHead();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+    function LoadCashInHandBal() {
+
+        debugger
+
+        var Datetime = $('#TransactionDateval').val();
+        var HeadId = $('#SelHeadId').val();
+
+        $('#imagemodal').show();
+
+        $.ajax({
+
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#imagemodal').hide();
+            },
+
+            url: '/FPettyCash/GetCashinHandByHeadIdAndTransactionDate',
+            data: { nHeadId: HeadId, dtTransactionDate: Datetime },
+            success: function (data) {
+
+                debugger
+                $('#imagemodal').hide();
+                $('#lblCashInHand').html("" + data);
+                $('#cashInHand').val(data);
+            },
+            aync: false
+        });
+    }
+
+    $('#TransactionDateval').change(function () {
+        LoadCashInHandBal();
+    });
+
+    $('#TransactionDateval').focus(function () {
+        $('#lessDatesReq').hide();
+    });
+
+    $('#SubHeadId').focus(function () {
+        $('#Nameval').hide();
+    });
+
+    $('#PaidTo').focus(function () {
+        $('#PaidToNull').hide();
+    });
+
+    $('#Amount').focus(function () {
+        $('#spendAmountNull').hide();
+    });
+
+    $('#DepartmentId').focus(function () {
+        $('#authorizedByNull').hide();
+    });
+
+    $('#SearchEmployeeId').focus(function () {
+        $('#EmployeeNull').hide();
+    });
+
+    $('#tbNarration').focus(function () {
+        $('#NarrationNull').hide();
+    });
+
+    $(document).on('focus', '#datepicker', function () {
+        $("#datepicker").datepicker({
+            endDate: $('#dtEndDate').val(),
+            startDate: $('#dtStartDate').val(),
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+</script>

@@ -1,0 +1,103 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    ViewBag.Title = "ExamAnalysis";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Transactions
+        </li>
+        <li>
+            <i class=""></i>
+            Parent
+        </li>
+        <li class="active">Subject Wise Average</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+
+
+<section class="content">
+    
+    <br />
+    @using (Html.BeginForm("SubjectWiseAverage", "AReports", FormMethod.Post))
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header"></div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Examination")</label>
+                                <div class="col-sm-6">
+                                    <select id="ExamId" name="Exam" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div id="ResultsData"></div>
+            </div>
+        </div>
+    }
+   
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        GetExaminations();
+    });
+
+    function GetExaminations() {
+
+        $.ajax({
+            url: '/AReports/GetExaminations',
+            success: function (result) {
+                var Exam = $('#ExamId')
+                Exam.children().remove();
+                Exam.append($("<option>").val("null").text("--select--"))
+                $.each(result, function (i, record) {
+                    Exam.append($("<option>").val(record.ExamId).text(record.ExamName))
+                })
+                $('#ExamId').append(Exam);
+            },
+            async: false
+        })
+
+    }
+
+    $('#ExamId').change(function () {
+        GetResults();
+    });
+
+    function GetResults() {
+
+        $.ajax({
+            url: '/AReports/GetSubjectWiseAverage',
+            data : {ExamId : $('#ExamId').val()},
+            success: function (result) {
+                $('#ResultsData').html(result);
+            },
+            async: false
+        })
+
+    }
+
+</script>
+
+
+
+

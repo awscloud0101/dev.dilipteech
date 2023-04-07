@@ -1,0 +1,119 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StaffHolidaysData>
+@{
+    ViewBag.Title = "StaffHolidaysPartialView";
+
+    int nSNo = 1;
+
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    @*<div id="message" class="alert alert-info bigger-110">
+        </div>*@
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+@if (null != Model && Model.Count() > 0)
+{
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    <div class="col-xs-12">
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+        <!-- /.box-header -->
+        <!-- div.table-responsive -->
+        <!-- div.dataTables_borderWrap -->
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Holiyday Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Holiyday Date")
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nSNo++)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                       
+                        <td>
+                            @if (item.HolidayDate.HasValue)
+                            {
+                                @item.HolidayDate.Value.ToString("dd-MMM-yyyy")
+                            }
+                        </td>
+
+                        <td>
+                            <div class="hidden-sm hidden-xs action-buttons">
+                                <a class="green P2" href="@Url.Action("StaffHolidaysE", "HRLeaveManagement", new { id = item.StaffHolidaysId })">
+                                    <i class="ace-icon fa fa-pencil bigger-130"></i>
+                                </a>
+                                <a class="red P2" onclick="btnConfirm(@item.StaffHolidaysId)">
+                                    <i class="ace-icon fa fa-trash bigger-130"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+}
+else
+{
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    <div class="col-xs-12">
+        <span style="font-weight:bold;color:red">No records found</span>
+    </div>
+}
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/HRLeaveManagement/ValidationForStaffHolidaysD',
+                data: { id: Value },
+                success: function (data) {
+                    var url = '/HRLeaveManagement/StaffHolidaysD?id=' + Value;
+                    var title = "Exam Schedules";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+
+
+

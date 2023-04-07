@@ -1,0 +1,141 @@
+﻿
+@model AsteriskBrowserAL.Models.StudentDetailsData
+
+@{
+    ViewBag.Title = "";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Agreed Fee Request</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<section class="content">
+    <div class="row">
+        @*<div class=col-xs-12>
+                <h3>@Html.ActionLink("<< Exam Schedule Details", "ExamSchedules", new { ClassNumber = Model.ClassNumber, TermNumber = Model.TermNumber, SubscriptionId = Model.SubscriptionId }) </h3>
+            </div>*@
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <span style="color:red;" id="Validation"></span>
+            <span style="color:red;font-weight:bold;">@Html.ValidationMessage("Validation")</span>
+            <div class="box">
+                @using (Html.BeginForm("StudentFeeArrivedRequest", "FOperations", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+                {
+
+                    @Html.HiddenFor(model => model.StudentId)
+
+                    <input type="hidden" id="SelStudentId" value="@Model.StudentId" />
+
+                    <div class="page-header">
+
+                        <h1>
+                            Agreed Fee Request
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "FeeArrivedRequest", new { })
+                            </small>
+                        </h1>
+                    </div>
+
+                    <div class="box-body">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Agreed Fee Amount")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.TuitionFee, new { @class = "form-control textlength", placeholder = "Amount", @id = "ExamName" })
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESExamName">
+                            </span>
+                        </div>
+
+                        <!--<div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Upload Documents</label>
+                            <div class="col-sm-3">
+                                <input type="file" name="FileUpload" id="FileUpload" />-->
+                        @*<input type="submit" name="Submit" id="Submit" value="Upload" />*@
+                        <!--</div>
+                        </div>-->
+
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                        <br />
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    function submitForm() {
+       debugger
+        var validatestatus = validateES();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function validateES() {
+
+        var validate = true;
+
+        var ExamName = document.getElementById("ExamName").value;
+
+        if (ExamName == "0") {
+            document.getElementById("ESExamName").innerHTML = "Please enter Amount";
+            validate = false;
+        }
+
+        return validate;
+    };
+
+    $('#ExamName').focus(function () {
+        document.getElementById("ESExamName").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+</script>
+
+

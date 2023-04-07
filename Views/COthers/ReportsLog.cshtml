@@ -1,0 +1,121 @@
+﻿@model AsteriskBrowserAL.Models.EventsData
+@{
+    ViewBag.Title = "ReportsLog";
+}
+
+<h2>ReportsLog</h2>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Controls
+        </li>
+        <li>
+            <i class=""></i>
+            Others
+        </li>
+        <li class="active">ReportsLog</li>
+    </ul><!-- /.breadcrumb -->
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<section class="content">
+
+    @*@if (null != TempData["Events"])
+        {
+            @Html.Raw(TempData["Events"])
+        }*@
+    @if (null != Model)
+    {
+        int nsno = 1;
+        <div class="row">
+            @using (Html.BeginForm("ReportsLogEx", "COthers", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <div class="col-xs-12">
+                    <div class="table-header">
+                        Reports Log
+                        <div style="float:right;margin-right:10px;">
+
+                            <button type="submit" class="btncustom">
+                                Download
+                            </button>
+
+                        </div>
+                    </div><!-- /.box-header -->
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Branch")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Report Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("User Name")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Date")
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var item in Model.lstEventsData)
+                            {
+                                <tr>
+                                    <td>
+                                        @(nsno++)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Event)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Priority)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.UserName)
+                                    </td>
+                                    <td>
+                                        @if (item.StartDate.HasValue)
+                                        {
+                                            @item.StartDate.Value.ToString("dd-MMM-yyyy")
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+
+                    </table>
+                </div>
+            }
+        </div>
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+    }
+    else
+    {
+        <span style="color: red;"><b>There are no Events to Display</b></span>
+    }
+</section>
+
+

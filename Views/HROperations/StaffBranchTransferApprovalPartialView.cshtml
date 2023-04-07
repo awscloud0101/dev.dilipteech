@@ -1,0 +1,126 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffBranchTransferData>
+@{
+    var Status = "";
+    ViewBag.Title = "Approve Branch Transfers";
+}
+
+<section class="content">
+
+
+    @if (Model != null && Model.Count > 0)
+    {
+        int nsno = 1;
+        string strClass = "";
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+
+        <div class="overflowscroll">
+
+            <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:15Px">
+                <thead>
+                    <tr>
+                        <th>
+                            S.No.
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("From Branch")
+                        </th>
+                        <th>
+                            @Html.DisplayName("To Branch")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Requested Date")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Staff Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Remarks")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Action")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                {
+                        <tr>
+                            <td>
+                                @(nsno++)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FromBranchName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ToBranchName)
+                            </td>
+
+                            <td>
+                                @if (item.FirstInserted.HasValue)
+                                {
+                                    @item.FirstInserted.Value.ToString("dd-MMM-yyyy hh:mm tt")
+                                }
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.StaffName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Reason)
+                            </td>
+
+                            @if (item.ActionStatus == 1)
+                            {
+                                strClass = "label label-warning";
+                                Status = "Pending";
+
+                                <td>
+                                    <a role="button" class="btn btn-white btn-success btn-sm btn-round" id="lnkApprove" onclick="ApproveBD(@item.StaffBranchTransferId,@item.FromBranch ,@item.ToBranch,2)"><i class="ace-icon fa fa-check "></i> Approve</a>
+
+                                    <a role="button" class="btn btn-white btn-danger btn-sm btn-round" id="lnkReject" onclick="ApproveBD(@item.StaffBranchTransferId, @item.FromBranch,@item.ToBranch,3)"><i class="ace-icon fa fa-times"></i> Reject</a>
+                                </td>
+                            }
+                            @if (item.ActionStatus == 2)
+                            {
+                                strClass = "label label-success";
+                                Status = "Accepted ";
+
+                                <td>
+                                    <span class="@strClass">@Html.DisplayName(Status)</span> @item.ActionDescription;
+                                </td>
+                            }
+                            @if (item.ActionStatus == 3)
+                            {
+                                strClass = "label label-danger";
+                                Status = "Rejected ";
+
+                                <td>
+                                    <span class="@strClass">@Html.DisplayName(Status)</span> @item.ActionDescription;
+                                </td>
+                            }
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @Html.Action("DataTableScripts", "Base")
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold">Data is not available</span>
+    }
+
+
+
+
+</section>

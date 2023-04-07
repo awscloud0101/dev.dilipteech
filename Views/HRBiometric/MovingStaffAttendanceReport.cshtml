@@ -1,0 +1,187 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.MovingStaffAttendanceData>
+
+@{
+    ViewBag.Title = "Moving StaffAttendance Report";
+   
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Reports
+        </li>
+        <li>
+            <i class=""></i>
+            Biometric
+        </li>
+        <li class="active">Moving Staff Attendance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<!--Main Content-->
+<section class="content">
+    <br />
+    @using (Html.BeginForm())
+    {
+        <span id="Validation" style="color:red;font-weight:bold"></span>
+        <div class="box">
+            <div class="box-header">
+
+                <h3 class="box-title">Moving Staff Attendance</h3>
+
+                <button class="btn btn-primary col-xs-1" style="float:right;width:80px" onclick="return GetAttendanceData();">
+                    View Data
+                </button>
+                <div class="box-body">
+
+
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <label class="col-sm-3 ">Select Staff</label>
+                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                @Html.DropDownList("EmployeeNumber", null, "--Select--", new { @class = "form-control ", @id = "EmployeeNumber" })
+                            </div>
+                            <div class="col-xs-3">
+                                <span style="color:red;font-weight:bold;display:none;" id="vpro">Please select PRO</span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                   
+                    <br />
+                    @*<div class="form-group">*@
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            @if (null != ViewBag.Date)
+                                        {
+                                                <input class="form-control" type="text" name="Date" id="Date" value="@ViewBag.Date.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+                                        }
+                                        else
+                                        {
+                                                <input class="form-control" type="text" name="Date" id="Date" autocomplete="off" placeholder="Select Date" />
+
+                                        }
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <span style="color:red;font-weight:bold;display:none;" id="vdate">Please select Date range</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+                        </div>
+                        <br />
+                    @*</div>*@
+                    <div class="col-sm-12">
+                        @*<button class="btn btn-primary col-xs-1" style="width:80px" onclick="return GetAttendanceData();">
+                            View Data
+                        </button>**@
+                    </div>
+                </div>
+                <br />
+            </div>
+        <div id="table">
+        </div>   
+    }
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+</section>
+    <script type="text/javascript">
+        function GetAttendanceData() {
+            var validate = ValidateAttendanceData();
+            if (!validate)
+                return false;
+
+            var employeeNumber = $('#EmployeeNumber').val();
+            var date= $('#Date').val();
+            $.ajax({
+                url: '/HRBiometric/MovingStaffattendanceRepotdata',
+                data: { employeeNumber: employeeNumber, date: date },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#table').html(data);                 
+                   
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+
+            return false;
+        };
+
+        function ValidateAttendanceData() {
+            var validation = true;
+            var employeeNumber = $('#EmployeeNumber').val();
+            var date = $('#').val();
+            if (employeeNumber == "" || employeeNumber == 0) {
+                $('#vpro').show();
+                validation = false;
+            };
+            if (date == "") {
+                $('#vdate').show();
+                validation = false;
+            };
+            return validation;
+        }
+
+        $('#EmployeeNumber').focus(function () {
+            $('#vpro').hide();
+        });
+
+        $('#date').focus(function () {
+            $('#vdate').hide();
+        });
+
+ 
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,161 @@
+﻿
+@model List<AsteriskBrowserAL.HomeWork>
+@{
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<div class="row">
+	<div class="col-xs-12">
+		<div class="widget-box">
+			<div class="widget-header widget-header-flat widget-header-small">
+				<h5 class="widget-title">
+					HomeWork
+				</h5>
+				<div class="widget-toolbar no-border">
+					<div class="inline dropdown-hover">
+					</div>
+				</div>
+			</div>
+			<div class="widget-body">
+				<div class="widget-main">
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="col-sm-6">
+								<label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+								<div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+									<div id="datepicker" class="input-group date">
+										@if (ViewBag.StartDate != null)
+										{
+											<input class="form-control" type="text" id="StartDate" name="StartDate" autocomplete="off" value="@ViewBag.StartDate.ToShortDateString()" placeholder="Select Date" />
+										}
+										else
+										{
+											<input class="form-control" type="text" id="StartDate" name="StartDate" autocomplete="off" placeholder="Select Date" />
+										}
+										<span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+@if (null != Model)
+{
+	if (null != Model && Model.Count() > 0)
+	{
+		int Sno = 1;
+
+		<div class="table-header">
+            <div class="txtTableHeader">
+                Records Found (@Model.Count())
+            </div>
+			<div style="float:right">
+
+				@*<button class="btn btn-info btn-xs" id="btnExport">
+						<i class="ace-icon fa fa-share bigger-180"></i>
+					</button>*@
+
+			</div>
+		</div>
+		<table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+			<thead>
+				<tr>
+					<th>
+						@*@Html.DisplayName("SNo")*@S.No.
+					</th>
+					<th>
+						@Html.DisplayName("Topic Name")
+					</th>
+					<th>
+						@Html.DisplayName("From Date")
+					</th>
+					<th>
+						@Html.DisplayName("To Date")
+					</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (HomeWork item in Model)
+				{
+					<tr>
+						<td>
+							@(Sno++)
+						</td>
+						<td>
+							@item.Title
+						</td>
+						<td>
+							@item.FromDate.Value.ToString("dd-MMM-yyyy")
+						</td>
+						<td>
+							@item.ToDate.Value.ToString("dd - MMM - yyyy")
+						</td>
+                        @if (item.AttachmentName != null)
+                        {
+                            
+                        <td>
+                            
+                            <a href="@item.AttachmentName" target="_blank">Download</a>
+                        </td>
+                        }
+                        else
+                        {
+								<td></td>
+							}
+						<td>
+							<div class="hidden-sm hidden-xs action-buttons">
+								<a class="blue" href="@Url.Action("HomeWorkDetailsPartial", "Parent", new { HomeWorkId = item.HomeworkId,StartDate=ViewBag.StartDate})">
+									<i class="ace-icon fa fa-info-circle bigger-130"></i>
+								</a>
+							</div>
+						</td>
+
+					</tr>
+				}
+
+			</tbody>
+		</table>
+	}
+	else
+	{
+		<div style="color:red;font-weight:bold">Data not available to display</div>
+	}
+}
+else
+{
+	<div style="color:red;font-weight:bold">Data not available to display</div>
+}
+
+@Html.Action("DataTableScripts", "Base")
+
+
+
+
+
+<script type="text/javascript">
+
+	$('#StartDate').change(function () {
+
+		window.location.href = "/Parent/HomeWorkDetails?StartDate=" + $('#StartDate').val();
+	})
+</script>
+
+
+
+
+
+
+
+
+

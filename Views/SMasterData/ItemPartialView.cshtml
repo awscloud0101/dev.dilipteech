@@ -1,0 +1,115 @@
+﻿@model IEnumerable<AsteriskBrowserAL.InventorySubCategoryItem>
+
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (null != Model)
+{
+    if (Model.Count() > 0)
+    {
+        int nsno = 1;
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+
+        <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("SKU Code")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Item Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("UOM")
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SKUCode)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ItemName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UOM)
+                        </td>
+                        <td>
+                            <div class="hidden-sm hidden-xs action-buttons">
+                                <a class="green P2" href="@Url.Action("ItemE", "SMasterData", new { id = item.InventorySubCategoryItemId })">
+                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                </a>
+                                <a class="red P2" onclick="btnConfirm(@item.InventorySubCategoryItemId)">
+                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                </a>
+                            </div>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    }
+    else
+    {
+        <span style="color: red;"><b>No records found</b></span>
+    }
+
+}
+
+
+
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SMasterData/ValidationForItemD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SMasterData/ItemD?id=' + Value;
+                    var title = "Item";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+

@@ -1,0 +1,179 @@
+﻿@model AsteriskBrowserAL.Models.Ranges
+
+@{
+    ViewBag.Title = "Range Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Reports 
+        </li>
+        <li class="active">Range Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("RangeReport", "FReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Range Report</span>
+
+                        </div>
+
+
+
+
+
+                        <div class="widget-box">
+
+                        
+                            <!-- /.box-header -->
+                            <!-- form start -->
+
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-6">
+                                                    <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+                                                    <div class="col-sm-6">
+                                                        @if (null != Model.lstBranch)
+                                                        {
+                                                            @Html.DropDownListFor(model => model.lstBranch, new SelectList(Model.lstBranch, "SubscriptionId", "Institute"), "--- Select Branch ---", new { @class = "form-control", @id = "SubscriptionId", @name = "SubscriptionId" })
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-6 pull-right">
+                                                <input type="radio" id="Template" value="true" name="Status" checked="checked"><b> &nbsp; &nbsp;Template Range</b> &nbsp; &nbsp;&nbsp; &nbsp;
+                                                <input type="radio" id="Manual" value="false" name="Status"><b> &nbsp; &nbsp;Manual Range</b>  &nbsp; &nbsp;&nbsp; &nbsp;
+                                                <input type="radio" id="Application" value="false" name="Status"><b> &nbsp; &nbsp;Registration Range</b>  &nbsp; &nbsp;&nbsp; &nbsp;
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        }
+
+                        <div id="MissingReceiptReportDetails"></div>
+
+
+                        }
+                    </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+    var status = 0;
+    var DisplayValidation = "";
+
+    $('#SubscriptionId').change(function () {
+       GetStudentTransferHistoryData();
+    })
+
+    $('#Template').change(function () {
+        GetStudentTransferHistoryData();
+    })
+
+    $('#Manual').change(function () {
+        GetStudentTransferHistoryData();
+    })
+    $('#Application').change(function () {
+        GetStudentTransferHistoryData();
+    })
+    function GetStudentTransferHistoryData() {
+        var BranchId = $('#SubscriptionId').val();
+
+        if (document.getElementById('Template').checked) {
+            status = 1;
+        }
+        if (document.getElementById('Manual').checked) {
+            status = 2;
+        }
+        if (document.getElementById('Application').checked) {
+            status = 3;
+        }
+
+        var valid = Validations();
+        if (valid == true) {
+            $.ajax({
+                url: '/FReports/GetRangesReportData',
+                data: { nBranchId: BranchId,nstatus: status },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#MissingReceiptReportDetails').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+            $('#MissingReceiptReportDetails').html("");
+        }
+    }
+
+    function Validations() {
+        var branchId = $('#SubscriptionId').val();
+        var isvalid = true;
+
+        var ValidationString = "Please Select ";
+            if (branchId < 0) {
+                ValidationString += "Branch,"
+                isvalid = false
+            }
+
+        if (isvalid == false) {
+            document.getElementById("Validation").innerHTML = ValidationString;
+        }
+        return isvalid;
+    }
+
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+
+

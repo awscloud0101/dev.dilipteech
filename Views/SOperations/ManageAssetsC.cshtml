@@ -1,0 +1,267 @@
+﻿@model AsteriskBrowserAL.ManageAsset
+@{
+    ViewBag.Title = "ManageAssetsC";
+}
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-shopping-cart"></i>
+            Inventory&Assests
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Manage Assets</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+  
+    @Html.Action("DatePickerScripts", "Base")
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- form start -->
+                @using (Html.BeginForm("ManageAssetsC", "SOperations", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    if (null != TempData["ManageAssetsC"])
+                    {
+                        <span style="color:red">
+                            @TempData["ManageAssetsC"]
+                        </span>
+                    }
+
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;"> Manage Assets</span>
+                        <small style="float:right;font-weight:bold;" class="textheader">
+                            @Html.ActionLink("Back To Details", "ManageAssets", new { AssetCategoryId = ViewBag.AssetCategoryId })
+                        </small>
+
+                    </div>
+
+                   <div class="widget-box row" style="padding:10px">
+
+                       <form class="form-horizontal" role="form">
+                           @Html.AntiForgeryToken()
+                           @Html.ValidationSummary(true)
+                           <span style="color: red;">@Html.ValidationMessage("ManageAssets")</span>
+
+                           <div class="row">
+                               <div class="col-sm-6">
+
+                                   <div class="form-group">
+                                       <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Asset Name")</label>
+
+                                       <div class="col-sm-6">
+                                           @Html.TextBoxFor(model => model.AssetName, new { @class = "form-control col-sm-5", id = "AssetName", placeholder = "Asset Name", @onchange = "removeError();" })
+                                           <div class="" style="display:none;" id="vAssetName">
+                                               <label style="color:red;font-weight:bold;"> Required </label>
+                                           </div>
+                                       </div>
+
+                                      
+
+                                   </div>
+
+                               </div>
+                               <div class="col-sm-6">
+
+                                   <div class="form-group">
+                                       <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Received Date")</label>
+                                       <div class="col-sm-6">
+                                           <div class="row">
+                                               <div class="col-sm-12">
+                                                   <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                       <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" placeholder="Select Date" />
+                                                       <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                           <div class="" style="display:none;" id="vDate">
+                                               <label style="color:red;font-weight:bold;">Required </label>
+                                           </div>
+                                       </div>
+
+                                   </div>
+                               </div>
+
+                           </div>
+
+
+
+                           
+
+                           <div class="row">
+                               <div class="col-sm-6">
+
+
+                                   <div class="form-group">
+                                       <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Number Of Assets")</label>
+
+                                       <div class="col-sm-6">
+                                           @Html.TextBoxFor(model => model.NoOfAssets, new { @class = "form-control col-sm-5", id = "NoOfAssets", placeholder = "Number Of Assets", onkeypress = "return isNumber(event)", @onchange = "removeError();" })
+                                           <div class="" style="display:none;" id="vNumberOfAssets">
+                                               <label style="color:red;font-weight:bold;"> Required </label>
+                                           </div>
+
+                                       </div>
+
+                                   </div>
+                               </div>
+                               <div class="col-sm-6">
+
+                                   <div class="form-group">
+                                       <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Other Details")</label>
+
+                                       <div class="col-sm-6">
+                                           @Html.TextBoxFor(model => model.OtherDetails, new { @class = "form-control col-sm-5", id = "OtherDetails", placeholder = "Other Details", @onchange = "removeError();" })
+                                           <div class="" style="display:none;" id="vOtherDetails">
+                                               <label style="color:red;font-weight:bold;"> Required </label>
+                                           </div>
+
+                                       </div>
+
+
+                                   </div>
+
+                               </div>
+
+
+                           </div>
+
+
+                           <div class="row">
+
+                               <div class="col-sm-6">
+                                   <div class="form-group">
+                                       <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Asset Location")</label>
+
+                                       <div class="col-sm-6">
+                                           @Html.DropDownList("AssetLocationId", null, "--- Select Asset Location ---", new { @class = "form-control", id = "AssetLocation", @onchange = "removeError();" })
+                                           <div class="" style="display:none;" id="vAssetLocation">
+                                               <label style="color:red;font-weight:bold;">Required</label>
+                                           </div>
+
+                                       </div>
+
+
+                                   </div>
+                               </div>
+
+                               <div class="col-sm-6">
+
+                               </div>
+
+                           </div>
+                           
+
+                           
+
+
+                           
+                       
+                           <div class="col-md-9">
+                               <div class="hr hr-18 dotted hr-double"></div>
+                               <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                   <i class="ace-icon fa fa-check bigger-50"></i>
+                                   Save
+                               </button>
+
+                               &nbsp; &nbsp; &nbsp;
+                               <button class="btn btn-sm" type="reset" onclick="return resetManageAssets();">
+                                   <i class="ace-icon fa fa-undo bigger-50"></i>
+                                   Reset
+                               </button>
+                           </div>
+                       </form>
+                   </div>
+                    
+
+                }
+
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script>
+    function submitForm() {
+        debugger
+        validation = true;
+        var AssetName = $('#AssetName').val();
+        var Date = $('#Date').val();
+        var AssetLocation = $('#AssetLocation').val();
+        var OtherDetails = $('#OtherDetails').val();
+        var NoOfAssets = $('#NoOfAssets').val();
+
+        if (AssetName == "" || AssetName == null || AssetName == undefined) {
+            $("#vAssetName").show();
+            validation = false;
+        }
+        if (Date == "" || Date == undefined || Date == null) {
+            $('#vDate').show();
+            validation = false;
+        }
+        if (AssetLocation == "" || AssetLocation == undefined || AssetLocation == null) {
+            $('#vAssetLocation').show();
+            validation = false;
+        }
+        if (OtherDetails == "" || OtherDetails == undefined || OtherDetails == null) {
+            $('#vOtherDetails').show();
+            validation = false;
+        }
+        if (NoOfAssets == "" || NoOfAssets == undefined || NoOfAssets == null) {
+            $('#vNumberOfAssets').show();
+            validation = false;
+        }
+        return validation;
+    };
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+    function resetManageAssets() {
+        debugger
+        document.getElementById("count").value = "0";
+        document.getElementById("vAssetName").style.display = "none";
+        document.getElementById("vOtherDetails").style.display = "none";
+        document.getElementById("vAssetLocation").style.display = "none";
+        document.getElementById("vDate").style.display = "none";
+        document.getElementById("vNumberOfAssets").style.display = "none";
+
+        document.getElementById("AssetName").value = "";
+        document.getElementById("OtherDetails").value = "";
+        document.getElementById("AssetLocation").value = "";
+        document.getElementById("Date").value = "";
+        document.getElementById("NoOfAssets").value = "";
+        return false;
+    }
+
+
+    $('#AssetName').focus(function () {
+        $('#vAssetName').hide();
+    })
+    $('#OtherDetails').focus(function () {
+        $('#vOtherDetails').hide();
+    })
+    $('#AssetLocation').focus(function () {
+        $('#vAssetLocation').hide();
+    })
+    $('#Date').focus(function () {
+        $('#vDate').hide();
+    })
+    $('#NoOfAssets').focus(function () {
+        $('#vNumberOfAssets').hide();
+    })
+</script>
+

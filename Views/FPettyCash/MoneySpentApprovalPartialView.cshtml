@@ -1,0 +1,162 @@
+﻿@model List<AsteriskBrowserAL.Models.MoneySpentCorrection>
+@{
+    var Status = "";
+    ViewBag.Title = "Approve Money Spent Correction";
+}
+
+
+
+<section class="content">
+    @if (Model != null && Model.Count > 0)
+    {
+        int nsno = 1;
+        
+                    <div class="table-header">
+                        Records Found(@Model.Count)
+                    </div>
+
+                  
+                        <div class="overflowscroll">
+                            <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14Px">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:center">
+                                           S.No.
+                                        </th>
+                                        <th style="min-width:140Px">
+                                            @Html.DisplayName("Branch Name")
+                                        </th>
+                                        <th style="min-width:126Px">
+                                            @Html.DisplayName("Transaction Date")
+                                        </th>
+                                        <th style="min-width:126Px">
+                                            @Html.DisplayName("Voucher Number")
+                                        </th>
+
+                                        <th style="min-width:200Px">
+                                            @Html.DisplayName("Old Sub Head")
+                                        </th>
+                                        <th style="min-width:200Px">
+                                            @Html.DisplayName("New Sub Head")
+                                        </th>
+
+                                        <th>
+                                            @Html.DisplayName("Old Amount")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("New Amount")
+                                        </th>
+
+                                        <th style="min-width:160Px">
+                                            @Html.DisplayName("Old Paid To")
+                                        </th>
+
+                                        <th style="min-width:160Px">
+                                            @Html.DisplayName("New Paid To")
+                                        </th>
+
+                                        <th style="min-width:152Px">
+                                            @Html.DisplayName("Remarks")
+                                        </th>
+
+                                        <th style="min-width:152Px">
+                                            @Html.DisplayName("Request Type")
+                                        </th>
+
+                                        <th>
+                                            @Html.DisplayName("Status")
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @(nsno++)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.BranchName)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.TransactionDate)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.DisplayVoucherNo)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.OldSubHeadName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.NewSubHeadName)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.OldAmount)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.NewAmount)
+                                            </td>
+
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.OldPaidTo)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.NewPaidTo)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Remarks)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.RequestTypeDisplay)
+                                            </td>
+                                            <td>
+                                                @if (item.ActionStatus == 0)
+                                                {
+                                                    Status = "Pending";
+                                                }
+                                                @if (item.ActionStatus == 1)
+                                                {
+                                                    Status = "Accepted " + item.ApprovedBy;
+                                                }
+                                                @if (item.ActionStatus == 2)
+                                                {
+                                                    Status = "Rejected " + item.ApprovedBy;
+                                                }
+
+                                                @Html.DisplayName(Status)
+                                            </td>
+
+                                            @if (item.ActionStatus == 0)
+                                            {
+                                                <td>
+                                                    <a role="button" id="lnkApprove" onclick="ApprovePC(@item.PettyCashCorrectionId, @item.SubscriptionId,1,@item.RequestType)">Approve</a>
+                                                </td>
+                                                <td>
+                                                    |
+                                                </td>
+                                                <td>
+                                                    <a role="button" id="lnkReject" onclick="ApprovePC(@item.PettyCashCorrectionId,@item.SubscriptionId,2,@item.RequestType)">Reject</a>
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                 
+             
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold">Data is not available</span>
+    }
+
+</section>
+@Html.Action("DataTableScripts", "Base")

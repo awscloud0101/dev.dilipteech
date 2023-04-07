@@ -1,0 +1,457 @@
+﻿@using AsteriskBrowserAL.Models
+@model Register
+@{
+    ViewBag.Title = "Register";
+    int[] SelectedSubscriptions = ViewBag.SelectedSubscriptions;
+    SelectedSubscriptions = SelectedSubscriptions ?? new int[0];
+}
+@{
+    Layout = "";
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="icon" type="image/png" href="~/Content/images/Asterisk.png">
+    <title>
+        CampusWhiz
+    </title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    @using AsteriskBrowserAL.Helpers
+
+
+    <link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+    <script src="~/assets/js/jquery-ui.min.js"></script>
+    <script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+    <link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+    <script src="~/assets/js/jquery-ui.min.js"></script>
+
+    <!-- daterange picker -->
+
+    <style type="text/css">
+        .ui-autocomplete {
+            font-size: 12px;
+            cursor: pointer;
+            width: 120px;
+            height: 120px;
+            overflow-y: scroll;
+        }
+    </style>
+
+
+
+</head>
+
+<body class="skin-blue sidebar-mini" id="form">
+    <div class="wrapper">
+        <header class="main-header">
+            <nav class="navbar navbar-static-top" role="navigation">
+                <!-- Sidebar toggle button-->
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav"></ul>
+                </div>
+            </nav>
+        </header>
+
+
+
+    </div><!-- ./wrapper -->
+
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                @using (Html.BeginForm())
+                {
+                    <div class="box">
+                        <div class="box-header">
+                            <h4 style="margin :15px" class="header green lighter bigger">
+                                <i class="ace-icon fa fa-user blue"></i>
+                                Registration
+                            </h4>
+                            <br />
+
+                            <span style="color:red">@Html.ValidationMessage("Register")</span>
+                            <br />
+
+
+                        </div><!-- /.box-header -->
+                        <!-- form start -->
+
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-2"></div>
+                                <div class="col-sm-3">
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <i class="ace-icon fa fa-envelope"></i>
+                                            </div>
+                                            <br />
+                                            <div class="col-sm-6">
+                                                @Html.AntiForgeryToken()
+                                                @if (null != Model.Email)
+                                                {
+                                                    <input type="email" name="Email" class="form-control" style="width:200px;" value="@Model.Email" placeholder="Email" required="required" title="Please enter Email" autocomplete="off" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="email" name="Email" class="form-control" style="width:200px;" placeholder="Email" required="required" title="Please enter Email" autocomplete="off" />
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <i class="ace-icon fa fa-user"></i>
+                                            </div>
+                                            <br />
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(m => m.Username, new { @class = "form-control", style = "width:200px;", placeholder = "Username", @required = "required", @title = "Please enter User Name", autocomplete = "off" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <i class="ace-icon fa fa-lock"></i>
+                                            </div>
+                                            <br />
+                                            <div class="col-sm-6">
+                                                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password", style = "width:200px;", @required = "required", @title = "Please enter Password", autocomplete = "off" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    @*User Original data base path*@
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <i class="ace-icon fa fa-building-o"></i>
+                                            </div>
+                                            <br />
+                                            <div class="col-sm-8">
+                                                <select id="databaseId" name="path" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @*User Original Id*@
+                                    <div class="form-group">
+                                        <div class="row">
+
+                                            <div class="col-sm-6">
+                                                <i class="ace-icon fa-user-circle-o"></i>
+                                            </div>
+                                            <br />
+                                            <div class="col-sm-8">
+                                                <input type="text" name="TextId" id="TextId" placeholder="Search your Name" style="width:200px" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-9">
+                                                <span style="color:red" id="Valiadtion"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @*Marketing*@
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-1">
+                                                @if (Model.IsMarketing.HasValue)
+                                                {
+                                                    @Html.CheckBoxFor(model => model.IsMarketing.Value)
+                                                }
+                                                else
+                                                {
+                                                    @Html.CheckBox("IsMarketing", Model.IsMarketing)
+                                                }
+                                            </div>
+                                            <div class="col-sm-6">
+
+                                                <label>Is Marketing</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                                @*Subscriptions*@
+                                <div class="col-sm-3">
+                                    <label>Subscriptions</label>
+
+                                    <br />
+                                    @if (null != Model.lstSubscriptions)
+                                    {
+                                        if (SelectedSubscriptions.Count() > 0)
+                                        {
+                                            <select name="Subscriptions" id="Subscriptions" multiple="multiple" size="11" style="width:250px;" required="required">
+                                                @foreach (var sub in Model.lstSubscriptions)
+                                                {
+                                                    if (SelectedSubscriptions.Contains(sub.SubscriptionId.Value))
+                                                    {
+                                                        <option value="@sub.SubscriptionId" selected="selected" style="width:250px;">@sub.Institute</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@sub.SubscriptionId" style="width:250px;">@sub.Institute</option>
+                                                    }
+
+                                                }
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <select name="Subscriptions" id="Subscriptions" multiple="multiple" size="11" style="width:250px;" required="required">
+                                                @foreach (var sub in Model.lstSubscriptions.OrderBy(s => s.DataBasePath))
+                                                {
+                                                    <option value="@sub.SubscriptionId" style="width:250px;">@sub.DataBasePath</option>
+                                                }
+                                            </select>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <select name="Subscriptions" id="Subscriptions" multiple="multiple" size="11" style="width:250px;" required="required" title="Select the institute" />
+                                    }
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <button class="btn btn-primary" type="submit" style="width:80px;" onclick="return validation();">
+                                        Register
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="UserOriginalId" id="UserOriginalId" />
+
+                    if (null != Model)
+                    {
+                        <input type="hidden" name="ModeldatabaseId" id="ModeldatabaseId" value="@Model.path" />
+                        <input type="hidden" name="isRegister" id="isRegister" value="@Model.isRegister" />
+                    }
+
+                }
+            </div>
+
+            <div id="dialog" style="display:none">
+                Successfully Registered
+            </div>
+        </div>
+
+    </section>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+@*<script src="~/script/jquery-2.0.3.js"></script>
+    <script src="~/script/jquery-ui.js"></script>
+    <script src="~/js/jquery-1.10.2.js"></script>
+    <script src="~/js/jquery-ui.js"></script>*@
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+<script>
+
+    var dbId = $('#databaseId').val();
+    var Role = $('#RoleName').val();
+    var ModeldatabaseId = $('#ModeldatabaseId').val();
+
+    var isRegister = $('#isRegister').val();
+
+
+    function OpenStatusDialogue()
+    {
+        debugger
+
+        if (isRegister == "YES") {
+            document.getElementById("dialog").style.display = "inline"
+            yesnodialog("OK")
+        }
+    }
+
+    function yesnodialog(button1) {
+        var btns = {};
+
+        btns[button1] = function () {
+            window.location = "/account/login"
+            $(this).dialog("close");
+            return true;
+        };
+
+
+        $("#dialog").dialog({
+            autoOpen: true,
+            display: 'inline',
+            title: 'Registration',
+            modal: true,
+            buttons: btns
+
+        });
+    }
+
+    function GetDbPathdropDown() {
+
+        debugger
+
+        $.ajax({
+            url: "/Account/DatabaseList",
+            success: function (data) {
+                var databaseItems = $('#databaseId')
+                databaseItems.children().remove();
+                databaseItems.append($("<option>").val("").text("--Select--"))
+                $.each(data, function (i, record) {
+                    databaseItems.append($("<option>").val(record.DataBasePath).text(record.DataBasePath));
+                });
+                $('#databaseId').append(databaseItems);
+                if (ModeldatabaseId != "") {
+                    document.getElementById("databaseId").style.display = "inline"
+                    document.getElementById("databaseId").required = true;
+                    document.getElementById('databaseId').value = ModeldatabaseId
+                    dbId = ModeldatabaseId
+                    document.getElementById("TextId").style.display = "inline"
+                    document.getElementById("TextId").required = true;
+                }
+            }
+        });
+
+    }
+
+
+    $("#databaseId").change(function () {
+        dbId = $(this).val();
+        if (dbId != "") {
+            document.getElementById("TextId").style.display = "inline"
+            document.getElementById("TextId").required = true;
+        }
+        else {
+            document.getElementById("TextId").style.display = "none"
+            document.getElementById("TextId").required = false;
+        }
+
+
+
+    })
+
+    $("#TextId").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/Account/GetUserDetailsList",
+                type: "POST",
+                dataType: "json",
+                data: { term: request.term, dbPath: dbId, Role: 0 },
+
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.Name,
+                            value: data.Name,
+                            id: data.Id
+                        };
+                    }));
+                },
+            });
+        },
+        minLength: 1,
+        select: function (event, ui) {
+            document.getElementById('UserOriginalId').value = ui.item.id
+            $('#StudentId').val(ui.item.label);
+            var id = ui.item.value
+        }
+    });
+
+
+    function validation() {
+        var IsValidate = true;
+        Role = $("#RoleName").val();
+        if (Role.indexOf("superadmin") > 0 || Role.indexOf("sitemaster") > 0 || Role.indexOf("marketing") > 0) {
+        }
+        else {
+            TextId = $('#UserOriginalId').val();
+            if (TextId > 0) {
+                IsValidate = true;
+            }
+            else {
+                document.getElementById('Valiadtion').innerHTML = "Please select proper name"
+                IsValidate = false;
+            }
+        }
+        return IsValidate;
+    }
+
+    $('#TextId').focus(function () {
+        document.getElementById('Valiadtion').innerHTML = ""
+    });
+
+    $(document).ready(function () {
+
+        GetDbPathdropDown();
+        OpenStatusDialogue();
+    });
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,94 @@
+﻿@model AsteriskBrowserAL.Models.ReturnBookViewModel
+
+@{
+    ViewBag.Title = "GenerateBarCode";
+}
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+<br /><br />
+<span style="color:red;font-weight:bold" id="ValidationMsg"> </span>
+<div class="row">
+    @using (Html.BeginForm("BarCodePrint", "ALibrary", FormMethod.Post))
+    {
+        <div class="col-xs-12">
+            <div class="widget-box">
+                <div class="widget-body">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Generate Barcode
+                            <div style="float:right;">
+                                <button class="btn btn-success btn-sm" name="Generate" id="Generate" type="submit">
+                                    Generate
+                                </button>
+                            </div>
+                        </h5>
+                    </div>
+
+                    <div class="widget-main">
+                        <br /><br />
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Acc #1</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownList("BookDetailsId1", null, "--Select--", new { @class = "form-control select2", @id = "BookDetailsId1", @name = "BookDetailsId1" })
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Acc #2</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownList("BookDetailsId2", null, "--Select--", new { @class = "form-control select2", @id = "BookDetailsId2", @name = "BookDetailsId2" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+<script>
+    $('#Generate').click(function () {
+        var Acc1 = $('#BookDetailsId1').val()
+        var Acc2 = $('#BookDetailsId2').val()
+        var validation = true;
+        if(Acc1 > 0 && Acc2 > 0)
+        {
+            validation = true;
+        }
+        else if (Acc1 > 0 && (Acc2 == "" || Acc2 == null || Acc2 == undefined)) {
+            document.getElementById("ValidationMsg").innerHTML = "Select Acc #2";
+        }
+        else if (Acc2 > 0 && (Acc1 == "" || Acc1 == null || Acc1 == undefined)) {
+            document.getElementById("ValidationMsg").innerHTML = "Select Acc #1";
+        }
+        else {
+            document.getElementById("ValidationMsg").innerHTML = "Select Acc #1 and Acc #2";
+            validation = false
+        }
+        return validation;
+    })
+
+    $('#BookDetailsId1').change(function () {
+        document.getElementById("ValidationMsg").innerHTML = "";
+    })
+    $('#BookDetailsId2').change(function () {
+        document.getElementById("ValidationMsg").innerHTML = "";
+    })
+
+</script>

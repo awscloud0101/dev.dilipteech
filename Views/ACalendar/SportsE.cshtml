@@ -1,0 +1,401 @@
+<<<<<<< .mine
+﻿@model AsteriskBrowserAL.SportsSchedule
+
+@{
+    ViewBag.Title = "SportsE";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Calendar
+        </li>
+        <li class="active">Sports Schedule</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<section class="content">
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("SportsE", "ACalendar", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+
+                @Html.HiddenFor(model => model.SportsScheduleId)
+
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                <div class="table-header">
+
+                    Sports Schedule
+                    <small style="float:right;" class="textheader">
+                        @Html.ActionLink("Back to Sports Schedule", "Sports")
+                    </small>
+
+                </div>
+                <div class="widget-box row" style="padding:10px">
+
+
+                    <form class="form-horizontal" role="form">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">  @Html.Label("Start Date")</label>
+
+                                <div class="col-sm-8">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="SDate" name="SDate" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="" style="display:none;" id="SDates">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">  @Html.Label("End Date")</label>
+
+                                <div class="col-sm-8">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="EDate" name="EDate" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="" style="display:none;" id="EDates">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="col-sm-6">
+
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Event Name")</label>
+
+                                <div class="col-sm-8">
+                                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control textlength", @id = "Desc", placeholder = "Event Name" })
+
+                                    <div class="" style="display:none;" id="descrHoliday">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+
+                        <div class=" col-md-9" align="left">
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            }
+        </div>
+
+    </div>
+
+
+
+    <input type="hidden" id="count" name="count" value="0" />
+    @*<input type="hidden" name="OldStartDate" id="OldStartDate" value="@Model.StartDate.Value.ToShortDateString()" />
+        <input type="hidden" name="OldEndDate" id="OldEndDate" value="@Model.StartDate.Value.ToShortDateString()" />
+        <input type="hidden" name="OldEventName" id="OldEventName" value="@Model.Name"/>*@
+</section>
+
+
+<script type="text/javascript">
+    function validateHolidays() {
+        debugger
+        document.getElementById("count").value = "1";
+
+        var SDate = document.getElementById("SDate").value;
+        var EDate = document.getElementById("EDate").value;
+        var Desc = document.getElementById("Desc").value;
+
+        validate = true;
+
+        if (SDate == "") {
+            document.getElementById("SDates").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("SDates").style.display = "none";
+        }
+        if (EDate == "") {
+            document.getElementById("EDates").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EDates").style.display = "none";
+        }
+
+        if (Desc == "") {
+            document.getElementById("descrHoliday").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("descrHoliday").style.display = "none";
+        }
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateHolidays();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+    $('#SDate').focus(function () {
+        $('#SDates').hide();
+    });
+    $('#EDate').focus(function () {
+        $('#EDates').hide();
+    });
+    $('#Desc').focus(function () {
+        $('#descrHoliday').hide();
+    });
+
+</script>
+
+
+=======
+﻿@model AsteriskBrowserAL.SportsSchedule
+
+@{
+    ViewBag.Title = "SportsE";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Calendar
+        </li>
+        <li class="active">Sports Schedule</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<section class="content">
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("SportsE", "ACalendar", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+
+                @Html.HiddenFor(model => model.SportsScheduleId)
+
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                <div class="table-header">
+
+                    Sports Schedule
+                    <small style="float:right;" class="textheader">
+                        @Html.ActionLink("Back to Sports Schedule", "Sports")
+                    </small>
+
+                </div>
+                <div class="widget-box row" style="padding:10px">
+
+
+                    <form class="form-horizontal" role="form">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">  @Html.Label("Start Date")</label>
+
+                                <div class="col-sm-8">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="SDate" name="SDate" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="" style="display:none;" id="SDates">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">  @Html.Label("End Date")</label>
+
+                                <div class="col-sm-8">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="EDate" name="EDate" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="" style="display:none;" id="EDates">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="col-sm-6">
+
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Event Name")</label>
+
+                                <div class="col-sm-8">
+                                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control textlength", @id = "Desc", placeholder = "Event Name" })
+
+                                    <div class="" style="display:none;" id="descrHoliday">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+
+                        <div class=" col-md-9" align="left">
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            }
+        </div>
+
+    </div>
+
+
+
+    <input type="hidden" id="count" name="count" value="0" />
+    @*<input type="hidden" name="OldStartDate" id="OldStartDate" value="@Model.StartDate.Value.ToShortDateString()" />
+    <input type="hidden" name="OldEndDate" id="OldEndDate" value="@Model.StartDate.Value.ToShortDateString()" />
+    <input type="hidden" name="OldEventName" id="OldEventName" value="@Model.Name"/>*@
+</section>
+
+
+<script type="text/javascript">
+    function validateHolidays() {
+    debugger
+        document.getElementById("count").value = "1";
+        
+        var SDate = document.getElementById("SDate").value;
+        var EDate = document.getElementById("EDate").value;
+        var Desc = document.getElementById("Desc").value;
+
+        validate = true;
+
+        if (SDate == "") {
+            document.getElementById("SDates").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("SDates").style.display = "none";
+        }
+        if (EDate == "") {
+            document.getElementById("EDates").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("EDates").style.display = "none";
+        }
+
+        if (Desc == "") {
+            document.getElementById("descrHoliday").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("descrHoliday").style.display = "none";
+        }
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateHolidays();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+    $('#SDate').focus(function () {
+        $('#SDates').hide();
+    });
+    $('#EDate').focus(function () {
+        $('#EDates').hide();
+    });
+    $('#Desc').focus(function () {
+        $('#descrHoliday').hide();
+    });
+
+</script>
+
+
+>>>>>>> .r319

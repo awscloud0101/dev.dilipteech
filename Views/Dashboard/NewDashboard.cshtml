@@ -1,0 +1,866 @@
+﻿@model AsteriskBrowserAL.Models.SubscriptionsData
+@{
+    ViewBag.Title = "NewDashboard";
+    var Date = DateTime.Today;
+}
+
+
+
+
+@section BreadCrumb{
+
+    <div class="widget-header">
+        <ul class="breadcrumb">
+            <li>
+                <img src="~/Content/images/Dashboard.png" width="30px" /><strong> Dashboard</strong>
+
+            </li>
+            <li>
+                <i class=""></i>
+                Daily Summary
+            </li>
+
+
+        </ul><!-- /.breadcrumb -->
+
+        <div class="widget-toolbar no-border">
+            <ul class="nav nav-tabs" id="recent-tab" onclick="ChartData()">
+                <li class="active">
+                    <a data-toggle="tab" href="#task-tab" aria-expanded="true">UI</a>
+                </li>
+
+                <li class="">
+                    <a data-toggle="tab" href="#Notifications" aria-expanded="false">
+                        Notifications
+                        <i class="ace-icon fa fa-bell icon-animated-bell" style="color:#d30202"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+}
+
+
+<style>
+    li {
+        cursor: pointer;
+    }
+
+    #example1 {
+        border: 1px solid;
+        padding: 10px;
+        box-shadow: 5px 8px 6px #888888;
+    }
+
+    .panel-footer {
+        padding: 5px 10px;
+        background-color: #f5f5f5;
+        border-top: 1px solid #ddd;
+        border-bottom-right-radius: 3px;
+        border-bottom-left-radius: 3px;
+    }
+
+
+    .widget-main {
+        padding: 0px;
+    }
+
+    P {
+        display: list-item; /* This has to be "list-item"                                               */
+        list-style-type: disc;
+        list-style-position: inside;
+    }
+
+    .widget-header {
+        width: 100%;
+    }
+
+
+
+    .widget-box {
+        border-bottom: 2px solid #a9d9f7;
+        border-left: 2px solid #a9d9f7;
+        border-right: 2px solid #a9d9f7;
+        color: darkolivegreen;
+    }
+</style>
+@*<link href="~/Content/c3/c3.min.css" rel="stylesheet" />*@
+
+<link href="~/assets/css/ace.min.css" rel="stylesheet" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+<script src="~/Scripts/highcharts.js"></script>
+
+
+<div class="widget-box transparent" id="recent-box">
+
+    <div class="widget-main" style="background-color:#06213e">
+        <div class="tab-content">
+            <div id="task-tab" class="tab-pane active">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="row" style="margin-top:0px; padding: 5px 0px;">
+                            <div class="col-lg-9 col-md-9 col-sm-9">
+                                <div class="col-lg-12">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <div class="col-lg-3 col-md-6 col-sm-3" style="padding:0px 2px;">
+                                                <div class="panel panel-primary5" style="height: 100px;">
+                                                    <div class="row " style="margin-bottom:10px;margin-top:10px;">
+
+                                                        <div class="col-lg-3">
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-xs-6">
+                                                            <img src="~/Content/images/Alphorese.jpg" class="contentimg" style=" width: 100%; padding: 3px; height: 89px; margin-top: -5px">
+                                                        </div>
+                                                        <div class="col-lg-3">
+                                                        </div>
+                                                    </div>
+                                                        <!--<div class="panel-heading" style="height:auto">-->
+                                                        @*<div class="row" style="margin-bottom:10px;margin-top:10px;">
+            <div class="col-lg-12 col-md-12 col-xs-12">
+                <img src="~/Content/images/Alphorese.jpg" class="contentimg">
+            </div>
+        </div>*@
+                                                        <!--</div>-->
+                                                        <!--<div class="panel-primary6text">-->
+                                                        @*<span class="pull-left "><strong>Alphores Group</strong></span>*@
+                                                        @*<span class="pull-right "><i class="fa fa-arrow-circle-right"></i></span>*@
+                                                        <!--<div class="clearfix"></div>
+    </div>-->
+
+                                                    </div>
+
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-3">
+                                            <div class="col-lg-3 col-md-6 col-sm-3" style="padding:0px 2px">
+                                                <div class="panel panel-primary5" style="height: 100px;">
+                                                    <div class="panel-heading">
+                                                        <div class="row" style="text-align:center; font-size:12px">
+                                                            <span><strong style="text-align:center; display:block;">Student & Staff</strong></span>
+                                                            @*<div class=" panel-primary6text panel-butto"></div>*@
+                                                                    <div class="col-lg-4 col-md-4 col-xs-4 ">
+                                                                        <img src="~/assets/images/DashBoard/student_staff img.png" style="width:50px;padding:3px;background:white;margin-top:10px;height:50px;" class="img-circle">
+                                                                    </div>
+                                                                    <div class="col-lg-8 col-md-8 col-xs-8" style="float: left;">
+                                                                        <div style="margin:12px 0px; padding-right:20px;">
+                                                                            <strong style="font-size: 11px; margin: 0px 0px; padding: 0px 0px;">Student  : @Model.StudentCount</strong>
+                                                                            <br />
+                                                                            <strong style="font-size: 11px; margin: 0px 0px; padding: 0px 0px;">Staff  : @Model.StaffCount </strong>
+                                                                        </div>
+                                                                    </div>
+                                                        </div>
+                                                        @*<a href="/FReports/FeeCollectionReport">
+                        <span class="pull-right panel-primary6text"><i class="fa fa-arrow-circle-right"></i></span><div class="clearfix"></div>
+                    </a>*@
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-3">
+                                        <div class="col-lg-3 col-md-6 col-sm-3" style="padding:0px 2px">
+                                            <div class="panel panel-primary5" style="height: 100px;">
+                                                <div class="panel-heading">
+                                                    <span><strong style="text-align:center; display:block;">Admissions</strong></span>
+                                                    <div class="row" style="text-align:center; font-size:12px">
+                                                        <div class=" col-lg-4 col-md-4 col-xs-4  ">
+                                                            <img src="~/assets/images/DashBoard/admission_img.png" style="width:50px;padding:3px;background:white;margin-top:10px;" class="img-circle">
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-8 col-xs-8">
+                                                            <div style="margin:12px 0px;">
+                                                                @*<strong style="font-size:10px;margin:0px 23px;">Today: 580</strong>*@
+                                                                <strong style="font-size:13px;margin:0px 10px; padding:10px 5px;">Total:  @Model.NewAdmission </strong>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                @*<a href="/FReports/FeeCollectionReport">
+                    <span class="pull-right panel-primary6text"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </a>*@
+                                            </div>
+
+                                        </div>
+                                            </div>
+
+                                        <div class="col-3">
+                                            <div class="col-lg-3 col-md-6 col-sm-3" style="padding:0px 2px">
+                                                <div class="panel panel-primary5" style="height: 100px;">
+                                                    <div class="panel-heading">
+                                                        <span><strong style="text-align:center; display:block;">Collections</strong></span>
+                                                        <div class="row" style="text-align:center; font-size:12px">
+                                                            <div class="col-lg-4 col-md-4 col-xs-4 col-sm-4 ">
+                                                                <img src="~/assets/images/DashBoard/collections_img.png" style="width:50px;padding:3px;background:white;margin-top:10px;" class="img-circle">
+
+                                                            </div>
+                                                            <div class="col-lg-8 col-md-8 col-xs-8">
+                                                                <div style="margin: 10px 0px; text-align: center;">
+
+                                                                    <strong style="font-size: 12px; margin: 0px 0px; padding: 5px 5px;">Last Month : @Model.LastMonth</strong>
+                                                                    <br />
+                                                                    <strong style="font-size: 12px; margin: 0px 0px; padding: 5px 5px;">This Month : @Model.ThisMonth</strong>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @*<a href="/FReports/FeeCollectionReport">
+                        <span class="pull-right panel-primary6text "><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </a>*@
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12" style="margin-top:10px 15px;">
+                                                @*<div class="panel-primary5 ">*@
+                                                    
+                                                        <div class="col-lg-4 col-md-4 col-sm-4" style="padding:0px 2px">
+                                                            <div class="panel panel-primary5" style="width:100%;">
+                                                                <div class="panel-heading" style="height:100%;">
+                                                                    <div class="panel-primary6text">
+                                                                        <span><h5 style="text-align: center; font-weight: bold;">Student Attendance</h5></span>
+                                                                        @*<span class="pull-right "><i class="fa fa-arrow-circle-right"></i></span>*@
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-lg-11">
+                                                                            <div role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="--value: @Model.StudentPrecentage"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    
+
+                                                    
+                                                        <div class="col-lg-4 col-md-4 col-sm-4" style="padding:0px 2px;height:auto;">
+                                                            <div class="panel panel-primary5" style="width:100%;height:auto">
+                                                                <div class="panel-heading">
+                                                                    <div class="panel-primary6text">
+                                                                        <span><h5 style="text-align: center; font-weight: bold;">Staff Attendance</h5></span>
+                                                                        @*<span class="pull-right "><i class="fa fa-arrow-circle-right"></i></span>*@
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        @*<a href="">
+
+                                        </a>*@
+                                                                        <div class="col-lg-11">
+                                                                            <div role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="--value:@Model.StaffPrecentage"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        
+                                                    </div>
+
+                                                    
+                                                        <div class="col-lg-4 col-md-4 col-sm-4" style="padding:0px 2px;">
+                                                            <div class="panel panel-primary5" style="width:100%">
+                                                                <div class="panel-heading" style="height:auto;">
+                                                                    <div class="panel-primary6text">
+                                                                        <span class="pull-center  "><h5 style="text-align:center; font-weight:bold;">Admission Target</h5></span>
+                                                                        @*<span class="pull-right "><i class="fa fa-arrow-circle-right"></i></span>*@
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-lg-11">
+                                                                            <div role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="--value:@Model.AdmissionsTarget"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                @*<a href="">
+
+                                </a>*@
+                                                            </div>
+                                                        </div>
+                                                    
+                                                @*</div>*@
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @*<div class="col-lg-4 col-md-6" style="margin:0px;padding:2px;">
+            <div class="panel panel-primary5">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <img src="~/Content/images/staff.png" style="width:55px;padding:3px;background:white" class="img-circle">
+
+                        </div>
+                        <div class="col-xs-3"></div>
+                        <div class="col-xs-6 text-left">
+                            <div class="huge"></div>
+
+                            <div><strong>Income&nbsp; &nbsp;&nbsp;@Model.Income</strong></div>
+                            <br style="margin:3px;" />
+                            <div> <strong>Consolidated &nbsp;@Model.CIncome </strong></div>
+
+                        </div>
+                    </div>
+                </div>
+                <a href="/FOperations/Daysheet">
+                    <div class="panel-footer panel-primary1text">
+                        <span class="pull-left "><strong>Today Income</strong></span>
+                        <span class="pull-right "><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>*@
+                                </div>
+
+
+
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-3">
+                                <div class="panel panel-primary5 ">
+                                    <div class="row" style="margin: 6px 0px;">
+
+                                        <div class="col-md-3">
+                                            <img src="~/assets/images/DashBoard/Income Image.png" alt="" width="65" style="margin-left:10px;" />
+                                        </div>
+                                        <div class="col-md-1">
+
+        </div>
+                                        <div class="col-md-7" style="font-size:13px; padding-top:10px; padding-bottom:5px">
+                                            <div><strong>Income :&nbsp; &nbsp;&nbsp;@Model.Income</strong></div>
+                                          
+                                            <div> <strong>Consolidated : &nbsp;@Model.CIncome </strong></div>
+                                            @*<strong class="time-text">67.76<span class="text-hr">%</span></strong>
+            <strong>Promotores</strong>*@
+                                        </div>
+
+
+                                    </div>
+                                    <hr />
+                                    <div class="row" style="margin: 6px 0px;" >
+
+                                        <div class="col-md-3">
+                                            <img src="~/assets/images/DashBoard/Expenses image1.png" alt="" width="65" style="margin-left:5px;" />
+                                        </div>
+                                        <div class="col-md-1">
+
+        </div>
+                                        <div class="col-md-7" style="font-size: 13px; padding-top:5px; padding-bottom:5px;">
+                                            <div><strong style="margin:0px 0px;">Expenses :&nbsp; &nbsp;&nbsp;@Model.Expense</strong></div>
+                                          
+                                            <div> <strong>Consolidated : &nbsp;@Model.CExpense </strong></div>
+
+                                            @*<strong class="time-text">67.76<span class="text-hr">%</span></strong>
+            <strong>Passives</strong>*@
+                                        </div>
+
+
+                                    </div>
+                                    <hr/> 
+                                    <div class="row" style="margin: 6px 0px;">
+
+                                        <div class="col-md-3">
+                                            <img src="~/assets/images/DashBoard/total_profit_loss1.png" alt="" width="70" style="margin-left:0px; margin-top:0px;"/>
+                                        </div>
+                                        <div class="col-md-1">
+
+        </div>
+                                        <div class="col-md-7" style="font-size:13px; padding-top:5px; padding-bottom:10px">
+
+                                            <div><strong>Profit/Loss :&nbsp; &nbsp;&nbsp;@(Model.Income- Model.Expense)</strong></div>
+                                           
+                                            <div><strong>Consolidated : &nbsp;@(Model.CIncome - Model.CExpense)</strong></div>
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                       
+
+                       
+                                @*<div class="col-lg-4 col-md-6" style="margin:0px;padding:2px;">
+                        <div class="panel panel-primary5">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <img src="~/Content/images/staff.png" style="width:55px;padding:3px;background:white" class="img-circle">
+
+                                    </div>
+                                    <div class="col-xs-3"></div>
+                                    <div class="col-xs-6 text-left">
+                                        <div class="huge"></div>
+
+                                        <div><strong>Today Expense&nbsp; &nbsp;&nbsp;@Model.Expense</strong></div>
+                                        <br style="margin:3px;" />
+                                        <div> <strong>Consolidated &nbsp;@Model.CExpense </strong></div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="/FOperations/Daysheet">
+                                <div class="panel-footer panel-primary1text">
+                                    <span class="pull-left " style="text-align:center"><strong> Expense</strong></span>
+                                    <span class="pull-right "><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>*@
+
+
+
+                      
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="col-lg-6">
+                                    <div style="align-items: center">
+                                        <h4 style="text-align:center; color:white"> Student Present Percentage</h4>
+                                    </div>
+                                    <div>
+                                        <div class="row">
+                                            <div id="chart1" style="height:300px; background-color: #012D56"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div style="text-align: center">
+                                        <h4 style="text-align: center; color: white"> Staff Present Percentage</h4>
+                                    </div>
+                                    <div>
+                                        <div class="row">
+                                            <div id="chart2" style="height:300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <br />
+                        <br />
+                    </div>
+                </div>
+             </div>
+         </div>
+    </div>
+
+</div>
+
+
+    <script>
+        $(document).ready(function () {
+            $('.progress .progress-bar').css("width",
+                function () {
+                    return $(this).attr("aria-valuenow") + "%";
+                }
+            )
+            GetHighChartData();
+            GetHighChartData1();
+        });
+    </script>
+
+
+    <script src="~/assets/js/jquery-ui.custom.min.js"></script>
+    <script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+    <script src="~/assets/js/jquery.easypiechart.min.js"></script>
+    <script src="~/assets/js/jquery.sparkline.min.js"></script>
+    <script src="~/assets/js/jquery.flot.min.js"></script>
+    <script src="~/assets/js/jquery.flot.pie.min.js"></script>
+    <script src="~/assets/js/jquery.flot.resize.min.js"></script>
+    <script src="~/Scripts/canvasjs.min.js"></script>
+
+    <script type="text/javascript">
+
+
+
+        $('.easy-pie-chart.percentage').each(function () {
+            var $box = $(this).closest('.infobox');
+            var barColor = $(this).data('color') || (!$box.hasClass('infobox-dark') ? $box.css('color') : 'rgba(255,255,255,0.95)');
+            var trackColor = barColor == 'rgba(255,255,255,0.95)' ? 'rgba(255,255,255,0.25)' : '#E2E2E2';
+            var size = parseInt($(this).data('size')) || 50;
+            $(this).easyPieChart({
+                barColor: barColor,
+                trackColor: trackColor,
+                scaleColor: false,
+                lineCap: 'butt',
+                lineWidth: parseInt(size / 10),
+                animate: /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase()) ? false : 1000,
+                size: size
+            });
+        })
+
+        $('.sparkline').each(function () {
+            var $box = $(this).closest('.infobox');
+            var barColor = !$box.hasClass('infobox-dark') ? $box.css('color') : '#FFF';
+            $(this).sparkline('html',
+                {
+                    tagValuesAttribute: 'data-values',
+                    type: 'bar',
+                    barColor: barColor,
+                    chartRangeMin: $(this).data('min') || 0
+                });
+        });
+
+
+        //flot chart resize plugin, somehow manipulates default browser resize event to optimize it!
+        //but sometimes it brings up errors with normal resize event handlers
+        $.resize.throttleWindow = false;
+
+        var placeholder = $('#piechart-placeholder').css({ 'width': '90%', 'min-height': '150px' });
+        var data = [
+            { label: "social networks", data: 38.7, color: "#68BC31" },
+            { label: "search engines", data: 24.5, color: "#2091CF" },
+            { label: "ad campaigns", data: 8.2, color: "#AF4E96" },
+            { label: "direct traffic", data: 18.6, color: "#DA5430" },
+            { label: "other", data: 10, color: "#FEE074" }
+        ]
+        function drawPieChart(placeholder, data, position) {
+            $.plot(placeholder, data, {
+                series: {
+                    pie: {
+                        show: true,
+                        tilt: 0.8,
+                        height: 30,
+                        width: 30,
+                        highlight: {
+                            opacity: 0.25
+                        },
+                        stroke: {
+                            color: '#fff',
+                            width: 2
+                        },
+                        startAngle: 2
+                    }
+                },
+                legend: {
+                    show: true,
+                    position: position || "ne",
+                    labelBoxBorderColor: null,
+                    margin: [-30, 15]
+                }
+                ,
+                grid: {
+                    hoverable: true,
+                    clickable: true
+                }
+            })
+        }
+        drawPieChart(placeholder, data);
+
+        /**
+        we saved the drawing function and the data to redraw with different position later when switching to RTL mode dynamically
+        so that's not needed actually.
+        */
+        placeholder.data('chart', data);
+        placeholder.data('draw', drawPieChart);
+
+
+        //pie chart tooltip example
+        var $tooltip = $("<div class='tooltip top in'><div class='tooltip-inner'></div></div>").hide().appendTo('body');
+        var previousPoint = null;
+
+        placeholder.on('plothover', function (event, pos, item) {
+            if (item) {
+                if (previousPoint != item.seriesIndex) {
+                    previousPoint = item.seriesIndex;
+                    var tip = item.series['label'] + " : " + item.series['percent'] + '%';
+                    $tooltip.show().children(0).text(tip);
+                }
+                $tooltip.css({ top: pos.pageY + 10, left: pos.pageX + 10 });
+            } else {
+                $tooltip.hide();
+                previousPoint = null;
+            }
+
+        });
+
+        /////////////////////////////////////
+        $(document).one('ajaxloadstart.page', function (e) {
+            $tooltip.remove();
+        });
+
+
+
+
+
+        var d1 = [];
+        for (var i = 0; i < Math.PI * 2; i += 0.5) {
+            d1.push([i, Math.sin(i)]);
+        }
+
+        var d2 = [];
+        for (var i = 0; i < Math.PI * 2; i += 0.5) {
+            d2.push([i, Math.cos(i)]);
+        }
+
+        var d3 = [];
+        for (var i = 0; i < Math.PI * 2; i += 0.2) {
+            d3.push([i, Math.tan(i)]);
+        }
+
+
+
+        var sales_charts = $('#sales-charts').css({ 'width': '100%', 'height': '220px' });
+        $.plot("#sales-charts", [
+            { label: "Domains", data: d1 },
+            { label: "Hosting", data: d2 },
+            { label: "Services", data: d3 }
+        ], {
+            hoverable: true,
+            shadowSize: 0,
+            series: {
+                lines: { show: true },
+                points: { show: true }
+            },
+            xaxis: {
+                tickLength: 0
+            },
+            yaxis: {
+                ticks: 10,
+                min: -2,
+                max: 2,
+                tickDecimals: 3
+            },
+            grid: {
+                backgroundColor: { colors: ["#fff", "#fff"] },
+                borderWidth: 1,
+                borderColor: '#555'
+            }
+        });
+
+
+        $('#recent-box [data-rel="tooltip"]').tooltip({ placement: tooltip_placement });
+        function tooltip_placement(context, source) {
+            var $source = $(source);
+            var $parent = $source.closest('.tab-content')
+            var off1 = $parent.offset();
+            var w1 = $parent.width();
+
+            var off2 = $source.offset();
+            //var w2 = $source.width();
+
+            if (parseInt(off2.left) < parseInt(off1.left) + parseInt(w1 / 2)) return 'right';
+            return 'left';
+        }
+
+
+        $('.dialogs,.comments').ace_scroll({
+            size: 300
+        });
+
+
+        //Android's default browser somehow is confused when tapping on label which will lead to dragging the task
+        //so disable dragging when clicking on label
+        var agent = navigator.userAgent.toLowerCase();
+        if ("ontouchstart" in document && /applewebkit/.test(agent) && /android/.test(agent))
+            $('#tasks').on('touchstart', function (e) {
+                var li = $(e.target).closest('#tasks li');
+                if (li.length == 0) return;
+                var label = li.find('label.inline').get(0);
+                if (label == e.target || $.contains(label, e.target)) e.stopImmediatePropagation();
+            });
+
+        $('#tasks').sortable({
+            opacity: 0.8,
+            revert: true,
+            forceHelperSize: true,
+            placeholder: 'draggable-placeholder',
+            forcePlaceholderSize: true,
+            tolerance: 'pointer',
+            stop: function (event, ui) {
+                //just for Chrome!!!! so that dropdowns on items don't appear below other items after being moved
+                $(ui.item).css('z-index', 'auto');
+            }
+        }
+        );
+        $('#tasks').disableSelection();
+        $('#tasks input:checkbox').removeAttr('checked').on('click', function () {
+            if (this.checked) $(this).closest('li').addClass('selected');
+            else $(this).closest('li').removeClass('selected');
+        });
+
+
+        //show the dropdowns on top or bottom depending on window height and menu position
+        $('#task-tab .dropdown-hover').on('mouseenter', function (e) {
+            var offset = $(this).offset();
+
+            var $w = $(window)
+            if (offset.top > $w.scrollTop() + $w.innerHeight() - 100)
+                $(this).addClass('dropup');
+            else $(this).removeClass('dropup');
+        });
+
+        // Donut Chart
+
+    </script>
+
+
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+    //$(document).ready(function () {
+    //    //GetChartData();
+    //    GetHighChartData();
+    //    GetHighChartData1();
+    // });
+      function GetHighChartData() {
+        var Collection = [];
+        var ModelData =@Html.Raw(Json.Encode(Model.lstBranches));
+        if (ModelData != null) {
+           
+            for (var i = 0; i < ModelData.length; i++) {
+                Collection.push({
+                    name: ModelData[i].Name,
+                    y: ModelData[i].StudentCount,
+                    drilldown: ModelData[i].Name
+                });
+            }
+
+            
+            // Create the chart
+            Highcharts.chart('chart1', {
+                chart: {
+                    type: 'column'
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Percentage '
+                    }
+
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    GetDistrictData(this.name);
+                                    //alert('Category: ' + this.category + ', value: ' + this.name);
+                                }
+                            }
+                        },
+                        borderWidth: 0,
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.y:.f}%'
+                        }
+                    }
+                },
+
+                tooltip: {
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b><br/>'
+                },
+
+                series: [
+                    {
+                        colorByPoint: true,
+                        data: Collection,
+                    }
+                ]
+            });
+
+        }
+    }
+      function GetHighChartData1() {
+        var Collection = [];
+        var ModelData =@Html.Raw(Json.Encode(Model.lstBranches));
+        if (ModelData != null) {
+           
+            for (var i = 0; i < ModelData.length; i++) {
+                Collection.push({
+                    name: ModelData[i].Name,
+                    y: ModelData[i].StaffCount,
+                    drilldown: ModelData[i].Name
+                });
+            }
+
+
+            // Create the chart
+            Highcharts.chart('chart2', {
+                chart: {
+                    type: 'column'
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Percentage '
+                    }
+
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    GetDistrictData1(this.name);
+                                    //alert('Category: ' + this.category + ', value: ' + this.name);
+                                }
+                            }
+                        },
+                        borderWidth: 0,
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.y:.f}%'
+                        }
+                    }
+                },
+
+                tooltip: {
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b><br/>'
+                },
+
+                series: [
+                    {
+                        colorByPoint: true,
+                        data: Collection,
+                    }
+                ]
+            });
+
+        }
+    }
+
+     function GetDistrictData(DistrictName) {
+        
+         window.location.href = "/Dashboard/SendAttendance?Institute=" + DistrictName;
+     }
+        function GetDistrictData1(DistrictName) {
+
+            window.location.href = "/Dashboard/StaffAttendanceData?Institute=" + DistrictName;
+        }
+   
+
+    </script>
+
+
+

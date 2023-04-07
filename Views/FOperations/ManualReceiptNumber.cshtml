@@ -1,0 +1,282 @@
+﻿@model  AsteriskBrowserAL.Models.AddManualReceiptData
+@{
+    Layout = null;
+}
+
+@Html.Action("DatePickerScripts","Base")
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div id="ManualRecieptView">
+                <div class="widget-box">
+                    <input id="StartRange" type="hidden" name="StartRange" value="@Model.StartRange" />
+                    <input id="EndRange" type="hidden" name="EndRange" value="@Model.EndRange" />
+                    <input id="expectedno" type="hidden" name="expectedno" value="@Model.ManualReceitpNo" />
+
+                    <input class="form-control" type="hidden" value="@Model.StartDate.ToShortDateString()" id="dtManualTemplateStartDate" />
+                    <input class="form-control" type="hidden" value="@Model.EndDate.ToShortDateString()" id="dtManualTemplateEndDate" />
+
+                    <input type="hidden" id="IsValidNumber" />
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-12">
+                                        @if (Model.StartRange > 0 && Model.EndRange > 0)
+                                        {
+                                            <label class="control-label no-padding-right" for="form-field-1">@Html.Label("Range : " + Model.StartRange + " - " + Model.EndRange)</label>
+                                        }
+                                        <div id="divManualSave" style="display:none">
+                                            <a id="SaveTemplateNumbers" class="btn btn-info btn-sm pull-right action-buttons" onclick="SaveMissingManuals()">Save</a>
+                                        </div>
+                                    </div>
+                                    <span style="color:red;" id="Validate"></span>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+
+                                <div class="col-sm-6">
+                                    <div class="col-sm-5">
+                                        <label class="control-label no-padding-right" for="form-field-1">@Html.Label("Reciept : ")</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input class="form-control textlength txtboxNum" id="ManualReciptNo" type="text" name="ManualReciptNo" value="@Model.ManualReceitpNo" />
+                                    </div>
+
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div id="DatePicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" value="@Model.PaymentDate.ToShortDateString()" name="ManualReciptDate" id="ManualReciptDate" autocomplete="off" placeholder="Select Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                  
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="col-sm-5">
+                                        <label class="control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input class="form-control " id="ManualReciptDescription" name="ManualReciptDescription" />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <br />
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="ManualRecieptList">
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+</section>
+
+<script>
+
+
+
+    $(document).on('focus', '#DatePicker', function () {
+        
+        $(this).datepicker({
+            endDate: $('#dtManualTemplateEndDate').val(),
+            startDate: $('#dtManualTemplateStartDate').val(),
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+    $("#ManualReciptNo").autocomplete({
+        source: function (request, response) {
+
+            var StartRange = $("#StartRange").val();
+            var EndRange = $("#EndRange").val();
+            var Enteredno = request.term; //$("#ManualReciptNo").val();
+            var expectedno = $("#expectedno").val();
+            document.getElementById('Validate').innerHTML = "";
+            $("#ManualRecieptList").html("")
+            document.getElementById("divManualSave").style.display = "none";
+
+            if (parseInt(Enteredno) < parseInt(StartRange)) {
+                document.getElementById('Validate').innerHTML = "Entered receipt number is not in a range";
+                $("#IsValidNumber").val("false");
+                return;
+            }
+
+            if (parseInt(Enteredno) < parseInt(expectedno)) {
+                document.getElementById('Validate').innerHTML = "Entered receipt number already in use";
+                $("#IsValidNumber").val("false");
+                return;
+            }
+
+            if (parseInt(Enteredno) > parseInt(EndRange)) {
+
+                document.getElementById('Validate').innerHTML = "Entered receipt number is not in a range";
+                $("#IsValidNumber").val("false");
+                return;
+            }
+
+            $("#ManualRecieptList").html("");
+
+            debugger
+
+            if (expectedno < request.term) {
+                $.ajax({
+                    url: "/AFrontOffice/GetManualReciepts",
+                    data: { term: request.term, LastReciept: expectedno },
+                    success: function (result) {
+                        $("#ManualRecieptList").html(result)
+                        document.getElementById("divManualSave").style.display = "inline";
+                        $("#IsValidNumber").val("false");
+                    },
+                    async: false
+                })
+            }
+        },
+    });
+
+    function ValidateManualReceiptControls() {
+
+        var validate = true;
+        var ValidateMessage = "";
+        var ManualDate = $('#ManualReciptDate').val();
+        var MDescription = $('#ManualReciptDescription').val();
+
+        var StartRange = $("#StartRange").val();
+        var EndRange = $("#EndRange").val();
+        var Enteredno = $("#ManualReciptNo").val();
+        var expectedno = $("#expectedno").val();
+
+
+        if (ManualDate == "") {
+            validate = false;
+            ValidateMessage += "Select Date,";
+        }
+
+        if (MDescription == "") {
+            validate = false;
+            ValidateMessage += "Enter Description,";
+        }
+
+        if (Enteredno == "") {
+            validate = false;
+            ValidateMessage += "Enter manual receipt number,";
+        }
+
+        if (parseInt(Enteredno) < parseInt(expectedno)) {
+            validate = false;
+            ValidateMessage += "Entered receipt number already in use,";
+        }
+
+        if (parseInt(Enteredno) > parseInt(EndRange)) {
+            validate = false;
+            ValidateMessage += "Entered receipt number not in a range,";
+        }
+
+        if (Enteredno < expectedno) {
+            validate = false;
+            ValidateMessage += "Manual receipt number already in use, ";
+        }
+
+        if (!validate) {
+            $('#Validate').show();
+            document.getElementById('Validate').innerHTML = "Please fill the fields : " + ValidateMessage;
+
+        } else {
+            document.getElementById('Validate').innerHTML = "";
+        }
+
+        return validate;
+    }
+
+
+    function ValidateMissingReceiptData() {
+        var valid = "";
+        $("#tbManualReceipt tr").each(function (index) {
+
+            var Remarks = $(this).find("#Remarks").val();
+
+            if (Remarks == "") {
+                document.getElementById("RemarksValidation").innerHTML = "Remarks are required";
+                valid = "false";
+            }
+        });
+
+        return valid;
+    }
+
+    function SaveMissingManuals() {
+        debugger
+
+        var MissingData = GetListOfMissingReceips(); //Getting the data from  template partial view
+        var bValidate = ValidateMissingReceiptData();
+
+        if (bValidate == "") {
+
+            $("#tbManualReceipt tr").each(function (index) {
+
+                var Remarks = $(this).find("#Remarks").val();
+                MissingData[index].Remarks = Remarks;
+
+            });
+
+            if (null != MissingData) {
+
+                $.ajax
+                  ({
+                      error: function (jqXHR, textStatus, errorThrown) {
+                          alert(errorThrown);
+                      },
+
+                      url: '/FOperations/ManualReceiptNumber/',
+                      data: { ManualMissingTemplates: MissingData },
+                      type: "POST",
+                      success: function (data) {
+
+                          debugger
+                          document.getElementById("divManualSave").style.display = "none";
+                          $('#ManualRecieptList').html("");
+                          $('#ManualRecieptView').html("");
+                          $('#ManualRecieptView').html(data);
+                          $("#IsValidNumber").val("true");
+                      }
+
+                  }).done(function () {
+                  });
+            }
+        }
+    }
+
+</script>

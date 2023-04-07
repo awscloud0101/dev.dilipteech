@@ -1,0 +1,527 @@
+﻿@model AsteriskBrowserAL.Models.MasterBookDetailsModel
+
+@{
+    ViewBag.Title = "Create ManageBooks";
+    DateTime TodayDate = DateTime.Today;
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Manage Books</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- form start -->
+                @using (Html.BeginForm("ManageBooksC", "ALibrary", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    //if (null != Model)
+                    //{
+
+                    <input type="hidden" name="MasterBookId" value="@Model.MasterBookId" id="MasterBookId" />
+                    <input type="hidden" name="BookCategoryId" value="@Model.BookCategoryId" id="BookCategoryId" />
+
+                    <div class="page-header">
+                        <h1>
+                            Manage Books
+                            <small style="float:right;">
+                                @Html.ActionLink("Back To Details", "ManageBooks", new { BookCategoryId = @Model.BookCategoryId, MasterBookDataId = @Model.MasterBookId })
+                            </small>
+                        </h1>
+
+                    </div><!-- /.page-header -->
+                    @*<form class="form-horizontal" role="form">*@
+
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Vendor")</label>
+
+                        <div class="col-sm-3">
+                            @Html.DropDownListFor(m => m.VendorId, new SelectList(Model.VendorList, "VendorId", "VendorName"), new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="MBVendor">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("InVoice Number")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(m => m.InvoiceNumber, new { @class = "form-control col-sm-5", id = "InvoiceNumber", @maxLength = "20", placeholder = "InvoiceNumber" })
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="MBInvoiceNumber">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Authors")</label>
+
+                        <div class="col-sm-3">
+                            @Html.DropDownListFor(m => m.AuthorId, new SelectList(Model.AuthorList, "AuthorId", "AuthorName"), new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="MBAuthor">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Publication")</label>
+
+                            <div class="col-sm-3">
+                                @Html.DropDownListFor(m => m.PublicationId, new SelectList(Model.PublicationList, "PublicationId", "PublicationName"), new { @class = "form-control" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBPublication">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Year Of Publication")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        @Html.TextBoxFor(model => model.YearOfPublication, new { @class = "form-control col-sm-5", @maxLength = "4", placeholder = "Year Of Publication", onkeypress = "return isNumberKey(event)" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="MBYearOfPublication">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Number Of Pages")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        @Html.TextBoxFor(model => model.NumberOfPages, new { @class = "form-control col-sm-5", id = "NumberOfPages", @maxLength = "5", placeholder = "Number Of Pages", onkeypress = "return isNumberKey(event)" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="MBNumberOfPages">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Edition")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Edition, new { @class = "form-control col-sm-5", id = "Edition", @maxLength = "20", placeholder = "Edition" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBEdition">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Location")</label>
+
+                            <div class="col-sm-3">
+                                @Html.DropDownListFor(m => m.BookLocationId, new SelectList(Model.BookLocationList, "BookLocationId", "LocationName"), new { @class = "form-control", disabled = "disabled" })
+                            </div>
+
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Total Copies")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.NumOfCopies, new { @class = "form-control col-sm-5", id = "NumOfCopies", min = "1", placeholder = "Total Copies", onblur = " return TotalPriceAmount(this)", onkeypress = "return isNumberKey(event)" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBNumOfCopies">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Remarks")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Remarks, new { @class = "form-control col-sm-5", placeholder = "Remarks", @maxLength = "150" })
+                            </div>
+
+                            <div class="col-sm-3">
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("ISBN -Call Number")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.ISBN, new { @class = "form-control col-sm-5", min = "1", placeholder = "ISBN -Call Number" @*onkeypress = "return isNumberKey(event)"*@ , @maxLength = "13" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBIsBnCallNumber">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Price")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Price, new { @class = "form-control col-sm-5", id = "Price", placeholder = "Book Price", onblur = " return TotalPriceCal(this)", onkeypress = "return isNumberKey(event)" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBPrice">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Total Books Price")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.TotalBookPrice, new { @class = "form-control col-sm-5", disabled = "disabled" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBPrice">
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label(" Date Of Purchase")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" id="DateOfPurchase" value="@TodayDate.ToShortDateString()"  name="DateOfPurchase" autocomplete="off" placeholder="Select Date Of Purchasae" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="MBPurchaseDate">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset" onclick="return resetManageBooks();">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+                }
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+@*@section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }*@
+
+<script type="text/javascript">
+    function validateManageBooks() {
+        debugger
+        document.getElementById("count").value = "1";
+        var Invoicenumber = document.getElementById("InvoiceNumber").value;
+        var VendorId = document.getElementById("VendorId").value;
+        var Author = document.getElementById("AuthorId").value;
+        var Publication = document.getElementById("PublicationId").value;
+        var NumberOfPages = document.getElementById("NumberOfPages").value;
+        var NumOfCopies = document.getElementById("NumOfCopies").value;
+        var Edition = document.getElementById("Edition").value;
+        var Price = document.getElementById("Price").value;
+        var DateOfPurechase = document.getElementById("DateOfPurchase").value;
+        var InvoiceNumber = document.getElementById("InvoiceNumber").value;
+       var YearOfPublication = document.getElementById("YearOfPublication").value;
+        var NumberOfPages = document.getElementById("NumberOfPages").value;
+        var ISBN = document.getElementById("ISBN").value;
+        validate = true;
+        if (NumOfCopies == "" || NumOfCopies == null) {
+            document.getElementById("MBNumOfCopies").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("MBNumOfCopies").style.display = "none";
+        }
+        //if (ISBN == "" || ISBN == null) {
+        //    document.getElementById("MBIsBnCallNumber").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("MBIsBnCallNumber").style.display = "none";
+        //}
+        if (VendorId == "" || VendorId == -1 || VendorId == null) {
+            document.getElementById("MBVendor").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("MBVendor").style.display = "none";
+        }
+        if (InvoiceNumber == "" || InvoiceNumber == null) {
+            document.getElementById("MBInvoiceNumber").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("MBInvoiceNumber").style.display = "none";
+        }
+        //if (YearOfPublication == "" || YearOfPublication == null) {
+        //    document.getElementById("MBYearOfPublication").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("MBYearOfPublication").style.display = "none";
+        //}
+
+        //if (Author == "" || Author == -1 || Author == null) {
+        //    document.getElementById("MBAuthor").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("MBAuthor").style.display = "none";
+        //}
+        if (Publication == "" || Publication == -1 || Publication == null) {
+            document.getElementById("MBPublication").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("MBPublication").style.display = "none";
+        }
+
+        //if (Edition == "") {
+        //    document.getElementById("MBEdition").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("MBEdition").style.display = "none";
+        //}
+        if (Price == "") {
+            document.getElementById("MBPrice").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("MBPrice").style.display = "none";
+        }
+        if (NumberOfPages == "" || NumberOfPages == null) {
+            document.getElementById("MBNumberOfPages").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("MBNumberOfPages").style.display = "none";
+        }
+        if (DateOfPurechase == "") {
+            document.getElementById("MBPurchaseDate").style.display = "inline";
+            validate = false;
+        }
+        else {
+            document.getElementById("MBPurchaseDate").style.display = "none";
+        }
+        return validate;
+    };
+
+    function submitForm() {
+        var validatestatus = validateManageBooks();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function resetManageBooks() {
+        document.getElementById("count").value = "0";
+        //document.getElementById("MBMasterBookName").style.display = "none";
+        document.getElementById("MBPublication").style.display = "none";
+        document.getElementById("MBPublishedDate").style.display = "none";
+        document.getElementById("MBEdition").style.display = "none";
+        document.getElementById("MBISBN").style.display = "none";
+        document.getElementById("MBAuthor").style.display = "none";
+        document.getElementById("MBBookLocation").style.display = "none";
+        document.getElementById("MBNumOfCopies").style.display = "none";
+        document.getElementById("MBPrice").style.display = "none";
+
+        document.getElementById("MasterBookName").value = "";
+        document.getElementById("Author").value = "";
+        document.getElementById("Publication").value = "";
+        document.getElementById("PublishedDate").value = "";
+        document.getElementById("Edition").value = "";
+
+        document.getElementById("BookLocation").value = "";
+        document.getElementById("NumOfCopies").value = "";
+        document.getElementById("Price").value = "";
+        return false;
+    };
+    //$('#MasterBookName').focus(function () {
+    //    $('#MBMasterBookName').hide();
+    //});
+    $('#Author').focus(function () {
+        $('#MBAuthor').hide();
+    });
+    $('#Publication').focus(function () {
+        $('#MBPublication').hide();
+    });
+    $('#PublishedDate').focus(function () {
+        $('#MBPublishedDate').hide();
+    });
+    $('#Edition').focus(function () {
+        $('#MBEdition').hide();
+    });
+    $('#ISBN').focus(function () {
+        $('#MBISBN').hide();
+    });
+    $('#BookLocation').focus(function () {
+        $('#MBBookLocation').hide();
+    });
+    $('#NumOfCopies').focus(function () {
+        $('#MBNumOfCopies').hide();
+    });
+    $('#Price').focus(function () {
+        $('#MBPrice').hide();
+    });
+    //function removeError() {
+
+    //    var count = document.getElementById("count").value;
+    //    var Author = document.getElementById("Author").value;
+    //    var Publication = document.getElementById("Publication").value;
+    //    var PublishedDate = document.getElementById("PublishedDate").value;
+    //    var Edition = document.getElementById("Edition").value;
+
+    //    var BookLocation = document.getElementById("BookLocation").value;
+    //    var NumOfCopies = document.getElementById("NumOfCopies").value;
+    //    var Price = document.getElementById("Price").value;
+
+    //    if (count != 0) {
+    //        //if (MasterBookName != "") {
+    //        //    document.getElementById("MBMasterBookName").style.display = "none";
+    //        //} else {
+    //        //    document.getElementById("MBMasterBookName").style.display = "inline";
+    //        //}
+
+    //        if (Author != "") {
+    //            document.getElementById("MBAuthor").style.display = "none";
+    //        } else {
+    //            document.getElementById("MBAuthor").style.display = "inline";
+    //        }
+
+    //        if (Publication != "") {
+    //            document.getElementById("MBPublication").style.display = "none";
+    //        } else {
+    //            document.getElementById("MBPublication").style.display = "inline";
+    //        }
+
+    //        if (PublishedDate != "") {
+    //            document.getElementById("MBPublishedDate").style.display = "none";
+    //        } else {
+    //            document.getElementById("MBPublishedDate").style.display = "inline";
+    //        }
+
+    //        if (Edition != "") {
+    //            document.getElementById("MBEdition").style.display = "none";
+    //        } else {
+    //            document.getElementById("MBEdition").style.display = "inline";
+    //        }
+
+    //        if (ISBN != "") {
+    //            document.getElementById("MBISBN").style.display = "none";
+    //        } else {
+    //            document.getElementById("MBISBN").style.display = "inline";
+    //        }
+
+    //        if (BookLocation != "") {
+    //            document.getElementById("MBBookLocation").style.display = "none";
+    //        } else {
+    //            document.getElementById("MBBookLocation").style.display = "inline";
+    //        }
+
+    //        if (NumOfCopies != "") {
+    //            document.getElementById("MBNumOfCopies").style.display = "none";
+    //        } else {
+    //            document.getElementById("MBNumOfCopies").style.display = "inline";
+    //        }
+
+    //        if (Price != "") {
+    //            document.getElementById("MBPrice").style.display = "none";
+    //        } else {
+    //            document.getElementById("MBPrice").style.display = "inline";
+    //        }
+
+    //    }
+    //};
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+</script>
+<script language="Javascript" type="text/javascript">
+
+    function onlyAlphabets(e, t) {
+        debugger
+        try {
+            if (window.event) {
+                var charCode = window.event.keyCode;
+            }
+            else if (e) {
+                var charCode = e.which;
+            }
+            else { return true; }
+            if ((charCode > 64 && charCode < 91) || (charCode > 96 && charCode < 123) || (charCode == 32))
+                return true;
+            else
+                return false;
+        }
+        catch (err) {
+            alert(err.Description);
+        }
+    }
+
+</script>
+<script>
+
+    function TotalPriceCal() {
+        var NoOfCopies = $('#NumOfCopies').val()
+        var Amount = $('#Price').val()
+        var TotalAmount = NoOfCopies * Amount;
+        $('#TotalBookPrice').val(TotalAmount);
+    }
+    function TotalPriceAmount() {
+        var NoOfCopies = $('#NumOfCopies').val()
+        var Amount = $('#Price').val()
+        if (NoOfCopies > 0) {
+            var TotalAmount = NoOfCopies * Amount;
+            $('#TotalBookPrice').val(TotalAmount);
+        }
+        else {
+            $('#TotalBookPrice').val('');
+        }
+    }
+
+</script>
+<script type="text/javascript">
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode != 46 && charCode > 31
+          && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>

@@ -1,0 +1,469 @@
+﻿@model AsteriskBrowserAL.Models.StockEntryList
+@{
+    ViewBag.Title = "RequesitionApproval";
+    var Status = "";
+    int SNo = 1;
+}
+
+<style>
+    .modal-backdrop {
+        z-index: -1;
+    }
+
+    .main-content-inner, .footer-content{
+        background: white;
+    }
+
+
+
+    .footer .footer-inner .footer-content{
+        left:0px;
+        right:0px;
+        padding-right:10px;
+        padding-left:10px;
+        margin:0px;
+
+
+    }
+
+        
+        
+        fa {
+            font-size: 15px;
+        }
+</style>
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-shopping-cart"></i>
+            Inventory&Assests
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Requisition Approval</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="row" style="background:white;">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <div class="table-header">
+                    Requisition Approval
+                    <div style="float:right;">
+                    </div>
+                </div>
+            </div>
+            <br />
+            @if (null != Model)
+            {
+                <div class="overflowscroll"  style="height:450px;" >
+                    <div class="box-body table-responsive no-padding">
+                        <div class="hideScrolling">
+                            <table id="TableOne" class="table table-hover table-bordered table-striped nowrap" style="font-size:14px;overflow:auto;">
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Sent By")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Request Id")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Items Required")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Quantity")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Purpose")
+                                        </th>
+                                        <th>@Html.DisplayName("Budget Available")</th>
+                                        <th>
+                                            @Html.DisplayName("Status")
+                                        </th>
+                                        @*<th>
+                                            @Html.DisplayName("Print")
+                                        </th>*@
+                                        @*<th></th>*@
+                                    </tr>
+                                    @foreach (var s in Model.lststock)
+                                    {
+
+                                        <tr>
+                                            <td>
+                                                @SNo
+                                            </td>
+
+                                            <td>
+                                                @s.StaffName
+                                            </td>
+                                            <td>@s.RequestId</td>
+                                            <td>
+                                                @s.RequiredItems
+                                            </td>
+                                            <td>
+                                                @s.Quantity
+                                            </td>
+                                            <td>
+                                                @s.Purpose
+                                            </td>
+                                            @foreach (var obj in Model.staff.Where(se => se.StaffId == s.ApprovedBy).ToList())
+                                            {
+                                                if (obj.DesignationId == 27)
+                                                {
+                                                    if (s.Budget > 0)
+                                                    {
+                                                        <td>@s.Budget</td>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            <div class="hidden-sm hidden-xs ">
+                                                                <a class="btn btn-info btn-xs" id="Budget" data-toggle="modal" data-target="#myNewModal" onclick="Budget(@s.RequisitionId);">
+                                                                    <span class="fa fa-inr"></span>
+                                                                    Budget
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                }
+                                            }
+                                            @foreach (var obj in Model.staff.Where(se => se.StaffId == s.ApprovedBy).ToList())
+                                            {
+                                                if (obj.DesignationId == 27)
+                                                {
+                                                    if (!s.IsApproved.HasValue)
+                                                    {
+                                                        <td>
+                                                            @if (null != s.Budget && s.Budget > 0)
+                                                            {
+                                                                <button id="approve" class="btn btn-sm btn-success" name="approve" onclick="return SendMailA(@s.Staffid,@s.RequisitionId, '@s.RequiredItems', @s.Quantity);">Approve</button>
+                                                            }
+                                                            <button id="reject" class="btn btn-sm btn-danger" name="reject" onclick="return SendMailR (@s.Staffid,@s.RequisitionId, '@s.RequiredItems', @s.Quantity)">Reject</button>
+                                                        </td>
+                                                        @*<td>
+                                                            <div class="table-header">
+                                                                <button id="Generate" onclick="Generate(@s.RequisitionId)" class="btn btn-info btn-xs" value="@s.RequisitionId" style="float:right">
+                                                                    <i class="ace-icon fa fa-print small"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>*@
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            @if (s.IsApproved == true)
+                                                            {
+                                                                Status = "Approved";
+                                                            }
+                                                            @if (s.IsApproved == false)
+                                                            {
+                                                                Status = "Rejected";
+                                                            }
+                                                            @Html.DisplayName(Status)
+                                                        </td>
+                                                       
+                                                        @*<td>
+                                                            <div class="table-header">
+                                                                <button id="Generate" onclick="Generate(@s.RequisitionId)" class="btn btn-info btn-xs" value="@s.RequisitionId" style="float:right">
+                                                                    <i class="ace-icon fa fa-print small"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>*@
+                                                    }
+
+                                                }
+                                                @*else if (obj.DesignationId == 27)
+                                                {
+                                                    if (!s.IsApproved.HasValue)
+                                                    {
+                                                        <td>
+                                                            <div class="hidden-sm hidden-xs action-buttons">
+                                                                <a class="btn btn-xs btn-success" id="requestedstaff" data-toggle="modal" data-target="#mymodal" onclick="SendTo(@s.ApprovedBy,@s.RequisitionId);">
+                                                                    Comment
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                        <td></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                }*@
+                                            }
+
+                                            @*@foreach (var obj in Model.lstHistory.Where(se => se.StaffId == s.Staffid && se.RequisitionId == s.RequisitionId).ToList())
+                                            {
+                                                <td>
+                                                    <a class="blue" id="HistoryId" data-toggle="modal" data-target="#myModalsat" onclick="Comments(@s.ApprovedBy,@s.RequisitionId);">
+                                                        <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                                                    </a>
+                                                </td>
+                                            }*@
+
+                                        </tr>
+                                        SNo++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            }
+
+            else
+            {
+                <p style="color:red;">Data not available</p>
+            }
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .modal{
+
+        margin-top:25px;
+    }
+
+</style>
+<div class="modal fade" id="myModal" role="dialog" style="overflow:auto;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" onclick="SendTo()">&times;</button>
+                <h4 class="modal-title" style="color:orangered">Requested To</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+                        <span style="color:green;font-weight:bold" id="SaveVal"></span>
+                        <div id="RequisitionApprovalC">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModalsat" role="dialog" style="overflow:auto;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" onclick="SendTo()">&times;</button>
+                <h4 class="modal-title" style="color:orangered">Comments</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+                        <span style="color:green;font-weight:bold" id="SaveVal"></span>
+                        <div id="Comments">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myNewModal" role="dialog" style="overflow:auto;">
+
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" onclick="Budget()">&times;</button>
+                <h4 class="modal-title" style="color:orangered">Budget Available</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+                        <span style="color:green;font-weight:bold" id="SaveVal"></span>
+                        <div id="BudgetAvailable">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function SendMailA(nStaffid, nRequisitionId, RequiredItems, nQuantity) {
+        debugger
+        var Approve = true;
+        //  var Reject=0;
+        if (nStaffid > 0)
+            $('#imagemodal').show();
+        {
+            $.ajax({
+                url: '/SOperations/SaveRequisitionApprovalDeatils/',
+                data: { SId: nStaffid, Isapproved: Approve, RID: nRequisitionId, RequiredItems: RequiredItems, Quantity: nQuantity },
+                success: function (result) {
+                    $('#imagemodal').hide();
+                    location.reload();
+
+                }
+            })
+        }
+
+    }
+
+    function SendTo(ApprovedBy, nRequisitionId) {
+        debugger
+        if (ApprovedBy > 0) {
+            $.ajax({
+                url: '/SOperations/RequisitionApprovalC',
+                data: { RstaffId: ApprovedBy, nRequisitionId: nRequisitionId },
+                success: function (Data) {
+                    debugger
+                    $('#myModal').show();
+                    $('#RequisitionApprovalC').html(Data);
+                }
+            })
+        }
+        else {
+            $("#RequisitionApprovalC").html("")
+        }
+
+    }
+    function Comments(ApprovedBy, nRequisitionId) {
+        debugger
+        if (ApprovedBy > 0) {
+            $.ajax({
+                url: '/SOperations/Comments',
+                data: { ApprovedBy: ApprovedBy, RequisitionId: nRequisitionId },
+                success: function (Data) {
+                    debugger
+                    $('#myModalsat').show();
+                    $('#Comments').html(Data);
+                }
+            })
+        }
+        else {
+            $("#Comments").html("")
+        }
+
+    }
+
+    function SendMailR(nStaffid, nRequisitionId, RequiredItems, nQuantity) {
+        debugger
+        //var Approve = 1;
+        var Reject = false;
+        if (nStaffid > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/SOperations/SaveRequisitionApprovalDeatils/',
+                data: { SId: nStaffid, Isapproved: Reject, RID: nRequisitionId, RequiredItems: RequiredItems, Quantity: nQuantity },
+                success: function (result) {
+                    $('#imagemodal').hide();
+                    location.reload();
+
+                }
+            })
+        }
+
+    }
+    function Budget(nRequisitionId) {
+        debugger
+        if (nRequisitionId > 0) {
+            $.ajax({
+                url: '/SOperations/BudgetAvailable',
+                data: { nRequisitionId: nRequisitionId },
+                success: function (Data) {
+                    debugger
+                    $('#myNewModal').show();
+                    $('#BudgetAvailable').html(Data);
+
+                }
+            })
+        }
+        else {
+            $("#BudgetAvailable").html("")
+        }
+
+    }
+    function OnloadData() {
+        document.getElementById("SaveVal").innerHTML = ""
+    }
+
+    window.onload = OnloadData();
+</script>
+<script>
+    function Generate(requisitionid) {
+        debugger
+        ///var requisitionid = $().val();
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/SOperations/PrintRequisitionApproval',
+            data: { nRequisitionId: requisitionid },
+            success: function (data) {
+                $('#table').html(data);
+                PrintData(data);
+            }
+        }).done(function (data) {
+            $('#imagemodal').hide();
+        });
+    };
+
+    function PrintData(data) {
+        debugger
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+@*<script>
+        function PrintElem(strid) {
+            debugger
+            var prtContent = document.getElementById(strid);
+            var WinPrint =
+    window.open('', '', 'left=0,top=0,width=1,height=1,toolbar=0,scrollbars=0,status=0');
+           // WinPrint.document.write(prtContent.innerHTML);
+            WinPrint.document.close();
+            WinPrint.focus();
+            WinPrint.print();
+            return false;
+            WinPrint.close();
+
+        }
+
+
+    </script>*@

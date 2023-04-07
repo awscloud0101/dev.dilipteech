@@ -1,0 +1,374 @@
+﻿@model AsteriskBrowserAL.Models.FeePaymentsData
+@{
+    ViewBag.Title = "Approve Branch Transfer";
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+<div id="dvApprovalRemarks" class="hide" role="dialog">
+    <div class="box">
+        <div class="box-body">
+            <label class="col-sm-4">@Html.Label("Enter Remarks")</label>
+            <div>
+                @Html.TextAreaFor(model => model.ApprovalRemarks, new { autocomplete = "off", @class = "form-control textlength", @id = "ActionDescription", placeholder = "Enter Remarks", @maxlength = 248, @height = "200Px" })
+                <div class="col-sm-12" style="display:none;" id="ActionDescriptionNull">
+                    <label style="color:red;font-weight:bold;"> Required </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BreadCrumb{
+
+<ul class="breadcrumb">
+    <li>
+        <i class="menu-icon fa fa-money"></i>
+        Finance
+    </li>
+    <li>
+        <i class=""></i>
+        Operations
+    </li>
+    <li class="active">Approve Fee Transfer</li>
+</ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+
+    @using (Html.BeginForm())
+    {
+        if(null != TempData["Message"])
+        {
+            <span style="color:forestgreen">@Html.Raw(TempData["Message"])</span>
+        }
+
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color:red;font-weight:bold" id="Validation"></span>
+
+
+            <div class="table-header">
+                <span style="font-family:calibri;"> Fee Transfer Approval</span>
+                <div class="" style="float:right;margin-right:10px;">
+                    @*<input type="button" class="btn btn-primary pull-right" id="btnViewData2" style="min-width:80Px" value="View Data" onclick="GetData()" />*@
+                    <a class="P2" onclick="GetData()" id="btnViewData2" value="View Data">
+                    <span class="btncustom">View Data</span></a>
+                </div>
+
+            </div>
+
+
+
+            <div class="widget-box">
+         
+
+                <input type="hidden" value="@Model.IsCentral" id="IsCentral" />
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            @if (Model.IsCentral)
+                            {
+                            <div class="col-sm-12">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                    <div class="col-sm-6">
+                                        <select id="CboDivision" class="form-control" onchange="LoadBranchCombo()"></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                    <div class="col-sm-6">
+                                        <select id="CboBranch" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                  
+                            }
+                            else
+                            {
+                            <input type="hidden" id="CboBranch" name="CboBranch" value="@Model.SubscriptionId" />
+                            }
+
+
+                            <div class="col-sm-12">
+
+                                <div class="col-xs-6">
+                                  
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Status</label>
+                                    <div class="col-sm-6">
+                                        <select id="CboStatus" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-body table-responsive no-padding" id="dvApproveBranchTransfers">
+            </div>
+
+
+        </div>
+    </div>
+    }
+</section>
+<script type="text/javascript">
+    $('#ActionDescription').focusin(function () {
+        $('#ActionDescriptionNull').hide();
+    });
+    function ONLOADDATA() {
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            LoadDivisionCombo();
+        }
+
+        LoadStatusCombo();
+
+    }
+    window.onload = ONLOADDATA();
+    function LoadBranchCombo() {
+        $('#dvApproveBranchTransfers').html('');
+        var DivisionId = $('#CboDivision').val();
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+                    BranchItems.children().remove();
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+
+
+        }
+    }
+
+    function LoadStatusCombo() {
+
+        var StatusItems = $('#CboStatus');
+
+        StatusItems.children().remove();
+        StatusItems.append($("<option>").val("-1").text("--- Select ---"));
+        StatusItems.append($("<option>").val("0").text("Pending"));
+        StatusItems.append($("<option>").val("1").text("Accepted"));
+        StatusItems.append($("<option>").val("2").text("Rejected"));
+        StatusItems.append($("<option>").val("3").text("All"));
+
+        $('#CboStatus').append(StatusItems);
+    }
+
+    function LoadDivisionCombo() {
+
+        $('#dvApproveBranchTransfers').html('');
+
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (data) {
+                var BranchItems = $('#CboDivision');
+
+                BranchItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    BranchItems.append($("<option>").val(record.DivisionId).text(record.DivisionName));
+                });
+
+                $('#CboDivision').append(BranchItems);
+            },
+            aync: false
+        });
+    }
+
+    function GetData() {
+        debugger
+        var DivisionId = $('#CboDivision').val();
+        var SubscriptionId = $('#CboBranch').val();
+        var Status = $('#CboStatus').val();
+        var IsCentral = $('#IsCentral').val();
+
+        $('#dvApproveBranchTransfers').html('');
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (IsCentral == "value") {
+            if (DivisionId < 0) {
+                Message += "Division";
+                isValid = false;
+            }
+
+            if (SubscriptionId == "null" || SubscriptionId < 0) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Branch";
+                isValid = false;
+            }
+        }
+        else
+            DivisionId = 0;
+
+        if (Status < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Status";
+            isValid = false;
+        }
+
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        document.getElementById("Validation").innerHTML = "";
+        $('#imagemodal').show();
+        $.ajax
+            ({
+
+                url: '/FOperations/GetFeeTransferRequestData/',
+                data: { DivisionId: DivisionId, SubscriptionId: SubscriptionId, StatusId: Status },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#dvApproveBranchTransfers').html(data);
+                }
+            });
+
+    }
+
+    function ApproveBD(FeeTransferId, nStudentId, dDebitAmount, nOnlineReceiptNo, nSubscriptionId, FromParticularId, TransactionType, TemplateNumner, Type, ToFeeParicularId, ToTransactionType) {
+        debugger
+
+        if (FeeTransferId < 1)
+            retun;
+
+        var $dialog = $('#dvApprovalRemarks').removeClass("hide")
+      .dialog({
+          resizable: false,
+          draggable: false,
+          width: '600',
+          modal: true,
+          title: 'Fee Transfer Approval',
+          open: function (event, ui) {
+              $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+          },
+          title_html: true,
+          buttons: [
+              {
+                  html: "OK",
+                  "class": "btn btn-success btn-minier",
+                  click: function () {
+                      debugger
+                      var Description = $('#ActionDescription').val();
+
+                      if (Description == "") {
+                          $('#ActionDescriptionNull').show();
+                          return;
+                      }
+                      else {
+                          $(this).dialog("close");
+
+
+                          if (nOnlineReceiptNo >= 0) {
+
+                              $.ajax({
+                                  url: '/FOperations/GetParticularsForTransfer',
+                                  data: { FeeTransferId: FeeTransferId, StudentId: nStudentId, DebitAmount: dDebitAmount, OnlineReceiptNo: nOnlineReceiptNo, SubscriptionId: nSubscriptionId, FromParticularId: FromParticularId, TransactionType: TransactionType, TemplateNumner: TemplateNumner, Type: Type, strDescription: Description,ToFeeParicularId:ToFeeParicularId, ToTransactionType: ToTransactionType },
+                                  success: function (data) {
+
+                                      if (data != null) {
+
+                                          $('#divPaymentDialogue').html(data);
+
+                                          OpenTransferDialog();
+                                      }
+                                  },
+                                  async: false
+                              });
+                          }
+
+
+                      }
+                  }
+              },
+              {
+                  html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                  "class": "btn btn-minier",
+                  click: function () {
+                      $(this).dialog("close");
+                      $('#ActionDescription').val("");
+                  }
+              }
+          ]
+
+      });
+    }
+
+
+    function OpenTransferDialog() {
+
+        var $dialog = $('#divPaymentDialogue')
+
+        .dialog({
+            resizable: false,
+            draggable: false,
+            width: '900',
+            modal: true,
+            title: 'Payment Heads',
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            title_html: true,
+            buttons: [
+                {
+                    html: "Yes",
+                    "class": "btn btn-success btn-minier",
+                    click: function () {
+                        debugger
+                        SaveFeeTransfer();
+                    }
+                },
+                {
+                    html: "No",
+                    "class": "btn btn-danger btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                        $('#ActionDescription').val("");
+                    }
+                }
+            ]
+        });
+    }
+
+
+    function disableF5(e) {
+        if ((e.which || e.keyCode) == 116) e.preventDefault();
+    };
+
+</script>
+

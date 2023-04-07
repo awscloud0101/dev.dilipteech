@@ -1,0 +1,394 @@
+﻿@model AsteriskBrowserAL.Models.NewTicketModelData
+@{
+    ViewBag.Title = "ComplaintBox";
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+
+
+
+
+<style>
+
+    .message-form {
+        border: none;
+    }
+</style>
+
+@using (Html.BeginForm("ComplaintBox", "Parent", FormMethod.Post, new { @class = "form-horizontal message-form col-xs-12", id = "id-message-form", enctype = "multipart/form-data" }))
+{
+
+    <input type="hidden" name="FromPlayerId" id="FromPlayerId" />
+    <input type="hidden" name="ToPlayerId" id="ToPlayerId" />
+    <input type="hidden" value="@Model.FromPlayerId" id="SelFromPlayerId" />
+    <input type="hidden" value="@Model.ToPlayerId" id="SelToPlayerId" />
+    <input type="hidden" value="@Model.FromPlayerName" id="SelFromPlayerName" />
+    <input type="hidden" value="@Model.ToPlayerName" id="SelToPlayerName" />
+    <input type="hidden" value="@Model.GroupId" id="SelGroupId" />
+
+
+
+    <div class="table-header" style="margin-top:-20px;">
+        <span style="font-family:calibri;">Complaint Box</span>
+        <small style="float:right;" class="textheader">
+            @Html.ActionLink("Open Ticket", "OpenTicket", new { })
+        </small>
+    </div>
+
+    <div class="widget-box row overflowscroll" style="padding:10px;height:450px;overflow-x:hidden;">
+
+        <br />
+        <div class="row ">
+
+
+            @*<div class="col-sm-6">
+
+                    <div class="form-group">
+                        <label class="col-sm-6 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Type")</label>
+
+                        <div class="col-sm-6">
+                            @Html.DropDownListFor(model => model.HDTicketTypeId, new SelectList(Model.lstTicketType, "HDTicketTypeId", "HDTicketTypeName"), "--- Select ---", new { @class = "form-control", id = "Type" })
+                        </div>
+                    </div>
+
+                </div>*@
+
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="col-sm-6 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Category")</label>
+
+                    <div class="col-sm-6">
+                        <select class="form-control" id="GroupId"></select>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="row">
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="col-sm-6 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Category Type")</label>
+
+                    <div class="col-sm-6">
+                        <select class="form-control" id="CategoryId" name="TicketCategoryId"></select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="col-sm-6 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Report To")</label>
+
+                    <div class="col-sm-6">
+                        <select class="form-control" id="ReportTo" name="ReportTo"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <div class="row">
+
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="col-sm-6 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Priority")</label>
+
+                    <div class="col-sm-6">
+                        @Html.DropDownListFor(model => model.PriorityId, new SelectList(Model.lstHDPriority, "HDPriorityId", "Priority"), "--- Select ---", new { @class = "form-control", id = "Priority" })
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+
+            </div>
+        </div>
+
+        <div>
+            <div class="row">
+
+                @*<div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-6 control-label no-padding-right" for="form-field-EndUser">@Html.Label("End User")</label>
+
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="input-icon block col-xs-12 no-padding">
+                                    @Html.TextBoxFor(model => model.EndUser, new { @class = "form-control textlength", id = "EndUser", @maxlength = "100", @type = "email" })
+                                    <i class="ace-icon fa fa-envelope-o"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>*@
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-6 control-label no-padding-right" for="form-field-subject"><span style="color:red;font-weight:bold">*</span>@Html.Label("Subject")</label>
+
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="input-icon block col-xs-12 no-padding">
+                                @Html.TextBoxFor(model => model.Subject, new { @class = "form-control textlength", id = "Subject", @maxlength = "100" })
+                                <i class="ace-icon fa fa-comment-o"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="hr hr-8 dotted"></div>
+
+
+
+
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right">
+                    <span style="color:red;font-weight:bold">*</span>Message
+                </label>
+
+                <div class="col-sm-9">
+                    @Html.TextAreaFor(model => model.Description, 10, 20, new { @class = "form-control textlength", id = "Description" })
+                </div>
+            </div>
+
+            <div class="hr hr-8 dotted"></div>
+
+            @*<div class="form-group no-margin-bottom">
+                    <label class="col-sm-3 control-label no-padding-right">Attachments</label>
+
+                    <div class="col-sm-9">
+                        <div id="form-attachments">
+                            <input type="file" name="AttachmentFile" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="align-right">
+                    <button id="id-add-attachment" type="button" class="btn btn-sm btn-danger P2">
+                        <i class="ace-icon fa fa-paperclip bigger-140"></i>
+                        Add Attachment
+                    </button>
+                </div>
+
+                <div class="hr hr-8 dotted"></div>*@
+
+
+            <div class="">
+                <small id="Validation" style="color:red;font-weight:bold;font-size:small"></small>
+
+
+
+                <button class="btn btn-success btn-sm P2" onclick="return SubmitForm();" type="submit">
+                    <i class="ace-icon fa fa-check "></i>
+                    Send
+                </button>
+
+                &nbsp;
+                <button class="btn btn-sm P2" type="reset">
+                    <i class="ace-icon fa fa-undo"></i>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        GetGroupsDropDown()
+    });
+    $("#GroupId").change(function () {
+        var GroupId = $("#GroupId").val();
+        document.getElementById("ReportTo").value = ""
+        if (GroupId != "") {
+            LoadPlayers();
+            LoadCatgeoryDropdown()
+            $('#ReportTo').attr('readonly', false);
+        }
+        else {
+            $("#CategoryId").html("")
+            $('#ReportTo').attr('readonly', true);
+        }
+    });
+    function LoadCatgeoryDropdown() {
+        var GroupId = $("#GroupId").val();
+        $.ajax({
+            url: '/SeHelpDesk/GetCayegoryDropDown',
+            data: { GroupId: GroupId },
+            success: function (result) {
+                CategoryId = $("#CategoryId")
+                CategoryId.children().remove();
+                CategoryId.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    CategoryId.append($("<option>").val(record.HDCategoryId).text(record.CategoryName))
+                })
+                $("#CategoryId").append(CategoryId)
+            },
+            async: false
+        })
+    }
+    function LoadPlayers() {
+        var GroupId = $("#GroupId").val();
+
+        if (GroupId > 0) {
+            $("#imagemodal").show()
+
+            $.ajax({
+                url: "/HDOperations/GetPlayersWithGroupForEdit",
+                data: { GroupId: GroupId },
+                success: function (result) {
+                    $("#imagemodal").hide()
+
+                    Players = $("#ReportTo")
+                    Players.children().remove();
+                    Players.append($("<option>").val("").text("--- Select ---"))
+                    $.each(result, function (e, record) {
+                        Players.append($("<option>").val(record.PlayerId).text(record.EmployeeName))
+                    })
+                    $("#ReportTo").append(Players)
+                },
+                asynch: false
+            })
+        }
+    }
+
+    function GetGroupsDropDown() {
+        $.ajax({
+            url: '/SeHelpDesk/GetGroupsDropDown',
+            success: function (Data) {
+                var Group = $('#GroupId')
+                Group.children().remove();
+                Group.append($("<option>").val("").text("--- Select ---"))
+                $.each(Data, function (i, record) {
+                    Group.append($("<option>").val(record.HDExecutiveGroupId).text(record.GroupName));
+                });
+                $('#GroupId').append(Group);
+            }
+        })
+    }
+    var ReportToEmployeeNumber = "";
+    var FromPlayerId = "";
+    var ToPlayerId = "";
+    var ImageUrl = "";
+
+
+    function SubmitForm() {
+        var valid = true;
+        var Category = $('#CategoryId').val();
+        var Priority = $('#Priority').val();
+        var TicketType = $('#Type').val();
+        var Subject = $('#Subject').val();
+        var Description = $('#Description').val();
+        if (Category == "" || Category < 1) {
+            valid = false;
+        }
+        if (Priority == "" || Priority < 1) {
+            valid = false;
+        }
+        if (TicketType == "" || TicketType < 1) {
+            valid = false;
+        }
+        if (Subject == "") {
+            valid = false;
+        }
+
+        if (Description == "") {
+            valid = false;
+        }
+        ReportToEmployeeNumber = $("#ReportTo").val()
+
+        if (ReportToEmployeeNumber == "") {
+            valid = false;
+        }
+        if (valid == false) {
+            document.getElementById("Validation").innerHTML = "Fields marked with (*) are mandatory"
+        }
+        else {
+            $("#id-message-form").submit();
+        }
+        //$("#imagemodal").show()
+        return valid;
+    }
+</script>
+
+
+
+
+<!-- PAGE CONTENT ENDS -->
+<!-- inline scripts related to this page -->
+<script type="text/javascript">
+    jQuery(function ($) {
+
+        //file input
+        $('.message-form input[type=file]').ace_file_input()
+            .closest('.ace-file-input')
+            .addClass('width-90 inline')
+            .wrap('<div class="form-group file-input-container"><div class="col-sm-7"></div></div>');
+
+        //Add Attachment
+        //the button to add a new file input
+        $('#id-add-attachment')
+            .on('click', function () {
+                var file = $('<input type="file" name="AttachmentFile" />').appendTo('#form-attachments');
+                file.ace_file_input();
+
+                file.closest('.ace-file-input')
+                    .addClass('width-90 inline')
+                    .wrap('<div class="form-group file-input-container"><div class="col-sm-7"></div></div>')
+                    .parent().append('<div class="action-buttons pull-right col-xs-1">\
+                            <a href="#" data-action="delete" class="middle">\
+                                <i class="ace-icon fa fa-trash-o red bigger-130 middle"></i>\
+                            </a>\
+                        </div>')
+                    .find('a[data-action=delete]').on('click', function (e) {
+                        //the button that removes the newly inserted file input
+                        e.preventDefault();
+                        $(this).closest('.file-input-container').hide(300, function () { $(this).remove() });
+                    });
+            });
+
+        //turn the recipient field into a tag input field!
+        /**
+        var tag_input = $('#form-field-recipient');
+        try {
+            tag_input.tag({placeholder:tag_input.attr('placeholder')});
+        } catch(e) {}
+
+
+        //and add form reset functionality
+        $('#id-message-form').on('reset', function(){
+            $('.message-form .message-body').empty();
+
+            $('.message-form .ace-file-input:not(:first-child)').remove();
+            $('.message-form input[type=file]').ace_file_input('reset_input_ui');
+
+            var val = tag_input.data('value');
+            tag_input.parent().find('.tag').remove();
+            $(val.split(',')).each(function(k,v){
+                tag_input.before('<span class="tag">'+v+'<button class="close" type="button">&times;</button></span>');
+            });
+        });
+        */
+
+    });
+</script>
+
+

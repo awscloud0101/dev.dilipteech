@@ -1,0 +1,297 @@
+﻿
+@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    ViewBag.Title = "Exam Schedules";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Content Management</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm("ContentManagement", "AExamination", FormMethod.Post))
+    {
+        @Html.ValidationMessage("ExamSchedules")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Content Management
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <a class="blue P2" id="NewExamination" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.BatchId, new SelectList(Model.lstSubscriptions, "SubscriptionId", "Institute"), "-- Select --", new { @class = "form-control", id = "SubscriptionId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Class</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.lstClassNumbers, "ClassNumber", "ClassNumberDisplay"), new { @class = "form-control", id = "ClassNumber" })
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                }
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Subject</label>
+                                            <div class="col-sm-6">
+                                                <select id="SubjectIdValue" name="SubjectId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Chapters</label>
+                                            <div class="col-sm-6">
+                                                <select id="Chapters" name="Chapters" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div id="SearchData" class="row">
+        </div>
+
+
+        if (null != Model)
+        {
+            <input style="display:none" id="SelClass" value="@Model.ClassNumber" />
+            <input style="display:none" id="SelSubjectId" value="@Model.SubjectId" />
+            <input style="display:none" id="SelSubId" value="@Model.SubscriptionId" />
+            <input style="display:none" id="SelContentIndexId" value="@Model.ExaminationPapersId" />
+        }
+        else
+        {
+
+            <input style="display:none" id="SelClass" value="0" />
+            <input style="display:none" id="SelSubjectId" value="0" />
+            <input style="display:none" id="SelSubId" value="0" />
+            <input style="display:none" id="SelContentIndexId" value="0" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+    var SubjectItems = $('#SubjectIdValue');
+    var Chapters = $('#Chapters');
+
+    $(document).ready(function () {
+
+        var SelClass = $('#SelClass').val();
+        var SelTerm = $('#SelSubjectId').val();
+        var SelSubId = $('#SelSubId').val();
+        var SelContentIndexId = $('#SelContentIndexId').val();
+
+        if (SelClass > 0 && SelTerm > 0 && SelSubId >= 0) {
+            GetSubjects();
+        }
+    });
+
+    $('#NewExamination').click(function () {
+
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        var SubjectId = $('#SubjectIdValue').val();
+        var ContentIndexId = $('#Chapters').val();
+        if (ClassNumber < 1 && BranchId < 0) {
+            document.getElementById("Validation").innerHTML = "Please select both class and branch";
+            return false;
+        }
+        else if (ClassNumber < 1) {
+            document.getElementById("Validation").innerHTML = "Please select the class";
+            return false;
+        }
+        else if (BranchId < 0 || BranchId == "") {
+            document.getElementById("Validation").innerHTML = "Please select the branch";
+            return false;
+        }
+        else if (SubjectId < 1 || SubjectId == "null") {
+            document.getElementById("Validation").innerHTML = "Please select the subject";
+            return false;
+        }
+        else if (ContentIndexId < 1 || ContentIndexId == "null") {
+            document.getElementById("Validation").innerHTML = "Please select the Chapter";
+            return false;
+        }
+        else {
+            window.location.href = "/AExamination/ContentManagementC?ClassNumber=" + ClassNumber + "&SubjectId=" + SubjectId + "&BranchId=" + BranchId + "&ContentIndexId=" + ContentIndexId;
+        }
+
+    });
+
+    $('#SubscriptionId').change(function () {
+
+        $("#SearchData").html("");
+        document.getElementById('ClassNumber').value = "0";
+        document.getElementById('SubjectIdValue').value = "0";
+        var BranchId = $('#SubscriptionId').val();
+        if (BranchId >= 0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+    });
+
+    $('#ClassNumber').change(function () {
+
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        if (ClassNumber > 0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+        if (ClassNumber > 0 && BranchId >= 0) {
+            GetSubjects();
+        }
+    });
+
+    function GetSubjects() {
+        var SelClassNumberId = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        $.ajax({
+            url: '/AExamination/GetSelectedClassSubject',
+            data: { ClassNumber: SelClassNumberId, BranchId: BranchId },
+            success: function (data) {
+
+                SubjectItems.children().remove();
+
+                SubjectItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+
+                    SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+                });
+
+                $('#SubjectIdValue').append(SubjectItems);
+            },
+            aync: false
+        });
+    }
+
+    $('#SubjectIdValue').change(function () {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        var SubjectId = $('#SubjectIdValue').val();
+        if (SubjectId > 1) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+        if (ClassNumber > 0 && SubjectId > 0) {
+            GetChapters();
+        }
+    });
+
+    $('#Chapters').change(function () {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        var SubjectId = $('#SubjectIdValue').val();
+        var ContentIndexId = $('#Chapters').val();
+        if (ContentIndexId > 1) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+        if (ClassNumber > 0 && SubjectId > 0 && ContentIndexId > 0) {
+            GetSchedules();
+        }
+    });
+
+    function GetChapters() {
+        var SubjectId = $('#SubjectIdValue').val();
+        var BranchId = $('#SubscriptionId').val();
+        $.ajax({
+            url: '/AExamination/GetContentIndex',
+            data: { BranchId: BranchId, SubjectId: SubjectId },
+            success: function (data) {
+
+                Chapters.children().remove();
+
+                Chapters.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+
+                    Chapters.append($("<option>").val(record.ContentIndexId).text(record.ContentName));
+                });
+
+                $('#Chapters').append(Chapters);
+            },
+            aync: false
+        });
+    }
+
+
+    function GetSchedules() {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        var ContentIndexId = $('#Chapters').val();
+        $('#imagemodal').show();
+        if (BranchId >= 0 && ContentIndexId > 0) {
+            $.ajax({
+                url: '/AExamination/ContentManagementReport',
+                data: { BranchId: BranchId, ContentIndexId: ContentIndexId },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchData").html(Data);
+                }
+            });
+        }
+    }
+
+</script>
+
+
+
+
+
+

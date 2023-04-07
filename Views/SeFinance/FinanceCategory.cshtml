@@ -1,0 +1,160 @@
+﻿@model IEnumerable<AsteriskBrowserAL.FinanceCategory>
+@{
+    ViewBag.Title = "Holidays";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Settings
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Finance Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <div class="space-6"></div>
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @*<h3>@Html.ActionLink("New", "HolidaysC")</h3>*@
+
+        </div>
+    </div>
+
+    @if (null != TempData["Holidays"])
+    {
+        @Html.Raw(TempData["Holidays"])
+    }
+
+    @if (Model != null)
+    {
+        int nsno = 1;
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Finance Category</span>
+
+                    <div class="" style="float:right;margin-right:10px;">
+                        <a class="btncustom P2" href="@Url.Action("CategoryIncomeC", "SeFinance")" role="button" id="New" name="New">Add</a>
+                    </div>
+
+                </div><!-- /.box-header -->
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Finance Category")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Type")
+                            </th>
+
+                            <th>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    <b> @Html.DisplayFor(modelItem => item.CategoryName)</b>
+                                </td>
+                                @if (item.IsUnderIncome == true)
+                                {
+                                    <td>
+                                        <b> Income</b>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <b> Expense</b>
+                                    </td>
+                                }
+                                <td>
+                                    <div>
+                                        <a class="green P2" href="@Url.Action("CategoryIncomeEdit", "SeFinance", new { Id = item.FinanceCategoryId })">
+                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                        </a>
+                                        @*<a class="red P2" onclick="btnConfirm(@item.HolidaysId)">
+                                                <i class="ace-icon fa fa-trash-o bigger-130"> </i>
+
+                                            </a>*@
+                                    </div>
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+    }
+    else
+    {
+        <div class="table-header">
+            Finance Category
+
+            <a class="view-header-btn btn btn-info btn-xs P2" style="float:right" href="@Url.Action("FinanceCategoryC", "SeFinance")" role="button" id="New" name="New"><i class="fa fa-plus-circle"></i></a>
+        </div>
+        <span style="color: red;"><b>There are no Finance Category</b></span>
+    }
+
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeFinance/ValidationForHolidaysD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SeFinance/HolidaysD?id=' + Value;
+                    var title = "Holidays";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

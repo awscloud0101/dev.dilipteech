@@ -1,0 +1,160 @@
+﻿@{
+    ViewBag.Title = "Conveyance";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Conveyance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <br />
+
+    <span style="color:red;" id="EPCombos"></span>
+    <input type="hidden" id="SelType" value="@ViewBag.IsLocal" />
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header"></div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("MonthYear", null, "-- Select --", new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label><input type="radio" id="LocalConveyance" name="IsLocal" /> Apply For Local Conveyance</label>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label><input type="radio" id="OutStationConveyance" name="IsLocal" /> Apply For Out Station Conveyance</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ConveyanceTypePartial">
+
+            </div>
+        </div>
+    </div>
+
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+</section>
+
+
+<script>
+
+    //$(document).ready(function () {
+    //    var strMonthYear = $('#MonthYear').val();
+    //    var bIsLocal = $('#SelType').val();
+
+    //    if ((strMonthYear != "") && (bIsLocal != null) && (strMonthYear != undefined))
+    //    {
+    //        LoadConveyanceData();
+    //    }
+
+    //})
+
+    function LoadConveyanceData(strMonthYear, bIsLocal) {
+        if (bIsLocal) {
+            $('#LocalConveyance').prop('checked', true);
+            LoadLocalConveyance(strMonthYear, bIsLocal);
+        }
+
+        else {
+            $('#OutStationConveyance').prop('checked', false);
+            LoadOutStationConveyance(strMonthYear, bIsLocal);
+        }
+    }
+
+    function LoadLocalConveyance(strMonthYear) {
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/HROperations/LocalConveyance',
+            data: { MonthYear: strMonthYear },
+            success: function (data) {
+                $('#ConveyanceTypePartial').html(data);
+                $('#imagemodal').hide();
+            },
+
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+    }
+
+    function LoadOutStationConveyance(strMonthYear) {
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/HROperations/OutStationConveyance',
+            data: { MonthYear: strMonthYear },
+            success: function (data) {
+                $('#ConveyanceTypePartial').html(data);
+                $('#imagemodal').hide();
+            },
+
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+    }
+
+    //Local Conveyance click
+    $('#LocalConveyance').click(function () {
+        if ($(this).is(':checked')) {
+            $('#ConveyanceTypePartial').html("");
+            var strMonthYear = $('#MonthYear').val();
+            if (strMonthYear != "" && strMonthYear != undefined) {
+                LoadLocalConveyance(strMonthYear);
+            }
+        }
+    });
+
+    //Out station conveyance click
+    $('#OutStationConveyance').click(function () {
+        if ($(this).is(':checked')) {
+            $('#ConveyanceTypePartial').html("");
+            var strMonthYear = $('#MonthYear').val();
+            if (strMonthYear != "" && strMonthYear != undefined) {
+                LoadOutStationConveyance(strMonthYear);
+            }
+        }
+    });
+
+</script>

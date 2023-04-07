@@ -1,0 +1,257 @@
+﻿
+@model AsteriskBrowserAL.Models.FeeCorrectionViewModel
+@{
+    ViewBag.Title = "Money Spent Request";
+}
+
+<link href="~/plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<style>
+    .ui-widget-header, .ui-state-default, ui-button {
+        background: #3c8dbc;
+        border: 1px solid #3c8dbc;
+        color: #3c8dbc;
+        font-weight: normal;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Money Spent Request</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<!--Main Content-->
+<section class="content">
+    <br />
+
+    @using (Html.BeginForm("MOneySpentRequest", "FPettyCash", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        <input type="hidden" id="Ispopulate" value="@ViewBag.PopulateData" />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                   
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Money Spent Request
+                        </h5>
+
+                        <div class="widget-toolbar no-border">
+                            <div class="inline-dropdown hover">
+                                <div class="inline action-buttons">
+                                    <a class="P2" id="ViewData" name="ViewData" onclick="return PopulateData();"><span class="btn btn-info btn-minier">View Data</span></a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            @*<div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title">Money Spent Request</h3>
+
+                                    <input class="btn btn-primary pull-right" type="button" style="width:80px;" name="ViewData" id="ViewData" value="View Data" onclick="PopulateData()">
+                                </div>*@<!-- /.box-header -->
+
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-4">
+                                                    <label for="form-field-1">Select Date</label>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <div id="datepicker" class="input-group date">
+                                                        <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" value="@ViewBag.TransactionDate" placeholder="Select Date" required="required" title="Please select the date" />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-2">
+                                                    <span style="color:red;font-weight:bold;display:none" id="DateVal"> Required </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                          
+                            <div id="dvApprovalRemarks" style="display:none;height:250Px" role="dialog">
+                                <div class="box">
+                                    <div class="box-body">
+                                        <label class="col-sm-6">@Html.Label("Enter Description")</label>
+                                        <div>
+                                            <input class="form-control" type="text" id="CancelRemarks" autocomplete="off" placeholder="Enter Description" required="required" maxlength="200" height="200" />
+                                            <div class="col-sm-12" style="display:none;" id="ActionDescriptionNull">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <div id="SearchData">
+
+                </div>
+                </div>
+            </div>
+                    }
+
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        LoadData();
+    });
+
+    function LoadData() {
+
+        var Value = $('#Ispopulate').val();
+
+        if (Value == "value")
+            PopulateData();
+    }
+
+    $('#Date').change(function () {
+        $('#DateVal').hide();
+    });
+
+    function PopulateData() {
+        var VrDate = $('#Date').val();
+        if (VrDate == "" || VrDate == "undefined" || VrDate == "null") {
+
+            $('#DateVal').show();
+            return;
+        }
+
+        $.ajax
+           ({
+               error: function (jqXHR, textStatus, errorThrown) {
+                   alert(errorThrown);
+                   $('SearchData').html('');
+                   $('#imagemodal').hide();
+               },
+
+               url: "/FPettyCash/GetPettyCashTransactionsByDate",
+               data: { StrDate: VrDate },
+               beforeSend: function () {
+                   $('#imagemodal').show();
+               },
+               success: function (data) {
+                   $('#imagemodal').hide();
+                   $('#SearchData').html(data);
+               }
+
+           })
+           ;
+    }
+
+    function SaveCancelRequest(PettyCashTransactionId, Description) {
+        $('#imagemodal').show();
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+            },
+
+            url: '/FPettyCash/MoneySpentCancel/',
+            type: "POST",
+            dataType: "json",
+            data: { TransactionId: PettyCashTransactionId, Remarks: Description },
+            success: function (data) {
+                PopulateData();
+            },
+            aync: false
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function CancelRequest(PettyCashTransactionId) {
+    debugger
+        if (PettyCashTransactionId < 1)
+            return;
+        document.getElementById("dvApprovalRemarks").style.display = "inline"
+        var $dialog = $('#dvApprovalRemarks')
+
+      .dialog({
+          autoOpen: false,
+          width: 600,
+          height: 'auto',
+          resizable: true,
+          title: 'Money Spent Cancel Request',
+          modal: true,
+          closeOnEscape: false,
+          responsive: true,
+          show: "slide",
+          buttons: {
+              "OK": function () {
+
+                  debugger
+
+                  var Description = $('#CancelRemarks').val();
+
+                  if (Description == "") {
+                      $('#ActionDescriptionNull').show();
+                      return;
+                  }
+                  else {
+                      $(this).dialog("close");
+                      var VrMessage = SaveCancelRequest(PettyCashTransactionId, Description);
+                  }
+              },
+              "Close": function () {
+                  $(this).dialog("close");
+              }
+          },
+      });
+
+        $dialog.dialog('open');
+        return false;
+    }
+
+</script>
+
+

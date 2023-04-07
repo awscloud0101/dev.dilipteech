@@ -1,0 +1,95 @@
+﻿@model List<AsteriskBrowserAL.Models.SalePriceSettingsViewModel>
+
+@{
+    ViewBag.Title = "Sale Price Settings";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Stores
+        </li>
+        <li class="active">Sale Price Settings</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <form id="myForm" method="post">
+        <br />
+        <div class="row">
+            <div class="col-xs-12">
+                @using (Html.BeginForm("SalePriceSettings", "SeStores", FormMethod.Post))
+                {
+                    <div class="table-header">
+                        Sale Price Settings
+                        <div class="col-xs-6 " style="float:right">
+                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1"></label>
+                            <div class="col-xs-3">
+                                <label><input type="radio" name="rbType" value="Kit" checked="checked" />Kit</label>
+                            </div>
+                            <div class="col-xs-3">
+                                <label><input type="radio" name="rbType" value="Item" /> Item</label>
+                            </div>
+                            <button type="submit" name="Save" class="btn btn-info btn-xs P2" onclick="return submitForm();">
+                                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                            </button>
+                        </div>
+                    </div><!-- /.box-header -->
+            }
+            <div id="SalePriceData"></div>
+        </div>
+    </div>
+        </form>
+</section>
+
+<script>
+    var rbType = "";
+    $(document).ready(function () {
+        GetDataOnrbClick();
+    });
+
+    $('input[name="rbType"]').click(function radioButton() {
+
+        rbType = $(this).val();
+        GetDataOnrbClick();
+    });
+
+    function GetDataOnrbClick() {
+        rbType = $('input[name=rbType]:checked', '#myForm').val();
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            },
+
+            url: '/SeStores/GetSalePriceData',
+            data: { rbType: rbType },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (Data) {
+                $('#SalePriceData').html(Data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide()
+        });
+    }
+
+
+
+
+</script>
+
+ 
+
+
+

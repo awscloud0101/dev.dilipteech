@@ -1,0 +1,192 @@
+﻿@model AsteriskBrowserAL.EmployeePosition
+
+@{
+    ViewBag.Title = "Edit Employee Position";
+}
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Employee  Designations</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<section class="content">
+
+
+    @Html.AntiForgeryToken()
+
+    <div class="col-xs-12">
+        <div class="box">
+            @using (Html.BeginForm("EmployeePositionE", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.ValidationSummary(true)
+
+                <span style="color: red;">@Html.ValidationMessage("Designations")</span>
+                <div class="table-header">
+
+                    Designations
+                    <small style="float:right;" class="textheader">
+                        @Html.ActionLink("Back to details", "EmployeePosition", new { CategoryId = Model.EmployeePositionId })
+                    </small>
+
+                </div><!-- /.page-header -->
+                <div class="widget-box row" style="padding:10px;">
+
+
+                    <!-- form start -->
+                    <form class="form-horizontal" role="form">
+
+                        @Html.HiddenFor(model => model.EmployeePositionId)
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Designation Name")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.PositionName, new { @class = "form-control col-sm-5 textlength", placeholder = "Position Name", @id = "PositionName", @onchange = "removeError();" })
+                                </div>
+                                <div class="col-sm-1" style="display:none;" id="pnPositionName">
+                                    <label style="color:red;font-weight:bold;"> Please Enter The Designation Name </label>
+                                </div>
+                                @*<div class="col-sm-3">
+                                        <span style="color: red;font-weight: bold;">@Html.ValidationMessage("PositionName")</span>
+                                    </div>*@
+                            </div>
+
+                        </div>
+                        <div class="col-sm-5">
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Category Name")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("CategoryId", null, "--Select Category --", new { @class = "form-control", @id = "CategoryName", @onchange = "removeError();" })
+                                </div>
+                                <div class="col-sm-2" style="display:none;" id="cnCategoryName">
+                                    <label style="color:red;font-weight:bold;"> Please Enter The Category Name </label>
+                                </div>
+                                @*<div class="col-sm-3">
+                                        <span style="color: red;font-weight: bold;">@Html.ValidationMessage("CategoryId")</span>
+                                    </div>*@
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="col-sm-1 control-label no-padding-right"></label>
+
+                                <div class="col-sm-9">
+                                    @Html.CheckBoxFor(model => model.Status)
+                                    <span class="lbl bigger-120">Is Active</span>
+                                </div>
+
+                                <div class="col-sm-1">
+                                    @Html.ValidationMessageFor(model => model.Status)
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-9" align="left">
+
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            }
+        </div>
+        <input type="hidden" id="count" name="count" value="0" />
+    </div>
+
+</section>
+
+<script type="text/javascript">
+    function validateEmployeePosition() {
+
+        document.getElementById("count").value = "1";
+        var PositionName = document.getElementById("PositionName").value;
+        var CategoryName = document.getElementById("CategoryName").value;
+
+
+        validate = true;
+
+        if (PositionName == "") {
+            document.getElementById("pnPositionName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("pnPositionName").style.display = "none";
+        }
+
+        if (CategoryName == "") {
+            document.getElementById("cnCategoryName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("cnCategoryName").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateEmployeePosition();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var PositionName = document.getElementById("PositionName").value;
+        var CategoryName = document.getElementById("CategoryName").value;
+
+        if (count != 0) {
+            if (PositionName != "") {
+                document.getElementById("pnPositionName").style.display = "none";
+            } else {
+                document.getElementById("pnPositionName").style.display = "inline";
+            }
+
+        }
+    };
+
+    $('#PositionName').click(function () {
+        document.getElementById('pnPositionName').style.display = "none"
+    })
+
+
+    $('#CategoryName').click(function () {
+        document.getElementById('cnCategoryName').style.display = "none"
+    })
+
+</script>

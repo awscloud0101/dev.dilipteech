@@ -1,0 +1,90 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ApporveChequeDataView>
+
+@{
+    Layout = null;
+}
+
+
+<section class="content">
+
+    @if (Model.Count() > 0)
+    {
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    Records (@Model.Count())
+                </div>
+                <div class="overflowscroll">
+                    <table class="table tbhover table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Branch")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Cheque Count")
+                                </th>
+                                @if (ViewBag.StatusId != 1 || ViewBag.StatusId != 2)
+                                {
+                                    <th>
+                                        @Html.DisplayName("Status")
+                                    </th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @(nsno++)
+                                    </td>
+                                    <td>
+                                        @item.BranchName
+                                    </td>
+                                    <td>
+                                        @item.StudentName
+                                    </td>
+                                    <td>
+                                        @item.ChequeCount
+                                    </td>
+                                    <td>
+                                        @if (item.IsAllowCheque == 0)
+                                        {
+                                            <div style="white-space:nowrap">
+                                                <button type="button" class="btn btn-sm btn-success" onclick="SaveStatus(1,@item.ChequePenaltyId,@item.SubscriptionId)">Approve</button> &nbsp;
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="SaveStatus(2,@item.ChequePenaltyId,@item.SubscriptionId)">Reject</button>
+                                            </div>
+                                        }
+                                        else if (item.IsAllowCheque == 1)
+                                        {
+                                            <span style="font-weight:bold;color:green">Approved</span>
+                                        }
+                                        else if (item.IsAllowCheque == 2)
+                                        {
+                                            <span style="font-weight:bold;color:red">Rejected</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-header">
+            Records (0)
+        </div>
+        <span style="color: red;">&nbsp;&nbsp; <b>No Records Found</b></span>
+    }
+</section>

@@ -1,0 +1,258 @@
+﻿@model AsteriskBrowserAL.LeaveTypes
+
+@{
+                /**/
+
+                ViewBag.Title = "Edit Leave Types";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Leave Management
+        </li>
+        <li class="active">Leave Types</li>
+    </ol>
+}
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+
+            <div class="table-header">
+                <span style="font-family:calibri;">Leave Types</span>
+                <small style="float:right;font-weight:bold;" class="textheader">
+                    @Html.ActionLink("Back to details", "LeaveTypes")
+                </small>
+            </div>
+
+            @*<div class="page-header">
+                <br />
+                <h1>
+                    Leave Types
+                    <small style="float:right;">
+                        @Html.ActionLink("Back to details", "LeaveTypes")
+                    </small>
+                </h1>
+            </div>*@
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                @using (Html.BeginForm("LeaveTypesE", "HRLeaveManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    <div class="box-body">
+
+                        <span style="color:red;font-weight:bold;" id="validation">@Html.ValidationMessage("LeaveTypes")</span>
+
+                        @Html.HiddenFor(model => model.LeaveTypeId)
+                        @Html.HiddenFor(model => model.FirstInserted)
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Leave Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.LeaveName, new { @class = "form-control col-sm-5", placeholder = "Leave Name", @id = "LeaveName", @onchange = "removeError();", onkeypress = "return IsAlphaNumeric(event);", @maxlength = "20" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="leavename">
+                                <label style="color:red;font-weight:bold;">Required</label>
+                            </div>
+
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Leave Code")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.LeaveCode, new { @class = "form-control col-sm-5", placeholder = "Leave Code", @id = "LeaveCode", MaxLength = "7", @onchange = "removeError();" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="leavecode">
+                                <label style="color:red;font-weight:bold;">Required</label>
+                            </div>
+
+                        </div>
+
+                        @*<div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Consecutive Days")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.ConsecutiveDaysCount, new { @class = "form-control col-sm-5 txtboxNum", placeholder = "Count", @id = "txtConDays", MaxLength = "3", @onchange = "removeError();", title = "Maxmimum leaves can be applied at a time" })
+                                </div>
+
+                                <span class="help-button" data-toggle="popover" data-trigger="hover" data-placement="right" title="" data-content="Maxmimum number of leaves can be availed at a time. Enter greater than 0 (Zero) to apply the rule" data-original-title="Consecutive Days">?</span>
+
+
+                                <div class="col-sm-3" style="display:none;" id="vConsecutiveDaysCount">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>*@
+
+                        @*<div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Carry Forward")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.CheckBox("IsCarryForward", (bool)Model.IsCarryForward, new { @class = "col-sm-5", style = "height:20px;width:30px" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Half Days")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.CheckBox("IsHalfDay", (bool)Model.IsHalfDay, new { @class = "col-sm-5", style = "height:20px;width:30px" })
+                                </div>
+                            </div>*@
+
+                    </div>
+                    <div class="hr hr-18 dotted hr-double"></div>
+                    <div class="col-md-offset-3 col-md-9">
+                        <button class="btn btn-success btn-sm" onclick="return validateLeaveTypes();" type="submit">
+                            <i class="ace-icon fa fa-check bigger-50"></i>
+                            Save
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover();
+    });
+    function validateLeaveTypes() {
+
+        document.getElementById("count").value = "1";
+        var LeaveName = document.getElementById("LeaveName").value;
+        var LeaveCode = document.getElementById("LeaveCode").value;
+        //var vConCount = document.getElementById("txtConDays").value;
+
+        validate = true;
+
+        if (LeaveName == "") {
+            document.getElementById("leavename").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("leavename").style.display = "none";
+        }
+
+        if (LeaveCode == "") {
+            document.getElementById("leavecode").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("leavecode").style.display = "none";
+        }
+
+        //if (vConCount == "") {
+        //    document.getElementById("vConsecutiveDaysCount").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("vConsecutiveDaysCount").style.display = "none";
+        //}
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateLeaveTypes();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var LeaveName = document.getElementById("LeaveName").value;
+        var LeaveCode = document.getElementById("LeaveCode").value;
+        // var vConCount = document.getElementById("txtConDays").value;
+
+
+        if (count != 0) {
+            if (LeaveName != "") {
+                document.getElementById("leavename").style.display = "none";
+            } else {
+                document.getElementById("leavename").style.display = "inline";
+            }
+
+            if (LeaveCode != "") {
+                document.getElementById("leavecode").style.display = "none";
+            } else {
+                document.getElementById("leavecode").style.display = "inline";
+            }
+
+            //if (vConCount == "") {
+            //    document.getElementById("vConsecutiveDaysCount").style.display = "inline";
+            //    validate = false;
+            //} else {
+            //    document.getElementById("vConsecutiveDaysCount").style.display = "none";
+            //}
+        }
+    };
+
+    function IsAlphaNumeric(e) {
+        var length = $('#LeaveName').val().length;
+        if (length > 50)
+            return false;
+    }
+
+
+
+    $("#LeaveName").keypress(function (e) {
+        debugger
+        $('#validation').hide();
+        var LeaveName = $('#LeaveName').val();
+
+        if (e.which == 32) {
+            if (LeaveName.length == "") {
+                return false;
+            }
+        }
+
+    });
+    $("#LeaveCode").keypress(function (e) {
+        debugger
+        $('#validation').hide();
+        var LeaveCode = $('#LeaveCode').val();
+
+        if (e.which == 32) {
+            if (LeaveCode.length == "") {
+                return false;
+            }
+        }
+
+    });
+</script>

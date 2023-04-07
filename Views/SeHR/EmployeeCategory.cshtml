@@ -1,0 +1,146 @@
+﻿@model IEnumerable<AsteriskBrowserAL.EmployeeCategory>
+
+@{
+    ViewBag.Title = "Employee Category";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Employee Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+
+<section class="content">
+
+
+
+    @if (null != TempData["EmployeeCategory"])
+    {
+        @Html.Raw(TempData["EmployeeCategory"])
+    }
+    @if (null != Model)
+    {
+        int nsno = 1;
+        <div class="table-header">
+            Employee Category
+            <div style="float:right;margin-right:10px;">
+            <a class="btncustom P2" href="@Url.Action("EmployeeCategoryC", "SeHR")" role="button" id="New" name="New">Add</a>
+          </div>
+        </div>
+       
+
+
+            <div class="box-body table-responsive no-padding">
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+    <thead>
+        <tr>
+            <th>
+               S.No.
+            </th>
+            <th>
+                @Html.DisplayName("Category Name")
+            </th>
+            <th>
+                @Html.DisplayName("Prefix")
+            </th>
+            <th>
+                @Html.DisplayName("Status")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+   
+    
+<tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @(nsno++)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Prefix)
+            </td>
+            <td>
+                @Html.CheckBoxFor(modelItem => item.Status, new { @class = "checkbox"})
+            </td>
+
+            <td>
+                <div>
+                    <a class="green P2" href="@Url.Action("EmployeeCategoryE", "SeHR", new { id = item.EmployeeCategoryId })">
+                        <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                    </a>
+
+                    <a class="red P2" onclick="btnConfirm(@item.EmployeeCategoryId)">
+                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    }
+
+                    </tbody>
+            </table>
+            </div>
+
+    }
+    else
+    {
+        <div class="table-header">
+           Employee Category
+            <a class="view-header-btn btn btn-info btn-xs P2" href="@Url.Action("EmployeeCategoryC", "SeHR")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+        </div>
+        <span style="color: red;"><b>   Records Found (0) </b></span>
+     
+    }
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+</section>
+
+<script>
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeHR/ValidationForEmployeeCategoryD',
+                data: { id: Value },
+                success: function (data) {
+                    var url = '/SeHR/EmployeeCategoryD?id=' + Value;
+                    var title = "Employee Category";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+</script>
+

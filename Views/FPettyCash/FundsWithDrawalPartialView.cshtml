@@ -1,0 +1,104 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.FundsTransferViewModel>
+@{
+    ViewBag.Title = "Funds withdrawal details";
+}
+
+
+
+
+
+@if (Model != null)
+{
+    if (Model.Count() < 1)
+    {
+        <span style="color:red;font-weight:bold">Funds withdrawals are not done yet</span>
+    }
+    else
+    {
+
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+            <div style="float:right;margin-right:10px;">
+                <button class="btncustom" id="btnExport" type="submit">
+                   Download
+                </button>
+            </div>
+        </div>
+
+        int nsno = 1;
+        <div class="overflowscroll">
+            <table id="tbFundsWithDrawals" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Withdrawal Date")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Head Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Cash Card")
+                        </th>
+
+                        <th class="rightAlign">
+                            @Html.DisplayName("Amount")
+                        </th>
+
+
+                        <th></th>
+                    </tr>
+
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @if (item.TransactionDate.HasValue)
+                                {
+                                @item.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                                }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.HeadName)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DisplayCashCard)
+                        </td>
+
+                        <td class="rightAlign">
+                            @Html.DisplayFor(modelItem => item.DisplayAmount)
+                        </td>
+
+
+                        <td>
+                            @if (item.IsCentral)
+                                {
+                                @Html.ActionLink("Edit", "FundsWithdrawalE", new { @class = " P2", Id = item.PettyCashWithDrawalId, DivisionId = item.DivisionId, SubscriptionId = item.FromBranch })
+                                }
+
+                        </td>
+                    </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+
+    }
+}
+
+@Html.Action("DataTableScripts", "Base", new { Ispaging = false })
+
+

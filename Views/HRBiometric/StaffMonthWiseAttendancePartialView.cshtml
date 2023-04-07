@@ -1,0 +1,105 @@
+﻿@model AsteriskBrowserAL.Models.MonthwiseWorkingDaysData
+@{
+    int sno = 1;
+}
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+<section>
+    @if (null != Model)
+    {
+
+        <div class="table-header">
+            Staff Month Wise Attendance
+            <div style="float:right;">
+                <button type="submit" name="Save" id="Save" onclick="return submitform()" class="btn btn-info btn-xs P2">
+                    <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                </button>
+            </div>
+        </div>
+        <table id="myTab" class="table tbhover table-striped table-bordered nowrap dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("SNo")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Employee Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Employee Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Designation")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Paid Days")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Arrear Days")
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.lstAttendance.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            @Html.Hidden("lstAttendance.Index", (@i + 10))
+                            @(sno++)
+                        </td>
+                        <td>
+                            @Html.Hidden("lstAttendance.Index", (@i))
+                            @Html.Hidden("lstAttendance[" + (@i) + "].SubscriptionId", Model.lstAttendance.ElementAt(i).SubscriptionId)
+                            @Html.Hidden("lstAttendance[" + (@i) + "].StaffMonthWiseAttendanceId", Model.lstAttendance.ElementAt(i).StaffMonthWiseAttendanceId)
+                            @Html.Hidden("lstAttendance[" + (@i) + "].StaffId", Model.lstAttendance.ElementAt(i).StaffId)
+                            @Html.Hidden("lstAttendance[" + (@i) + "].MonthValue", Model.MonthValue, new { id = "MonthValue", name = "MonthValue" })
+
+                            @Model.lstAttendance.ElementAt(i).StaffName
+                        </td>
+                        <td>
+                            @Model.lstAttendance.ElementAt(i).EmployeeNumber
+                        </td>
+                        <td>
+                            @Model.lstAttendance.ElementAt(i).Designation
+                        </td>
+                        <td>
+                            @Html.TextBox("lstAttendance[" + (@i) + "].PaidDays", Model.lstAttendance.ElementAt(i).NoOfPaidDays, new { @style = "width:60px;", @type = "number", @step = 0.5, @max = @Model.lstAttendance.ElementAt(i).DaysInMonth })
+                            @*@Html.TextBox("lstAttendance[" + (@i) + "].PaidDays", Model.lstAttendance.ElementAt(i).NoOfPaidDays, new { @style ="width:50px;", @class = "allownumericwithdecimal", @step = "0.5", @id = "NoOfPaidDays_" + @i, @name = "NoOfPaidDays", @onkeyup = "SetMaxValue(this.id," + Model.lstAttendance.ElementAt(i).DaysInMonth + ");" })*@
+                        </td>
+                        <td>
+                            @Html.TextBox("lstAttendance[" + (@i) + "].SupplementaryDays", Model.lstAttendance.ElementAt(i).SupplementaryDays, new { @style = "width:60px;", @type = "number", @step = 0.5, @max = @Model.lstAttendance.ElementAt(i).DaysInMonth })
+                            @*@Html.TextBox("lstAttendance[" + (@i) + "].SupplementaryDays", Model.lstAttendance.ElementAt(i).SupplementaryDays, new { @style = "width:50px;", @class = "allownumericwithdecimal", @step = "0.5", @id = "SupplementaryDays_" + @i, @name = "SupplementaryDays", @onkeyup = "SetMaxValue(this.id," + Model.lstAttendance.ElementAt(i).DaysInMonth + ");" })*@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</section>
+@*@Html.Action("DataTableScripts", "Base")*@
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, strHeight = "250px", allowScroll = true })
+
+<script>
+    function SetMaxValue(id, max) {
+        debugger
+        var value = $('#' + id).val();
+        if ((value !== '') && (value.indexOf('.') === -1)) {
+            $('#' + id).val(Math.min(value, max));
+        } else {
+            var value
+        }
+    };
+
+
+    $(".allownumericwithdecimal").on("keypress keyup", function (event) {
+        debugger
+        //this.value = this.value.replace(/[^0-9\.]/g,'');
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+</script>
+

@@ -1,0 +1,216 @@
+﻿
+@model AsteriskBrowserAL.Models.VehicleRoutePointViewModel
+@{
+    ViewBag.Title = "Route Point";
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Route Point</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+  
+    <div class="row">
+        <div class=col-xs-12>
+            <span id="Validation" style="color:red;font-weight:bold"></span>
+            @using (Html.BeginForm("RoutePoint", "SeFinance", FormMethod.Post))
+            {
+
+                <input type="hidden" id="SelAyId" value="@ViewBag.AcademicYearId" />
+                <div class="table-header">
+                    <span style="font-family:calibri;">Route Points</span>
+
+                    &nbsp;&nbsp;&nbsp; <small style="float:right;font-weight:bold;">
+                        @Html.ActionLink("back", "TransportPlans")
+                    </small>
+
+
+
+                    @if (null != Model)
+                    {
+
+     
+
+                        <div class="inline action-buttons" style="float:right;">
+                        
+                                <a class="btn btn-info btn-minier P2" id="New" name="New"><i class="fa fa-plus"> | Add</i></a>
+                            </div>
+
+
+
+                        
+                    }
+
+                    </div>
+
+
+
+                    <div class="widget-box">
+             
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 ">Academic Year</label>
+                                            <div class="col-sm-6">
+                                                <select id="CboAcademicYear" name="AcademicYearId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6"></div>
+                                    </div>
+                                </div>
+
+
+                                @if (null != Model)
+                                {
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4">Transport Plan</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.TransportPlanId, new SelectList(Model.IstTransportPlans, "TransportPlanId", "PlanName"), "--- Select ---", new { @class = "form-control", id = "TransportPlanId" })
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.BranchId, new SelectList(Model.IstBranchList, "SubscriptionId", "Institute"), "--- Select ---", new { @class = "form-control", id = "BranchId" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+
+                    <div id="TransportPlanData"></div>
+                    }
+                </div>
+    </div>
+
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        LoadAcademicYearCombo();
+    });
+
+
+    function LoadAcademicYearCombo() {
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                $('#imagemodal').hide();
+
+                var ObjAyYear = $("#CboAcademicYear")
+                ObjAyYear.children().remove();
+                ObjAyYear.append($("<option>").val(-1).text("--Select--"))
+
+                $.each(result, function (i, elm) {
+                    ObjAyYear.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(ObjAyYear)
+
+                if ($('#SelAyId').val() > 0) {
+                    $('#CboAcademicYear').val($('#SelAyId').val());
+                }
+
+            },
+            async: false
+        })
+
+    }
+
+    $('#CboAcademicYear').change(function () {
+        PopulateData();
+    });
+
+    function GetTransportPlanListdata() {
+        var TransportPlanId = $('#TransportPlanId').val()
+        var BranchId = $('#BranchId').val();
+
+        if (TransportPlanId > 0 && BranchId > 0) {
+            $('#Imagemodel').show()
+            $.ajax({
+                url: '/SeFinance/GetTransportPlanList',
+                data: { nTransportPlanId: $('#TransportPlanId').val(), nBranchId: BranchId },
+                success: function (data) {
+                    $('#TransportPlanData').html(data);
+                }
+            })
+        }
+        else {
+            $('#TransportPlanData').html("");
+        }
+    }
+
+    function PopulateData() {
+        if ($('#CboAcademicYear').val() < 1) {
+
+            if ($('#divData') != "undefined")
+                $('#divData').html('');
+
+            return;
+        }
+
+        window.location.href = '/SeFinance/RoutePoint?AcademicYearId=' + $('#CboAcademicYear').val();
+    }
+
+
+    $('#BranchId').change(function () {
+        var TransportPlanId = $('#TransportPlanId').val();
+        var BranchId = $('#BranchId').val();
+        if (TransportPlanId > 0 && BranchId > 0) {
+            GetTransportPlanListdata();
+        }
+        else {
+            $('#TransportPlanData').html("");
+        }
+    })
+    $('#TransportPlanId').change(function () {
+        document.getElementById("Validation").innerHTML = ""
+    })
+    $('#BranchId').change(function () {
+        document.getElementById("Validation").innerHTML = ""
+    })
+
+    $('#New').click(function () {
+        debugger
+        var TransportPlanId = $('#TransportPlanId').val();
+        var BranchId = $('#BranchId').val();
+
+        if (TransportPlanId < 1 || BranchId < 0 || TransportPlanId == "" || BranchId == "") {
+            document.getElementById("Validation").innerHTML = "Please select transport plane"
+        }
+        else {
+            window.location.href = "/SeFinance/RoutePointC?TransportPlanId=" + TransportPlanId + '&BranchId=' + BranchId;
+        }
+
+    });
+
+
+
+
+</script>

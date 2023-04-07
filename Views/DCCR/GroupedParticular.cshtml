@@ -1,0 +1,141 @@
+﻿@model IEnumerable<AsteriskBrowserAL.GroupedParticular>
+@{
+    ViewBag.Title = "GroupedParticular";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            DCCR
+        </li>
+        <li class="active">Grouped Particular</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @*<h3>@Html.ActionLink("New", "HolidaysC")</h3>*@
+
+        </div>
+    </div>
+
+    @if (null != TempData["GroupedParticular"])
+    {
+        @Html.Raw(TempData["GroupedParticular"])
+    }
+
+
+    <div class="row ">
+        <div class="col-xs-12">
+
+            <div class="table-header">
+                GroupedParticular
+                <div class="" style="float:right;margin-right:10px;">
+                    <a class="btncustom P2" href="@Url.Action("GroupedParticularC", "DCCR")" role="button" id="New" name="New">
+                         Add
+                    </a>
+                </div>
+            </div>
+
+            @if (Model != null)
+            {
+                int nsno = 1;
+
+                <div class="box-body table-responsive no-padding overflowscroll" style="height:400px;">
+
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Particular Name")
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ParticularName)
+                                </td>
+
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="red P2" onclick="btnConfirm(@item.GroupedParticularId)">
+                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+            else
+            {
+                <span style="color: red;"><b>There are no Group Particulars</b></span>
+            }
+
+        </div>
+
+    </div>
+
+
+
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/DCCR/ValidationForGroupedParticularD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/DCCR/GroupedParticularD?id=' + Value;
+                    var title = "GroupedParticular";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+

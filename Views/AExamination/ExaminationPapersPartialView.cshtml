@@ -1,0 +1,140 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ExaminationPapersData>
+@{
+    ViewBag.Title = "ExaminationPapersPartialView";
+    int nSno = 1;
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+
+@if (null != Model && Model.Count() > 0)
+{
+    <div class="table-header">
+        Records Found (@Model.Count())
+    </div>
+
+    <div class="overflowscroll">
+
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                        S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Exam Code")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Examination")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Paper Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Exam Date")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Max. Marks")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Pass Marks")
+
+                    <th>
+                        @Html.DisplayName("Duration (min)")
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nSno++)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ExamCode)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ExamName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PaperName)
+                        </td>
+
+                        <td>
+                            @if (item.ExamDate.HasValue)
+                            {
+                                @item.ExamDate.Value.ToString("dd - MMM - yyyy")
+                            }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MaxMarks)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PassMarks)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Duration)
+                        </td>
+
+                        <td>
+                            <div>
+                                <a class="green P2" href="@Url.Action("ExaminationPapersE", "AExamination", new { id = item.ExaminationPapersId })">
+                                    <i class="ace-icon fa fa-pencil bigger-130"></i>
+                                </a>
+                                <a class="red P2" onclick="btnConfirm(@item.ExaminationPapersId)">
+                                    <i class="ace-icon fa fa-trash bigger-130"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+
+    </div>
+   
+                    
+               
+
+}
+else
+{
+        <span style="font-weight:bold;color:red">Data not available to display</span>
+}
+
+<script>
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            debugger
+            $.ajax({
+                url:'/AExamination/ValidationForExamPapersD',
+                data: { id: Value },
+                success: function (data) {
+                    var url = '/AExamination/ExaminationPapersD?id=' + Value;
+                    var title = "Exam Papers";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

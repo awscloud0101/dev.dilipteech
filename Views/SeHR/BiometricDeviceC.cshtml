@@ -1,0 +1,186 @@
+﻿@model AsteriskBrowserAL.BioMetricDevice
+
+@{
+    ViewBag.Title = "Biometric Device";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Biometric Device</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<section class="content">
+
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Biometric Device Details", "BiometricDevice")</h3>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                @using (Html.BeginForm("BiometricDeviceC", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.ValidationSummary(true)
+                    <span style="color: red;">@Html.ValidationMessage("BiometricDevice")</span>
+                    <div class="box-body">
+                        <div class="box-header">
+                            <h3 class="box-title">Biometric Device</h3>
+                            <br />
+                            <br />
+                            <button class="btn btn-primary" onclick="return submitForm();" type="submit" style="width:80px;">
+                                Create
+                            </button>
+                        </div><!-- /.box-header -->
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Select Branch")</label>
+                            <div class="col-sm-3">
+                                @Html.DropDownList("SubscriptionId", null, "--Select Branch--", new { @class = "form-control", @id = "SubscriptionId", placeholder = "SubscriptionId", @onchange = "removeError();" })
+                            </div>
+                            <div class="col-sm-5" style="display:none;" id="subscriptionId">
+                                <label style="color:red;font-weight:bold;"> Please  Select Brach Name </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("DeviceId")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.BiometricDeviceId, new { @class = "form-control col-sm-5", placeholder = "BiometricDeviceId", @id = "BiometricDeviceId", @onchange = "removeError();" })
+                            </div>
+
+                            <div class="col-sm-5" style="display:none;" id="biometricDeviceId">
+                                <label style="color:red;font-weight:bold;"> Please Enter  DeviceId </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Enroll StartNumber")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.StartNumber, new { @class = "form-control col-sm-5", placeholder = "StartNumber", @id = "StartNumber", @onchange = "removeError();" })
+                            </div>
+                            <div class="col-sm-5" style="display:none;" id="startNumber">
+                                <label style="color:red;font-weight:bold;"> Please Enter Start Number </label>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+        <input type="hidden" id="count" name="count" value="0" />
+    </div>
+</section>
+
+<script type="text/javascript">
+      function ValidateBank() {
+          document.getElementById("count").value = "1";
+
+          var StartNumber = document.getElementById("StartNumber").value;
+          var BiometricDeviceId = document.getElementById("BiometricDeviceId").value;
+          var SubscriptionId = document.getElementById("SubscriptionId").value;
+
+
+        validate = true;
+
+        if (StartNumber == "") {
+            document.getElementById("startNumber").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("startNumber").style.display = "none";
+        }
+
+        if (BiometricDeviceId == "") {
+            document.getElementById("biometricDeviceId").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("biometricDeviceId").style.display = "none";
+        }
+        if (SubscriptionId == 0) {
+            document.getElementById("subscriptionId").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("subscriptionId").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+        var validatestatus = ValidateBank();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+        var StartNumber = document.getElementById("StartNumber").value;
+        var BiometricDeviceId = document.getElementById("BiometricDeviceId").value;
+        var SubscriptionId = document.getElementById("SubscriptionId").value;
+
+
+
+        if (count != 0) {
+            if (BiometricDeviceId != "")
+            {
+                document.getElementById("biometricDeviceId").style.display = "none";
+            } else {
+                document.getElementById("biometricDeviceId").style.display = "inline";
+            }
+            if (SubscriptionId != 0) {
+                document.getElementById("subscriptionId").style.display = "none";
+            } else {
+                document.getElementById("subscriptionId").style.display = "inline";
+            }
+            if (StartNumber != "") {
+                document.getElementById("startNumber").style.display = "none";
+            } else {
+                document.getElementById("startNumber").style.display = "inline";
+            }
+
+        }
+    };
+
+    $('#StartNumber').click(function () {
+        document.getElementById('startNumber').style.display = "none"
+    })
+    $('#BiometricDeviceId').click(function () {
+        document.getElementById('biometricDeviceId').style.display = "none"
+    })
+
+</script>
+
+
+
+
+
+
+

@@ -1,0 +1,229 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentAdmissionData>
+@{
+    int sno = 1;
+}
+
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<!-- CSS -->
+@if ((null != Model))
+{
+
+    if (Model.Count() > 0)
+    {
+        <div class="box">
+          
+            <div class="box-body">
+                <div class="table-header">
+                    Records Found (@Model.Count())
+
+
+                    <div style="float:right;margin-right:10px;">
+                        <button type="submit" name="Save" class="btncustom P2" style="margin-top:2px">
+                            save
+                        </button>
+                    </div>
+                </div>
+                @*<input class="btn btn-primary pull-right" style="width:80px;" type="submit" name="Save" id="Save" value="Save" o />*@
+
+            </div><!-- /.box-header -->
+            <!-- form start -->
+
+            <div class="overflowscroll">
+                <table id="PlayerTable" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;width:100%">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Admission Number")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Legacy Number")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Section")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Plan")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Amount")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Due")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Total Concession")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Concession")
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count(); i++)
+                        {
+                            string Color = "";
+                            if (Model.ElementAt(i).isExists == true)
+                            {
+                                Color = "background-color:orange";
+                            }
+
+
+                            <tr style="@Color">
+                                <td>
+                                    @Html.Hidden("Student.Index", (@i + 10))
+                                    @Html.Hidden("Student[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                                    @Html.Hidden("Student[" + (@i + 10) + "].FirstName", Model.ElementAt(i).FirstName)
+                                    @Html.Hidden("Student[" + (@i + 10) + "].SectionId", Model.ElementAt(i).SectionId)
+                                    @Html.Hidden("Student[" + (@i + 10) + "].SectionName", Model.ElementAt(i).SectionName)
+                                    @Html.Hidden("Student[" + (@i + 10) + "].Amount", Model.ElementAt(i).Amount)
+
+                                    @Html.Hidden("Student[" + (@i + 10) + "].Due", Model.ElementAt(i).Due)
+                                    @Html.Hidden("Student[" + (@i + 10) + "].TotalDiscount", Model.ElementAt(i).TotalDiscount)
+
+                                    @sno
+
+                                </td>
+                                <td>
+                                    @Model.ElementAt(i).AdmissionNumber
+
+
+                                </td>
+
+                                <td>
+                                    @Model.ElementAt(i).AccreditationNumber
+
+
+                                </td>
+
+                                <td>
+                                    @Model.ElementAt(i).FirstName
+                                </td>
+
+                                <td>
+                                    @Model.ElementAt(i).SectionName
+                                </td>
+
+                                <td>
+                                    @Model.ElementAt(i).Plan
+                                </td>
+                                <td>
+                                    @Model.ElementAt(i).Amount
+                                </td>
+                                <td>
+                                    @Model.ElementAt(i).Due
+                                </td>
+                                <td>
+                                    @Model.ElementAt(i).TotalDiscount
+                                </td>
+
+
+                                <td>
+                                    @{
+                                        double Balance = Model.ElementAt(i).TotalBalance;
+
+                                    }
+                                    @if (Balance > 0)
+                                    {
+                                        @Html.TextBox("Student[" + (@i + 10) + "].Discount", @Model.ElementAt(i).Discount, new { @Class = "form-control txtboxNum", @type = "number", @min = "0", @max = @Model.ElementAt(i).TotalBalance, @title = "Please enter proper amount", @Style = "width:150px" })
+
+                                    }
+                                </td>
+
+                            </tr>
+                                            sno++;
+                                        }
+                    </tbody>
+                </table>
+
+
+
+            </div>
+
+        </div>
+
+
+                                        }
+                                        else
+                                        {
+                                            <span style="color: red;"><b>Data not available</b></span>
+                                            }
+
+
+                                        }
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+    function SaveStudent() {
+        var Ids = " ";
+        var result = $('#Check:checked');
+
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+
+        });
+        if (Ids != "") {
+            SaveData(Ids)
+        }
+        else {
+
+        }
+    }
+
+
+    function SaveData(Data) {
+        var ClassId = $("#ClassId").val();
+        var BranchId = $("#BranchId").val();
+        $("#imagemodal").show();
+        $.ajax({
+            url: "/AStudent/RemoveTransportStudents",
+            data: { StudentsIds: Data, ClassId: ClassId, BarnchId: BranchId },
+            success: function (Data) {
+                $("#SearchDiv").html(Data)
+                document.getElementById("SaveVal").innerHTML = "Data saved"
+
+            }
+        }).done(function () {
+            $("#imagemodal").hide();
+
+        })
+    }
+
+
+    function RemoveVal() {
+        document.getElementById("SaveVal").innerHTML = ""
+
+    }
+
+
+
+
+
+
+</script>
+

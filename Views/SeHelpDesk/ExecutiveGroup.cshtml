@@ -1,0 +1,124 @@
+﻿@model IEnumerable<AsteriskBrowserAL.HDExecutiveGroup>
+@{
+    ViewBag.Title = "Category";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Settings
+        </li>
+        <li>
+            <i class=""></i>
+            Help Desk
+        </li>
+        <li class="active">Executive Group</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+<section class="content">
+ 
+
+    @if (null != TempData["error"])
+    {
+        <span style="color:red;font-weight:bold" id="errorid">@TempData["error"]</span>
+    }
+
+    <div class="table-header">
+    Executive Group
+        <div  style="float:right;margin-right:10px;">
+            <a class="btncustom P2" href="@Url.Action("ExecutiveGroupC", "SeHelpDesk")" role="button" id="New" name="New">
+           Add</a>
+      </div>
+
+    </div>
+
+
+
+    @if (Model != null && Model.Count() > 0)
+    {
+        int nsno = 1;
+
+            <div class="overflowscroll">
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("S No")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Group Name")
+                            </th>
+
+                            <th></th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>@item.GroupName</td>
+                                <td>
+                                    <div>
+                                        <a class="green P2" href="@Url.Action("ExecutiveGroupE", "SeHelpDesk", new { id = item.HDExecutiveGroupId })">
+                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                        </a>
+                                        <a class="red P2" onclick="btnConfirm(@item.HDExecutiveGroupId)">
+                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+    }
+    else
+    {
+        <span style="color: red;"><b>There are no Categories</b></span>
+    }
+
+</section>
+
+
+@Html.Action("DataTableScripts", "Base")
+
+
+<script>
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeHelpDesk/ValidationExecutiveGroupD',
+                data: { id: Value },
+                success: function (data) {
+                    var url = '/SeHelpDesk/ExecutiveGroupD?id=' + Value;
+                    var title = "Executive Group";
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

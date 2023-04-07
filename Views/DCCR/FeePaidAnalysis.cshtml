@@ -1,0 +1,327 @@
+﻿
+@model AsteriskBrowserAL.Models.DaysheetViewModel
+@{
+    ViewBag.Title = "Fee Paid Analysis";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            DCCR
+        </li>
+        <li class="active">Fee Paid Analysis</li>
+    </ul>
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+<section class="content">
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color:red;font-weight:bold" id="Validation"></span>
+            <div class="table-header">
+                <span style="font-family:calibri;"> Fee Paid Analysis</span>
+                <div class="" style="float:right;margin-right:10px;">
+                    <a class="btncustom P2" id="btnViewData">View Data</a>
+        </div>
+
+            </div>
+            <div class="widget-box">
+          
+
+                <div class="widget-body">
+
+                    <div class="widget-main">
+
+                        <div class="row">
+                            <div class="row">
+
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboDivision" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboBranch" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+       
+                            <div class="row">
+
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Date Range</label>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control pull-right" id="daterange" name="DateRange" autocomplete="off" />
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <table class="col-xs-3 no-border">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <input type="radio" id="All" name="Status" value="true" checked="checked"><b> &nbsp; &nbsp;All</b>
+                                                </td>
+
+                                                <td>
+                                                    <input type="radio" id="Active" name="Status" value="false"><b> &nbsp; &nbsp;Active</b>
+                                                </td>
+                                                <td>
+                                                    <input type="radio" id="InActive" name="Status" value="false"><b> &nbsp; &nbsp;In-Active</b>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="dvSearchData">
+
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    window.onload = LoadData();
+
+    function LoadData() {
+
+        debugger
+        LoadDivisionCombo();
+        LoadGroupedParticularCombo();
+    }
+
+    function LoadGroupedParticularCombo() {
+
+        $.ajax({
+            url: '/DCCR/GetGroupedParituclars',
+            success: function (data) {
+                var HeadItems = $('#CboGroupedParticular');
+
+                HeadItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    HeadItems.append($("<option>").val(record.GroupedParticularId).text(record.ParticularName));
+                });
+
+                $('#CboGroupedParticular').append(HeadItems);
+            },
+            aync: false
+        });
+
+    }
+
+    function LoadDivisionCombo() {
+
+        $.ajax({
+            url: '/Common/GetDivisions',
+            success: function (data) {
+                var DivisionItems = $('#CboDivision');
+
+                DivisionItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    DivisionItems.append($("<option>").val(record.DivisionId).text(record.DivisionName));
+                });
+
+                $('#CboDivision').append(DivisionItems);
+            },
+            aync: false
+        });
+
+    }
+
+
+    $('#CboDivision').change(function () {
+        document.getElementById("Validation").innerHTML = ""
+
+        var DivisionId = $('#CboDivision').val();
+        $('#dvSearchData').html("");
+        $('#CboBranch').html("");
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+
+                    BranchItems.children().remove();
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    });
+
+
+    $("#CboBranch").change(function () {
+        document.getElementById("Validation").innerHTML = ""
+        $('#dvSearchData').html("");
+    });
+
+    $("#CboGroupedParticular").change(function () {
+
+        document.getElementById("Validation").innerHTML = ""
+        $('#dvSearchData').html("");
+    });
+
+    $("#CboMonth").change(function () {
+
+        document.getElementById("Validation").innerHTML = ""
+        $('#dvSearchData').html("");
+    });
+
+    $('#btnViewData').click(function () {
+
+        $('#dvSearchData').html('');
+
+        var DivisionId = $('#CboDivision').val();
+        var SubscriptionId = $('#CboBranch').val();
+        var Date = $('#daterange').val();
+        var Studentstype = 0;
+
+        if (document.getElementById('All').checked) {
+            Studentstype = 0;
+        }
+
+        if (document.getElementById('Active').checked) {
+            Studentstype = 1;
+        }
+
+        if (document.getElementById('InActive').checked) {
+            Studentstype = 2;
+        }
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+
+        if (DivisionId == "null" || DivisionId < 0) {
+            Message += "Division";
+            isValid = false;
+        }
+
+        if (SubscriptionId == "null" || SubscriptionId < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Branch";
+            isValid = false;
+        }
+
+        if (Date == "null" || Date == '') {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Dates";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        $('#imagemodal').show();
+
+        $.ajax
+            ({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#imagemodal').hide();
+                },
+
+                url: '/DCCR/GetFeePaidAnalysisData/',
+                data: { DivisionId: DivisionId, strBranch: SubscriptionId, DateRange: Date, Studentstype : Studentstype },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#dvSearchData').html(data);
+                }
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+    });
+
+    $("#Date").focus(function () {
+        document.getElementById("Error").innerHTML = ""
+    })
+
+
+    $('#rbMonth').change(function () {
+        SetPicker(false);
+    });
+
+    $('#rbDay').change(function () {
+        SetPicker(true);
+    });
+
+
+    function SetPicker(IsDate) {
+
+        if (IsDate == true) {
+            $('#divMonth').hide();
+            $('#divDate').show();
+        }
+        else {
+            $('#divMonth').show();
+            $('#divDate').hide();
+
+        }
+    }
+
+
+    //$('#CboBranch').select2().select2('val', rr)
+    //var rr1 = [];
+    //var array1 = data.Subjects.split(',');
+    //for (var j = 0; j < array1.length; j++) {
+    //    rr1.push(array1[j]);
+
+    //}
+
+</script>

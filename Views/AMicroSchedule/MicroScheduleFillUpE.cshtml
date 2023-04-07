@@ -1,0 +1,290 @@
+﻿@model AsteriskBrowserAL.Models.MicroScheduleFillUpData
+@{
+    ViewBag.Title = "Micro Schedule Fill Up";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Micro Plan
+        </li>
+        <li class="active">Micro Schedule Fill Up Edit</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<section class="content">
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                @using (Html.BeginForm("MicroScheduleFillUpE", "AMicroSchedule", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    <input type="hidden" id="FillUpDate" name="FillUpDate" value="@Model.FillUpDate" />
+                    <input type="hidden" id="StaffId" name="StaffId" value="@Model.StaffId" />
+                    <input type="hidden" id="SelSyllabusId" name="SelSyllabusId" value="@Model.SyllabusId" />
+                    <input type="hidden" id="TeachersDairyId" name="TeachersDairyId" value="@Model.TeachersDairyId" />
+                    <input type="hidden" id="SubjectId" name="SubjectId" value="@Model.SubjectId" />
+                    @Html.ValidationSummary(true)
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("MicroScheduleFillUP")</span>
+
+                    <div class="page-header">
+                        <br />
+                        <h1>
+                            Micro Schedule Fill Up
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "MicroScheduleFillUP", new { dtDate = Model.FillUpDate, nStaffId = Model.StaffId })
+                            </small>
+                        </h1>
+                    </div><!-- /.page-header -->
+                <!-- form start -->
+
+
+                    <form class="form-horizontal" role="form">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Period Name")</label>
+
+                            <div class="col-sm-3">
+
+                                @Html.DropDownListFor(model => model.PeriodId, new SelectList(Model.lstPeriods, "PeriodsId", "PeriodName"), "-- Select --", new { @class = "form-control", @id = "nPeriodId" })
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="PeriodIdVal">
+                            </span>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Schedule")</label>
+
+                            <div class="col-sm-3">
+                                <select id="SyllabusId" name="SyllabusId" class="form-control"></select>
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="SyllabusIdVal">
+                            </span>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label(" Close Date")</label>
+
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            @if (Model.ClosedDate.HasValue)
+                                            {
+                                                <input class="form-control" type="text" value="@Model.ClosedDate.Value.ToShortDateString()" name="ClosedDate" id="Date" autocomplete="off" placeholder="Select Start Date" />
+                                            }
+                                            else
+                                            {
+                                                <input class="form-control" type="text" name="ClosedDate" id="Date" autocomplete="off" placeholder="Select Start Date" />
+                                            }
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="ClosedDateVal">
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Remarks")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Remarks, new { @class = "form-control textlength", placeholder = "Remarks", @id = "Remarks" })
+                            </div>
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="RemarksVal">
+                            </span>
+                        </div>
+
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            @*&nbsp; &nbsp; &nbsp;
+                                <button class="btn btn-sm" type="reset">
+                                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                                    Reset
+                                </button>*@
+                        </div>
+
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+
+<script>
+
+    function validateFillUp() {
+
+        var PeriodId = document.getElementById("nPeriodId").value;
+        var SyllabusId = document.getElementById("SyllabusId").value;
+        var ClosedDate = document.getElementById("Date").value;
+        var Remarks = document.getElementById("Remarks").value;
+
+        validate = true;
+
+        if (PeriodId < 1) {
+            document.getElementById("PeriodIdVal").innerHTML = "Please select period";
+            validate = false;
+        }
+
+        if (SyllabusId < 1) {
+            document.getElementById("SyllabusIdVal").innerHTML = "Please select syllabus";
+            validate = false;
+        }
+
+        if (ClosedDate == "") {
+            document.getElementById("ClosedDateVal").innerHTML = "Please select closed date";
+            validate = false;
+        }
+
+        if (Remarks == "") {
+            document.getElementById("RemarksVal").innerHTML = "Please enter remarks";
+            validate = false;
+        }
+
+        //if (validate == true) {
+        //    IsPeriodOrSyllabusExists();
+        //}
+
+        return validate;
+    };
+
+    function IsPeriodOrSyllabusExists() {
+        var val = true;
+
+        var periodid = $('#nPeriodId').val();
+        var SyllabusId = $('#SyllabusId').val();
+
+
+
+        $.ajax({
+
+            url: '/AFrontOffice/IsPeriodOrSyllabusExists/',
+            data: { PeriodId: periodid, SyllabusId: SyllabusId },
+            success: function (data) {
+
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            },
+            async: false
+        });
+
+        return val;
+    }
+
+    function submitForm() {
+
+        var validatestatus = validateFillUp();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#nPeriodId').focus(function () {
+        document.getElementById("PeriodIdVal").innerHTML = "";
+    });
+
+    $('#SyllabusId').focus(function () {
+        document.getElementById("SyllabusIdVal").innerHTML = "";
+    });
+
+    $('#ClosedDate').focus(function () {
+        document.getElementById("ClosedDateVal").innerHTML = "";
+    });
+
+    $('#Remarks').focus(function () {
+        document.getElementById("RemarksVal").innerHTML = "";
+    });
+
+
+    $(document).ready(function () {
+        if ($('#nPeriodId').val() > 0) {
+            GetData();
+        }
+    })
+
+
+    $('#nPeriodId').change(function () {
+        $("#SyllabusId").html("");
+        $("#SyllabusId").val("");
+        GetData();
+    })
+    function GetData() {
+        debugger
+
+        var PeriodId = $('#nPeriodId').val();
+        var FillUpDate = $("#FillUpDate").val();
+
+        if (PeriodId > 0) {
+
+            debugger
+
+            $.ajax({
+
+                url: '/AFrontOffice/GetSyllabusByPeriodAndDate',
+                data: { PeriodId: PeriodId, dtDate: FillUpDate, nTDId: $('#TeachersDairyId').val() },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    var Syllabus = $("#SyllabusId")
+                    Syllabus.children().remove();
+
+                    Syllabus.append($("<option>").val("0").text("--- Select ---"))
+
+                    $.each(data, function (i, elm) {
+                        Syllabus.append($("<option>").val(elm.SyllabusId).text(elm.TopicName))
+                    })
+                    $("#SyllabusId").append(Syllabus)
+
+                    if ($('#SelSyllabusId').val() > 0) {
+                        $("#SyllabusId").val($('#SelSyllabusId').val());
+                    }
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+
+</script>
+
+
+
+
+

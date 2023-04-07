@@ -1,0 +1,125 @@
+﻿@model IEnumerable<AsteriskBrowserAL.AVCategory>
+ 
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">AV Category</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+    <br />
+    <br />
+    @if (null != Model)
+    {
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    AV Category
+                    <div class="widget-toolbar no-border">
+                        <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("AVCategoryC", "ALibrary")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+                    </div>
+                </div>
+                <div style="overflow-y:auto">
+                    <table id="dynamic-table" class="table table-hover table-bordered table-striped nowrap dynamic-table" style="font-size:14px;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayName("SNo")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Category Name")
+                                </th>
+                                <td> </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+
+                                <tr>
+                                    <td>
+                                        @(nsno++)
+                                    </td>
+                                    <td>
+                                        @item.CategoryName
+                                    </td>
+                                    <td>
+                                        <div class="hidden-sm hidden-xs action-buttons">
+                                            <a class="green" href="@Url.Action("AVCategoryE", "ALibrary", new { id = item.AVCategoryId })">
+                                                <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                            </a>
+
+                                            <a class="red" onclick="btnConfirm(@item.AVCategoryId)">
+                                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-header">
+            AV Category
+            <div class="widget-toolbar no-border">
+                <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("AVCategoryC", "ALibrary")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+            </div>
+        </div>
+        <br />
+        <span style="color: red;"><b>There are no Categories to Display</b></span>
+    }
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            debugger
+            $.ajax({
+                url: '/ALibrary/ValidationForAVCategoryD',
+                data: { Id: Value },
+                success: function (data) {
+                    debugger
+                    var url = '/ALibrary/AVCategoryD?id=' + Value;
+                    var title = "AV Category";
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+@Html.Action("DataTableScripts", "Base")

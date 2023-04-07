@@ -1,0 +1,108 @@
+﻿@model List<AsteriskBrowserAL.Models.CostPriceSettingsViewModel>
+
+@{
+    ViewBag.Title = "Cost Price Settings";
+    int nSno = 1;
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Stores
+        </li>
+        <li class="active">Cost Price Settings</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<br/>
+<section class="content">
+ @using (Html.BeginForm("CostPriceSettings", "SeStores", FormMethod.Post))
+    {
+
+        if (null != Model)
+        {
+        
+        <div class="row">
+            <div class="col-xs-12">
+               
+                    <div class="table-header">
+                    Cost Price Settings
+                        <div style="float:right;">
+                            <button type="submit" name="Save" class="btn btn-info btn-xs P2" onclick="return submitForm();">
+                                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                            </button>
+                        </div>
+                    </div>
+                <div style="overflow:auto;height:400px">
+
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>@("S.No")</th>
+                                <th>
+                                    @Html.DisplayName("Item Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("SKU Code")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Cost Price")
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Count(); i++)
+                        {
+                                <tr>
+                                    @Html.Hidden("lstItem.Index", (@i))
+                                    @Html.Hidden("lstItem[" + @i + "].CostPriceSettingId", Model.ElementAt(i).CostPriceSettingId)
+                                    @Html.Hidden("lstItem[" + @i + "].InventorySubCategoryItemId", Model.ElementAt(i).InventorySubCategoryItemId)
+                                    @Html.Hidden("lstItem[" + @i + "].ItemName", Model.ElementAt(i).ItemName)
+                                    @Html.Hidden("lstItem[" + @i + "].SKUCode", Model.ElementAt(i).SKUCode)
+                                    <td>
+                                        @(nSno++)
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).ItemName
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).SKUCode
+                                    </td>
+                                    <td>
+                                        @Html.TextBox("lstItem[" + @i + "].Price", Model.ElementAt(i).Price, new { @class = "form-control textlength txtboxNum", @maxlength = "7", @style = "width:180px" })
+                                    </td>
+                                </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+        </div>
+
+        }
+        else
+        {<span style="color: red;"><b>Data not available</b></span> }
+
+        }
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+</section>
+
+
+
+
+
+
+

@@ -1,0 +1,177 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentAdmissionData>
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<!-- CSS -->
+
+
+
+@if ((null != Model))
+{
+
+    if (Model.Count() > 0)
+    {
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+            <div style="float:right;margin-right:10px;">
+                <button name="Save" class="btncustom P2" id="Save" onclick="SaveStudent()">
+                    Download
+                </button>
+            </div>
+        </div>
+
+        <div class="overflowscroll">
+
+            <table id="PlayerTable" class="table table-bordered table-striped table-hover display nowrap  dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Admission Number")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Legacy Number")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Section")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Plan")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        string Color = "";
+                        if (Model.ElementAt(i).isExists == true)
+                        {
+                            Color = "background-color:orange";
+                        }
+
+
+                        <tr style="@Color">
+                            <td>
+                                @Html.Hidden("Student.Index", (@i + 10))
+                                @Html.Hidden("Student[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                                @Html.Hidden("Student[" + (@i + 10) + "].FirstName", Model.ElementAt(i).FirstName)
+                                @Html.Hidden("Student[" + (@i + 10) + "].SectionId", Model.ElementAt(i).SectionId)
+                                @Html.Hidden("Student[" + (@i + 10) + "].SectionName", Model.ElementAt(i).SectionName)
+
+                                @if (Model.ElementAt(i).isExists == false)
+                        {
+                                    @Html.CheckBox("Student[" + (@i + 10) + "].isChecked", Model.ElementAt(i).isChecked, new { @id = "Check", @name = "Check", @Value = Model.ElementAt(i).StudentId, @onclick = "RemoveVal()" })
+                                }
+                                @Html.Hidden("Student[" + (@i + 10) + "].isChecked", Model.ElementAt(i).isChecked)
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).AdmissionNumber
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).AccreditationNumber
+
+
+                            </td>
+
+                            <td>
+                                @Model.ElementAt(i).FirstName
+                            </td>
+
+                            <td>
+                                @Model.ElementAt(i).SectionName
+                                @Html.Hidden("Student[" + (@i + 10) + "].SectionName", Model.ElementAt(i).SectionName)
+                            </td>
+
+                            <td>
+                                @Model.ElementAt(i).Plan
+                                @Html.Hidden("Student[" + (@i + 10) + "].Plan", Model.ElementAt(i).Plan)
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+
+    }
+        else
+        {
+        <span style="color: red;"><b>Data not available</b></span>
+    }
+
+
+}
+
+
+
+
+<script>
+
+    function SaveStudent() {
+        debugger
+        var Ids = " ";
+        var result = $('#Check:checked');
+
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+
+        });
+        if (Ids != "") {
+            SaveData(Ids)
+        }
+        else {
+
+        }
+    }
+
+    function RemoveVal() {
+        debugger
+        document.getElementById("SaveVal").innerHTML = ""
+
+    }
+
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    function SaveData(Data) {
+        debugger
+        var ClassId = $("#ClassId").val();
+        var BranchId = $("#BranchId").val();
+        $("#imagemodal").show();
+        $.ajax({
+            url: "/AStudent/RemoveTransportStudents",
+            data: { StudentsIds: Data, ClassId: ClassId, BarnchId: BranchId },
+            success: function (Data) {
+                $("#SearchDiv").html(Data)
+                document.getElementById("SaveVal").innerHTML = "Data saved"
+
+            }
+        }).done(function () {
+            $("#imagemodal").hide();
+
+        })
+    }
+
+</script>
+

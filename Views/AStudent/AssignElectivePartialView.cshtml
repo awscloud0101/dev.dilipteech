@@ -1,0 +1,110 @@
+﻿@model AsteriskBrowserAL.Models.ElectiveSubjectsStudentViewData
+@{
+              bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<div class="hr hr-18 dotted hr-double"></div>
+@if (null != Model && null != Model.lstElectiveStudentsData && Model.lstElectiveStudentsData.Count() > 0)
+{
+    int nsno = 1;
+
+    <div class="table-header">
+        Records Found (@Model.lstElectiveStudentsData.Count())
+        <div style="float:right;">
+            <button type="submit"  name="save" id="save" class="btn btn-info btn-xs P2">
+                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+            </button>
+        </div>
+    </div>
+    <div>
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Roll Number")
+                    </th>
+                    @if (bIsCoastal)
+                {
+                    <th>
+                        @Html.DisplayName("Registration Number")
+                    </th>
+                }
+                    <th>
+                        @Html.DisplayName("I Language")
+                    </th>
+                    <th>
+                        @Html.DisplayName("II Language")
+                    </th>
+                    <th>
+                        @Html.DisplayName("III Language")
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.lstElectiveStudentsData.Count(); i++)
+            {
+                <tr>
+                    <td>
+                        @Html.Hidden("lstData.Index", (@i + 10))
+                        @(nsno++)
+                    </td>
+                    <td>
+                        @Html.Hidden("lstData[" + (@i + 10) + "].StudentId", Model.lstElectiveStudentsData.ElementAt(i).StudentId)
+                        @Model.lstElectiveStudentsData.ElementAt(i).DisplayName
+                    </td>
+                    <td>
+                        @Model.lstElectiveStudentsData.ElementAt(i).RollNumber
+                    </td>
+                    @if (bIsCoastal)
+                    {
+                <td>
+                    @Model.lstElectiveStudentsData.ElementAt(i).OMRNumber
+                </td>
+                    }
+                    <td>
+                        @Html.DropDownList("lstData[" + (@i + 10) + "].IstLanguage", new SelectList(Model.lst1stLanguages, "SubjectId", "SubjectName", Model.lstElectiveStudentsData.ElementAt(i).IstLanguage), new { @class = "form-control" })
+                    </td>
+                    <td>
+                        @Html.DropDownList("lstData[" + (@i + 10) + "].IIndLanguage", new SelectList(Model.lst2ndLanguages, "SubjectId", "SubjectName", Model.lstElectiveStudentsData.ElementAt(i).IIndLanguage), new { @class = "form-control" })
+                    </td>
+                    <td>
+                        @Html.DropDownList("lstData[" + (@i + 10) + "].IIIrdLanguage", new SelectList(Model.lst3rdLanguages, "SubjectId", "SubjectName", Model.lstElectiveStudentsData.ElementAt(i).IIIrdLanguage), new { @class = "form-control" })
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+        <span style="color: red;"><b>No data to display</b></span>
+        }
+
+
+     
+        <script>
+            function isNumberKey(evt) {
+                var charCode = (evt.which) ? evt.which : event.keyCode
+
+                if (charCode == 46)
+                    return true;
+
+                if (charCode > 31 && (charCode < 48 || charCode > 57))
+                    return false;
+                return true;
+            }
+        </script>
+
+
+
+

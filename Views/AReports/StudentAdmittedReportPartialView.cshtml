@@ -1,0 +1,272 @@
+﻿
+@model AsteriskBrowserAL.Models.StudentAdmissionRegisterData
+@{
+
+    int sno = 1;
+}
+
+
+@Html.Action("DataTableScripts", "Base")
+
+
+
+
+@if (null != Model)
+
+{
+    if (null != Model.StudentAdmittedDetails && Model.StudentAdmittedDetails.Count() > 0)
+    {
+
+        <div class="table-header">
+            Records Found (@Model.StudentAdmittedDetails.Count())
+            <div style="float:right;margin-right:10px;">
+                <button class="btncustom" id="btnExport">
+                    Download
+                </button>
+                <button class="btncustom" id="btnPrint">
+                    Print
+                </button>
+            </div>
+        </div>
+       
+            <div id="Print">
+                    <table id="StudentAdmittedData" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;border-collapse:collapse;width:100%" border="1">
+                        <thead>
+                            <tr>
+                                <th colspan="1">
+                                    S.No.
+                                </th>
+
+                                <th colspan="1">
+                                    @Html.DisplayName("Academic Year")
+                                </th>
+
+                                @if (Model.IsCentral)
+                    {
+                                    <th colspan="1">
+                                        @Html.DisplayName("Branch Name")
+                                    </th>
+                                }
+
+                                <th>
+                                    @Html.DisplayName("Date")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Student Name")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Father Name")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Mobile No")
+                                </th>
+
+                                @*<th>
+                            @Html.DisplayName("Reference Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Employee Id")
+                        </th>*@
+
+                                <th>
+                                    @Html.DisplayName("Inquiry No")
+                                </th>
+
+                                @if (Model.ApplicationStatus == true)
+                    {
+
+                                    <th>
+                                        @Html.DisplayName("Registration No")
+
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Class Name")
+
+                                    </th>
+                                }
+                                <th>
+                                    @Html.DisplayName("Admitted Status")
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.StudentAdmittedDetails)
+                            {
+                                <tr>
+
+                                    <td colspan="1">
+                                        @(sno++)
+                                    </td>
+
+
+                                    <td colspan="1">
+                                        @item.AcademicYear
+                                    </td>
+
+                                    @if (Model.IsCentral)
+                        {
+                                        <td colspan="1">
+                                            @item.BranchName
+                                        </td>
+                                    }
+
+                                    <td>
+                                        @item.AdmissionDate.Value.ToString("dd - MMM- yyyy")
+                                    </td>
+
+                                    <td>
+                                        @item.FirstName
+                                    </td>
+
+                                    <td>
+                                        @item.FatherName
+                                    </td>
+                                    <td>
+                                        @item.FatherMobileNumber
+                                    </td>
+
+                                    @*<td>
+                                @item.SchoolReferenceName
+                            </td>
+
+                            <td>
+                                @item.EmployeeNumber
+                            </td>*@
+
+                                    <td>
+                                        @item.InquiryNumber
+                                    </td>
+
+                                    @if (Model.ApplicationStatus == true)
+                        {
+                                        <td>
+                                            @item.StudentApplicationNumber
+                                        </td>
+                                        <td>
+                                            @item.SectionName
+
+                                        </td>
+                                    }
+
+                                    <td>
+                                        @item.Remarks
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+            </div>
+
+            }
+            else
+            {
+            <div style="color:red;font-weight:bold">Data not available to display</div>
+            }
+
+            }
+
+
+            <script>
+                function submitform() {
+                    $.ajax({
+                        url: '/AReports/StudentAdmittedReport',
+                        data: {},
+                        success: function (result) {
+                        }
+                    })
+                };
+
+                $('#btnExport').click(function () {
+                    window.location.href = "/AReports/InquiryAndApplicationStudentReportExporttoExcell"
+                    var Data = $("#StudentAdmittedData").html();
+
+                });
+
+
+
+                //function onloadData() {
+                //    PrintElem('#StudentAdmittedData');
+                //}
+                $('#btnPrint').click(function () {
+                    debugger
+                    var Columns = 5;
+                    var value = 2;
+                    var CourseId = 1;
+                    var SectionId = 1;
+                    $.ajax({
+                        url: '/AReports/PrintDT',
+                        data: { Columns: Columns, Status: value, CourseId: CourseId, SectionId: SectionId },
+                        success: function (data) {
+                            debugger
+                            PrintData(data);
+                        },
+                    })
+                    debugger
+                    //Old
+                    //PrintElem('#Print');
+                });
+
+                //window.onload = onloadData();
+
+                function PrintElem(data) {
+
+                    Popup(document.getElementById("Print").innerHTML)
+                }
+
+                function Popup(data) {
+
+                    var mywindow = window.open('', 'my div', 'size=potrait;width: 50%;margin=0;padding=0;');
+                    mywindow.document.write('<p></p>');
+                    mywindow.document.write(data);
+                    mywindow.document.write('<p></p>');
+
+                    var is_chrome = Boolean(mywindow.chrome);
+
+                    if (is_chrome) {
+                        setTimeout(function () { // wait until all resources loaded
+                            mywindow.document.close();
+                            mywindow.focus();
+                            mywindow.print();
+                            mywindow.close();
+                            window.location.href = "/AReports/AdmittedStudentsReport";
+
+                        }, 2050);
+                    } else {
+                        mywindow.document.close();
+                        mywindow.focus();
+                        mywindow.print();
+                        mywindow.close();
+                        window.location.href = "/AReports/AdmittedStudentsReport";
+
+                    }
+
+                    return true;
+                }
+
+                //New
+                function PrintData(data) {
+                    var mywindow = window.open('', 'my div', 'height=300,width=600,size=landscape');
+                    mywindow.document.write('<p></p>');
+                    mywindow.document.write(data);
+                    mywindow.document.write('<p></p>');
+                    mywindow.document.close();
+                    mywindow.focus();
+                    mywindow.print();
+                    mywindow.close();
+                    return true;
+                }
+            </script>
+
+
+
+
+
+
+

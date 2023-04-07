@@ -1,0 +1,710 @@
+﻿@model AsteriskBrowserAL.Models.ApplicationFeePaymentViewModel
+@{
+    List<SelectListItem> PaymentMode = new List<SelectListItem>()
+        {
+        new SelectListItem()
+        {
+        Text = "Cash",
+        Value = "1"
+        },
+
+        new SelectListItem()
+        {
+        Text = "Cheque",
+        Value = "3"
+        },
+        new SelectListItem()
+        {
+        Text = "Swipe",
+        Value = "5"
+        },
+        new SelectListItem()
+        {
+        Text = "Online",
+        Value = "6"
+        }
+        };
+}
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Front Office
+        </li>
+        <li class="active">Registration Fill Up</li>
+    </ul>
+}
+
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm("ApplicationFeePayment", "AFrontOffice"))
+    {
+
+        if (null != TempData["Message"])
+        {
+            <span style="color:green;">@TempData["Message"]</span>
+        }
+
+        <span style="color:red;display:none;font-weight:bold;" id="Validate"></span>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Registration Fee Payment
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <button class="btn btn-info btn-xs" style="width:80px;margin-top:2px" name="Pay" id="Pay" type="submit" onclick="return Validations();">
+                                    Pay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Name")</label>
+
+                                    <div class="col-sm-6">
+                                        <label class="control-label no-padding-right" for="form-field-1"> : @Model.StudentName<text id="AFStudentName" name="StudentName"></text></label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Class Name")</label>
+
+                                    <div class="col-sm-6">
+                                        <label class="control-label no-padding-right" id="" for="form-field-1"> : @Model.Class<text id="AFClass"></text></label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Particular Name")</label>
+
+                                    <div class="col-sm-6">
+                                        <label class="control-label no-padding-right" id="" for="form-field-1"> : @Model.ParticularName<text id="AFParticularName"></text></label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Amount")</label>
+
+                                    <div class="col-sm-6">
+                                        <label class="control-label no-padding-right" id="" for="form-field-1"> :@Model.Amount<input type="hidden" name="Amount" value="@Model.Amount" /></label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="space-4"> </div>
+
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h5 class="widget-title">
+                            Receipt
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <div class="row">
+
+                                            <div class="col-sm-3">
+                                                <label><input class="case" type="radio" vlaue="1" checked="checked" name="ReceiptType1" id="ReceiptType1" onclick="HideManualReceiptControls();" />Online Receipt</label>
+                                            </div>
+
+                                            <div class="col-sm-3">
+                                                <label><input class="case" type="radio" vlaue="2" name="ReceiptType2" id="ManualReceiptId" onclick="VisibleManualReceiptControls();" />Manual Receipt</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div id="ManualReceiptControls" style="display:none;">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div>
+                                            <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Receipt Number </label>
+
+                                            <div class="col-sm-3">
+                                                <input type="text" value="@Model.ManualReceiptNo" name="ManualReceiptNo" max="7" id="ManualReceiptNo" class="form-control textlength txtboxNum" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="col-sm-2 control-label no-padding-right required" for="form-field-1">*Date</label>
+
+                                            <div class="col-sm-3">
+                                                @if (null != ViewBag.ApplicationDate)
+                                                {
+                                                    @*<input type="hidden" value="@Model.ApplicationDate.Value.ToShortDateString()" id="ApplicationDate" />
+                                                    <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+
+                                                        <input class="form-control" type="text" name="Date" id="Date" value="@Model.ApplicationDate.Value.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>*@
+                                                      <div id="datepicker" class="input-group date">
+                                                    @if (null != ViewBag.ApplicationDate)
+                                                    {
+                                                        <input class="form-control" type="text" value="@ViewBag.ApplicationDate" disabled="disabled" id="ApplicationDate" name="ApplicationDate" autocomplete="off" placeholder="Select Date" />
+                                                    }
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+
+                                                </div>
+                                                }
+                                               
+
+                                                else
+                                                {
+
+                                                    <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+
+                                                        <input class="form-control" type="text" name="Date" id="Date" autocomplete="off" placeholder="Select Date" />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <label class="required">*Reason for Manual Receipt</label>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            @Html.TextBox("Description", null, "", new { @class = "form-control col-sm-6", @min = "6", @id = "Description", @onchange = "removeError();", @name = "Remarks" })
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div id="ManualRecieptList">
+
+                                </div>
+                            </div>
+                            @*</div>*@
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+                @*<div class="space-4"> </div>
+
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h5 class="widget-title">
+                            Template
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div id="Template">
+                                <div class="form-group ">
+                                    <div class="row">
+                                        <div>
+                                            @if (null != Model)
+                                            {
+                                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Template Number <text id="lbltemplateid"></text></label>
+                                            }
+                                            else
+                                            {
+                                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Template Number <text id="lbltemplateid"></text></label>
+                                            }
+                                            <div class="col-sm-3">
+                                                @if (null != Model)
+                                                {
+                                                    <input type="text" class="form-control textlength txtboxNum" name="TempleteNo" id="TempalteNumber" value="@Model.TempleteNo" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="text" class="form-control textlength txtboxNum" name="TempleteNo" id="TempalteNumber" />
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="MissingTemplates">
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+
+
+                    </div>
+                </div>*@
+
+                <div class="space-4"></div>
+
+                <div class="col-xs-12" id="divpaymentMode">
+                    <div class="row">
+                        <div class="widget-box">
+                            <div class="widget-header widget-header-flat widget-header-small">
+                                <h5 class="widget-title">Payment Mode</h5>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Payment Mode")</label>
+
+                                                    <div class="col-sm-3">
+                                                        @Html.DropDownList("PaymentMode", PaymentMode, new { @class = "form-control col-sm-5", onchange = "GetPaymentModeControls();" })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div id="paymode" style="display:none;">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Bank Name")</label>
+
+                                                <div class="col-sm-3">
+                                                    @Html.DropDownList("Bank", null, "--Select Bank--", new { @class = "form-control col-sm-6", @id = "bank" })
+                                                </div>
+                                                <div class="col-sm-3" style="display:none;" id="fBank">
+                                                    <label style="color:red;font-weight:bold;font-size:12px;"> Please Select Bank </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                    <label id="dd">DD #</label>
+                                                    <label id="chequeId">Cheque #</label>
+
+                                                    <label id="account">Account #</label>
+                                                    <label id="batch">Batch #</label>
+                                                    <label id="online">Transaction Id</label>
+                                                </div>
+
+                                                <div class="col-sm-3">
+                                                    @Html.TextBox("ChequeNo", null, "", new { @class = "form-control col-sm-6 textlength", onkeypress = "return isNumberKey(event)", @min = "6", @maxlength = "6", @id = "cheque", @onchange = "removeError();" })
+                                                </div>
+                                                <div class="col-sm-3" style="display:none;" id="fChequeNo">
+                                                    <label style="color:red;font-weight:bold;font-size:12px;">Required</label>
+                                                </div>
+                                                <span style="color:red;font-weight:bold;font-size:12px;" id="ChequeNoVal"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group ">
+                                            <div class="row">
+                                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Dated")</label>
+
+
+
+                                                <div class="col-sm-3">
+
+                                                    <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                        <input class="form-control" type="text" name="ChequeDate" id="ChequeDate" autocomplete="off" placeholder="Select Date" />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-3" style="display:none;" id="fChequeDate">
+                                                    <label style="color:red;font-weight:bold;font-size:12px;">Required</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    }
+
+    <input name="StudentId" id="StudentId" type="hidden" value="@Model.StudentId" />
+    <input type="hidden" id="expectedtempletednumber" />
+    <input type="hidden" id="expectedmanualreceiptnumber" />
+
+    <input type="hidden" id="Maxtempletednumber" />
+    <input type="hidden" id="Maxmanualreceiptnumber" />
+
+</section>
+
+
+<script type="text/javascript">
+
+
+    window.onload = PopulateTemplateNumber();
+    var templateNoExpected;
+
+    function VisibleManualReceiptControls() {
+        document.getElementById('ReceiptType1').checked = false;
+        $('#ManualReceiptControls').show();
+    }
+
+
+    function HideManualReceiptControls() {
+
+        $('#Description').val('');
+
+        document.getElementById('ManualReceiptId').checked = false;
+        $('#ManualReceiptControls').hide();
+    }
+
+
+    function SaveApplicationPayment() {
+        debugger;
+        var tNo = parseInt($('#TempalteNumber').val());
+        var exptemp = parseInt(templateNoExpected);
+
+        if (tNo != exptemp) {
+            if (tNo < exptemp) {
+                //alert("Template Number is already in use");
+            }
+            if (exptemp < tNo) {
+                MissingTemplateRemarks();
+            }
+        }
+        return false;
+    }
+
+    function PopulateTemplateNumber() {
+
+        debugger;
+        $.ajax({
+            url: '/AFrontOffice/GetMaxTemplateNo',
+            success: function (data) {
+
+                document.getElementById("ManualReceiptNo").value = data.MNo;
+                //document.getElementById("TempalteNumber").innerHTML = data.TemplateNumber;
+                document.getElementById("expectedtempletednumber").value = data.TemplateNumber;
+                document.getElementById("expectedmanualreceiptnumber").value = data.MNo;
+
+                document.getElementById("Maxtempletednumber").value = data.nMaxTemplateNo;
+                document.getElementById("Maxmanualreceiptnumber").value = data.nMaxManualNo;
+
+                $('#TempalteNumber').val(data.TemplateNumber);
+                templateNoExpected = data.TemplateNumber;
+            },
+            error: function () {
+
+            },
+            async: false,
+        })
+    }
+
+    $("#TempalteNumber").keyup(function () {
+        var tNo = parseInt($('#TempalteNumber').val());
+        var exptemp = parseInt(templateNoExpected);
+        if (tNo != exptemp) {
+            if (tNo < exptemp) {
+                $('#MissingTemplates').html("");
+            }
+            else if (exptemp < tNo) {
+                MissingTemplateRemarks();
+            }
+            else {
+                $('#MissingTemplates').html("");
+
+            }
+        }
+        else {
+            $('#MissingTemplates').html("");
+
+        }
+    });
+
+
+    $("#ManualReceiptNo").keyup(function () {
+        var value = $("#ManualReceiptNo").val();
+        if (value == undefined || value == "") {
+            $("#ManualRecieptList").html("")
+        }
+        var val = parseInt(value);
+        var LastReciept = $('#expectedmanualreceiptnumber').val();
+        if (LastReciept < val) {
+            $.ajax({
+                url: "/AFrontOffice/GetManualReciepts",
+                data: { term: val, LastReciept: LastReciept },
+                success: function (result) {
+                    $("#ManualRecieptList").html(result)
+                },
+                async: false
+            })
+        }
+        else if (LastReciept >= val) {
+            $("#ManualRecieptList").html("")
+        }
+
+    });
+
+    function MissingTemplateRemarks() {
+
+        var TemplateNoEntered = $("#TempalteNumber").val();
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AFrontOffice/GetMissingTemplatesData',
+            data: { m_nExpectedTemplateNo: templateNoExpected, m_nEnteredTemplateNo: TemplateNoEntered },
+            success: function (data) {
+
+                $('#MissingTemplates').html(data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+    };
+
+
+    function Validations() {
+        var validate = true;
+        var ValidateMessage = "";
+
+        var vStudentId = $('#StudentId').val();
+
+        var Manualno = $('#expectedmanualreceiptnumber').val();
+        var templatenoexp = $('#expectedtempletednumber').val();
+
+        var res1 = document.getElementById('ManualReceiptId').checked;
+
+        var applicationDate = $('#ApplicationDate').val();
+
+
+        var ManualRecptNo = $('#ManualReceiptNo').val();
+        var MDate = $('#Date').val();
+        var MDescription = $('#Description').val();
+        var templateNo = $('#TempalteNumber').val();
+
+        var MaxTemplate = $('#Maxtempletednumber').val();
+        var MaxManual = $('#Maxmanualreceiptnumber').val();
+
+
+        if (res1) {
+            if (parseInt(ManualRecptNo) > parseInt(MaxManual) || parseInt(ManualRecptNo) < parseInt(Manualno)) {
+                ValidateMessage += "Manual Receipt Number is not in range, ";
+                validate = false;
+            }
+        }
+
+        else {
+            ValidateMessage = "";
+            validate = true;
+        }
+
+        if (parseInt(templateNo) > parseInt(MaxTemplate) || parseInt(templateNo) < parseInt(templatenoexp)) {
+            ValidateMessage += "Template Number is not in range, ";
+            validate = false;
+        }
+
+        if (vStudentId == "" || vStudentId == undefined) {
+            ValidateMessage += "Student, ";
+            validate = false;
+        }
+
+        if (res1) {
+
+            if (ManualRecptNo == "0" || ManualRecptNo == "undefined" || ManualRecptNo == "") {
+                ValidateMessage += "Manual Receipt Number, ";
+                validate = false;
+            }
+            if (MDate == "" || MDate == "undefined") {
+                ValidateMessage += "Manual Receipt Date, ";
+                validate = false;
+            } else {
+                if (MDate < applicationDate) {
+                    ValidateMessage += "Manual receipt Date is older then Registration Date, ";
+                    validate = false;
+                }
+            }
+            if (MDescription == "" || MDescription == "undefined") {
+                ValidateMessage += "Description, ";
+                validate = false;
+            }
+        }
+
+
+        if (!validate) {
+            $('#Validate').show();
+            document.getElementById('Validate').innerHTML = "Please fill the fields, " + ValidateMessage.slice(0, -2);
+        } else {
+            document.getElementById('Validate').innerHTML = "";
+            validate = validatePaymentMode();
+        }
+        return validate;
+    }
+
+    function validatePaymentMode() {
+
+        var validate = true;
+
+        var paymentMode = document.getElementById("PaymentMode").value;
+        var ChequeDate = document.getElementById("ChequeDate").value;
+        var ChequeNo = document.getElementById("cheque").value;
+        var Bank = document.getElementById("bank").value;
+
+        if (paymentMode > 1) {
+
+            if (ChequeDate == "") {
+                document.getElementById("fChequeDate").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fChequeDate").style.display = "none";
+            }
+
+            if (ChequeNo == "") {
+                document.getElementById("fChequeNo").style.display = "inline";
+                validate = false;
+            } else if (paymentMode == 2 || paymentMode == 3 && ChequeNo.length < 6) {
+                document.getElementById("ChequeNoVal").innerHTML = "Length must be six digits"
+                validate = false;
+            }
+            else if (paymentMode == 5 && ChequeNo.length < 4) {
+                document.getElementById("ChequeNoVal").innerHTML = "Length must be four digits"
+                validate = false;
+            }
+            else {
+                document.getElementById("fChequeNo").style.display = "none";
+                document.getElementById("ChequeNoVal").innerHTML = "";
+            }
+
+            if (Bank == "") {
+                document.getElementById("fBank").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fBank").style.display = "none";
+            }
+
+            return validate;
+        }
+    }
+
+    function GetPaymentModeControls() {
+
+        var paymentMode = document.getElementById("PaymentMode").value;
+
+        if (paymentMode == 1) {
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('paymode').style.display = 'none'
+            document.getElementById("fChequeDate").style.display = "none";
+            document.getElementById("fChequeNo").style.display = "none";
+            document.getElementById("fBank").style.display = "none";
+
+        }
+        else if (paymentMode == 2) {
+            document.getElementById('dd').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 3) {
+            document.getElementById('chequeId').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '6');
+        }
+        else if (paymentMode == 4) {
+            document.getElementById('account').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 5) {
+            document.getElementById('batch').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '4');
+        }
+        else if (paymentMode == 6) {
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            $("#cheque").attr('maxlength', '10');
+        }
+
+    }
+
+</script>
+
+<div id="mydiv" style="display:none;"></div>

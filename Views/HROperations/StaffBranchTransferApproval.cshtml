@@ -1,0 +1,380 @@
+﻿@model AsteriskBrowserAL.Models.StaffBranchTransferData
+@using AsteriskBrowserAL.Helpers
+@{
+    ViewBag.Title = "Approve Branch Transfer";
+
+    int nSubId = 0;
+
+    bool bIsCentral = Utility.IsCentral();
+
+    if (!bIsCentral)
+    {
+        nSubId = Utility.GetLoggedSubscriptiond();
+    }
+
+}
+
+
+<link href="~/plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<!-- CSS -->
+<style>
+    .ui-widget-header, .ui-state-default, ui-button {
+        background: #3c8dbc;
+        border: 1px solid #3c8dbc;
+        color: #3c8dbc;
+        font-weight: normal;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Approve Branch Transfer</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+<section class="content">
+
+    @using (Html.BeginForm())
+    {
+        <div class="row">
+            <div class="col-xs-12">
+
+                <input type="hidden" id="IsCentral" value="@bIsCentral" />
+
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Staff Branch Transfer Approve/Reject</span>
+                    <div  style="float:right;margin-right:10px">
+                        <a class="P2" id="btnViewData2" name="btnViewData2" onclick="return GetData();">
+                        <span class="btncustom">View Data</span></a>
+                    </div>
+
+                </div>
+
+
+
+
+
+                <div class="widget-box">
+
+                    @*<div class="col-xs-12">
+                            <div class="col-xs-12">
+                            </div>
+                        </div>*@
+
+           
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            @if (bIsCentral)
+                            {
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                            <div class="col-sm-6">
+                                                <select id="CboDivision" class="form-control" onchange="LoadBranchCombo()"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                            <div class="col-sm-6">
+                                                <select id="CboBranch" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                            }
+                            else
+                            {
+                                <input type="hidden" id="CboBranch" value="@nSubId" />
+                            }
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Status</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboStatus" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="dvApproveBranchTransfers">
+                </div>
+
+                <div id="dvApprovalRemarks" style="display:none;height:250Px" role="dialog">
+                    <div class="box">
+                        <div class="box-body">
+                            <label class="col-sm-4">@Html.Label("Enter Description")</label>
+                            <div>
+                                @Html.TextBoxFor(model => model.ActionDescription, new { autocomplete = "off", @class = "form-control textlength", @id = "ActionDescription", placeholder = "Enter Description", @maxlength = 248, @height = "200Px" })
+                                <div class="col-sm-12" style="display:none;" id="ActionDescriptionNull">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</section>
+
+
+
+<script type="text/javascript">
+
+
+    $('#ActionDescription').focusin(function () {
+        $('#ActionDescriptionNull').hide();
+    });
+
+    function ONLOADDATA() {
+
+        if ($('#IsCentral').val() == "value") {
+            LoadDivisionCombo();
+        }
+
+        LoadStatusCombo();
+    }
+
+    window.onload = ONLOADDATA();
+
+    function LoadBranchCombo() {
+
+        $('#dvApproveBranchTransfers').html('');
+
+        var DivisionId = $('#CboDivision').val();
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+                    BranchItems.children().remove();
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    }
+
+    function LoadStatusCombo() {
+
+        var StatusItems = $('#CboStatus');
+
+        StatusItems.children().remove();
+        StatusItems.append($("<option>").val("-1").text("--- Select ---"));
+        StatusItems.append($("<option>").val("0").text("All"));
+        StatusItems.append($("<option>").val("1").text("Pending"));
+        StatusItems.append($("<option>").val("2").text("Accepted"));
+        StatusItems.append($("<option>").val("3").text("Rejected"));
+
+        $('#CboStatus').append(StatusItems);
+    }
+
+    function LoadDivisionCombo() {
+
+        $('#dvApproveBranchTransfers').html('');
+
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (data) {
+                var BranchItems = $('#CboDivision');
+
+                BranchItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    BranchItems.append($("<option>").val(record.DivisionId).text(record.DivisionName));
+                });
+
+                $('#CboDivision').append(BranchItems);
+            },
+            aync: false
+        });
+    }
+
+    function GetData() {
+
+        var IsCentral = $('#IsCentral').val();
+
+        var DivisionId = 0;
+
+        if (IsCentral == "value") {
+            DivisionId = $('#CboDivision').val();
+        }
+
+        var SubscriptionId = $('#CboBranch').val();
+        var Status = $('#CboStatus').val();
+        $('#dvApproveBranchTransfers').html('');
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (IsCentral == "value") {
+            if (DivisionId < 0) {
+                Message += "Division";
+                isValid = false;
+            }
+
+            if (SubscriptionId == "null" || SubscriptionId < 0) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Branch";
+                isValid = false;
+            }
+
+        }
+
+
+        if (Status < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Status";
+            isValid = false;
+        }
+
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        document.getElementById("Validation").innerHTML = "";
+
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('dvApproveBranchTransfers').html('');
+                $('#imagemodal').hide();
+            },
+            url: '/HROperations/GetStaffBranchTransferRequestData/',
+            data: { DivisionId: DivisionId, SubscriptionId: SubscriptionId, StatusId: Status },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#imagemodal').hide();
+                $('#dvApproveBranchTransfers').html(data);
+            }
+
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function SaveStatus(BranchTransferId, FromBranch, ToBranch, Type, Description) {
+        $('#imagemodal').show();
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+            },
+
+            url: '/HROperations/SaveStaffBranchTransferAction',
+            data: { BranchTransferId: BranchTransferId, nFromBranch: FromBranch, nToBranch: ToBranch, nAction: Type, strDescription: Description },
+            success: function (data) {
+                GetData();
+            },
+            aync: false
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function ApproveBD(BranchTransferId, FromBranch, ToBranch, Type) {
+
+        if (BranchTransferId < 1)
+            return;
+
+        var $dialog = $('#dvApprovalRemarks')
+
+      .dialog({
+          autoOpen: false,
+          width: 600,
+          height: 'auto',
+          resizable: true,
+          title: 'Branch Transfer Approval',
+          modal: true,
+          closeOnEscape: false,
+          responsive: true,
+          show: "slide",
+          buttons: {
+              "OK": function () {
+
+                  debugger
+
+                  var Description = $('#ActionDescription').val();
+
+                  if (Description == "") {
+                      $('#ActionDescriptionNull').show();
+                      return;
+                  }
+                  else {
+                      $(this).dialog("close");
+                      var VrMessage = SaveStatus(BranchTransferId, FromBranch, ToBranch, Type, Description);
+                      $('#Validation').val(VrMessage);
+                  }
+              },
+              "Close": function () {
+                  $(this).dialog("close");
+              }
+          },
+      });
+
+        $dialog.dialog('open');
+        e.preventDefault();
+        return false;
+    }
+
+    function disableF5(e) {
+        if ((e.which || e.keyCode) == 116) e.preventDefault();
+    };
+
+</script>
+

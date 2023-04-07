@@ -1,0 +1,336 @@
+﻿@model List<AsteriskBrowserAL.Models.FeeSchedulesDataDueDates>
+@{
+    ViewBag.Title = "Installment Due Dates";
+
+    List<AsteriskBrowserAL.Models.FeeSchedulesDataDueDates> feeshedulelist = new List<AsteriskBrowserAL.Models.FeeSchedulesDataDueDates>();
+    List<AsteriskBrowserAL.Models.FeeSchedulesDataDueDates> transportshedulelist = new List<AsteriskBrowserAL.Models.FeeSchedulesDataDueDates>();
+
+    if (null != Model && Model.Count() > 0)
+    {
+        feeshedulelist = Model.Where(f => f.IsTransport == false).ToList();
+        transportshedulelist = Model.Where(s => s.IsTransport == true).ToList();
+    }
+}
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Installments Due Dates</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<style>
+    .red {
+        color: red;
+    }
+</style>
+
+<!--Main Content-->
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+      
+            @using (Html.BeginForm("InstallmentDuedates", "SeFinance", FormMethod.Post))
+            {
+                <input type="hidden" id="SelAyId" value="@ViewBag.AcademicYearId" />
+
+                if(Convert.ToString(TempData["InstallmentDuedates"]) == "true")
+                {
+        
+
+                    <p align="center">
+                        <span class="savedinfo">
+
+
+
+                            <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                            <br />
+                            <span id="spnSave" style="color:green;font-weight:bold;">Data saved</span>
+                            <br />
+
+                            <a href="" class="cls1 btncustom">Close</a>
+                            <script>
+
+                                $(document).ready(function () {
+                                    $(".cls1").click(function () {
+
+                                        $(".savedinfo").css("display", "none")
+                                    });
+
+
+
+                            </script>
+                        </span>
+                    </p>
+                }
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Installment Due Dates</span>
+
+
+                </div>
+
+                    <div class="widget-box">
+                 
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 ">Academic Year</label>
+                                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                <select id="CboAcademicYear" name="AcademicYearId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                        </div>
+                    </div>
+
+                    if (Model != null)
+                    {
+                
+                    <div class="overflowscroll">
+
+                        <div id="divData">
+                            <div class="table-header">
+                                Fee Schedules
+                                <div style="float:right;margin-right:10px;">
+                                    <button type="submit" name="Save" class="btncustom P2" value="Save">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+
+                            @if (null != feeshedulelist && feeshedulelist.Count() > 0)
+                            {
+                                int sno = 1;
+
+                                <table class="table tbhover table-striped table-bordered dynamic-table" id="myfeetable">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                @("S.No")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Installments")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Due Date")
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < feeshedulelist.Count(); i++)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @Html.Hidden("AllFeeShedulesList.Index", (@i + 10))
+                                                    @sno
+                                                    @Html.Hidden("AllFeeShedulesList[" + (@i + 10) + "].FeeSchedulesId", feeshedulelist.ElementAt(i).FeeSchedulesId)
+                                                    @Html.Hidden("AllFeeShedulesList[" + (@i + 10) + "].FeeParticularId", feeshedulelist.ElementAt(i).FeeParticularId)
+                                                    @Html.Hidden("AllFeeShedulesList[" + (@i + 10) + "].IsTransport", feeshedulelist.ElementAt(i).IsTransport)
+                                                    @Html.Hidden("AllFeeShedulesList[" + (@i + 10) + "].EndDate", feeshedulelist.ElementAt(i).EndDate)
+
+
+
+                                                </td>
+                                                <td>
+                                                    @feeshedulelist.ElementAt(i).InstallmentName
+                                                </td>
+
+                                                <td>
+                                                    @if (@feeshedulelist.ElementAt(i).DueDate == null)
+                                                    {
+                                                        <div style="max-width:500Px" id="datepicker" class="input-group date">
+                                                            <input class="form-control hideMsg" type="text" id="fe1DueDate" name="DueDate" placeholder="Start Date" />
+                                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                            @Html.Hidden("AllFeeShedulesList[" + (@i + 10) + "].DueDate", feeshedulelist.ElementAt(i).DueDate)
+                                                            @Html.Hidden("AllFeeShedulesList[" + (@i + 10) + "].FeeSchedulesId", feeshedulelist.ElementAt(i).FeeSchedulesId)
+
+                                                        </div>
+                                                    }
+
+                                                    else
+                                                    {
+                                                        <div style="max-width:500Px" id="datepicker" class="input-group date">
+
+                                                            <input class="form-control hideMsg" type="text" id="fe1DueDate" name="DueDate" value="@feeshedulelist.ElementAt(i).DueDate.ToShortDateString()" placeholder="Select Date" autocomplete="off" />
+                                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                            @Html.Hidden("AllFeeShedulesList[" + (@i + 10) + "].DueDate", feeshedulelist.ElementAt(i).DueDate)
+                                                            @Html.Hidden("AllFeeShedulesList[" + (@i + 10) + "].FeeSchedulesId", feeshedulelist.ElementAt(i).FeeSchedulesId)
+                                                        </div>
+
+                                                    }
+                                                </td>
+                                            </tr>
+
+                                            sno++;
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+
+
+
+                            <br/>
+                            <div class="table-header">
+                                Transport Schedules
+                            </div>
+                            @if (null != transportshedulelist && transportshedulelist.Count() > 0)
+                            {
+                                int nSno = 1;
+
+                                <table class="table tbhover table-striped table-bordered dynamic-table" id="myTranstable">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                @("S.No")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Installments")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Due Date")
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < transportshedulelist.Count(); i++)
+                                        {
+                                            <tr>
+
+                                                <td>
+                                                    @Html.Hidden("AllTransShedulesList.Index", (@i + 10))
+                                                    @nSno
+                                                    @Html.Hidden("AllTransShedulesList[" + (@i + 10) + "].FeeSchedulesId", transportshedulelist.ElementAt(i).FeeSchedulesId)
+                                                    @Html.Hidden("AllTransShedulesList[" + (@i + 10) + "].FeeParticularId", transportshedulelist.ElementAt(i).FeeParticularId)
+                                                    @Html.Hidden("AllTransShedulesList[" + (@i + 10) + "].IsTransport", transportshedulelist.ElementAt(i).IsTransport)
+                                                    @Html.Hidden("AllTransShedulesList[" + (@i + 10) + "].EndDate", transportshedulelist.ElementAt(i).EndDate)
+                                                </td>
+                                                <td>
+                                                    @transportshedulelist.ElementAt(i).InstallmentName
+                                                </td>
+                                                <td>
+                                                    @if (@transportshedulelist.ElementAt(i).DueDate == null)
+                                                    {
+                                                        <div style="max-width:200Px" id="datepicker" class="input-group date">
+                                                            <input class="form-control hideMsg" type="text" id="transDueDate" name="DueDate" placeholder="Due Date" />
+                                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                            @Html.Hidden("AllTransShedulesList[" + (@i + 10) + "].DueDate", transportshedulelist.ElementAt(i).DueDate)
+                                                            @Html.Hidden("AllTransShedulesList[" + (@i + 10) + "].FeeSchedulesId", transportshedulelist.ElementAt(i).FeeSchedulesId)
+                                                        </div>
+
+
+                                                    }
+
+                                                    else
+                                                    {
+                                                        <div style="max-width:200Px" id="datepicker" class="input-group date">
+                                                            <input class="form-control hideMsg" type="text" id="transDueDate" name="DueDate" value="@transportshedulelist.ElementAt(i).DueDate.ToShortDateString()" placeholder="Select Date" autocomplete="off" />
+                                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                            @Html.Hidden("AllTransShedulesList[" + (@i + 10) + "].DueDate", transportshedulelist.ElementAt(i).DueDate)
+                                                            @Html.Hidden("AllTransShedulesList[" + (@i + 10) + "].FeeSchedulesId", transportshedulelist.ElementAt(i).FeeSchedulesId)
+                                                        </div>
+
+                                                    }
+                                                </td>
+                                            </tr>
+
+                                            nSno++;
+                                        }
+
+
+                                    </tbody>
+                                </table>
+                            }
+
+                        </div>
+
+                    </div>
+                    }
+
+                    }
+
+                </div>
+
+    </div>
+
+    @if (Model != null)
+    {
+        
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+        
+    }
+
+</section>
+<script type="text/javascript">
+
+    $('.hideMsg').click(function () {
+        $('#spnSave').hide();
+    })
+
+    $(document).ready(function () {
+        LoadAcademicYearCombo();
+    });
+
+
+    function LoadAcademicYearCombo() {
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                $('#imagemodal').hide();
+
+                var ObjAyYear = $("#CboAcademicYear")
+                ObjAyYear.children().remove();
+                ObjAyYear.append($("<option>").val(-1).text("--Select--"))
+
+                $.each(result, function (i, elm) {
+                    ObjAyYear.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(ObjAyYear)
+
+                if ($('#SelAyId').val() > 0) {
+                    $('#CboAcademicYear').val($('#SelAyId').val());
+                }
+
+            },
+            async: false
+        })
+
+    }
+
+    $('#CboAcademicYear').change(function () {
+        PopulateData();
+    });
+
+    function PopulateData() {
+        if ($('#CboAcademicYear').val() < 1) {
+
+            if ($('#divData') != "undefined")
+                $('#divData').html('');
+
+            return;
+        }
+
+        window.location.href = '/SeFinance/InstallmentDuedates?AcademicYearId=' + $('#CboAcademicYear').val();
+    }
+
+</script>

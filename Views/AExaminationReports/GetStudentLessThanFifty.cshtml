@@ -1,0 +1,203 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ExaminationPapersData>
+
+@{
+    int nSno = 1;
+    int Total = 0;
+    int Boys = 0;
+    int Girls = 0;
+    if (null != Model)
+    {
+        Total = Model.Count();
+        Boys = Model.Where(s => s.GenderId == 0).Count();
+        Girls = Model.Where(s => s.GenderId == 1).Count();
+    }
+}
+@*<div class="widget-body">
+    <div class="widget-main">
+        <div class="row">
+            <div class="col-xs-4">
+
+            </div>
+            <div class="col-xs-8">
+                <div class="scrollable-horizontal" data-size="800" style="width:100%">
+                    <div id="Graph" style="height: 150px; width: 100%;"> </div>
+                </div>
+                <div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>*@
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+
+    .foo {
+        float: left;
+        width: 15px;
+        height: 15px;
+        margin: 5px;
+        border: 1px solid rgba(0, 0, 0, .2);
+    }
+</style>
+<div class="widget-body">
+    <div class="widget-main">
+        <div class="row">
+            <div class="col-xs-4">
+
+            </div>
+            <div class="col-xs-8">
+                <div class="scrollable-horizontal" data-size="800" style="width:100%">
+                    <div id="Graph" style="height: 150px; width: 100%;"> </div>
+                </div>
+                <div>
+                </div>
+            </div>
+            <br />
+            <div class="col-xs-2">
+
+            </div>
+
+            <div class="col-xs-10">
+                <div class="col-xs-1">
+
+                </div>
+                <div class="col-xs-3">
+                    <div class="foo" style="background-color:#C2365B"></div><label>Total: @Total </label>
+                </div>
+                <div class="col-xs-3">
+                    <div class="foo" style="background-color:#369ead"></div><label>Boys: @Boys</label>
+                </div>
+                <div class="col-xs-3">
+                    <div class="foo" style="background-color:#7f6084"></div><label>Girls: @Girls</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hr hr-18 dotted hr-double"></div>
+@if (Model.Count() > 0)
+{
+
+    <section class="content">
+        <!-- /.box-header -->
+        <br />
+        <br />
+        <div class="col-xs-12">
+            <div class="table-header">
+              
+                Records Found (@Model.Count())
+                <div style="float:right;">
+                    <a href="/AExaminationReports/ExportExcelStudentLessThanFifty?Status=1" value="PDF"><span class="btn btn-info btn-xs btn-danger">PDF</span></a>
+                    <a href="/AExaminationReports/ExportExcelStudentLessThanFifty?Status=0" value="Excel"><span class="btn btn-info btn-xs btn-success">Excel</span></a>
+                    <a onclick="PrintElem()" value="Print"><span class="btn btn-info btn-xs btn-warning">Print</span></a>
+                </div>
+            </div>
+         
+            <div class="box-body table-responsive no-padding">
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Admission Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Class")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Subject")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Max Marks")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Marks Scored")
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>
+                            @(nSno++)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AdmissionNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.StudentName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClassName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SubjectName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MaxMarks)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ScoredMarks)
+                        </td>
+                    </tr>
+                    }
+                    </tbody>
+                </table>
+                </div>
+            </div>
+    </section>
+}
+else
+{
+    <span style="color:red;font-weight:bold">No Records Found</span>
+}
+
+@Html.Action("DataTableScripts", "Base")
+
+
+<script>
+    function PrintElem() {
+        debugger
+        $.ajax({
+            url: '/AExaminationReports/ExportExcelStudentLessThanFifty',
+            data: { Status: 2 },
+            success: function (data) {
+                Popup(data);
+            }
+        })
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>

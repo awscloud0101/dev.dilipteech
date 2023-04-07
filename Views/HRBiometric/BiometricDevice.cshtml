@@ -1,0 +1,166 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.BioMetricDeviceData>
+@{
+    ViewBag.Title = "Biometric Device";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Staff
+        </li>
+        <li class="active">Biometric Device</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<section class="content">
+ 
+    <div class="row">
+        <div class="col-xs-12">
+           
+
+            @if (null != Model && Model.Count() > 0)
+            {
+                int nsno = 1;
+
+         
+                        <div class="table-header">
+                        Biometric Device
+                            <div style="float:right;margin-right:10px;">
+                                <a class="  btncustom P2" onclick="location.href='@Url.Action("BiometricDeviceC", "HRBiometric")'" role="button" id="New" name="New">
+                              Add</a>
+                                @*<a class="view-header-btn" onclick="location.href='@Url.Action("BiometricDeviceC", "HRBiometric")'" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+
+                                @*Records Found (@Model.Count())*@
+
+                                </div>
+                            </div>
+                    <!-- form start -->
+                    <div class="overflowscroll">
+
+                        <table id="mytab1" class="table tbhover table-striped table-bordered dynamic-table">
+
+                            <thead>
+                                <tr>
+                                    <th>
+                                        S.No.
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Device Id")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Branch Name")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("In Time")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Out Time")
+                                    </th>
+                                    @*<th>
+                        @Html.DisplayName("Enroll Start Number")
+                    </th>*@
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.BiometricDeviceId)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.BranchName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.InTime)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.OutTime)
+                                        </td>
+                                        <td>
+                                            @*@Html.ActionLink("Edit", "BiometricDeviceE", new { id = item.BiometricDeviceId }) |
+                            @Html.ActionLink("Delete", "BiometricDeviceD", new { id = item.BiometricDeviceId })*@
+
+
+                                            <div>
+                                                @*<a class="green" href="@Url.Action("BiometricDeviceE", "HRBiometric", new { id = item.BiometricDeviceId })">
+                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                </a>*@
+                                                <a class="red P2" onclick="btnConfirm(@item.BiometricDeviceId)">
+                                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                                </a>
+                                                @*<a class="red" href="@Url.Action("BiometricDeviceD", "HRBiometric", new { id = item.BiometricDeviceId })">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                </a>*@
+                                            </div>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                @*</div>*@
+
+
+            }
+            
+            @*<div class="table-header">
+                Biometric Device
+                <div style="float:right">
+                    <a class="view-header-btn  btn btn-info btn-xs P2" onclick="location.href='@Url.Action("BiometricDeviceC", "HRBiometric")'" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>*@
+                    @*<a class="view-header-btn" onclick="location.href='@Url.Action("BiometricDeviceC", "HRBiometric")'" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+
+                    @*Records Found (@Model.Count())*@
+
+                @*</div>
+            </div>*@
+        </div>
+    </div>
+</section>
+@Html.Action("DataTableScripts", "Base")
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/HRBiometric/ValidationForBiometricDeviceD',
+                data: { id: Value },
+                success: function (data) {
+
+                    var url = '/HRBiometric/BiometricDeviceD?id=' + Value;
+                    var title = "Biometric Device";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

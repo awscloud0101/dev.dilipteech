@@ -1,0 +1,950 @@
+﻿@model AsteriskBrowserAL.Models.StudentSalesData
+@{
+    ViewBag.Title = "Student Sales";
+
+
+
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Student Sales</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<!-- daterange picker -->
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+<form id="myForm" method="post">
+    <section class="content">
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                @using (Html.BeginForm("StudentSales", "FOperations", FormMethod.Post))
+                {
+
+                    <input type="hidden" id="SelStudentId" name="SelStudentId" />
+                    if (null != Model)
+                    {
+                        <input type="hidden" id="Status" value="@Model.Status" />
+                    }
+                    else
+                    {
+                        <input type="hidden" id="Status" value="false" />
+                    }
+
+                    if (null != TempData["Error"])
+                    {
+                        <span style="color:red">@Html.Raw(TempData["Error"])</span>
+                    }
+
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <div class="widget-box">
+
+
+                        <input type="hidden" id="SalesTemplateNumber" name="TemplateNumber" spellcheck="false" class="form-control" />
+
+                        <input type="hidden" id="ManualReceiptNo" name="ManualReceiptNo" spellcheck="false" class="form-control" />
+                        <input type="hidden" id="ManualReceiptDate" name="ManualReceiptDate" spellcheck="false" class="form-control" />
+                        <input type="hidden" id="ManualDescription" name="ManualDescription" spellcheck="false" class="form-control" />
+                        <div class="widget-header widget-header-flat widget-header-small">
+
+                            <h5 class="widget-title">
+                                Student Sales
+                            </h5>
+
+                        </div>
+                        @*<div class="box-header">
+                                <h3 class="box-title">Student Sales</h3>
+                            </div>*@<!-- /.box-header -->
+                        <!-- form start -->
+                        <div class="widget-body">
+
+                            <div class="widget-main">
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Class</label>
+                                            <div class="col-xs-6">
+                                                <select id="ClassNumber" class="form-control" name="ClassNumber"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Admission No</label>
+                                            <div class="col-xs-6">
+                                                <input type="text" name="AdmissionNumber" id="AdmissionNumberId" spellcheck="false" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+
+                                <div class="row">
+
+                                    <div class="col-xs-12">
+
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Student Name</label>
+                                            <div class="col-xs-6">
+                                                <input type="text" name="StudentName" id="StudentId" spellcheck="false" class="form-control" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Parent Name</label>
+                                            <div class="col-xs-6">
+                                                <input type="text" name="ParentName" id="ParentId" spellcheck="false" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <br />
+
+                                <div class="row">
+
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Purchase Books For</label>
+                                            <div class="col-xs-6">
+                                                <select id="BooksFromClass" disabled="disabled" class="form-control" name="BooksFromClass"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4"></label>
+                                            <div class="col-xs-6">
+                                                <input type="radio" checked="checked" value="Kit" name="rbType" />Kit &nbsp;&nbsp;
+                                                <input type="radio" value="Item" name="rbType" />Item
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div id="ValidationMsg" style="display:none" title="Student Sales"></div>
+                <div id="KitsData"></div>
+
+            </div>
+
+        </div>
+    </section>
+</form>
+
+<body>
+
+    <div id="mydiv" style="display:none;">
+
+        @if (null != Model)
+        {
+            if (null != Model.lstPrintData)
+            {
+                // template code
+                <div style="border:1px solid black;font-family:'Segoe UI';position: relative; width: 770px; max-width: 770px; height: 542px; max-height: 542px; display: inline-block;">
+
+                    <div style="position: absolute;text-align: center;width: 100%;top:1%;font-weight:bold;font-size:x-small">PARENT'S COPY</div>
+                    <div style="position: absolute;text-align:center;width: 100%;top:5%;font-weight:bold;font-size:large">DEMO SCHOOLS</div>
+                    <div style="position: absolute;text-align:center;width: 100%;top:8.7%;font-weight:bold;font-size:x-small">
+                        (Sponsered by Sri Demo Academy of general & Technical Education)
+                    </div>
+                    <div style="position: absolute;text-align:center;width: 100%;top:11.5%;font-size:x-small">
+                        H.NO. 10-2-249/250, GVRS Lakshmi Nivas,
+                    </div>
+                    <div style="position: absolute;text-align:center;width: 100%;top:13.5%;font-size:x-small">
+                        Street No. 6, West Maredpally, Secunderabd - 500028
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.QRCodeForParent))
+                    {
+                        <div style="position: absolute;top:1%;margin-left:640px">
+                            <img width="120" height="120" src="@Model.QRCodeForParent" /><br />
+                        </div>
+                        <div style="position: absolute;top:22%;margin-left:655px">
+                            <span style="font-size:11px;">@Model.TimeStamp</span>
+                        </div>
+                    }
+
+                    <div style="margin-left:20px;font-weight:bold;font-size:13px">
+                        <p style="position: absolute;top:18.5%">Receipt No</p>
+                        <p style="position: absolute;top:22%">Name of the Student</p>
+                        <p style="position: absolute;top:25.5%">Name of the Parent</p>
+                        <p style="position: absolute;top:29%">Class / Section</p>
+                    </div>
+                    <div style="margin-left:155px;font-weight:bold;font-size:13px">
+                        <p style="position: absolute;top:18.5%">:</p>
+                        <p style="position: absolute;top:22%">:</p>
+                        <p style="position: absolute;top:25.5%">:</p>
+                        <p style="position: absolute;top:29%">:</p>
+                    </div>
+
+                    <div style="margin-left:170px;font-size:13px">
+                        <p style="position: absolute;top:18.5%">@Model.ReceiptNo</p>
+                        <p style="position: absolute;top:22%">@Model.StudentName</p>
+                        <p style="position: absolute;top:25.5%">@Model.ParentName</p>
+                        <p style="position: absolute;top:29%">@Model.SectionName</p>
+                    </div>
+
+                    <div style="margin-left:450px;font-weight:bold;font-size:13px">
+                        <p style="position: absolute;top:18.5%">
+                            @if (Model.ReceiptMode == true)
+                    {
+                                <b>Manual Receipt No :</b> <span style="font-size:14px;">@Model.ManualReceiptNo</span>
+                            }
+                        </p>
+                        <p style="position: absolute;top:22%">Branch</p>
+                        <p style="position: absolute;top:25.5%">Enrollment No</p>
+                        <p style="position: absolute;top:29%">Date</p>
+                    </div>
+
+                    <div style="margin-left:545px;font-weight:bold;font-size:13px">
+                        <p style="position: absolute;top:22%">:</p>
+                        <p style="position: absolute;top:25.5%">:</p>
+                        <p style="position: absolute;top:29%">:</p>
+                    </div>
+
+                    <div style="margin-left:560px;font-size:13px">
+                        <p style="position: absolute;top:22%">@Model.BranchName</p>
+                        <p style="position: absolute;top:25.5%">@Model.AdmissionNo</p>
+                        <p style="position: absolute;top:29%">
+                            @if (Model.TransactionDate.HasValue)
+                            {
+                                @Model.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                            }
+                        </p>
+                    </div>
+
+                    <div style="margin-left:20px;position: absolute;top:40%;font-weight:bold;">
+
+                        <table style="border: 1px solid black;border-collapse: collapse;width: 100%">
+                            <tr style="color:white;background-color:#C0C0C0;font-size:x-small">
+                                <th style="border: 1px solid black;width:550px;border-collapse: collapse;">
+                                    <p style="text-align:center;">PARTICULARS</p>
+                                </th>
+                                <th style="border: 1px solid black;width:100px;border-collapse: collapse;">
+                                    <p style="text-align:center;">Amount<br />Rs.</p>
+                                </th>
+                                <th style="border: 1px solid black;width:70px;border-collapse: collapse;">
+                                    <p style="text-align:center;">Ps.</p>
+                                </th>
+                            </tr>
+                            <tr height="200px">
+                                <td style="border: 1px solid black;border-collapse: collapse;" rowspan=2></td>
+                                <td style="border: 1px solid black;border-collapse: collapse;"></td>
+                                <td style="border: 1px solid black;border-collapse: collapse;"></td>
+                            </tr>
+                            <tr height="25px">
+                                <td style="border: 1px solid black;border-collapse: collapse;"></td>
+                                <td style="border: 1px solid black;border-collapse: collapse;"></td>
+                            </tr>
+                        </table>
+
+
+                    </div>
+
+
+                    <div style="height:240px;margin-left:50px;position:absolute;top:45%">
+
+                        <table class="fixed" style="margin-left:20px;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-family:'Segoe UI';font-size:13px;font-weight:bold">
+                                        Regular Payment Details :- <br>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="fixed" style="margin-left: 20px; margin-top: 0px; width: 647px;">
+                            <tbody>
+
+                                @foreach (var fp in Model.lstPrintData)
+                                {
+                                    <tr>
+                                        <td style="font-family:'Segoe UI';font-size:14px;width:470px;">
+                                            @fp.KitName
+                                        </td>
+                                        <td style="font-family:'Segoe UI';font-size:14px;width:100px;">@string.Format("{0:n0}", fp.Price)</td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+
+                       @if (Model.PendingBooks != "" && Model.IsShow == true)
+                       {
+                            <table class="fixed" style="margin-left:20px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-family:'Segoe UI';font-size:13px;font-weight:bold">
+                                            Pending Books :-
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                                <table class="fixed" style="margin-left: 20px; width: 450px;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-family:'Segoe UI';font-size:12px;width:350px;">@Model.PendingBooks</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                        }
+
+
+
+                        <table class="fixed" style="margin-left:20px;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-family:'Segoe UI';font-size:14px;font-weight:bold"><br></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="fixed" style="margin-left:20px;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-family:'Segoe UI';font-size:14px;width:450px;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+                    </div>
+
+                    <p style="margin-left:40px;font-weight:bold;font-size:13px;position: absolute;top:82%">
+                        Rupees In Words :  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>@Model.AmountInWords</b>
+                    </p>
+
+                    <p style="margin-left:500px;font-weight:bold;font-size:13px;position: absolute;top:82%">Total</p>
+
+                    <p style="margin-left:600px;font-size:13px;position: absolute;top:82%;font-weight:bold">  @string.Format("{0:n0}", (Model.TotDebit))</p>
+
+                    <div style="margin-left:20px;font-size:13px">
+
+                        <p style="position: absolute;top:90%">
+                            <span style="font-weight:bold;">Cheque No.</span>   &nbsp;&nbsp;
+                            @Model.ChequeDDNumber
+                        </p>
+                        <p style="position: absolute;top:93%;font-weight:bold;">(Cheques are subject to realisation)</p>
+                    </div>
+
+                    <p style="margin-left:165px;font-weight:bold;font-size:13px;position: absolute;top:90%">Drawn on.</p>
+
+
+
+                    <p style="margin-left:260px;font-size:13px;position: absolute;top:90%">@Model.BankName</p>
+
+                    <p style="margin-left:650px;font-weight:bold;font-size:13px;position: absolute;top:93%">Accountant</p>
+                </div>
+
+                    <hr style="background-color: #fff;border-top: 2px dashed #8c8b8b;" />
+
+                    <div style="border:1px solid black;font-family:'Segoe UI';position: relative; width: 770px; max-width: 770px; height: 542px; max-height: 542px; display: inline-block;">
+
+                        <div style="position: absolute;text-align: center;width: 100%;top:1%;font-weight:bold;font-size:x-small">OFFICE COPY</div>
+                        <div style="position: absolute;text-align:center;width: 100%;top:5%;font-weight:bold;font-size:large">DEMO SCHOOLS</div>
+                        <div style="position: absolute;text-align:center;width: 100%;top:8.7%;font-weight:bold;font-size:x-small">
+                            (Sponsered by Sri Demo Academy of general & Technical Education)
+                        </div>
+                        <div style="position: absolute;text-align:center;width: 100%;top:11.5%;font-size:x-small">
+                            H.NO. 10-2-249/250, GVRS Lakshmi Nivas,
+                        </div>
+                        <div style="position: absolute;text-align:center;width: 100%;top:13.5%;font-size:x-small">
+                            Street No. 6, West Maredpally, Secunderabd - 500028
+                        </div>
+
+                       @if (!string.IsNullOrWhiteSpace(Model.QRCodeForOffice))
+                       {
+                        <div style="position: absolute;top:1%;margin-left:640px">
+                            <img width="120" height="120" src="@Model.QRCodeForOffice" /><br />
+                        </div>
+                        <div style="position: absolute;top:22%;margin-left:655px">
+                            <span style="font-size:11px;">@Model.TimeStamp</span>
+                        </div>
+                       }
+
+                        <div style="margin-left:20px;font-weight:bold;font-size:13px">
+                            <p style="position: absolute;top:18.5%">Receipt No</p>
+                            <p style="position: absolute;top:22%">Name of the Student</p>
+                            <p style="position: absolute;top:25.5%">Name of the Parent</p>
+                            <p style="position: absolute;top:29%">Class / Section</p>
+                        </div>
+                        <div style="margin-left:155px;font-weight:bold;font-size:13px">
+                            <p style="position: absolute;top:18.5%">:</p>
+                            <p style="position: absolute;top:22%">:</p>
+                            <p style="position: absolute;top:25.5%">:</p>
+                            <p style="position: absolute;top:29%">:</p>
+                        </div>
+
+                        <div style="margin-left:170px;font-size:13px">
+                            <p style="position: absolute;top:18.5%">@Model.ReceiptNo</p>
+                            <p style="position: absolute;top:22%">@Model.StudentName</p>
+                            <p style="position: absolute;top:25.5%">@Model.ParentName</p>
+                            <p style="position: absolute;top:29%">@Model.SectionName</p>
+                        </div>
+
+                        <div style="margin-left:450px;font-weight:bold;font-size:13px">
+                            <p style="position: absolute;top:18.5%">
+                                @if (Model.ReceiptMode == true)
+                    {
+                                    <b>Manual Receipt No :</b> <span style="font-size:14px;">@Model.ManualReceiptNo</span>
+                                }
+                            </p>
+                            <p style="position: absolute;top:22%">Branch</p>
+                            <p style="position: absolute;top:25.5%">Enrollment No</p>
+                            <p style="position: absolute;top:29%">Date</p>
+                        </div>
+
+                        <div style="margin-left:545px;font-weight:bold;font-size:13px">
+                            <p style="position: absolute;top:22%">:</p>
+                            <p style="position: absolute;top:25.5%">:</p>
+                            <p style="position: absolute;top:29%">:</p>
+                        </div>
+
+                        <div style="margin-left:560px;font-size:13px">
+                            <p style="position: absolute;top:22%">@Model.BranchName</p>
+                            <p style="position: absolute;top:25.5%">@Model.AdmissionNo</p>
+                            <p style="position: absolute;top:29%">
+                                @if (Model.TransactionDate.HasValue)
+                                {
+                                    @Model.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                                }
+                            </p>
+                        </div>
+
+                        <div style="margin-left:20px;position: absolute;top:40%;font-weight:bold;">
+
+                            <table style="border: 1px solid black;border-collapse: collapse;width: 100%">
+                                <tr style="color:white;background-color:#C0C0C0;font-size:x-small">
+                                    <th style="border: 1px solid black;width:550px;border-collapse: collapse;">
+                                        <p style="text-align:center;">PARTICULARS</p>
+                                    </th>
+                                    <th style="border: 1px solid black;width:100px;border-collapse: collapse;">
+                                        <p style="text-align:center;">Amount<br />Rs.</p>
+                                    </th>
+                                    <th style="border: 1px solid black;width:70px;border-collapse: collapse;">
+                                        <p style="text-align:center;">Ps.</p>
+                                    </th>
+                                </tr>
+                                <tr height="200px">
+                                    <td style="border: 1px solid black;border-collapse: collapse;" rowspan=2></td>
+                                    <td style="border: 1px solid black;border-collapse: collapse;"></td>
+                                    <td style="border: 1px solid black;border-collapse: collapse;"></td>
+                                </tr>
+                                <tr height="25px">
+                                    <td style="border: 1px solid black;border-collapse: collapse;"></td>
+                                    <td style="border: 1px solid black;border-collapse: collapse;"></td>
+                                </tr>
+                            </table>
+
+
+                        </div>
+
+
+                        <div style="height:240px;margin-left:50px;position:absolute;top:45%">
+
+                            <table class="fixed" style="margin-left:20px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-family:'Segoe UI';font-size:13px;font-weight:bold">
+                                            Regular Payment Details :- <br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="fixed" style="margin-left: 20px; margin-top: 0px; width: 647px;">
+                                <tbody>
+
+                                    @foreach (var fp in Model.lstPrintData)
+                                    {
+                                        <tr>
+                                            <td style="font-family:'Segoe UI';font-size:14px;width:470px;">
+                                                @fp.KitName
+                                            </td>
+                                            <td style="font-family:'Segoe UI';font-size:14px;width:100px;">@string.Format("{0:n0}", fp.Price)</td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+
+                          @if (Model.PendingBooks != "" && Model.IsShow == true)
+                          {
+                                <table class="fixed" style="margin-left:20px;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-family:'Segoe UI';font-size:13px;font-weight:bold">
+                                                Pending Books :-
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="fixed" style="margin-left: 20px; width: 450px;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-family:'Segoe UI';font-size:12px;width:350px;">@Model.PendingBooks</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            }
+
+
+
+                            <table class="fixed" style="margin-left:20px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-family:'Segoe UI';font-size:14px;font-weight:bold"><br></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="fixed" style="margin-left:20px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-family:'Segoe UI';font-size:14px;width:450px;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+
+                        <p style="margin-left:40px;font-weight:bold;font-size:13px;position: absolute;top:82%">
+                            Rupees In Words :  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>@Model.AmountInWords</b>
+                        </p>
+
+                        <p style="margin-left:500px;font-weight:bold;font-size:13px;position: absolute;top:82%">Total</p>
+
+                        <p style="margin-left:600px;font-size:13px;position: absolute;top:82%;font-weight:bold">  @string.Format("{0:n0}", (Model.TotDebit))</p>
+
+                        <div style="margin-left:20px;font-size:13px">
+
+                            <p style="position: absolute;top:90%">
+                                <span style="font-weight:bold;">Cheque No.</span>   &nbsp;&nbsp;
+                                @Model.ChequeDDNumber
+                            </p>
+                            <p style="position: absolute;top:93%;font-weight:bold;">(Cheques are subject to realisation)</p>
+                        </div>
+
+                        <p style="margin-left:165px;font-weight:bold;font-size:13px;position: absolute;top:90%">Drawn on.</p>
+
+
+
+                        <p style="margin-left:260px;font-size:13px;position: absolute;top:90%">@Model.BankName</p>
+
+                        <p style="margin-left:650px;font-weight:bold;font-size:13px;position: absolute;top:93%">Accountant</p>
+                    </div>
+            }
+        }
+    </div>
+</body>
+
+<script type="text/javascript">
+
+    $('input[name="rbType"]').click(function () {
+        debugger
+        $('#KitsData').html("");
+
+        var StudentId = $('#SelStudentId').val();
+
+        if (parseInt(StudentId) > 0) {
+            GetKitsByClass(StudentId);
+        }
+    });
+
+    $(document).ready(function () {
+
+        EnableDisableControls(false);
+
+        var Status = $('#Status').val();
+
+        if (Status == "value") {
+            dialog();
+        }
+
+        LoadClasses();
+    });
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+    function LoadClasses() {
+        $.ajax({
+            url: '/FOperations/LoadClasses',
+            success: function (data) {
+
+                var ClassNumberItems = $('#ClassNumber');
+
+                var BooksFromClass = $('#BooksFromClass');
+
+                ClassNumberItems.children().remove();
+
+                BooksFromClass.children().remove();
+
+                ClassNumberItems.append($("<option>").val("null").text("--- Select ---"));
+
+                BooksFromClass.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+
+                    ClassNumberItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+
+                    if (record.ClassNumber != 0) {
+                        BooksFromClass.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+                    }
+                });
+
+                $('#ClassNumber').append(ClassNumberItems);
+                $('#BooksFromClass').append(BooksFromClass);
+            }
+        });
+    }
+
+
+    $('#ClassNumber').change(function () {
+        debugger
+        var Classnumber = $('#ClassNumber').val();
+
+        if (Classnumber == "" || Classnumber == "null" || Classnumber == null) {
+            EnableDisableControls(false);
+        }
+        else {
+            EnableDisableControls(true);
+        }
+    });
+
+
+    function EnableDisableControls(enable) {
+
+        ResetControls(0);
+
+        if (enable == true) {
+            $("#AdmissionNumberId").removeAttr("disabled");
+            $("#StudentId").removeAttr("disabled");
+            $("#ParentId").removeAttr("disabled");
+        } else {
+            $("#AdmissionNumberId").attr("disabled", "disabled");
+            $("#StudentId").attr("disabled", "disabled");
+            $("#ParentId").attr("disabled", "disabled");
+        }
+    }
+
+    $("#AdmissionNumberId").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetControls(0);
+        };
+    });
+
+    $("#StudentId").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetControls(0);
+        };
+    });
+
+    $("#ParentId").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetControls(0);
+        };
+    });
+
+    function ResetControls(value) {
+
+        $('#StudentId').val = "";
+
+        $('#SelStudentId').val("0");
+
+        $('#KitsData').html("");
+
+        if (value != 1) {
+            $('#AdmissionNumberId').val('');
+        }
+        if (value != 2) {
+            $('#StudentId').val('');
+        }
+        if (value != 3) {
+            $('#ParentId').val('');
+        }
+
+        $('#BooksFromClass').val("null");
+        $("#BooksFromClass").attr("disabled", "disabled");
+
+    }
+
+    //auto complete AdmissionNumber
+    $("#AdmissionNumberId").autocomplete(
+        {
+            source: function (request, response) {
+
+                ResetControls(1);
+
+                if (request.term.length < 3) {
+                    return;
+                }
+                $('#imagemodal').show();
+                var nSectionId = document.getElementById("ClassNumber").value;
+                $.ajax({
+                    url: "/FOperations/GetAdmissionNumber",
+                    type: "POST",
+                    dataType: "json",
+                    data: { nSectionId: nSectionId, strVal: request.term },
+                    success: function (json) {
+                        response($.map(json, function (data, id) {
+                            return {
+                                label: data.AdmissionNumber,
+                                value: data.AdmissionNumber,
+                                id: data.AdmissionNumberId,
+                            };
+                        }));
+                        $('#imagemodal').hide();
+                    },
+                });
+            },
+            minLength: 3,
+            select: function SelectEvent(event, ui) {
+
+                admissionId = ui.item.value;
+                AutoFillStudentData(ui.item.value, "AdmissionNumber");
+            }
+        });
+
+    $("#ParentId").autocomplete(
+   {
+       source: function (request, response) {
+           ResetControls(3);
+
+           if (request.term.length < 3) {
+               return;
+           }
+
+           $('#imagemodal').show();
+           var nSectionId = document.getElementById("ClassNumber").value;
+           $.ajax({
+               url: "/FOperations/GetParentName",
+               data: { nSectionId: nSectionId, strVal: request.term },
+               success: function (json) {
+                   response($.map(json, function (data, id) {
+                       return {
+                           label: data.FatherName,
+                           value: data.FatherName,
+                           id: data.ParentId,
+                       };
+                   }));
+
+                   $('#imagemodal').hide();
+               }
+           });
+       },
+       minLength: 3,
+       select: function SelectEvent(event, ui) {
+           AutoFillStudentData(ui.item.id, "ParentName");
+       }
+   });
+
+    $("#StudentId").autocomplete(
+     {
+         source: function (request, response) {
+
+             debugger
+
+             ResetControls(2);
+
+             if (request.term.length < 3) {
+                 return;
+             }
+
+             $('#imagemodal').show();
+             var nSectionId = document.getElementById("ClassNumber").value;
+             $.ajax({
+                 url: "/FOperations/GetStudentName",
+                 data: { nClassNumber: nSectionId, strVal: request.term },
+                 success: function (json) {
+                     response($.map(json, function (data, id) {
+                         return {
+                             label: data.FirstName,
+                             value: data.FirstName,
+                             id: data.StudentId,
+                         };
+                     }));
+
+                     $('#imagemodal').hide();
+                 }
+             });
+         },
+         minLength: 3,
+         select: function SelectEvent(event, ui) {
+             AutoFillStudentData(ui.item.id, "StudentName");
+         }
+     });
+
+    function AutoFillStudentData(strval, type) {
+
+
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/FOperations/GetStudentDetailsByType',
+            data: { strVal: strval, type: type },
+            success: function (data) {
+                objStudent = data;
+                debugger
+
+                $("#AdmissionNumberId").val(data.AdmissionNumber);
+                $("#StudentId").val(data.FirstName);
+                $("#ParentId").val(data.FatherName);
+                $('#SelStudentId').val(data.StudentId);
+
+                if (data.JoinedForNextYear == true) {
+                    $("#BooksFromClass").removeAttr("disabled");
+                    $('#imagemodal').hide();
+                }
+                else {
+                    $("#BooksFromClass").attr("disabled", "disabled");
+
+                    $('#BooksFromClass').val(data.CourseId);
+                    GetKitsByClass(data.StudentId);
+                }
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            },
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    };
+
+    $('#BooksFromClass').change(function () {
+
+        $('#KitsData').html("");
+
+        var Class = $(this).val();
+
+        if (Class != null && Class != "null" && Class > 0) {
+            GetKitsByClass($('#SelStudentId').val());
+        }
+
+    })
+
+    function GetKitsByClass(StudentId) {
+
+        debugger
+
+        $('#imagemodal').show();
+
+        if (parseInt(StudentId) < 1 || StudentId == "")
+            return;
+
+        var ClassNumber = $('#ClassNumber').val();
+
+        var rbType = $('input[name=rbType]:checked', '#myForm').val();
+
+        if (ClassNumber != "null") {
+
+            $.ajax({
+                url: '/FOperations/GetKitsOrItemsByClass',
+                data: { ClassNumber: ClassNumber, StudentId: StudentId, rbType: rbType, BooksFromClass: $('#BooksFromClass').val() },
+                //beforeSend: function () {
+                //    $('#imagemodal').show();
+                //},
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#KitsData').html(data);
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+    function dialog() {
+
+        var $dialog = $('<div></div>')
+                  .html('Added Payments Successfully  <br />')
+
+                  .dialog({
+                      resizable: false,
+                      draggable: false,
+                      width: '320',
+                      modal: true,
+                      title: 'Student Sales',
+                      title_html: true,
+                      open: function (event, ui) {
+                          $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                      },
+                      buttons: [{
+
+                          html: "OK",
+                          "class": "btn btn-minier",
+                          click: function () {
+                              debugger
+                              $dialog.dialog('close');
+                              PrintElem('#mydiv');
+                          }
+                      }]
+                  });
+    }
+
+</script>
+
+
+
+

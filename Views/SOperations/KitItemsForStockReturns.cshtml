@@ -1,0 +1,105 @@
+﻿@model AsteriskBrowserAL.Models.StudentSalesData
+
+<div class="row">
+    <div class="col-xs-12">
+        @if (null != Model && null != Model.lstItemsData && Model.lstItemsData.Count() > 0)
+        {
+            int nSno = 1;
+            using (Html.BeginForm("StockReturns", "SOperations", FormMethod.Post))
+                {
+            <div class="row">
+                <div class="col-xs-12">
+
+                    <span style="color:red;" id="error"></span>
+
+                    <div class="table-header">
+                        Records Found(@Model.lstItemsData.Count())
+                        <div style="float:right">
+
+                            @if (Model.rbType == "Item")
+                            {
+                                <button class="btn btn-info btn-minier" onclick="return SubmitForm()" type="submit" id="btnExport">
+                                    Return
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-info btn-minier" onclick="return SubmitForm()" type="submit" id="btnExport">
+                                    Return
+                                </button>
+                                @Html.HiddenFor(model => model.KitId)
+                                    @Html.HiddenFor(model => model.ReturnQty)
+                                @*<input type="hidden" name="KitId" id="KitId" value="@Model.KitId" />
+                                <input type="hidden" name="ReturnQty" id="ReturnQty" value="@Model.ReturnQty" />*@
+
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="overflow:auto;height:320px">
+                <table id="tbKitItems" class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+
+                            <th>
+                               S.No.
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Item Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Transferred Qty")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Sold Qty")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Remaining Qty")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Return Qty")
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.lstItemsData.Count(); i++)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.Hidden("lstItemsData.Index", (@i))
+                                    @Html.Hidden("lstItemsData[" + (@i) + "].InventorySubCategoryItemId", Model.lstItemsData.ElementAt(i).InventorySubCategoryItemId)
+                                    @Html.Hidden("lstItemsData[" + (@i) + "].ItemName", Model.lstItemsData.ElementAt(i).ItemName)
+                                    @(nSno++)
+                                </td>
+                                <td>
+                                    @Model.lstItemsData.ElementAt(i).ItemName
+                                </td>
+                                <td>
+                                    @Model.lstItemsData.ElementAt(i).ReceivedQty
+                                </td>
+                                <td>
+                                    @Model.lstItemsData.ElementAt(i).ItemSoldQty
+                                </td>
+                                <td>
+                                    @(Model.lstItemsData.ElementAt(i).ReceivedQty - @Model.lstItemsData.ElementAt(i).ItemSoldQty)
+                                </td>
+                                <td>
+                                    @Html.TextBox("lstItemsData[" + (@i) + "].ItemReturnQty", Model.lstItemsData.ElementAt(i).ItemReturnQty, new { id = "ItemReturnQty" })
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+            }
+        }
+        else
+        {
+            <span style="color: red;"><b>No Records Found</b></span>
+        }
+    </div>
+</div>

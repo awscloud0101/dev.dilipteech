@@ -1,0 +1,114 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentDetailsData>
+@{
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+    <div class="table-header">
+        Records Found (@Model.Count)
+
+        <div style="float:right;">
+            <button type="submit" class="btn btn-info btn-minier P2" name="button" id="Save" value="Generate">
+                Generate
+            </button>
+        </div>
+    </div>
+    <div style="overflow:auto;height:400px">
+        <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Branch Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Section")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Admission Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+
+                    <th>
+                        <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                    </th>
+                </tr>
+
+            </thead>
+            <tbody>
+
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+
+                    <tr>
+                        <td>
+                            @Html.Hidden("lstStudents.Index", (@i + 10))
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].Name", Model.ElementAt(i).Name)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].ClassName", Model.ElementAt(i).ClassName)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].FatherName", Model.ElementAt(i).FatherName)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].DateofBirthDisplay", Model.ElementAt(i).DateofBirthDisplay)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].AdmissionNumber", Model.ElementAt(i).AdmissionNumber)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].Photo", Model.ElementAt(i).Photo)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].ClassNumber", Model.ElementAt(i).ClassNumber)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].AdmissionDate", Model.ElementAt(i).AdmissionDate)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].BranchAddress", Model.ElementAt(i).BranchAddress)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].AddressLineOne", Model.ElementAt(i).AddressLineOne)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].AddressLineTwo", Model.ElementAt(i).AddressLineTwo)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].GuardianName", Model.ElementAt(i).GuardianName)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].Religion", Model.ElementAt(i).Religion)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].DateofBirth", Model.ElementAt(i).DateofBirth)
+                            @Html.Hidden("lstStudents[" + (@i + 10) + "].City", Model.ElementAt(i).City)
+
+                            @Model.ElementAt(i).BranchName
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).Section
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).AdmissionNumber
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).Name
+                        </td>
+
+                        <td>
+                            @Html.CheckBox("lstStudents[" + (@i + 10) + "].IsChecked", Model.ElementAt(i).IsChecked, new { id = "Check" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+}
+else
+{
+    <span style="color: red;"><b>No sudents available to display</b></span>
+}
+
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+</script>

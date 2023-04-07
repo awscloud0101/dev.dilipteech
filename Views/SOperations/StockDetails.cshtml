@@ -1,0 +1,204 @@
+﻿@model AsteriskBrowserAL.Models.StockEntryData
+@{
+    ViewBag.Title = "StockDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Inventory&Assests
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li>
+            <i class=""></i>
+            Stock Details
+        </li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+<br />
+<br />
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+@if (Model.lsthistory.Count > 0)
+{    @*<span style="color:red;font-weight:bold" id="Validation"></span>*@
+
+int nsno = 1;
+
+<div class="form-group">
+    <label class="col-sm-2 control-label no-padding-right" for="form-field-1">@Html.Label("Asset Category")</label>
+
+    <div class="col-sm-2">
+        @Html.DropDownListFor(model => model.AssetCategoryId, new SelectList(Model.AssetCategoryDetails, "AssetCategoryId", "AssetName"), "---Select Asset Category---", new { @class = "form-control", onchange = "return GetCategoryData()", value = Model.AssetCategoryId })
+    </div>
+
+    <span class="col-sm-3" style="color:red;font-weight:bold;display:none" id="VAssetCategory">
+        *Required
+    </span>
+</div>
+
+<br />
+<br />
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="table-header">
+            <b>Stock Details</b>
+            ( @Model.lsthistory.Count() )
+        </div><!-- /.box-header -->
+
+        <table id="dynamic-table" class="table table-hover table-striped table-bordered nowrap dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th style="display:none">
+                        @Html.DisplayName("Requisition")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Asset Category")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Item")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Quantity")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Amount")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Purpose")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Asset Location")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Purchase Date")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Supplier")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Bill Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("DateOfSale")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Staff Id")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Authority")
+                    </th>
+                    <th>
+                        @Html.DisplayName("WriteDownVal")
+                    </th>
+                    <th>
+                        @Html.DisplayName("SaleProceeds")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Secretary")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Remarks")
+                    </th>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.lsthistory)
+                {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td style="display:none">
+                            @Html.DisplayFor(modelItem => item.RequisitionId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AssetCategory)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.RequiredItems)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Quantity)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Amount)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Purpose)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AssetLocationName)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PurchaseDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Supplier)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BillNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DateOfSale)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.RequestedStaffId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Authority)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.WriteDownVal)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SaleProceeds)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Secretary)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Remarks)
+                        </td>
+                        <td>
+                            <div class="hidden-sm hidden-xs action-buttons">
+                                <a class="green" @*data-form-method="post"*@ href="@Url.Action("StockEntryEdit", "SOperations", new { id = item.RequisitionId, Head = item.Head, AssetLoctionId = item.AssetLocationId })">
+                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                </a>
+                                <a class="red" id="Value" href="@Url.Action("StockEntryD", "SOperations", new { id = @item.RequisitionId }) ">
+                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+}
+@Html.Action("DataTableScripts", "Base")
+
+<script type="text/javascript">
+    function GetCategoryData(CategoryId) {
+        debugger
+        var id = $("#AssetCategoryId").val()
+
+        window.location.href = "/SOperations/StockDetails?Id=" + id;
+    }
+</script>

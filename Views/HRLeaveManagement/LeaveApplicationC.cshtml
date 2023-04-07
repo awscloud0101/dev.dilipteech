@@ -1,0 +1,468 @@
+﻿@model AsteriskBrowserAL.Models.LeaveApplication
+
+@{
+    ViewBag.Title = "LeaveApplicationC";
+}
+<!-- #section:basics/content.breadcrumbs -->
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            LeaveManagement
+        </li>
+        <li class="active">Leave Application</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+    <div class="table-header">
+  
+            Leave Application
+            <small style="float:right;font-weight:bold;" class="textheader">
+                @Html.ActionLink("Back to details", "LeaveApplicationRequest", new { StaffId = Model.StaffId })
+            </small>
+   
+    </div>
+
+
+    <div class="widget-box row" style="padding:10px;">
+
+        @using (Html.BeginForm("LeaveApplicationC", "HRLeaveManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+
+
+            <input type="hidden" id="StaffId" value="@Model.StaffId" />
+                <input type="hidden" id="RemainingLeaveCount" value="@Model.RemainingLeaveCount" />
+                <input type="hidden" id="IsSingleDay" value="@Model.IsSingleDay" />
+                <input type="hidden" name="StaffName" value="@Model.StaffName" />
+
+                @Html.ValidationSummary(true)
+                <span style="color:red;" id="ModelStateError">@Html.ValidationMessage("LeaveApplicationC")</span>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            @Html.HiddenFor(model => model.StaffId)
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Staff Name")</label>
+                                    <div class="col-sm-7">
+                                        <label class="col-sm-12" for="form-field-1" style="font-size:16px;font-weight:bold;">@Model.StaffName</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1" style="text-align:center;">@Html.Label("Leave Type")</label>
+
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("LeaveTypeId", null, "--Select--", new { @class = "form-control", @required = "required", id = "CboLeaveType", title = "Please select Staff Name" })
+                                   
+
+                                        <span id="spLeaveCount" style="color:green"></span>
+
+                                        <div id="vCboLeaveType" style="display:none">
+                                            <label style="color:red;font-weight:bold;"> Required</label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                            
+
+                            
+
+                            <div class="col-sm-6">
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Reporting To")</label>
+
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("ReportingTo", null, "--Select--", new { @class = "form-control", @required = "required", id = "CboReporting", title = "Request will sent to the selected staff" })
+                                    </div>
+
+                                    <div id="vCboReporting" style="display:none" class="col-sm-3">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            
+
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1" style="text-align:center">@Html.Label("Remarks")</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextAreaFor(model => model.Remarks, new { @class = "form-control", placeholder = "Remarks", @required = "required", id = "txtRemarks", title = "Remarks" })
+                                    </div>
+
+                                    <div id="vtxtRemarks" style="display:none" class="col-sm-3">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                    <br />
+
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-12">
+
+                                <div class="hr hr-18 dotted hr-double" style="margin:10px;"></div>
+                                <div class="form-group">
+                                    <table class="col-sm-6" align="left">
+                                        <tr>
+                                            <td>
+                                                <div class="col-sm-6 ">
+                                                    <input type="radio" id="rbLeaveSingleDay" name="Type" value="0" required="required" />
+                                                    <b>Single Day</b>
+                                                </div>
+                                            </td>
+                                      
+                                            <td>
+                                                <div class="col-sm-6" id="divmultiple">
+                                                    <input type="radio" id="rbLeaveMultipleDay" name="Type" value="1" required="required" />
+                                                    <b>Multiple Days</b>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div id="vradio" style="display:none" class="col-sm-3">
+                                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                                </div>
+                                                <br />
+                                            </td>
+                                        </tr>
+                                    </table>
+
+
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-12">
+                                            <div class="form-group" id="divStartDate" style="display:none">
+                                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Start Date")</label>
+
+                                                <div class="col-sm-6">
+                                                    <div class="row">
+                                                        <div class="col-sm-12">
+                                                            <div class="input-group date">
+                                                                <input class="form-control" type="text" name="StartDate" id="dtStartDate" value="@Model.StartDate" autocomplete="off" placeholder="Select Date" required="required" />
+                                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="vdtStartDate" style="display:none" class="col-sm-3">
+                                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    
+                                        <div class="col-sm-12" style="margin-top:10px;">
+                                            <div class="form-group" id="divEndDate" style="display:none">
+                                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("End Date")</label>
+
+                                                <div class="col-sm-6">
+                                                    <div class="row">
+                                                        <div class="col-sm-12">
+                                                            <div class="input-group date">
+                                                                <input class="form-control" type="text" value="@Model.EndDate" name="EndDate" id="dtEndDate" autocomplete="off" placeholder="Select Date" />
+                                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="vdtEndDate" style="display:none" class="col-sm-3">
+                                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                               </div>
+     
+
+                            
+
+
+              
+                             
+                                <div class="col-md-offset-0 col-md-9">
+                                    <div class="hr hr-18 dotted hr-double" style="margin:10px;"></div>
+                                    <button class="btn btn-success btn-sm" id="ApplyLeave" name="ApplyLeave" type="submit" value="Apply Leave" style="width:140px" onclick="return submitForm();">
+                                        <i class="ace-icon fa fa-check bigger-50"></i>
+                                        Apply Leave
+                                    </button>
+
+                            
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+        }
+    </div>
+
+
+
+
+
+</section>
+@Html.Action("DatePickerScripts", "Base")
+
+<script type="text/javascript">
+
+    function submitForm() {
+
+        var validatestatus = ValidateControls();
+
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+    $('#rbLeaveSingleDay').change(function (e) {
+
+        $('#divStartDate').hide();
+        $('#divEndDate').hide();
+        $('#vradio').hide();
+        $('#dtEndDate').html('');
+
+        if ($('#CboLeaveType').val() < 1) {
+
+            $('#rbLeaveSingleDay').attr("checked", false);
+            e.preventDefault();
+            $('#vCboLeaveType').show();
+            return;
+        }
+
+        $('#divStartDate').show();
+        $('#divEndDate').hide();
+    });
+
+
+    $('#rbLeaveMultipleDay').change(function (e) {
+
+        $('#divStartDate').hide();
+        $('#divEndDate').hide();
+        $('#dtEndDate').val('');
+        $('#vradio').hide();
+
+        if ($('#CboLeaveType').val() < 1) {
+            $('#rbLeaveMultipleDay').attr("checked", false);
+            $('#vCboLeaveType').show();
+            return;
+        }
+
+        $('#divStartDate').show();
+        $('#divEndDate').show();
+
+        if ($('#dtStartDate').val() != "") {
+            SetEndDate();
+        }
+
+    });
+
+    $(document).ready(function () {
+        $('#dtStartDate').datepicker('setStartDate', '+0d');
+
+
+        debugger
+
+        if ($('#ModelStateError').html() != "") {
+            GetLeaveRemainedCount();
+        }
+
+    });
+
+
+    $('#dtStartDate').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+    });
+
+
+    $('#dtEndDate').datepicker({
+        autoclose: true,
+    });
+
+    $('#dtStartDate').change(function () {
+        SetEndDate();
+    });
+
+    function SetEndDate() {
+
+        if ($('#rbLeaveMultipleDay').is(':checked')) {
+			debugger
+            var StartDate = new Date($('#dtStartDate').val());
+            var EndDate = new Date();
+
+            var RemainingLeaveCount = parseInt($('#RemainingLeaveCount').val());
+
+            StartDate.setDate(StartDate.getDate() + 1);
+            EndDate.setDate(StartDate.getDate() + (RemainingLeaveCount - 1));
+
+            $('#dtEndDate').datepicker('setStartDate', StartDate).datepicker('setEndDate', EndDate);
+        }
+    }
+
+
+    function ValidateControls() {
+        debugger
+        var bIsValid = true;
+
+        var nLeaveTypeId = $('#CboLeaveType').val();
+
+        var dtStartDate = $('#dtStartDate').val();
+
+        var dtEndDate = $('#dtEndDate').val();
+
+        var Reporting = $('#CboReporting').val();
+
+        var Remarks = $('#txtRemarks').val();
+
+        var Type = "undefined";
+
+        if ($('#rbLeaveSingleDay').is(':checked')) {
+           var Type = 0;
+        }
+
+        if ($('#rbLeaveMultipleDay').is(':checked')) {
+          var  Type = 1;
+        }
+
+        if (Type == 'undefined') {
+            $('#vradio').show();
+            bIsValid = false;
+        }
+
+
+        if (nLeaveTypeId == null || nLeaveTypeId < 1) {
+            $('#vCboLeaveType').show();
+            bIsValid = false;
+        }
+
+        if (dtStartDate == null || dtStartDate == "") {
+            $('#vdtStartDate').show();
+            bIsValid = false;
+        }
+
+        if (Type ==1) {
+            if (dtEndDate == null || dtEndDate == "") {
+                $('#vdtEndDate').show();
+                bIsValid = false;
+            }
+        }
+
+        if (Reporting == null || Reporting < 1) {
+            $('#vCboReporting').show();
+            bIsValid = false;
+        }
+
+        if (Remarks == null || $.trim(Remarks) == "") {
+            $('#vtxtRemarks').show();
+            bIsValid = false;
+        }
+
+        return bIsValid;
+
+    }
+
+    $('#CboLeaveType').change(function () {
+        $('#vCboLeaveType').hide();
+        $('#vradio').hide();
+        $('#vtxtRemarks').hide();
+
+        GetLeaveRemainedCount();
+    });
+
+
+    function GetLeaveRemainedCount() {
+
+
+        $('#spLeaveCount').html('');
+        $('#RemainingLeaveCount').val(0);
+        $('#dtEndDate').val('');
+
+        var nLeaveTypeId = $('#CboLeaveType').val();
+
+        var StaffId = $('#StaffId').val();
+
+        if (nLeaveTypeId < 1) {
+
+            $('#divStartDate').hide();
+            $('#divEndDate').hide();
+			$('#rbLeaveSingleDay').attr("checked", false);
+
+            $('#rbLeaveMultipleDay').attr("checked", false);
+
+            return;
+        }
+
+        $('#imagemodal').show();
+		$('#divmultiple').show();
+        $.ajax({
+
+            url: '/HRLeaveManagement/GetLeaveTypeWiseRemainingCount',
+            data: { StaffId: StaffId, LeaveTypeId: nLeaveTypeId },
+            success: function (data) {
+                debugger
+                $('#imagemodal').hide();
+
+                $('#RemainingLeaveCount').val(data);
+
+                $('#spLeaveCount').html(" You have " + data + " " + $("#CboLeaveType option:selected").text() + " remaining")
+				var days = parseInt(data);
+				if (days == 0)
+					$('#divmultiple').hide();
+                SetEndDate();
+
+            },
+            aync: false
+        });
+    }
+
+    $('#dtStartDate').change(function () {
+        $('#vdtStartDate').hide();
+    });
+
+
+    $('#txtRemarks').change(function () {
+        $('#vtxtRemarks').hide();
+    });
+
+    $('#CboReporting').change(function () {
+        $('#vCboReporting').hide();
+    });
+
+    $('#dtEndDate').change(function () {
+        $('#vdtEndDate').hide();
+    });
+
+
+</script>

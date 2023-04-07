@@ -1,0 +1,131 @@
+﻿@model AsteriskBrowserAL.Models.StockTransferData
+@{
+    int nSno = 1;
+}
+
+@if (null != Model)
+{
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="table-header">
+                Records Found (@Model.lstStockTransferData.Count())
+                <div style="float:right;">
+                    <button type="submit" onclick="return SubmitForm()" class="btn btn-success btn-xs P2">
+                        <i class="ace-icon fa fa-floppy-o bigger-80"></i>
+                        Transfer
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    if (null != Model.lstStockTransferData && Model.lstStockTransferData.Count() > 0)
+    {
+        <div style="overflow:auto;height:300px">
+            <table id="mytab1" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                <thead>
+                    <tr>
+                        <th>@("SNo")</th>
+                        <th>
+                            @if (Model.TransferType == "Kit")
+                            {
+                                @Html.DisplayName("Kit Name")
+                            }
+                            else
+                            {
+                                @Html.DisplayName("Item Name")
+                            }
+                        </th>
+
+                        @if (Model.TransferType == "Item")
+                    {
+                            <th>
+                                @Html.DisplayName("SKU Code")
+                            </th>
+                        }
+
+                        <th>
+                            @Html.DisplayName("Existing Qty")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Quantity")
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.lstStockTransferData.Count(); i++)
+                    {
+                        <tr>
+                            @Html.Hidden("lstTransferData.Index", (@i))
+                            @Html.Hidden("lstTransferData[" + @i + "].InventoryItemId", Model.lstStockTransferData.ElementAt(i).InventoryItemId, new { id = "ItemId" })
+                            @Html.Hidden("lstTransferData[" + @i + "].InventoryKitId", Model.lstStockTransferData.ElementAt(i).InventoryKitId, new { id = "KitId" })
+                            @Html.Hidden("lstTransferData[" + @i + "].ItemName", Model.lstStockTransferData.ElementAt(i).ItemName)
+                            @Html.Hidden("lstTransferData[" + @i + "].KitName", Model.lstStockTransferData.ElementAt(i).KitName)
+                            @Html.Hidden("lstTransferData[" + @i + "].SKUCode", Model.lstStockTransferData.ElementAt(i).SKUCode)
+                            @Html.Hidden("lstTransferData[" + @i + "].ExistedQuantity", Model.lstStockTransferData.ElementAt(i).ExistedQuantity, new { @id = "ExistedQty" })
+                            <td>
+                                @(nSno++)
+                            </td>
+                            <td>
+                                @if (Model.TransferType == "Kit")
+                                {
+                                    @Model.lstStockTransferData.ElementAt(i).KitName
+                                }
+                                else
+                                {
+                                    @Model.lstStockTransferData.ElementAt(i).ItemName
+                                }
+                            </td>
+                            @if (Model.TransferType == "Item")
+                        {
+                                <td>
+                                    @Model.lstStockTransferData.ElementAt(i).SKUCode
+                                </td>
+                            }
+
+                            <td>
+                                @Model.lstStockTransferData.ElementAt(i).ExistedQuantity
+                            </td>
+                            <td>
+                                @Html.TextBox("lstTransferData[" + @i + "].Quantity", @Model.lstStockTransferData.ElementAt(i).Quantity, new { @class = "form-control textlength txtQuantity", onkeypress = "return isNumberKey(event)", @maxlength = "4", @min = "0", @max = "100000", @id = "Quantity", @style = "width:180px" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+    }
+
+
+}
+else
+{
+    <span style="color:red">No data found</span>
+}
+
+
+
+
+
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+</script>
+
+
+
+
+
+
+

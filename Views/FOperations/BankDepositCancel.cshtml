@@ -1,0 +1,133 @@
+﻿
+@model AsteriskBrowserAL.Models.ApproveBankDepositViewModel
+
+@{
+    ViewBag.Title = "Request Bank Deposit";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class="fa fa-gears"></i>
+            Operations
+        </li>
+        <li class="active">Bank Deposit Cancel</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+   
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("BankDepositCR", "FOperations", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(model => model.FirstInserted)
+                @Html.HiddenFor(model => model.Lastupdated)
+                @Html.HiddenFor(model => model.BankDepositId)
+                @Html.HiddenFor(model => model.CashAmount)
+                @Html.HiddenFor(model => model.ChequeAmount)
+
+    <div class="page-header">
+        <br />
+        <h1>
+            <small style="float:right;">
+                @Html.ActionLink("<< Bank Deposit Details", "BankDeposit", new { dtFromdate = Model.FirstInserted, dtToDate = Model.Lastupdated })
+            </small>
+        </h1>
+    </div><!-- /.page-header -->
+
+                <div class="widget-box">
+
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("BankDepositRequest")</span>
+
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Bank Deposit Cancel Request
+                        </h5>
+
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <div style="float:right;">
+                                    <button class="btn btn-info btn-xs P2" type="submit" style="width:80px;" onclick="return submitForm();">
+                                        Request
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Remarks</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.Remarks, new { @class = "form-control textlength", @id = "Remarks", placeholder = "Remarks" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       
+
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+
+
+    function submitForm() {
+        var Remarks = $('#Remarks').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (Remarks == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Remarks";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return false;
+        }
+
+        return isValid;
+    }
+
+</script>
+
+
+
+
+
+
+
+
+

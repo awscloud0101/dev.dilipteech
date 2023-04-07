@@ -1,0 +1,391 @@
+﻿
+@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    List<SelectListItem> lstType = new List<SelectListItem>()
+                {
+                    new SelectListItem(){Text = "Single", Value = "1"},
+                    new SelectListItem(){Text = "Double", Value = "2"},
+                };
+    ViewBag.Title = "Create Examination Papers";
+
+    List<SelectListItem> lstExamPaperType = new List<SelectListItem>()
+                {
+                    new SelectListItem(){Text = "Daily", Value = "true"},
+                    new SelectListItem(){Text = "Consolidate", Value = "false"},
+                };
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-database"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Examination
+        </li>
+        <li class="active">IC Examination Papers</li>
+    </ul><!-- /.breadcrumb -->
+}
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<section class="content">
+
+      <div class="page-header">
+            <h1>
+                <small style="float:right;">
+                    @Html.ActionLink("Back to details", "ICExaminationPapers", new { CategoryId = Model.CategoryId })
+                </small>
+            </h1>
+        </div>
+   
+    <br />
+    @Html.ValidationSummary(true)
+    <span style="color: red;">@Html.ValidationMessage("Examination Papers")</span>
+
+    @using (Html.BeginForm("ICExaminationPapersC", "AExamination", FormMethod.Post))
+    {
+
+        <span style="color:red;" id="EPCombos"></span>
+
+        <input type="hidden" id="CategoryId" value="@Model.CategoryId" />
+
+        @Html.HiddenFor(model => model.CategoryId)
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                <span style="color:red;font-weight:bold;" id="Validation"></span>
+
+                        <div class="table-header">
+                            IC Examination Papers
+                            <div style="float:right;">
+                                <button name="Save" type="submit" class="btn btn-info btn-xs" id="btnSave" onclick="return SubmitForm()">
+                                    <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <table id="tab1" class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+                                <tr align="center">
+                                    <th>
+                                        @Html.DisplayName("Subject")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Type")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Paper Type")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Paper Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Exam Date")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Max Marks")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Pass Marks")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("ICExamination Cycle")
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+                            <tbody>
+
+                                @for (int i = 0; i < Model.AllSubjects.Count(); i++)
+                                {
+                                    <tr>
+                                        <td valign="middle">
+                                            @Html.Hidden("lstExamPapers.Index", (@i))
+                                            @Html.Hidden("lstExamPapers[" + (@i) + "].SubjectId", Model.AllSubjects.ElementAt(i).SubjectId)
+                                            <input type="hidden" id="Subject" value="@Model.AllSubjects.ElementAt(i).SubjectName" />
+                                            <input type="hidden" id="SubjectId" value="@Model.AllSubjects.ElementAt(i).SubjectId" />
+                                            @*@Html.Hidden("lstExamPapers[" + @i + "].CycleNumber", Model.lstICExaminationCycle.ElementAt(i).CycleNumber)*@
+                                            @Model.AllSubjects.ElementAt(i).SubjectName
+                                            @*@Model.lstICExaminationCycle.ElementAt(i).CycleNumber*@
+                                        </td>
+
+
+                                        <td valign="middle">
+                                            @Html.DropDownList("lstExamPapers[" + (@i) + "].Type", new SelectList(lstType, "Value", "Text"), new { @id = "NoOfPapers", @Class = "NoOfPapers" })
+                                        </td>
+                                        <td valign="middle">
+                                            @Html.DropDownList("lstExamPapers[" + (@i) + "].IsDaily", new SelectList(lstExamPaperType, "Value", "Text"), new { @id = "IsDaily" })
+                                        </td>
+                                        <td valign="middle">
+                                            <div class="single">
+                                                @Html.TextBox("lstExamPapers[" + (@i) + "].PaperName", "", new { @class = "form-control textlength PaperName", @maxlength = "50", @min = "0", @id = "PaperName" })
+                                            </div>
+                                            <div class="double">
+                                                @Html.TextBox("lstExamPapers[" + (@i) + "].PaperName1", "", new { @class = "form-control textlength PaperName1", @min = "0", @maxlength = "50", @id = "PaperName1" })<br />
+                                                @Html.TextBox("lstExamPapers[" + (@i) + "].PaperName2", "", new { @class = "form-control textlength PaperName2", @min = "0", @maxlength = "50", @id = "PaperName2" })
+                                            </div>
+                                        </td>
+                                        <td valign="middle">
+
+
+                                            <div class="single">
+
+                                                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                    @Html.TextBox("lstExamPapers[" + (@i) + "].ExamDate", "", new { @class = "form-control", @style = "width:100px;", @id = "ExamDate", @autocomplete = "off" })
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="double">
+                                                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                    @Html.TextBox("lstExamPapers[" + (@i) + "].ExamDate1", "", new { @class = "form-control", @style = "width:100px;", @id = "ExamDate1", @autocomplete = "off" })
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                                <br />
+                                                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                    @Html.TextBox("lstExamPapers[" + (@i) + "].ExamDate2", "", new { @class = "form-control", @style = "width:100px;", id = "ExamDate2", @autocomplete = "off" })
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td valign="middle">
+                                            <div class="single">
+                                                @Html.TextBox("lstExamPapers[" + (@i) + "].MaxMarks", "", new { @class = "form-control textlength", @maxlength = "3", @min = "0", onkeypress = "return isNumberKey(event)", @id = "MaxMarks" })
+                                            </div>
+                                            <div class="double">
+                                                @Html.TextBox("lstExamPapers[" + (@i) + "].MaxMarks1", "", new { @class = "form-control textlength", @maxlength = "3", @min = "0", onkeypress = "return isNumberKey(event)", @id = "MaxMarks1" })
+                                                <br />
+                                                @Html.TextBox("lstExamPapers[" + (@i) + "].MaxMarks2", "", new { @class = "form-control textlength", @maxlength = "3", @min = "0", onkeypress = "return isNumberKey(event)", @id = "MaxMarks2" })
+                                            </div>
+                                        </td>
+
+                                        <td valign="middle">
+                                            <div class="single">
+                                                @Html.TextBox("lstExamPapers[" + (@i) + "].PassMarks", "", new { @class = "form-control textlength", @maxlength = "3", @min = "0", onkeypress = "return isNumberKey(event)", @id = "PassMarks" })
+                                            </div>
+                                            <div class="double">
+                                                @Html.TextBox("lstExamPapers[" + (@i) + "].PassMarks1", "", new { @class = "form-control textlength", @maxlength = "3", @min = "0", onkeypress = "return isNumberKey(event)", @id = "PassMarks1" })
+                                                <br />
+                                                @Html.TextBox("lstExamPapers[" + (@i) + "].PassMarks2", "", new { @class = "form-control textlength", @maxlength = "3", @min = "0", onkeypress = "return isNumberKey(event)", @id = "PassMarks2" })
+                                            </div>
+                                        </td>
+
+                                        <td valign="middle">
+                                            <div class="single">
+                                                @*@Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.lstClassNumbers, "ClassNumber", "ClassNumberDisplay"), "-- Select --", new { @class = "form-control", id = "ClassNumber" })*@
+                                                @Html.DropDownList("lstExamPapers[" + @i + "].ICExaminationCycle", new SelectList(Model.lstICExaminationCycle, "ICExaminationCycleId", "CycleName"), "-- Select --", new { @class = "form-control", @style = "width:250px;", @id = "CycleNumber" })
+                                            </div>
+                                            <div class="double">
+                                                @Html.DropDownList("lstExamPapers[" + @i + "].ICExaminationCycle1", new SelectList(Model.lstICExaminationCycle, "ICExaminationCycleId", "CycleName"), "-- Select --", new { @class = "form-control", @style = "width:250px;", @id = "CycleNumber1" })
+                                                <br />
+                                                @Html.DropDownList("lstExamPapers[" + @i + "].ICExaminationCycle2", new SelectList(Model.lstICExaminationCycle, "ICExaminationCycleId", "CycleName"), "-- Select --", new { @class = "form-control", @style = "width:250px;", @id = "CycleNumber1" })
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+            </div>
+
+        </div>
+    }
+
+
+</section>
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+<script>
+
+
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    function SubmitForm() {
+
+        var valid = true;
+        var bSave = false;
+
+        var CategoryId = $('#CategoryId').val();
+
+        $("#tab1 tr").each(function (index) {
+            debugger
+            // traverse through all the rows
+            if (index != 0) { // if the row is not the heading one
+
+                var Type = $(this).find('#NoOfPapers').val(); //  'td' of the row
+
+                var SubjectId = $(this).find('#SubjectId').val();
+
+                if (Type == "1") {
+
+                    var PaperName = $(this).find('#PaperName').val();
+                    var Subject = $(this).find('#Subject').val();
+                    var ExamDate = $(this).find('#ExamDate').val();
+                    var MaxMarks = $(this).find('#MaxMarks').val();
+                    var PassMarks = $(this).find('#PassMarks').val();
+                    var CycleNumber = $(this).find('#CycleNumber').val();
+
+                    if (ExamDate != "" || PaperName != "" || parseInt(MaxMarks) > 0 || parseInt(PassMarks) > 0 || parseInt(CycleNumber) > 0) {
+                        bSave = true;
+                        if (ExamDate == "" || parseInt(MaxMarks) < 1 || MaxMarks == "" || parseInt(PassMarks) < 1 || PassMarks == "" || PaperName == "" || parseInt(CycleNumber) < 1 || CycleNumber == "") {
+                            document.getElementById("Validation").innerHTML = "Fields should not be empty for the subject " + Subject
+                            valid = false;
+                            return false;
+                        }
+
+                        //$("#tab1 tr").each(function (index) {
+
+                        //    if (index != 0)
+                        //    {
+                        //        var nSubjectId = $(this).find('#SubjectId').val();
+                        //        var dtExamDate = $(this).find('#ExamDate').val();
+
+                        //        if (nSubjectId != SubjectId && ExamDate != "" && dtExamDate != "") {
+                        //            if (dtExamDate == ExamDate) {
+                        //                document.getElementById("Validation").innerHTML = "Exam date should not be the same for different subjects";
+
+                        //                valid = false;
+                        //                return false;
+                        //            }
+                        //        }
+                        //    }
+                        //});
+
+                        //if (valid == true) {
+                        //    valid = IsPaperExists(CategoryId, ExamDate, SubjectId, Subject);
+
+                        //    if(valid == false)
+                        //    {
+                        //        return false;
+                        //    }
+
+                        //}
+                    }
+
+                    
+                }
+                else {
+                    var PaperName1 = $(this).find('#PaperName1').val();
+                    var PaperName2 = $(this).find('#PaperName2').val();
+
+                    var ExamDate2 = $(this).find('#ExamDate2').val();
+                    var Subject = $(this).find('#Subject').val();
+                    var ExamDate1 = $(this).find('#ExamDate1').val();
+                    var MaxMarks1 = $(this).find('#MaxMarks1').val();
+                    var MaxMarks2 = $(this).find('#MaxMarks2').val();
+                    var PassMarks1 = $(this).find('#PassMarks1').val();
+                    var PassMarks2 = $(this).find('#PassMarks2').val();
+                    var CycleNumber1 = $(this).find('#CycleNumber1').val();
+                    var CycleNumber2 = $(this).find('#CycleNumber2').val();
+
+                    if (ExamDate1 != "" || PaperName1 != "" || PaperName2 != "" || ExamDate2 != "" || parseInt(MaxMarks1) > 0 || parseInt(MaxMarks2) > 0 || parseInt(PassMarks1) > 0 || parseInt(PassMarks2) || parseInt(CycleNumber1) > 0 || parseInt(CycleNumber2) > 0) {
+                        bSave = true;
+                        if (ExamDate1 == "" || ExamDate2 == "" || parseInt(MaxMarks1) < 1 || MaxMarks1 == "" || parseInt(MaxMarks2) < 1 || MaxMarks2 == "" || parseInt(PassMarks1) < 1 || PassMarks1 == "" || parseInt(PassMarks2) < 1 || PassMarks2 == "" || PaperName1 == "" || PaperName2 == "" || parseInt(CycleNumber1) < 1 || parseInt(CycleNumber2) < 1 || CycleNumber1 == "" || CycleNumber2 == "") {
+                            document.getElementById("Validation").innerHTML = "Fields should not be empty for the subject " + Subject
+                            valid = false;
+                            return false;
+                        }
+                    }
+
+                }
+
+            }
+        });
+
+        if (bSave == false && valid == true) {
+            document.getElementById("Validation").innerHTML = "Fields should not be empty";
+            valid = false;
+        }
+
+       
+
+        return valid;
+    };
+
+
+    function IsPaperExists(CategoryId, ExamDate, SubjectId, Subject)
+    {
+        var valid = true;
+
+        $.ajax({
+            
+            url: '/AExamination/IsICExamPaperExists',
+            data: { CategoryId: CategoryId, ExamDate: ExamDate, SubjectId: SubjectId, SubjectName: Subject },
+            success: function (data) {
+                if(data != "")
+                {
+                    document.getElementById("Validation").innerHTML = data;
+                    valid = false;
+                }
+            },
+            async:false,
+        });
+
+        return valid;
+    }
+
+    $(document).ready(function () {
+
+        $('table tr td').find('.double').css("display", "none");
+        $('table tr td').find('.single').css("display", "inline");
+
+    });
+
+    $('.NoOfPapers').change(function () {
+        debugger
+        var value = $(this).val();
+        var Subject = $(this).closest("tr").find('#Subject').val();
+
+        if (value == "2") {
+            $(this).closest("tr").find('.PaperName').val("");
+            $(this).closest("tr").find('#ExamDate').val("");
+            $(this).closest("tr").find('#MaxMarks').val("");
+            $(this).closest("tr").find('#PassMarks').val("");
+            $(this).closest("tr").find('#Duration').val("");
+            $(this).closest("tr").find('.single').css("display", "none");
+            $(this).closest("tr").find('.double').css("display", "inline");
+
+            //$(this).closest("tr").find('.PaperName1').val(Subject + " - 1");
+            //$(this).closest("tr").find('.PaperName2').val(Subject + " - 2");
+        }
+        else {
+            $(this).closest("tr").find('.PaperName2').val("");
+            $(this).closest("tr").find('.PaperName1').val("");
+            $(this).closest("tr").find('#ExamDate2').val("");
+            $(this).closest("tr").find('#ExamDate1').val("");
+            $(this).closest("tr").find('#ExamDate2').val("");
+            $(this).closest("tr").find('#MaxMarks1').val("");
+            $(this).closest("tr").find('#MaxMarks2').val("");
+            $(this).closest("tr").find('#PassMarks1').val("");
+            $(this).closest("tr").find('#PassMarks2').val("");
+            $(this).closest("tr").find('.double').css("display", "none");
+            $(this).closest("tr").find('.single').css("display", "inline");
+            //$(this).closest("tr").find('.PaperName').val(Subject);
+        }
+    });
+
+</script>
+

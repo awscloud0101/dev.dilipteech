@@ -1,0 +1,152 @@
+﻿@model List<AsteriskBrowserAL.Models.FeePaymentsData>
+
+@{
+    ViewBag.Title = "Fee Payments";
+    int nSno = 1;
+}
+<div class="hr hr-18 dotted hr-double"></div>
+
+
+
+            @if (null != Model && Model.Count() > 0)
+            {
+                <div class="table-header">
+                    Records Found (@Model.Count())
+                   
+                </div>
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("S.No")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Date")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Student")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Manual Receipt")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Receipt")
+                            </th>
+
+
+                            <th>
+                                @Html.DisplayName("Amount")
+                            </th>
+
+                            <th></th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @(nSno++)
+                                </td>
+                                <td>
+                                    @if (item.TransactionDate.HasValue)
+                                    {
+                                        @item.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DisplayName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ManualReceiptNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ReceiptNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DebitAmount)
+                                </td>
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="blue" role="button" name="ReceiptNo" data-receipt="@item.ReceiptNumber"><i class="ace-icon fa fa-print bigger-160"></i></a>
+                                        </div>
+
+
+                                    @*<button onclick="PrintElem('#mydiv')" class="btn btn-info btn-minier">
+                                        <i class="ace-icon fa fa-print bigger-160"></i>
+                                    </button>
+                                    <a role="button" name="ReceiptNo" data-receipt="@item.ReceiptNumber">Print</a>*@
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+            }
+            else
+            {
+                <span style="color: red;"><b>Data not available to display</b></span>
+            }
+
+@Html.Action("DataTableScripts", "Base")
+                                               
+<script>
+
+    $('a[name=ReceiptNo]').click(function () {
+
+        var rceipt = $(this).data("receipt");
+        $('#imagemodal').show();
+
+        $.ajax({
+
+            url: '/FOperations/FeePaymentsReprint',
+            data: { strReceipt: rceipt },
+            success: function (Data) {
+
+                document.getElementById("Data").style.display = "inline";
+                $('#mydiv').html(Data);
+
+                $('#imagemodal').hide();
+
+                PrintElem('#mydiv');
+                document.body.style.cursor = 'default';
+
+            },
+            error: function (data) {
+                document.body.style.cursor = 'default';
+            }
+        }).done(function () {
+
+        });
+    });
+
+
+    function PrintElem(elem) {
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+
+</script>
+
+<div id="PrintDiv" style="display:none;">
+    <div id="mydiv" style="height:100%">
+    </div>
+</div>

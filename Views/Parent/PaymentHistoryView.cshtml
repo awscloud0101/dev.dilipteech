@@ -1,0 +1,142 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionData
+@{
+    ViewBag.Title = "PaymentHistoryView";
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+    int Sno = 1;
+}
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<section class="content">
+    <div class="widget-box" id="widget-box-1">
+        <div class="widget-header">
+            <h5 class="widget-title">Payment History</h5>
+        </div>
+        <div class="widget-body">
+            <br />
+            @if (null != Model.FeepaymentHistory && Model.FeepaymentHistory.Count() >= 1)
+            {
+                Sno = 1;
+                <div class="box-body">
+                    <div class="box-body table-responsive no-padding" style="overflow:auto; height:500px;">
+                        <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        S.No.
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Particular")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Transaction Date")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Receipt Number")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Template Number")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Amount")
+                                    </th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.FeepaymentHistory)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Sno
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.FeeParticularName)
+                                        </td>
+
+                                        <td>
+                                            @item.TransactionDate.Value.ToString("dd - MMM - yyyy")
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ReceiptNo)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.TemplateNumner)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.DebitAmount)
+                                        </td>
+                                        <td>
+                                            <div class="hidden-sm hidden-xs action-buttons">
+                                                <a class="blue" role="button" name="ReceiptNo" id="receipt" data-receipt="@item.ReceiptNo"><i class="ace-icon fa fa-print bigger-160"></i></a>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                    Sno++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+
+    $('a[name=ReceiptNo]').click(function () {
+        debugger
+        var rceipt = $(this).data("receipt");
+        $('#imagemodal').show();
+
+        $.ajax({
+
+            url: '/parent/FeePaymentsReprint',
+            data: { strReceipt: rceipt },
+            success: function (Data) {
+
+                //  document.getElementById("Data").style.display = "inline";
+                $('#mydiv').html(Data);
+
+                $('#imagemodal').hide();
+
+                PrintElem('#mydiv');
+                document.body.style.cursor = 'default';
+
+            },
+            error: function (data) {
+                document.body.style.cursor = 'default';
+            }
+        }).done(function () {
+
+        });
+    });
+
+    function PrintElem(elem) {
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+
+</script>
+<div id="PrintDiv" style="display:none;">
+    <div id="mydiv" style="height:100%">
+    </div>
+</div>
+

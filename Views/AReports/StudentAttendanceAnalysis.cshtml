@@ -1,0 +1,360 @@
+﻿@model AsteriskBrowserAL.Models.AttendanceData
+
+@{
+    ViewBag.Title = "StudentAttendanceAnalysis";
+    var hours = DateTime.Now.Hour;
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Student Attendance Analysis</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ExcelStudentAttendanceReportDT", "AReports", FormMethod.Post))
+            {
+                <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                <span style="color:red;" id="Validation"></span>
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Attendance Analysis</span>
+                    <div  style="float:right;margin-right:10px">
+                        <a class="btncustom P2" id="ViewData" onclick="return submitForm();">View Data</a>
+                    </div>
+
+                </div>
+
+
+             
+                <div class="widget-box">
+            
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            @if (Model.IsCentral)
+                            {
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">Division</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="BranchId" name="BranchId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         
+                            }
+                            else
+                            {
+                            <input type="hidden" id="BranchId" name="BranchId" value="@Model.BranchId" />
+                            }
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Class</label>
+                                        <div class="col-sm-6">
+                                            <select id="ClassId" name="ClassId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboSection" name="SectionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            @*<div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                    <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                        <select id="SectionId" name="Section" class="form-control"></select>
+                                    </div>
+                                </div>*@
+                   
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+                                        <div class="col-sm-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="SelectDate" name="SelectDate" autocomplete="off" value="@DateTime.Today.ToShortDateString()" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6 pull-right">
+                                        <label class="col-xs-4 control-label no-padding-right" for="form-field-1"></label>
+                                        <div class="col-xs-6">
+                                            @if (hours < 12)
+                                        {
+                                            <input type="radio" id="StatusM" name="Attendance" value="1" checked="checked"><b> &nbsp; Morning  &nbsp;</b>
+                                            <input type="radio" id="StatusE" name="Attendance" value="2"><b> &nbsp; Evening&nbsp;</b>
+
+                                        }
+                                        else
+                                        {
+                                            <input type="radio" id="StatusM" name="Attendance" value="1"><b> &nbsp; Morning  &nbsp;</b>
+                                            <input type="radio" id="StatusE" name="Attendance" value="2" checked="checked"><b> &nbsp; Evening&nbsp;</b>
+                                        }
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                   
+                </div>
+                <div id="SearchViewDiv">
+                </div>
+          
+            }
+        </div>
+    </div>
+
+        <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+            <p style="position:absolute; top: 50%; left:50%;">
+                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+            </p>
+        </div>
+</section>
+@Html.Action("DatePickerScripts", "Base")
+<script>
+
+    //function Onloadata() {
+    //    LoadCourseDropdown()
+    //}
+
+    $(document).ready(function () {
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral != "value") {
+            LoadCourseDropdown();
+        }
+    })
+
+    $('#DivisionId').change(function () {
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/AReports/GetBranchesByDivisionIdMarksEntryReport',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+        LoadCourseDropdown();
+    });
+
+    function LoadCourseDropdown() {
+        $.ajax({
+            url: '/AFrontOffice/GetClassData',
+            success: function (result) {
+                CourseList = $("#ClassId")
+                CourseList.children().remove();
+                CourseList.append($("<option>").val("").text("--select--"))
+                CourseList.append($("<option>").val("0").text("All"))
+                $.each(result, function (e, record) {
+                    CourseList.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(CourseList)
+            }
+        })
+    }
+
+    $('#CboSection').change(function () {
+        var ClassNumberId = $('#CboSection').val();
+        $('#SearchViewDiv').html('');
+    });
+
+    function LoadSections() {
+        debugger
+        var ClassNumberId = $('#ClassId').val();
+        var SubId = $('#BranchId').val();
+
+        $.ajax({
+            url: '/FReports/GetSections',
+            data: { nClassNumberId: ClassNumberId, nSubId: SubId },
+            success: function (data) {
+                var ClassItems = $('#CboSection');
+                ClassItems.children().remove();
+                ClassItems.append($("<option>").val("null").text("--- Select ---"));
+                ClassItems.append($("<option>").val("0").text("All"));
+
+                $.each(data, function (i, record) {
+                    ClassItems.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+
+                $('#CboSection').append(ClassItems);
+            },
+            aync: false
+        });
+
+    }
+
+
+    function submitForm() {
+        debugger
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        var Validation = ValidateStudentAttendanceAnalysis();
+
+        if (Validation == false) {
+
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+            GetStudentAttendance();
+        }
+    }
+
+    $('#SelectDate').change(function () {
+        $("#SearchViewDiv").val.html("");
+    });
+
+    $("#StatusM").change(function () {
+        $("#SearchViewDiv").val.html("");
+        debugger
+       // GetStudentAttendance();
+    })
+
+    $("#StatusE").change(function () {
+        $("#SearchViewDiv").val.html("");
+        //GetStudentAttendance();
+    })
+    $("#ClassId").change(function () {
+        debugger
+        var ClassNumberId = $('#ClassId').val();
+        LoadSections();
+        //GetStudentAttendance();
+    })
+
+    $('#ViewData').change(function () {
+        debugger
+        GetStudentAttendance();
+    })
+
+    function GetStudentAttendance() {
+        var nBranchId = $("#BranchId").val();
+        var dateval = $("#SelectDate").val();
+        var ClassId = $("#ClassId").val();
+        var Section = $("#CboSection").val();
+        var DivisionId = $("#DivisionId").val();
+
+        if(DivisionId == undefined)
+            DivisionId = 0;
+
+        var Attendance = $("input[name=Attendance]:checked").val()
+        $('#imagemodal').show();
+        $.ajax({
+            url: "/AReports/GetStudentAttendanceAnalysis",
+            data: { DivisionId : DivisionId, nBranchId: nBranchId, ClassId: ClassId, strDate: dateval, Attendance: Attendance, Section: Section },
+            success: function (Data) {
+                $("#SearchViewDiv").html(Data);
+                $('#imagemodal').hide();
+            },
+            //error: function () {
+            //    $('#imagemodal').hide();
+            //}
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function getFormattedDate(input) {
+        var pattern = /(.*?)\/(.*?)\/(.*?)$/;
+        var result = input.replace(pattern, function (match, p1, p2, p3) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return (p2 < 10 ? "0" + p2 : p2) + " - " + months[(p1 - 1)] + " - " + p3;
+        });
+        return result;
+    }
+
+    function ValidateStudentAttendanceAnalysis() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0 || Division === "" || Division === null) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+        var ClassId = $('#ClassId').val();
+        if (ClassId < 0 || ClassId === "" || ClassId === "null" || ClassId === null) {
+            valid = false;
+            DisplayValidation += "Class, ";
+        }
+        var SectionId = $('#CboSection').val();
+        if (SectionId < 0 || SectionId === "" || SectionId === "null" || SectionId === null) {
+            valid = false;
+            DisplayValidation += "Section ";
+        }
+        
+        return valid;
+
+    };
+
+</script>
+
+
+

@@ -1,0 +1,367 @@
+﻿@model AsteriskBrowserAL.Models.FundsTransferViewModel
+@{
+    ViewBag.Title = "Funds Withdrawals";
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Petty Cash
+        </li>
+        <li class="active">Fund withdrawal Details</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+
+<section class="content">
+
+    <div class="col-xs-12">
+        <span style="color:red;font-weight:bold" id="Validation"></span>
+@using (Html.BeginForm("ExportFundsWithdrawl", "FPettyCash", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+
+
+    <div class="table-header">
+        <span style="font-family:calibri;">Withdraws</span>
+        <div class="" style="float:right;margin-right:10px;">
+            <a class="btncustom P2" id="New" name="New">Add</a>
+            <a class="btncustom P2" id="btnViewData" >View Data</a>
+
+        </div>
+      </div>  
+        
+        <div class="widget-box">
+     
+
+            <div class="widget-body">
+                <div class="widget-main">
+
+                    <div class="row">
+                        <input type="hidden" value="@Model.IsCentral" id="IsCentral" />
+                        <input type="hidden" value="@Model.FromBranch" id="hSubscriptionId" />
+                        <input type="hidden" value="@Model.DivisionId" id="hDivisionId" />
+                        <input type="hidden" value="@Model.CashCardId" id="SelCashCardId" />
+                        <input type="hidden" value="@Model.IsCentral.ToString()" id="SelIsCentral" />
+
+
+                        @if (Model.IsCentral)
+                        {
+                            <div class="col-xs-6">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                <div class="col-sm-6">
+                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName", Model.DivisionId), new { @class = "form-control", id = "CboDivision" })
+                                </div>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                <div class="col-sm-6">
+                                    <select id="CboBranch" class="form-control"></select>
+                                </div>
+                            </div>
+                      
+
+                        }
+                        else
+                        {
+                            <input type="hidden" id="CboBranch" class="form-control" />
+
+                        }
+
+
+
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Cash Card</label>
+                            <div class="col-sm-6">
+                                <select id="CboCashCards" name="CboCashCards" class="form-control"></select>
+                            </div>
+                        </div>
+
+                        @*<div class="col-xs-6">
+                                <input type="button" class="btn btn-primary pull-right" id="btnViewData" style="min-width:80Px" value="View Data" />
+                            </div>*@
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <div id="dvFundsWithDrawals">
+
+        </div>
+        }
+    </div>
+
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        var IsCentral = $("#SelIsCentral").val()
+        if (IsCentral == "True")
+        {
+            var nDivisionId = $('#CboDivision').val();
+            if (nDivisionId > 0) {
+                GetBranches(nDivisionId);
+            }
+        }
+        else {
+            var BranchId = $("#hSubscriptionId").val();
+            document.getElementById("CboBranch").value = BranchId;
+            LoadCashCards(BranchId)
+        }
+      
+
+
+    });
+
+
+    $('#CboDivision').change(function () {
+
+        $('#hSubscriptionId').val('')
+        $('#hDivisionId').val('')
+        $('#SelCashCardId').val('')
+
+        $('#CboBranch').html("");
+        $('#CboCashCards').html("");
+        $('#dvFundsWithDrawals').html("");
+
+
+
+        var DivisionId = $('#CboDivision').val();
+        GetBranches(DivisionId);
+
+    });
+
+    $('#CboBranch').change(function () {
+
+        $('#hSubscriptionId').val('')
+        $('#hDivisionId').val('')
+        $('#SelCashCardId').val('')
+
+        $('#CboCashCards').html("");
+        $('#dvFundsWithDrawals').html("");
+        var BranchId =  $('#CboBranch').val()
+        LoadCashCards(BranchId)
+    });
+
+    function GetBranches(DivisionId) {
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+
+                    var SelBranchId = $('#hSubscriptionId').val();
+
+                    if (SelBranchId > 0) {
+                        $('#CboBranch').val(SelBranchId);
+
+                        LoadCashCards(SelBranchId)
+
+                    }
+                },
+                aync: false
+            });
+        }
+
+
+    }
+
+
+    function LoadCashCards(BranchId) {
+        if (BranchId > 0) {
+            $.ajax({
+                url: '/FPettyCash/GetCashCardsBySubscriptionId',
+                data: { SubscriptionId: BranchId },
+                success: function (data) {
+                    var CboCashCards = $('#CboCashCards');
+
+                    CboCashCards.children().remove();
+                    $.each(data, function (i, record) {
+                        CboCashCards.append($("<option>").val(record.CashCardId).text(record.DisplayCashCard));
+                    });
+
+                    $('#CboCashCards').append(CboCashCards);
+                    var SelCboCashCards = $("#SelCashCardId").val()
+                    if(SelCboCashCards > 0)
+                    {
+                        PopulateData(BranchId, SelCboCashCards);
+                    }
+                },
+                aync: false
+            });
+        }
+
+
+    }
+
+    $("#CboCashCards").change(function () {
+        $('#hSubscriptionId').val('')
+        $('#hDivisionId').val('')
+        $('#SelCashCardId').val('')
+
+        $('#dvFundsWithDrawals').html("");
+    })
+
+    $('#btnViewData').click(function () {
+
+        var DivisionId = $('#CboDivision').val();
+        var SubscriptionId = $('#CboBranch').val();
+        var CashCardId = $('#CboCashCards').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            if (DivisionId == "null" || DivisionId <= 0 && DivisionId != -1) {
+                Message += "Division";
+                isValid = false;
+            }
+
+            if (SubscriptionId == "null" || SubscriptionId <= 0 && SubscriptionId != -1) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Branch";
+                isValid = false;
+            }
+        }
+
+        if (CashCardId == "null" || CashCardId < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Cash Card";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        PopulateData(SubscriptionId, CashCardId);
+    });
+
+    $("#CboDivision").focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $("#CboBranch").focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $("#CboCashCards").focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    function PopulateData(SubscriptionId, nCashCardId) {
+        $.ajax
+            ({
+                error: function (jqXHR, textStatus, errorThrown) {
+                
+                    $('#imagemodal').hide();
+                },
+
+                url: '/FPettyCash/GetFundsWithdrawalsDatabySubscriptionId/',
+                data: { Subscriptionid: SubscriptionId, CashCardId: nCashCardId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#dvFundsWithDrawals').html(data);
+                }
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+    }
+
+    $("#New").click(function () {
+        NavigateToCreation()
+    })
+
+    function NavigateToCreation() {
+       
+        var DivisionId = $('#CboDivision').val()
+        var BranchId = $('#CboBranch').val();
+      
+        var nIsCentral = $('#IsCentral').val();
+
+        document.getElementById("Validation").innerHTML = "";
+        var DisplayValidation = "";
+
+        var valid = true;
+       
+
+
+        if (nIsCentral == "true" || nIsCentral == "value") {
+           
+
+            if (DivisionId == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+
+                if (valid == false) {
+                    DisplayValidation += " and Branch";
+                }
+                else {
+                    DisplayValidation += "Branch";
+                }
+
+                valid = false;
+            }
+            if (valid == false) {
+                document.getElementById("Validation").innerHTML = "Select " + DisplayValidation;
+                return;
+            }
+
+            if (valid == true) {
+                window.location.href = '/FPettyCash/FundsWithdrawalC?DivisionId=' + DivisionId + '&SubscriptionId=' + BranchId;
+            }
+
+        }
+        else {
+            BranchId = $('#CboBranch').val();
+
+            window.location.href = '/FPettyCash/FundsWithdrawalC?SubscriptionId=' + BranchId;
+        }
+
+    }
+
+</script>

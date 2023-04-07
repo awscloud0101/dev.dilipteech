@@ -1,0 +1,118 @@
+﻿
+@model List<AsteriskBrowserAL.Models.FeePaymentsData>
+@{
+    int sno = 1;
+    ViewBag.Title = "FeePayment";
+};
+
+<section class="content">
+    @if (null != Model && Model.Count() > 0)
+    {
+
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">Payment Heads</h3>
+                <br />
+                <br />
+                <input type="submit" name="Save" style="width:80px" value="Save" onclick="return SubmitForm();" class="btn btn-primary" />
+            </div>
+
+
+            <div class="box-body">
+                <div style="overflow:auto; max-height:350px;">
+                    <table class="table table-hover">
+                        <thead style="text-align:center;">
+                            <tr>
+                                <th>
+                                    SNo
+                                </th>
+                                <th>
+                                    Particular Name
+                                </th>
+                                <th class="centerAlign">
+                                    Fee Amount
+                                </th>
+                                <th class="centerAlign">
+                                    Discount Amount
+                                </th>
+                                <th class="centerAlign">
+                                    Net Amount
+                                </th>
+                                <th class="centerAlign">
+                                    Credit Amount
+                                </th>
+                                <th class="centerAlign">
+                                    Paid Amount
+                                </th>
+                                <th class="centerAlign">
+                                    Due Amount
+                                </th>
+                                @if (Model.FirstOrDefault().IsRegular == false)
+                                {
+                                    <th class="centerAlign">
+                                        Quantity
+                                    </th>
+                                }
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @for (int i = 0; i < Model.Count(); i++)
+                            {
+                                string color = "";
+                                color = (Model.ElementAt(i).DueAmount == 0) ? "gray" : string.Empty;
+
+                                if (sno == Model.Count())
+                                {
+                                    color = "lightyellow;";
+                                }
+
+                                <tr style="background-color:@color">
+                                    <td>
+                                        @(sno++)
+                                    </td>
+                                    <td style="text-align:left;">
+                                        @Html.Hidden("lstFeePaymentsData.Index", (@i))
+                                        @Html.Hidden("lstFeePaymentsData[" + (@i) + "].FeeParticular", Model.ElementAt(i).FeeParticular)
+                                        @Model[i].FeeParticularName
+                                    </td>
+                                    <td style="text-align:right;">
+                                        @Model[i].FeeAmount.ToString()
+                                    </td>
+                                    <td style="text-align:right;">
+                                        @Model[i].DiscountAmount.ToString()
+                                    </td>
+                                    <td style="text-align:right;">
+                                        @Html.Hidden("lstFeePaymentsData[" + (@i) + "].NetAmount", Model.ElementAt(i).NetAmount)
+                                        @Model[i].NetAmount.ToString()
+
+                                    <td style="text-align:right;">
+                                        @Html.Hidden("lstFeePaymentsData[" + (@i) + "].DebitAmount", Model.ElementAt(i).DebitAmount)
+                                        @Model[i].DebitAmount.ToString()
+                                    </td>
+                                    <td style="text-align:right;">
+                                        @Html.Hidden("lstFeePaymentsData[" + (@i) + "].PaidAmount", Model.ElementAt(i).PaidAmount)
+                                        @Model[i].PaidAmount.ToString()
+                                    </td>
+                                    <td style="text-align:right;">
+                                        @Html.Hidden("lstFeePaymentsData[" + (@i) + "].DueAmount", Model.ElementAt(i).DueAmount)
+                                        @Html.Hidden("lstFeePaymentsData[" + (@i) + "].TransacationType", Model.ElementAt(i).TransacationType)
+                                        @Model[i].DueAmount.ToString()
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <br />
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold;"> Fee payment heads are not available </span>
+    }
+</section>

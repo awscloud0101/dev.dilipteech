@@ -1,0 +1,118 @@
+﻿@model  List<AsteriskBrowserAL.Models.FeeComponentsViewModel>
+@{
+    ViewBag.Title = "Fee Component History";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Fee Components</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<style>
+    .table > thead > tr:nth-child(even) {
+        background: #f7fafc;
+    }
+
+    .table > thead > tr:nth-child(odd) {
+        background: #fdfdfd;
+    }
+    .table > thead > tr >th {
+     
+        color: #707070;
+        font-weight: 400;
+        background: repeat-x #F2F2F2;
+        background-image: -webkit-linear-gradient(top,#F8F8F8 0,#ECECEC 100%);
+        background-image: -o-linear-gradient(top,#F8F8F8 0,#ECECEC 100%);
+        background-image: linear-gradient(to bottom,#F8F8F8 0,#ECECEC 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff8f8f8', endColorstr='#ffececec', GradientType=0);
+    }
+
+ 
+</style>
+<section class="content">
+    @if (null != Model && Model.Count() > 0)
+    {
+        <input id="lblComponentValue" type="hidden" value="@Model.FirstOrDefault().FeeComponentId.Value">
+
+        int nsno = 1;
+
+       
+        <div class="table-header" style="border:none;height:30px;">
+           
+                <small style="float:right;" class="textheader">
+                    @Html.ActionLink("Back to details", "FeeComponents", new { AcademicYearId = ViewBag.AcademicYearId })
+                </small>
+           
+        </div>
+
+        if (Model.FirstOrDefault().Amount > 0)
+        {
+
+            <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                <thead>
+                    <tr>
+                        <th style="width :40px;   font-weight:bold;">
+                           S.No.
+                        </th>
+                        <th style="width :200px ;   font-weight:bold;text-align:center; ">
+                            @Html.DisplayName("Amount")
+                        </th>
+
+                        <th style="text-align:center;   font-weight:bold;">
+                            @Html.DisplayName("Date")
+                        </th>
+
+                        <th style="   font-weight:bold;text-align:center; ">
+                            @Html.DisplayName("Branch")
+                        </th>
+
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td style="width :40px">
+                                @(nsno++)
+                            </td>
+
+                            <td style="width :140px ; text-align:center">
+                                @AsteriskBrowserAL.Helpers.Utility.ConvertToStringCommas(item.Amount.Value.ToString())
+                            </td>
+                            <td style="padding-left: 60Px;text-align:center">
+                                @item.FeeComponentDate.Value.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <td>
+                                @item.Name
+                            </td>
+                        </tr>
+                    }
+                </thead>
+            </table>
+
+        }
+        else
+        {
+            <span style="color: red;"><b>Data is not available</b></span>
+        }
+       
+    }
+</section>
+
+<script>
+    function RedirectToNew() {
+        var Value = $("#lblComponentValue").val();
+        window.location.href = '/SeFinance/FeeComponentAmount?nFeeComponentId=' + Value;
+    }
+</script>

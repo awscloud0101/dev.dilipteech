@@ -1,0 +1,165 @@
+﻿@model IEnumerable<AsteriskBrowserAL.StaffShift>
+@{
+    ViewBag.Title = "Shifts";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Biometric
+        </li>
+        <li>
+            <i class=""></i>
+            Settings
+        </li>
+        <li class="active">Shifts</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+<section class="content">
+    <div class="hr hr-18 dotted hr-double"></div>
+
+    @if (null != TempData["Shifts"])
+    {
+        @Html.Raw(TempData["Shifts"])
+    }
+
+    @if (null != Model)
+    {
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    Shifts
+                    @*<a class="view-header-btn" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+                    <a class="view-header-btn btn btn-info btn-xs" href="@Url.Action("ShiftsC", "HRBiometric")" role="button" id="New" style="float:right" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+
+                
+                </div><!-- /.box-header -->
+                <table class="table table-striped table-bordered table-hover">
+
+
+                 
+                    @*<div class="box-body table-responsive no-padding">
+
+                        <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;">*@
+                            
+
+                            <tbody>
+                                <tr>
+                                    <th>
+                                       S.No.
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Shift Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("In Time")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Out Time")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Is Study Hour")
+                                    </th>
+                                    <th>
+
+                                    </th>
+                                </tr>
+
+                                @foreach (var item in Model)
+                                            {
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.StaffShiftName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.InTime)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.OutTime)
+                                        </td>
+                                        <td>
+                                            @if (item.IsStudyHour == true)
+                                            {
+                                                <input type="checkbox" class="checkbox" checked="checked" disabled />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="checkbox" disabled />
+                                            }
+                                        </td>
+                                        <td>
+                                          
+
+
+                                            <div class="hidden-sm hidden-xs action-buttons">
+                                                <a class="green" href="@Url.Action("ShiftsE", "HRBiometric", new { id = item.StaffShiftId })">
+                                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                                </a>
+                                                <a class="red" onclick="btnConfirm(@item.StaffShiftId)">
+                                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                            }
+                            </tbody>
+                        </table>
+                    </div>
+
+            </div><!-- /.box-header -->
+            }
+            else
+            {
+            <span style="color: red;"><b>Data is not available </b></span>
+            }
+    </section>
+    <script>
+
+        function btnConfirm(Value) {
+            if (Value > 0) {
+                $.ajax({
+                    url: '/HRBiometric/ValidationForShiftsD',
+                    data: { Id: Value },
+                    success: function (data) {
+
+                        var url = '/HRBiometric/ShiftsD?id=' + Value;
+                        var title = "Shifts";
+
+                        OpenDialog(data, url, title);
+                    },
+                    async: false
+                });
+            }
+        }
+
+    </script>
+
+
+
+
+

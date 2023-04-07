@@ -1,0 +1,154 @@
+﻿@model AsteriskBrowserAL.Models.EventsData
+@{
+    ViewBag.Title = "Events";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Events</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("ExportEventsReport", "AReports", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Events</span>
+
+
+                </div>
+                <div class="widget-box">
+        
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Branch</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.SubscriptionId, new SelectList(Model.lstBranches, "SubscriptionId", "Institute"), "--- Select ---", new { @class = "form-control select2", @id = "SubscriptionId" })
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Date Range</label>
+                                    <div class="col-sm-6">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control pull-right" id="daterange" name="daterange" autocomplete="off" />
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Event No.</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.EventId, new SelectList(Model.lstEvents, "EventId", "EventNumber"), "", new { @class = "form-control select2", @id = "EventId" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <div id="EventsDetails"></div>
+            }
+
+
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    function GetEventsData() {
+        var dateRange = $('#daterange').val();
+        var EventId = $('#EventId').val();
+        var SubscriptionId = $('#SubscriptionId').val();
+
+        if (dateRange != "" || EventId > 0 || SubscriptionId > 0) {
+
+            $('#imagesmodal').show();
+            $.ajax({
+                url: '/AReports/GetEventsWithStatus',
+                data: { DateRange: dateRange, EventId: EventId, SubscriptionId: SubscriptionId },
+                success: function (data) {
+                    $('#EventsDetails').html(data);
+                },
+            }).done(function () {
+                $('#imagesmodal').hide();
+            });
+        }
+        //    .done(function () {
+        //    $('#imagesmodal').hide();
+        //});
+    };
+
+    $('#EventId').change(function () {
+        $('#EventsDetails').html("");
+        $('#daterange').val("");
+        $('#SubscriptionId').val("");
+        GetEventsData();
+    });
+
+    $('#daterange').change(function () {
+        $('#EventsDetails').html("");
+        $('#EventId').val("");
+        $('#SubscriptionId').val("");
+        GetEventsData();
+    });
+
+    $('#SubscriptionId').change(function () {
+        $('#EventsDetails').html("");
+        $('#daterange').val("");
+        $('#EventId').val("");
+        GetEventsData();
+    });
+
+    function ResetValues() {
+        $('#EventsDetails').html("");
+        $('#daterange').val("");
+        $('#EventId').val("");
+        $('#SubscriptionId').val("");
+    }
+
+</script>

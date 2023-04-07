@@ -1,0 +1,285 @@
+﻿@{
+    ViewBag.Title = "Raise Dispute";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Raise Dispute</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<br />
+
+
+<style>
+    tr {
+        display: table-row;
+        vertical-align: inherit;
+        border-color: inherit;
+    }
+
+    .selected {
+        background-color: #ccc;
+    }
+</style>
+
+
+<section class="content">
+    <form id="myForm" method="post">
+
+        @*@if (null != TempData["Status"])
+        {
+            <span style="color:forestgreen">@Html.Raw(TempData["Status"])</span>
+        }*@
+
+        <div class="row">
+            <div class="col-xs-12">
+                @using (Html.BeginForm("RaiseDispute", "SOperations", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" id="SelInventoryTransferId" name="SelInventoryTransferId" />
+                    <div class="row">
+                        <div class="col-xs-12">
+
+                            <div class="widget-box">
+                                <div class="widget-header widget-header-flat widget-header-small">
+                                    <h5 class="widget-title">
+                                        Raise Dispute
+                                    </h5>
+
+                                    <div class="widget-toolbar no-border">
+                                        <div class="inline dropdown-hover">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <div class="col-sm-6">
+
+                                                    <input type="radio" name="rbReceivedType" checked="checked" value="Kit"><span style="margin-right:2em;">Kit</span>
+                                                    <input type="radio" name="rbReceivedType" value="Item" />Item
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+                <span id="Valid" style="color:red;"></span>
+                <div class="hr hr-18 dotted hr-double"></div>
+                <div id="Items"></div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div id="Kits"></div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="KitDetails"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+</section>
+
+<div id="DataTableScripts"></div>
+
+<script>
+    var rbReceivedType = "";
+
+    $(document).ready(function () {
+        GetDataOnrbClick();
+    });
+
+    $('input[name="rbReceivedType"]').click(function radioButton() {
+        rbReceivedType = $(this).val();
+        GetDataOnrbClick();
+    });
+
+    function GetDataOnrbClick() {
+        rbReceivedType = $('input[name=rbReceivedType]:checked', '#myForm').val();
+
+        $('#Kits').html("");
+        $('#DataTableScripts').html("");
+        $('#Items').html("");
+        $('#KitDetails').html("");
+
+        if (rbReceivedType == "Kit") {
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+
+                url: '/SOperations/PopulateReceivedKits',
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $('#Kits').html(Data);
+
+                    //ClassDataTableScripts();
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+        }
+        else {
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+
+                url: '/SOperations/PopulateReceivedItemsToDispute',
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $('#Items').html(Data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+        }
+    }
+
+    function ClassDataTableScripts() {
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            },
+            url: '/Base/DataTableScripts',
+            data: { IsPaging: false },
+            success: function (Data) {
+                $('#DataTableScripts').html(Data);
+            }
+        });
+    }
+
+    $(document).on("click", "#Tab1 tbody tr", function (e) {
+        debugger
+        var val = $(this).find('#InventoryTransferId').val();
+
+        $('#SelInventoryTransferId').val(val);
+
+        if (val > 0) {
+            $("#Tab1 tbody tr").children('td,th').css('background-color', 'transparent');
+            $(this).children('td,th').css('background-color', '#c4e2d1');
+
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+
+                url: '/SOperations/PopulateReceivedKitDetailsToDispute',
+                data: { InventoryTransferId: val },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $('#KitDetails').html(Data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+        }
+
+    });
+
+    function SubmitForm() {
+        debugger
+        var valid = true;
+        document.getElementById("Valid").innerHTML = "";
+        var ItemsTotalDisputeQty = 0;
+        $('#tbItems tbody tr').each(function () {
+            debugger
+            var ReceivedQty = $(this).find('.ReceivedQty').val();
+
+            var allCells = $(this).find('td');
+            var totalQty = 0;
+
+            if (allCells.length != 0) {
+
+                allCells.each(function (index, td) {
+                    debugger
+
+                    if (index > 2) {
+                        var DisputeQuantity = $(td).find(".Quantity").val();
+
+                        if (DisputeQuantity == "" || DisputeQuantity == "NaN")
+                            DisputeQuantity = "0";
+
+                        totalQty = parseInt(totalQty) + parseInt(DisputeQuantity);
+                    }
+                });
+
+                if (totalQty == "" || totalQty == "NaN")
+                    totalQty = "0";
+
+                ItemsTotalDisputeQty = parseInt(ItemsTotalDisputeQty) + parseInt(totalQty);
+
+                if (parseInt(totalQty) > parseInt(ReceivedQty)) {
+
+                    var ItemName = $(this).find('.ItemName').val();
+
+                    document.getElementById("Valid").innerHTML = "Total dispute quantity exceeds recieved qty for " + ItemName;
+
+                    valid = false;
+                    return valid;
+                }
+
+                if (valid == false)
+                    return valid;
+            }
+            else {
+                if (valid == false)
+                    return valid;
+            }
+
+        });
+
+        if (ItemsTotalDisputeQty == "" || ItemsTotalDisputeQty == "NaN")
+            ItemsTotalDisputeQty = "0";
+
+        if (parseInt(ItemsTotalDisputeQty) < 1) {
+            document.getElementById("Valid").innerHTML = "Enter quantity to dispute";
+            valid = false;
+            return valid;
+        }
+
+        if (valid == false)
+            return valid;
+
+        return valid;
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+

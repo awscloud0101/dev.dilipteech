@@ -1,0 +1,363 @@
+﻿
+@model AsteriskBrowserAL.Models.FeePaymentsData
+@{
+    ViewBag.Title = "Student Fee Refund";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Fee Refund Request</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style>
+    .ui-widget.ui-widget-content {
+        border: 1px solid #c5c5c5;
+        width: 19em;
+    }
+</style>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+
+            @using (Html.BeginForm("FeeRefundRequest", "FOperations", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+            {                
+                if (null != TempData["Message"])
+                {
+                    <span style="color:green;font-weight:bold;"id="Status">@TempData["Message"]</span>
+                }
+                <div class="table-header">
+                    Fee Refund Request
+                </div>
+              <div class="widget-box">
+                  
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Class")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownList("CboClass", (IEnumerable<SelectListItem>)ViewBag.Classes, "-- Select Class --", new { @class = "form-control col-sm-5", @id = "CboClass" })
+                                            </div>
+
+                                            <div class="col-sm-2" style="display:none;" id="fClass">
+                                                <label style="color:red;font-weight:bold;font-size:12px;">Select Class</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Student")</label>
+
+                                            <div class="col-sm-6">
+                                                <input type="text" name="StudentName" id="StudentId" spellcheck="false" class="form-control" />
+                                            </div>
+                                            <div class="col-sm-2" style="display:none;" id="fStudent">
+                                                <label style="color:red;font-weight:bold;font-size:12px;">Select Student</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Admission No")</label>
+
+                                            <div class="col-sm-6">
+                                                <input type="text" name="AdmissionNumber" id="AdmissionNumberId" spellcheck="false" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4" id="studentDetails" style="display:none;">
+                                    <div class="col-sm-12" style="font-family: 'Segoe UI'">
+
+                                        <b><span style="font-size:12px" id="AcademicYear"></span> </b>
+
+                                        <h4>
+                                            <span>
+                                                <b id="StudentName"></b>
+                                                <b style="margin-top:15px" id="CourseName"></b>
+                                            </span>
+                                        </h4>
+                                        <h3>
+                                            <span id="spnamt" style="display:none;">
+                                                <i class="fa fa-inr"></i>&nbsp;<b id="amount"></b><b style="font-size:14px;">  Due</b>
+                                            </span>
+                                        </h3>
+                                        <h5 id="guardianName"></h5>
+
+                                        <i class="fa fa-mobile" id="Mobile"> </i>
+                                        <br />
+                                        <i id="AddressLineOne"></i><br />
+                                        <i id="AddressLineTwo"></i><br />
+                                        <br />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div id="StudentPaymentHistoryData"></div>
+            }
+        </div>
+    </div>
+
+
+
+</section>
+
+
+<script type="text/javascript">
+
+    var Studentid = 0;
+    //window.onload = function (e) {
+
+    //    var AdmissionNumber = $('#AdmissionNo').val();
+
+    //    if ($('#AdmissionNo').val().trim()) {
+    //        AutoFillStudentData(AdmissionNumber, "AdmissionNumber");
+    //    }
+    //    else {
+    //        EnableDiableControls(false);
+    //    }
+    //}
+
+    $("#AdmissionNumberId").autocomplete(
+      {
+          source: function (request, response) {
+
+              ResetControls(1);
+
+              if (request.term.length < 3) {
+                  return;
+              }
+              $('#imagemodal').show();
+              var nSectionId = document.getElementById("CboClass").value;
+              if (nSectionId != "" && nSectionId != undefined) {
+                  $('#imagemodal').show();
+                  document.getElementById("fClass").style.display = "none";
+                  $.ajax({
+                      url: "/FOperations/GetAdmissionNumber",
+                      type: "POST",
+                      dataType: "json",
+                      data: { nSectionId: nSectionId, strVal: request.term },
+                      success: function (json) {
+                          response($.map(json, function (data, id) {
+                              return {
+                                  label: data.AdmissionNumber,
+                                  value: data.AdmissionNumber,
+                                  id: data.AdmissionNumberId,
+                              };
+                          }));
+                          $('#imagemodal').hide();
+                      }
+                  });
+              }
+              else {
+                  document.getElementById("fClass").style.display = "inline";
+              }
+          },
+          minLength: 3,
+          select: function SelectEvent(event, ui) {
+              debugger
+              admissionId = ui.item.value;
+              AutoFillStudentData(ui.item.value, "AdmissionNumber");
+          }
+      });
+
+    $("#StudentId").autocomplete(
+     {
+         source: function (request, response) {
+
+             ResetControls();
+             if (request.term.length < 3) {
+                 return;
+             }
+             $('#imagemodal').show();
+
+             var ClassNumber = document.getElementById("CboClass").value;
+             debugger
+
+             if (ClassNumber != "" && ClassNumber != undefined) {
+                 document.getElementById("fClass").style.display = "none";
+
+                 $.ajax({
+                     url: "/FOperations/GetStudentName",
+                     data: { nClassNumber: ClassNumber, strVal: request.term },
+                     success: function (json) {
+                         response($.map(json, function (data, id) {
+                             return {
+                                 label: data.FirstName,
+                                 value: data.FirstName,
+                                 id: data.StudentId,
+                             };
+                         }));
+                         $('#imagemodal').hide();
+                     }
+                 });
+             }
+             else {                 
+                 document.getElementById("fClass").style.display = "inline";
+             }
+         },
+         minLength: 3,
+         select: function SelectEvent(event, ui) {
+             AutoFillStudentData(ui.item.id, "StudentName");
+         }
+     });
+
+    function AutoFillStudentData(strval, type) {
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/FOperations/GetStudentDetailsByType',
+            data: { strVal: strval, type: type },
+            success: function (data) {
+                objStudent = data;
+
+                $("#AdmissionNumberId").val(data.AdmissionNumber);
+                $("#StudentId").val(data.FirstName);
+                $("#ParentId").val(data.FatherName);
+                Studentid = data.StudentId;
+                $('#m_StudentId').val(data.StudentId);
+                if ($('#CboClass').val() == "")
+                    $('#CboClass').val(data.CourseId);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            },
+        }).done(function () {
+            $('#imagemodal').hide();
+            GetStudentDetails(Studentid);
+        });
+    };
+
+    $('#CboClass').focus(function () {
+        $('#fClass').hide();
+    });
+
+    function GetStudentDetails(studentId) {
+        document.getElementById("studentDetails").style.display = "none";
+        var result = studentId;
+        if (result > 0) {
+            $('#imagemodal').show();
+
+            $.ajax({
+                url: '/FOperations/GetStudentDetails',
+                data: { studentId: result },
+                success: function (StudentDetails) {
+                    document.getElementById("studentDetails").style.display = "inline";
+                    document.getElementById("StudentName").innerHTML = StudentDetails.FullName;
+                    document.getElementById("CourseName").innerHTML = StudentDetails.CourseName;
+                    document.getElementById("guardianName").innerHTML = StudentDetails.GuardianName;
+                    document.getElementById("AddressLineOne").innerHTML = StudentDetails.AddressLineOne;
+                    document.getElementById("AddressLineTwo").innerHTML = StudentDetails.AddressLineTwo;
+                    document.getElementById("Mobile").innerHTML = "  " + StudentDetails.MobileNumber;
+                    document.getElementById("AcademicYear").innerHTML = " Academic Year  : " + StudentDetails.DisplayAcademicYear;
+                },
+                error: function () {
+                    document.body.style.cursor = 'default';
+                    $('#imagemodal').hide();
+                },
+
+            }).done(function () {
+                $('#imagemodal').hide();
+                GetStudentPaymentHistoryDetails(studentId);
+            });
+        }
+        else {
+            document.getElementById("studentDetails").style.display = "none";
+        }
+    };
+
+
+    function validateNum(e) {
+        //if the letter is not digit then display error and don't type anything
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            //display error message
+            return false;
+        }
+    };
+
+    function GetStudentPaymentHistoryDetails(StudentId) {
+        $('#imagemodal').show();
+        $.ajax({
+            url: "/FOperations/GetStudentPaymentHistoryData",
+            data: { nStudentId: StudentId },
+            success: function (data) {
+                $('#imagemodal').hide();
+                $('#StudentPaymentHistoryData').html(data);
+                document.getElementById("ParentRequestForm").style.display = "inline";
+            }
+        })
+    }
+
+    $("#StudentId").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetControls();
+        };
+    });
+    function ResetControls() {
+        if (window.location.href.indexOf('?') > 1) {
+            window.location.href = '/FOperations/FeeRefundRequest'
+            return;
+        }
+        $('#StudentId').val('');       
+        $('#studentDetails').val('')
+        $('#StudentPaymentHistoryData').html("");
+    
+        document.getElementById("studentDetails").style.display = "none";      
+    }
+
+
+    $('#ParentAmount').focus(function () {
+        $('#PAmount').hide();
+    });
+    $('#BranchAmount').focus(function () {
+        $('#fBranchAmount').hide();
+    });
+    $('#File').focus(function () {
+        $('#PUploadfiles').hide();
+    })
+    $('BranchUploadedFile').focus(function () {
+        $('#bUploadfiles').hide();
+    })
+
+
+</script>
+
+
+

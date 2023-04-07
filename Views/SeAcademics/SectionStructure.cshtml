@@ -1,0 +1,347 @@
+﻿@model List<AsteriskBrowserAL.Models.SectionStructureViewModel>
+@{
+    ViewBag.Title = "Section Structure";
+
+    int sno = 1;
+}
+
+
+<style>
+    .Text160Left {
+        text-align: left;
+        min-width: 160Px;
+    }
+
+    .Text50Center {
+        text-align: center;
+        min-width: 50Px;
+    }
+
+    .Text40Center {
+        text-align: center;
+        min-width: 40Px;
+    }
+</style>
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Section Structure</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+</style>
+
+<!--Main Content-->
+<section class="content">
+    <div class="row">
+        <div class=col-xs-6>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+
+        @using (Html.BeginForm("SectionStructure", "SeAcademics", FormMethod.Post))
+        {
+
+            if (null != TempData["SectionStructure"])
+            {
+                <p align="center">
+                    <span class="savedinfo">
+                    
+
+   
+                        <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                        <br />
+                        @Html.Raw(TempData["SectionStructure"])
+                        <br/>
+                    
+                                 <span class="cls1 btncustom">Close</span>                        <script>
+
+                     $(document).ready(function () {
+                         $(".cls1").click(function () {
+
+                             $(".savedinfo").css("display", "none")
+                         });
+                     });
+
+
+                        </script>
+                    </span>
+                </p>
+            }
+
+            if (Model != null && Model.Count() > 0)
+            {
+
+                <div class="col-sm-12">
+                   
+                        <div class="table-header">
+                           Section Structure
+                            <div style="float:right;margin-right:10px;">
+                                <button class="btncustom P2" type="submit"  name="Save" value="Save">
+                              Save
+                                </button>
+                               
+                                </div>
+                            </div>
+
+                            <div class="box-body table-responsive no-padding">
+                                <div>
+                                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                   S.No.
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayName("Branch")
+                                                </th>
+                                                @foreach (var c in Model.FirstOrDefault().ClassNumbers)
+                                                {
+                                                    <th>
+                                                        @c.ClassNumberDisplay
+                                                    </th>
+                                                }
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @for (int i = 0; i < Model.Count(); i++)
+                                            {
+                                                <tr>
+                                                    <td align="center">
+                                                        @Html.Hidden("SectionStructureList.Index", (@i + 10))
+                                                        @Html.Hidden("SectionStructureList[" + (@i + 10) + "].BranchName", Model.ElementAt(i).BranchName)
+                                                        @Html.Hidden("SectionStructureList[" + (@i + 10) + "].Databasepath", Model.ElementAt(i).Databasepath)
+                                                        @Html.Hidden("SectionStructureList[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+
+                                                        @sno
+                                                    </td>
+
+                                                    <td class="Text160Left">
+                                                        @Model.ElementAt(i).BranchName
+
+                                                    </td>
+                                                    @for (int j = 0; j < Model.ElementAt(i).SectionStucture.Count(); j++)
+                                                    {
+                                                        @Html.Hidden("SectionStructureList[" + (@i + 10) + "].SectionStucture.Index", (@j + 10))
+                                                        @Html.Hidden("SectionStructureList[" + (@i + 10) + "].SectionStucture[" + (@j + 10) + "].ClassNumber", Model.ElementAt(i).SectionStucture.ElementAt(j).ClassNumber)
+                                                        int SectionCount = Model.ElementAt(i).SectionStucture.ElementAt(j).NoOfSections.HasValue ? Model.ElementAt(i).SectionStucture.ElementAt(j).NoOfSections.Value : 10;
+                                                        <td>
+                                                            @Html.TextBox("SectionStructureList[" + (@i + 10) + "].SectionStucture[" + (@j + 10) + "].NoOfSections", Model.ElementAt(i).SectionStucture.ElementAt(j).NoOfSections, new { @class = "", @id = "nrSection", type = "number", @min = "0", @Maxlength = @SectionCount })
+                                                        </td>
+                                                    }
+
+                                                </tr>
+
+                                                    sno++;
+                                            }
+
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                  
+           
+
+
+
+            }
+
+
+        }
+
+
+    </div>
+
+</section>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+
+<script type="text/javascript">
+
+    $('#plan1').keyup(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    function validatePlans() {
+        var valid = true;
+        var plannurAmount = $('#nrSection').val();
+        var Plan1Aomunt = $('#lkgSection').val();
+        var Plan2Aomunt = $('#ukgSection').val();
+        var Plan3Aomunt = $('#c1Section').val();
+        var Plan4Aomunt = $('#c2Section').val();
+        var Plan5Aomunt = $('#c3Section').val();
+        var Plan6Aomunt = $('#c4Section').val();
+        var Plan7Aomunt = $('#c5Section').val();
+        var Plan8Aomunt = $('#c6Section').val();
+        var Plan9Aomunt = $('#c7Section').val();
+        var Plan10Aomunt = $('#c8Section').val();
+        var Plan10Aomunt = $('#c9Section').val();
+        var Plan10Aomunt = $('#c10Section').val();
+
+        if (Plan1Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+        if (plannurAmount == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+
+
+
+        if (Plan2Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+
+
+        if (Plan3Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+
+
+        if (Plan4Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+
+        if (Plan5Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+        if (Plan6Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+        if (Plan7Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+        if (Plan8Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+        if (Plan9Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+        if (Plan10Aomunt == "") {
+            document.getElementById("Validation").innerHTML = "Please enter Amount"
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    function submitForm() {
+        var validateFun = validatePlans();
+
+        if (validateFun == false) {
+            return false;
+        } else {
+            return false;;
+        }
+
+    };
+
+    $('#nrAmount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#lkgAmount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#ukgAmount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#class1Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#class2Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#class3Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#class4Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#class5Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#class6Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#class7Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+    $('#class8Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    $('#class9Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+    $('#class10Amount').focus(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

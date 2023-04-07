@@ -1,0 +1,605 @@
+﻿@model AsteriskBrowserAL.Models.BranchTransferViewModel
+@{
+    ViewBag.Title = "Branch Transfer";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Front Office
+        </li>
+        <li class="active">Branch Transfer</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+
+    @if (null != TempData["Message"])
+    {
+        <label style="color:green">@TempData["Message"]</label>
+    }
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("BranchTransfer", "AFrontOffice", FormMethod.Post))
+            {
+                <input type="hidden" id="SelBranch" name="HBranchId" value="@Model.HBranchId" />
+
+                @*<input type="hidden" id="DivisionId" name="DivisionId" value="@Model.DivisionId" />
+                    <input type="hidden" id="DestDivisionId" name="DestDivisionId" value="@Model.DestDivisionId" />
+                    <input type="hidden" id="FromBranch" name="FromBranch" value="@Model.FromBranch" />
+                    <input type="hidden" id="ToBranch" name="ToBranch" value="@Model.ToBranch" />
+                    <input type="hidden" id="StudentId" name="StudentId" value="@Model.StudentId" />
+                    <input type="hidden" id="ClassNumber" name="ClassNumber" value="@Model.ClassNumber" />
+                    <input type="hidden" id="Reason" name="Reason" value="@Model.Reason" />*@
+
+                        <span style="color:red;font-weight:bold" id="Validation"></span>
+                        <div class="table-header">
+                            <span style="font-family:calibri;">Branch Transfer</span>
+                            <div class="inline action-buttons" style="float:right;">
+                                <a onclick="return submitForm()"><input class="btn btn-info btn-minier P2" type="submit"></a>
+                            </div>
+                        </div>
+                        <div class="widget-box">
+                          
+                            
+                                
+                        
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-12">
+                                                    <label class="col-sm-3">@Html.Label("From Branch")</label>
+                                                    <div class="col-xs-7">
+                                                        <label class="col-sm-5" style="font-size:16px;">@Model.FromBranchName</label>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                            <br />
+                                            <br />
+                                            <br />
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-5">@Html.Label("From Class")</label>
+                                                    <div class="col-sm-6">
+                                                        <select id="CboClassNumber" name="ClassNumber" class="form-control"></select>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-6" style="display:none;" id="ClassVal">
+                                                    <label style="color:red;font-weight:bold;"> Select from class </label>
+                                                </div>
+
+                                            </div>
+                                            <br />
+                                            <br />
+                                            <br />
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12">
+
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-5">@Html.Label("From Section")</label>
+                                                    <div class="col-sm-6">
+                                                        <select id="cboSection" name="SectionId" class="form-control"></select>
+                                                    </div>
+
+
+                                                </div>
+                                                <div class="col-sm-6" style="display:none;" id="SectionVal">
+                                                    <label style="color:red;font-weight:bold;"> Select from section </label>
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <br />
+                                            <br />
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-5">@Html.Label("Student")</label>
+
+                                                    <div class="col-sm-6">
+                                                        <input type="text" id="StudentId123" class="form-control" />
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-xs-6" style="display:none;" id="StudentVal">
+                                                    <label style="color:red;font-weight:bold;"> Select student </label>
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <br />
+                                            <br />
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-5">@Html.Label("To Division")</label>
+                                                    <div class="col-sm-6">
+                                                        @Html.DropDownListFor(model => model.DestDivisionId, new SelectList(Model.lstDestDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DestDivisionId" })
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-6" style="display:none;" id="ToDivisionVal">
+                                                    <label style="color:red;font-weight:bold;"> Select transfered division </label>
+                                                </div>
+
+                                            </div>
+                                            <br />
+                                            <br />
+                                            <br />
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-5">@Html.Label("To Branch")</label>
+                                                    <div class="col-sm-6">
+                                                        <select id="DesCboBranch" name="ToBranch" class="form-control"></select>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-6" style="display:none;" id="ToBranchVal">
+                                                    <label style="color:red;font-weight:bold;"> Select transfered branch </label>
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <br />
+                                            <br />
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-5">@Html.Label("Reason for change")</label>
+                                                    <div class="col-sm-6">
+                                                        @Html.TextBoxFor(model => model.Reason, new { autocomplete = "off", @class = "form-control textlength", @id = "Reason", placeholder = "Reason for change" })
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-6" style="display:none;" id="ReasonVal">
+                                                    <label style="color:red;font-weight:bold;"> Mention reason for change </label>
+                                                </div>
+
+                                            </div>
+                                            <br />
+                                            <br />
+                                           
+                                           
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+
+                                <input type="hidden" id="StudentId" name="StudentId" value="@Model.StudentId" />
+
+                            </div>
+                                }
+                            </div>
+
+    </div>
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+
+       $(document).ready(function () {
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral != "value") {
+            LoadClassNumbers();
+        }
+
+        if ($('#DivisionId').val() > 0) {
+            var devn = $('#DivisionId').val();
+            GetBranches();
+        }
+
+       });
+
+       function GetBranches()
+       {
+           var DivisionId = $('#DivisionId').val();
+           if (DivisionId != 0) {
+               $.ajax({
+                   url: '/Common/GetBranchesByDivision',
+                   data: { DivisionId: DivisionId, IsAll: false },
+                   success: function (data) {
+                       var DescBranchItems = $('#CboBranch');
+
+                       DescBranchItems.children().remove();
+
+                       //DescBranchItems.append($("<option>").val("0").text("--- Select ---"));
+
+                       $.each(data, function (i, record) {
+                           DescBranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                       });
+
+                       $('#CboBranch').append(DescBranchItems);
+
+
+                       var SelBranchId = $('#SelBranch').val();
+
+                       if (SelBranchId > 0) {
+                           $('#CboBranch').val(SelBranchId);
+                       }
+
+                   },
+                   aync: false
+               });
+           }
+           else {
+               var BranchItems = $('#CboBranch');
+               BranchItems.children().remove();
+               BranchItems.append($("<option>").val(0).text(""));
+
+               var ClassItems = $('#CboClassNumber');
+               ClassItems.children().remove();
+               ClassItems.append($("<option>").val(0).text(""));
+
+           }
+       }
+
+    $('#DivisionId').change(function () {
+        var DivisionId = $('#DivisionId').val();
+        var nBranch = $('#CboBranch').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (data) {
+                    var DescBranchItems = $('#CboBranch');
+
+                    DescBranchItems.children().remove();
+
+                    //DescBranchItems.append($("<option>").val("0").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        DescBranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(DescBranchItems);
+
+                },
+                aync: false
+            });
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+
+            var ClassItems = $('#CboClassNumber');
+            ClassItems.children().remove();
+            ClassItems.append($("<option>").val(0).text(""));
+
+        }
+    });
+
+
+    $('#DestDivisionId').change(function () {
+        var DDivisionId = $('#DestDivisionId').val();
+        var nBranch = $('#CboBranch').val();
+        if (DDivisionId != 0) {
+            $.ajax({
+                url: '/AStudent/GetBranchesByDivisionId',
+                data: { DivisionId: DDivisionId, nBranchId: nBranch },
+                success: function (data) {
+                    var DescBranchItems = $('#DesCboBranch');
+
+                    DescBranchItems.children().remove();
+
+                    DescBranchItems.append($("<option>").val("0").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        DescBranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#DesCboBranch').append(DescBranchItems);
+                },
+                aync: false
+            });
+        }
+        else {
+            var DescBranchItems = $('#DesCboBranch');
+            DescBranchItems.children().remove();
+            DescBranchItems.append($("<option>").val(0).text(""));
+
+
+
+        }
+    });
+
+
+    $('#CboBranch').change(function () {
+        var BranchId = $('#CboBranch').val();
+
+        if (BranchId != 0) {
+            LoadClassNumbers();
+        }
+        else {
+            var BranchItems = $('#CboClassNumber');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    });
+
+    $('#CboClassNumber').change(function () {
+
+        var ClassNumberId = $('#CboClassNumber').val();
+
+        if (ClassNumberId != 0) {
+            LoadSections();
+        }
+        else {
+            var SectionItems = $('#cboSection');
+            SectionItems.children().remove();
+            SectionItems.append($("<option>").val(0).text(""));
+        }
+    });
+
+    function LoadClassNumbers() {
+
+        $.ajax({
+            url: '/Astudent/GetClassNumbers',
+            success: function (data) {
+                var ClassItems = $('#CboClassNumber');
+                ClassItems.children().remove();
+                ClassItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    ClassItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+                });
+
+                $('#CboClassNumber').append(ClassItems);
+            },
+            aync: false
+        });
+
+    }
+
+    function LoadSections() {
+        var BranchId = $('#CboBranch').val();
+        var ClassNumber = $('#CboClassNumber').val();
+
+        $.ajax({
+            url: '/AStudent/GetSectionDataByClassNumber',
+            data: { nSubId: BranchId, ClassNumber: ClassNumber },
+            success: function (data) {
+                var SectionItems = $('#cboSection');
+                SectionItems.children().remove();
+                SectionItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    SectionItems.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+
+                $('#cboSection').append(SectionItems);
+            },
+            aync: false
+        });
+
+    }
+
+    $("#StudentId123").autocomplete({
+        source: function (request, response) {
+            var SubId = $('#CboBranch').val();
+            var SectionId = $('#cboSection').val();
+            var strSearch = $('#StudentId123').val();
+
+
+            if (SubId < 1 || SectionId < 1 )
+            {
+                return;
+            }
+
+            $('#imagemodal').show();
+            $.ajax({
+                url: "/AStudent/GetStudentBySectionnSubscription",
+                type: "POST",
+                dataType: "json",
+                data: { nSubId:SubId, nSectionId:SectionId,strVal: request.term },
+                success: function (json) {
+                    response($.map(json, function (data, id) {
+                        return {
+                            label: data.FirstName,
+                            value: data.FirstName,
+                            id: data.StudentId,
+
+                        };
+                    }));
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        },
+        minLength: 3,
+        select: function (event, ui) {
+            //alert(ui.item.id)
+            document.getElementById('StudentId').value = ui.item.id
+        }
+    });
+
+    function submitForm() {
+
+        var validatestatus = validateBranchTransfer();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+
+    $('#DivisionId').focus(function () {
+        $('#FromDivisionVal').hide();
+    });
+
+    $('#CboBranch').focus(function () {
+        $('#FromBranchVal').hide();
+    });
+
+    $('#CboClassNumber').focus(function () {
+        $('#ClassVal').hide();
+    });
+
+    $('#cboSection').focus(function () {
+        $('#SectionVal').hide();
+    });
+    $('#DestDivisionId').focus(function () {
+        $('#ToDivisionVal').hide();
+    });
+
+    $('#DesCboBranch').focus(function () {
+        $('#ToBranchVal').hide();
+    });
+
+    $('#StudentId123').focus(function () {
+        $('#StudentVal').hide();
+    });
+
+    $('#Reason').focus(function () {
+        $('#ReasonVal').hide();
+    });
+
+
+
+    function validateBranchTransfer() {
+
+        document.getElementById("count").value = "1";
+
+        //var FromDivision = $('#DivisionId').val(); //parseInt($('#DivisionId').val());
+        //var FromBranch = $('#CboBranch').val();
+        var ClassNo = parseInt($('#CboClassNumber').val());
+        var SecId = $('#cboSection').val();
+        var ToDivision = $('#DestDivisionId').val();
+        var ToBranchId = $('#DesCboBranch').val();
+        var Student = $('#StudentId').val();
+        var Reason = $('#Reason').val();
+
+        validate = true;
+
+        //From division validation
+        //if (FromDivision == "null" || FromDivision < 1) {
+        //    document.getElementById("FromDivisionVal").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("FromDivisionVal").style.display = "none";
+
+        //}
+
+        ////From branch validation
+        //if (FromBranch == "null" || FromBranch < 1) {
+        //    document.getElementById("FromBranchVal").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("FromBranchVal").style.display = "none";
+        //}
+
+        //From class validation
+        if (ClassNo < 1 || ClassNo == 0 || ClassNo == "null" ) {
+            debugger
+            document.getElementById('ClassVal').style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById('ClassVal').style.display = "none";
+        }
+
+        //Section validation
+        if (SecId < 1 || SecId =="null") {
+            document.getElementById('SectionVal').style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById('SectionVal').style.display = "none";
+            validate = true;
+        }
+
+        //Student validation
+        if (Student == "" || Student < 1 || Student =="null") {
+            document.getElementById("StudentVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("StudentVal").style.display = "none";
+        }
+
+        //To Division Validation
+        if (ToDivision == "" || ToDivision < 1) {
+            document.getElementById("ToDivisionVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ToDivisionVal").style.display = "none";
+        }
+
+       //  Tobranch Validation
+        if (ToBranchId == "" || ToBranchId < 1) {
+            document.getElementById("ToBranchVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ToBranchVal").style.display = "none";
+        }
+
+        //Reason for change validation
+        if (Reason == "" ) {
+            document.getElementById("ReasonVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ReasonVal").style.display = "none";
+        }
+
+
+        return validate;
+    };
+
+
+</script>

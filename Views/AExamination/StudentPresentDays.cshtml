@@ -1,0 +1,177 @@
+﻿
+@model AsteriskBrowserAL.Models.StudentPresentDaysViewModel
+
+@{
+    ViewBag.Title = "Student Present Days";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Month Wise Attendance Entry</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+
+
+
+
+    @using (Html.BeginForm("StudentPresentDays", "AExamination", FormMethod.Post))
+    {
+        if (null != TempData["StudentPresentDays"])
+        {
+            <span style="color:green;font-weight:bold;">@Html.Raw(TempData["StudentPresentDays"])</span>
+        }
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+
+
+            <div class="table-header">
+                <span style="font-family:calibri;">Month Wise Attendance Entry</span>
+
+
+            </div>
+ 
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="widget-box row" style="padding:10px;">
+
+
+
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right">@Html.Label("Section")</label>
+
+<div class="col-sm-6">
+    @Html.DropDownListFor(model => model.SectionId, new SelectList(Model.lstSections, "SectionId", "SectionCode"), "-- Select --", new { @class = "form-control", @id = "ClassNumber" , @name = "SectionId" })
+</div>
+</div>
+</div>
+
+<div class="col-sm-6">
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Month")</label>
+        <div class="col-sm-6">
+
+            @Html.DropDownListFor(model => model.MonthId, new SelectList(Model.IstMonthList, "MonthId", "MonthName"), "-- Select --", new { @class = "form-control", @id = "MonthId", name = "MonthId" })
+        </div>
+    </div>
+</div>
+</div>
+
+
+</div>
+</div>
+</div>
+                    <div id="SearchData">
+                    </div>
+                    }
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        GetStudentList();
+    })
+
+    $('#ClassNumber').change(function () {
+
+        var ClassNumberId = $('#ClassNumber').val();
+        var monthid = $('#MonthId').val();
+        if (ClassNumberId > 0 && monthid > 0) {
+
+            GetStudentList();
+        }
+        else {
+            $("#SearchData").html("");
+        }
+    })
+
+    function GetStudentList() {
+        var ClassNumberId = $('#ClassNumber').val();
+        var monthid = $('#MonthId').val();
+        if (ClassNumberId > 0 && monthid > 0) {
+            $.ajax({
+                url: '/AExamination/GetStudentsPresentDaysList',
+                data: { nSectionId: ClassNumberId, nMonthId: monthid },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $("#SearchData").html(Data);
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            $("#SearchData").html("");
+        }
+    }
+    $('#MonthId').change(function () {    
+        var ClassNumberId = $('#ClassNumber').val();
+        var monthid = $('#MonthId').val();
+        if (ClassNumberId > 0 && monthid > 0) {
+
+            GetStudentList();
+        }
+        else {
+            $("#SearchData").html("");
+        }
+    })
+
+
+    function submitform() {
+        var valid = true;
+        document.getElementById("Valid").innerHTML = "";
+
+        $('#tab1 tbody tr').each(function () {
+            var allCells = $(this).find('td');
+
+            if (allCells.length != 0) {
+
+                allCells.each(function (index, td) {
+                    if (index > 3) {
+                        var NoOfWorkingDays = $(td).find(".NoOfWorkingDays").val();
+                        var PresentDays = $(td).find(".Presentdays").val();
+
+                        if (parseFloat(PresentDays) > parseFloat(NoOfWorkingDays)) {
+                            var DisplayName = $(td).find('.StudentName').val();
+                            document.getElementById("Valid").innerHTML = "Present Days are greater than number of working days for " + DisplayName;
+                            valid = false;
+                            return valid;
+                        }
+
+                    }
+
+                    if (valid == false)
+                        return valid;
+                });
+
+            }
+
+            if (valid == false)
+                return valid;
+
+        });
+
+        return valid;
+    };
+</script>
+
+
+
+
+
+
+

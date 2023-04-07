@@ -1,0 +1,88 @@
+﻿@model AsteriskBrowserAL.Models.StudentDetailsData
+
+
+   <div class="hr hr-18 dotted hr-double"></div>
+
+@if (null != Model )
+{
+    int nsno = 1;
+    
+
+    <div class="table-header">
+        Assign IC Category
+        <div style="float:right">
+            <button name="Save" type="submit" class="btn btn-info btn-xs P2" id="save" onclick="return submitForm()">
+                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+            </button>
+        </div>
+    </div>
+        <!-- form start -->
+            <div>               
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <tbody>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Section Name")
+                                </th>
+                                <th>
+                                    <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                                </th>
+                            </tr>
+                            @for (int i = 0; i < Model.lstStudents.Count(); i++)
+                            {
+                            <tr>
+                                <td>
+                                    @Html.Hidden("lstStudents.Index", (@i + 10))
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @Html.Hidden("lstStudents[" + (@i + 10) + "].StudentId", Model.lstStudents.ElementAt(i).StudentId)
+                                    @Html.Hidden("lstStudents[" + (@i + 10) + "].InVisible", Model.lstStudents.ElementAt(i).InVisible)
+                                    @Model.lstStudents.ElementAt(i).Name
+                                </td>
+                                <td>
+                                    @Model.lstStudents.ElementAt(i).Section
+                                </td>
+                                <td>
+                                    @if (Model.lstStudents.ElementAt(i).InVisible)
+                                    {
+                                    @Html.CheckBox("lstStudents[" + (@i + 10) + "].IsAssigned", Model.lstStudents.ElementAt(i).IsAssigned, new { @disabled = "disabled" })
+                                    @Html.Hidden("lstStudents[" + (@i + 10) + "].IsAssigned", Model.lstStudents.ElementAt(i).IsAssigned)
+                                    }
+                                    else
+                                    {
+                                    @Html.CheckBox("lstStudents[" + (@i + 10) + "].IsAssigned", Model.lstStudents.ElementAt(i).IsAssigned, new { id = "Check" })
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+             <input type="hidden" id="nCategoryId" name="CategoryId" value="@Model.CategoryId" />
+            </div>
+   
+}
+else
+{
+    <span style="color: red;"><b>No sudents available to display</b></span>
+}
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+</script>

@@ -1,0 +1,220 @@
+﻿@model AsteriskBrowserAL.Models.FeeCorrectionViewModel
+
+
+<style>
+    .Text160Left {
+        text-align: left;
+        min-width: 160Px;
+    }
+
+    .Text140Left {
+        text-align: left;
+        min-width: 170Px;
+    }
+
+    .Text40Center {
+        text-align: center;
+        min-width: 40Px;
+    }
+</style>
+<div class="hr hr-18 dotted hr-double"></div>
+<div class="row">
+    <div class="col-xs-12">
+        @if (Model != null)
+        {
+            int nsno = 1;
+
+            <input type="hidden" name="OldTemplateNo" value="@Model.OldTemplateNo" spellcheck="false" class="form-control" />
+            <input type="hidden" name="OldManualReceiptNo" value="@Model.OldManualReceiptNo" class="form-control" />
+            <input type="hidden" name="OldDate" id="OldDate" value="@Model.OldDate.ToShortDateString()" spellcheck="false" class="form-control" />
+            <input type="hidden" name="ReceiptNo" value="@Model.ReceiptNo" spellcheck="false" class="form-control" />
+            <input type="hidden" name="TransactionCategoryTypeId" value="@Model.TransactionCategoryTypeId" spellcheck="false" class="form-control" />
+            <input type="hidden" name="OldAmount" value="@Model.OldAmount" spellcheck="false" class="form-control" />
+            <input type="hidden" name="FeePaymentId" value="@Model.FeePaymentId" spellcheck="false" class="form-control" />
+            <input type="hidden" name="DisplayPaymentMode" value="@Model.DisplayPaymentMode" spellcheck="false" class="form-control" />
+            <input type="hidden" name="OldPaymentMode" value="@Model.OldPaymentMode" spellcheck="false" class="form-control" id="OldPaymentMode" />
+            <input type="hidden" id="ActionStatusId" name="ActionStatus" value="@Model.ActionStatus" spellcheck="false" class="form-control" />
+            <input type="hidden" name="OldChequeNo" value="@Model.OldChequeNo" spellcheck="false" class="form-control" id="OldChequeNo" />
+            <input type="hidden" name="OldChequeDate" value="@Model.OldChequeDate" spellcheck="false" class="form-control" id="OldChequeDate" />
+            <input type="hidden" name="OldBankId" value="@Model.OldBankId" spellcheck="false" class="form-control" id="OldBank" />
+
+
+            <div class="table-header">
+                Fee Payment Details
+            </div><!-- /.box-header -->
+
+
+            <div style="overflow:auto; max-height:460px">
+                <table class="table table-bordered table-striped table-hover nowrap">
+                    <thead>
+                        <tr>
+                            <th class="Text40Center">
+                               S.No.
+                            </th>
+                            <th style="text-align:center">
+                                @Html.DisplayName("ERP Receipt No")
+                            </th>
+
+                            <th class="Text140Left">
+                                @Html.DisplayName("Template Number")
+                            </th>
+
+                            <th class="Text140Left">
+                                @Html.DisplayName("Manual Receipt Number")
+                            </th>
+
+                            <th class="Text140Left">
+                                @Html.DisplayName("Transaction Date")
+                            </th>
+
+                            <th style="text-align:center">
+                                @Html.DisplayName("Debit Amount")
+                            </th>
+
+                            <th style="text-align:center">
+                                @Html.DisplayName("Payment Mode")
+                            </th>
+
+                            <th class="Text140Left">
+                                @Html.DisplayName("Student")
+                            </th>
+
+                            <th class="Text140Left">
+                                @Html.DisplayName("Status")
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align:center">
+                                @(nsno++)
+                            </td>
+                            <td class="Text140Left">
+                                @Model.ReceiptNo
+                            </td>
+
+                            <td class="Text140Left">
+                                @Model.OldTemplateNo
+                            </td>
+
+                            <td class="Text140Left">
+                                @Model.DisplayManualReceiptNo
+                            </td>
+
+                            <td class="Text140Left">
+                                @Model.OldDate.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <td style="text-align:right">
+                                @Model.OldAmount.ToString()
+                            </td>
+
+                            <td style="text-align:right">
+                                @Model.DisplayPaymentMode
+                            </td>
+
+                            <td class="Text140Left">
+                                @Model.StudentName
+                            </td>
+
+                            <td>
+                                @Model.ActionStatusDisplay
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        }
+        else
+        {
+            <span style="color:red;font-weight:bold">Data is not available</span>
+        }
+    </div>
+</div>
+
+<script>
+    window.onload = onloaddata()
+    function onloaddata() {
+        var PaymentMode = $('#OldPaymentMode').val();
+        var TransactionDate = $('#OldDate').val();
+        debugger
+        $('#PaymentMode').val(PaymentMode)
+        $('#ModifyDate').val(TransactionDate)
+        if (PaymentMode > 1) {
+            var BankId = $('#OldBank').val();
+            var ChequeNo = $('#OldChequeNo').val();
+            var ChequeDate = $('#OldChequeDate').val();
+            $('#Bank').val(BankId)
+            $('#cheque').val(ChequeNo)
+            $('#ChequeDate').val(ChequeDate)
+
+        }
+        GetPaymentModeControls();
+
+    }
+    function GetPaymentModeControls() {
+
+        var paymentMode = document.getElementById("PaymentMode").value;
+
+        if (paymentMode == 1) {
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('paymode').style.display = 'none'
+            document.getElementById("fChequeDate").style.display = "none";
+            document.getElementById("fChequeNo").style.display = "none";
+            document.getElementById("fBank").style.display = "none";
+
+        }
+        else if (paymentMode == 2) {
+            document.getElementById('dd').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 3) {
+            document.getElementById('chequeId').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '6');
+        }
+        else if (paymentMode == 4) {
+            document.getElementById('account').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 5) {
+            document.getElementById('batch').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '4');
+        }
+        else if (paymentMode == 6) {
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            $("#cheque").attr('maxlength', '8');
+        }
+
+    }
+</script>
+

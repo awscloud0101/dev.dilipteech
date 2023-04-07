@@ -1,0 +1,161 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Holidays>
+@{
+    ViewBag.Title = "Holidays";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+        Academics
+        </li>
+        <li>
+            <i class="" ></i>
+            Calendar
+        </li>
+        <li class="active" >Holidays</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <div class="space-6"></div>
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @*<h3>@Html.ActionLink("New", "HolidaysC")</h3>*@
+
+        </div>
+    </div>
+
+    @if (null != TempData["Holidays"])
+    {
+        @Html.Raw(TempData["Holidays"])
+    }
+
+    @if (Model != null)
+    {
+        int nsno = 1;
+
+        <div class="row">
+            <div class="col-xs-12">
+              
+                <div class="table-header">
+                   <span style="font-family:calibri;"> Holidays</span>
+                 
+                        <div class=""  style="float:right;margin-right:10px;" >
+                            <a class="btncustom P2" href="@Url.Action("HolidaysC", "ACalendar")" role="button" id="New" name="New">Add</a>
+                        </div>
+                    
+                </div><!-- /.box-header -->
+                   
+                        <table class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                       S.No.
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Holiday Date")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Description)
+                                    </th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                            {
+
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+                                            @if (null == item.HolidayDate)
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                                @item.HolidayDate.Value.ToString("dd - MMM - yyyy")
+                                        }
+
+                                        </td>
+                                        <td>
+                                            <b> @Html.DisplayFor(modelItem => item.Description)</b>
+                                        </td>
+
+                                        <td>
+                                            <div>
+                                                <a class="green P2" href="@Url.Action("HolidaysE", "ACalendar", new { id = item.HolidaysId })">
+                                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                                </a>
+                                                <a class="red P2" onclick="btnConfirm(@item.HolidaysId)">
+                                                    <i class="ace-icon fa fa-trash-o bigger-130"> </i>
+
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                            }
+                            </tbody>
+
+                        </table>
+
+
+
+                </div>
+
+        </div>
+      
+            @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+       
+    }
+    else
+    {
+        <div class="table-header">
+            Holidays
+           
+            <a class="view-header-btn btn btn-info btn-xs P2" style="float:right"  href="@Url.Action("HolidaysC", "ACalendar")" role="button" id="New" name="New"><i class="fa fa-plus-circle"></i></a>
+        </div>
+        <span style="color: red;"><b>There are no Holidays</b></span>
+    }
+
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/ACalendar/ValidationForHolidaysD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/ACalendar/HolidaysD?id=' + Value;
+                    var title = "Holidays";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

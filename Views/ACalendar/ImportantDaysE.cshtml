@@ -1,0 +1,194 @@
+﻿@model AsteriskBrowserAL.ImportantDays
+
+@{
+    ViewBag.Title = " Edit ImportantDay";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">     
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Calendar
+        </li>
+        <li class="active">Important Days</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<section class="content">
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ImportantDaysE", "ACalendar", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                @Html.HiddenFor(model => model.ImportantDaysId)
+
+
+
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+    <div class="table-header">
+      
+            Important Days
+            <small style="float:right;" class="textheader">
+                @Html.ActionLink("Back to Important Days", "ImportantDays")
+            </small>
+   
+    </div>
+
+
+    <div class="widget-box row" style="padding:10px;">
+        <form class="form-horizontal" role="form">
+            @Html.HiddenFor(model => model.ImportantDaysId)
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Important Date")</label>
+                    <div class="col-sm-8">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div id="datepicker" class="input-group date">
+                                    <input class="form-control" type="text" id="ImportantDate" name="ImportantDate" value="@Model.ImportantDate.Value.ToShortDateString()" data-date-format="dd/mm/yyyy" placeholder="Select Important Date" autocomplete="off" />
+                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="" style="display:none;" id="dateimportantday">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1"> @Html.Label("Description")</label>
+
+                    <div class="col-sm-8">
+                        @Html.TextBoxFor(model => model.Description, new { @class = "form-control col-sm-5 textlength", @id = "Desc", placeholder = "Description" })
+
+                        <div class="" style="display:none;" id="descrImportantday">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+
+
+
+
+                    
+
+
+
+                </div>
+
+
+            </div>
+
+            <div class="col-md-9">
+                <div class="hr hr-18 dotted hr-double"></div>
+                <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                    <i class="ace-icon fa fa-check bigger-50"></i>
+                    Save
+                </button>
+
+                &nbsp; &nbsp; &nbsp;
+                <button class="btn btn-sm" type="reset">
+                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                    Reset
+                </button>
+            </div>
+        </form>
+
+    </div>
+            }
+</div>
+                   
+         
+        </div>
+   
+    
+    <input type="hidden" id="count" name="count" value="0" />
+    <input type="hidden" name="OldImportantDate" id="OldImportantDate" value="@Model.ImportantDate.Value.ToShortDateString()" />
+    <input type="hidden" name="OldDescription" id="OldDescription" value="@Model.Description" />
+</section>
+
+<script type="text/javascript">
+        function validateiImportantdays() {
+
+            document.getElementById("count").value = "1";
+            var ImportantDate = document.getElementById("ImportantDate").value;
+            var Desc = document.getElementById("Desc").value;
+
+            validate = true;
+
+            if (ImportantDate == "") {
+                document.getElementById("dateimportantday").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("dateimportantday").style.display = "none";
+            }
+
+            if (Desc == "") {
+                document.getElementById("descrImportantday").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("descrImportantday").style.display = "none";
+            }
+
+
+            return validate;
+        };
+
+        function submitForm() {
+
+            var validatestatus = validateiImportantdays();
+            if (validatestatus == false) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+
+        function resetImportantDay() {
+            document.getElementById("count").value = "0";
+            document.getElementById("dateimportantday").style.display = "none";
+            document.getElementById("descrImportantday").style.display = "none";
+
+
+            document.getElementById("ImportantDate").value = document.getElementById("OldImportantDate").value;
+            document.getElementById("Desc").value = document.getElementById("OldDescription").value;
+
+            return false;
+        };
+
+        $('#ImportantDate').focus(function () {
+            $('#dateimportantday').hide();
+        });
+        $('#Desc').focus(function () {
+            $('#descrImportantday').hide();
+        });
+
+</script>
+
+@*@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}*@
+
+
+
+

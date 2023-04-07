@@ -1,0 +1,200 @@
+﻿
+    @model AsteriskBrowserAL.Models.MonthwiseWorkingDaysData
+
+
+@{
+    ViewBag.Title = "SectionCreation";
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">SectionCreation</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+
+    @using (Html.BeginForm("SectionCreationER", "SeAcademics", FormMethod.Post))
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                @Html.ValidationMessage("SectionCreation")
+                <span style="color:red;" id="EPCombos"></span>
+                @if (null != TempData["SectionCreation"])
+                {
+                    @Html.Raw(TempData["SectionCreation"])
+                }
+                <div class="table-header">
+                    <span style="font-family:calibri;"> SectionCreation</span>
+                    <div style="float:right;margin-right:10px">
+                        <a class="btncustom P2" id="NewPaper" name="New">
+                            Add
+                        </a>
+                    </div>
+                </div>
+                <div class="widget-box">
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Class")</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.lstClassNumbers, "ClassNumber", "ClassNumberDisplay"), "-- Select --", new { @class = "form-control", @id = "BatchId" })
+
+                                            @*@Html.DropDownList("BatchId", null, "--Select Class--", new { @class = "form-control", @id = "BatchId" })*@
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="desBatchId">
+                                            <label style="color:red;font-weight:bold; width:130px;">select class</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Branch")</label>
+
+                                        <div class="col-sm-6">
+
+                                            @*<select id="BranchId" name="BranchId" class="form-control" style="height:32px;"></select>*@
+                                            @Html.DropDownListFor(model => model.SubscriptionId, new SelectList(Model.lstBraches, "SubscriptionId", "Institute"), "-- Select --", new { @class = "form-control", @id = "SubscriptionId" })
+
+
+
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="desBranchId">
+                                            <label style="color:red;font-weight:bold; width:130px;">select branch</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="SearchViewDiv">
+                </div>
+
+            </div>
+        </div>
+        if (null != Model)
+        {
+            <input style="display:none" id="SelClass" value="@Model.ClassNumber" />
+            <input style="display:none" id="SelSubId" value="@Model.SubscriptionId" />
+        }
+        else
+        {
+
+            <input style="display:none" id="SelClass" value="0" />
+            <input style="display:none" id="SelTerm" value="0" />
+        }
+        <input type="hidden" id="count" name="count" value="0" />
+    }
+    </section>
+
+
+
+<script >
+
+    $(document).ready(function () {
+        debugger
+        var SelClass = $('#SelClass').val();
+        var SelSubId = $('#SelSubId').val();
+
+        if (SelClass > 0 && SelSubId > 0) {
+            GetSection();
+        }
+    });
+
+    function GetSection() {
+        var SubscriptionId = $('#SubscriptionId').val();
+        var ClassId = $('#BatchId').val();
+
+        if (ClassId > 0 && SubscriptionId > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/SeAcademics/SectionData',
+                data: { SubscriptionId: SubscriptionId, ClassId: ClassId },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchViewDiv").html(Data);
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            $("#SearchViewDiv").html("");
+        }
+    }
+
+    function validateSection() {
+
+        document.getElementById("count").value = "1";
+        var BatchId = document.getElementById("BatchId").value;
+        var SubId = document.getElementById("SubscriptionId").value;
+        validate = true;
+
+        if (BatchId == "") {
+            document.getElementById("desBatchId").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desBatchId").style.display = "none";
+        }
+        if (SubId == "" || SubId == "0") {
+            document.getElementById("desBranchId").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desBranchId").style.display = "none";
+        }
+        return validate;
+    };
+    $('#NewPaper').click(function () {
+        return submitForm();
+    });
+    function submitForm() {
+        var validatestatus = validateSection();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            var ClassNumber = document.getElementById("BatchId").value;
+            var SubscriptionId = document.getElementById("SubscriptionId").value;
+            window.location.href = '/SeAcademics/SectionCreationC?ClassId=' + ClassNumber + '&SubscriptionId=' + SubscriptionId;
+            return true;
+        }
+    };
+
+    $('#SubscriptionId').change(function () {
+        document.getElementById('desBatchId').style.display = "none"
+        document.getElementById('desBranchId').style.display = "none"
+        var SubscriptionId = $('#SubscriptionId').val();
+        var ClassId = $('#BatchId').val();
+        if (ClassId > 0 && SubscriptionId > 0) {
+            GetSection();
+        }
+
+    });
+    $('#BatchId').change(function () {
+        document.getElementById('desBatchId').style.display = "none"  
+        document.getElementById('desBranchId').style.display = "none"
+        var SubscriptionId = $('#SubscriptionId').val();
+        var ClassId = $('#BatchId').val();
+        if (ClassId > 0 && SubscriptionId > 0) {
+            GetSection();
+        }
+
+    });
+</script>
+

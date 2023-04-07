@@ -1,0 +1,240 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ManageAssetModelData>
+@{
+    ViewBag.Title = "ManageAssets";
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+<!-- #section:basics/content.breadcrumbs -->
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-shopping-cart"></i>
+            Inventory&Assests
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Manage Assets</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+
+    @using (Html.BeginForm("ManageAssets", "SOperations", FormMethod.Post))
+    {
+        if (null != TempData["ManageAssets"])
+        {
+            <span style="color:red">
+                @TempData["ManageAssets"]
+            </span>
+        }
+
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        <span style="color: red;">@Html.ValidationMessage("Manage Assets")</span>
+
+        <div class="row">
+            <div class="col-xs-12">
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Manage Assets</span>
+                    <div class="" style="float:right;margin-right:10px">
+                        <a href="/SOperations/ManageAssetsC" class="btncustom" role="button" id="New" name="New" onclick="return submittform()">
+                        Add</a>
+  </div>
+
+                </div>
+                                                                                                                    
+
+
+                <div class="widget-box">
+                  
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label no-padding-right" for="form-field-1">Asset category</label>
+                                    <div class="col-sm-3">
+                                        @Html.DropDownList("AssetCategoryId", null, "---Select---", new { @class = "form-control", onchange = "GetData()" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <span style="color:red;font-weight:bold;display:none" id="ValidationCategoryId">select Asset Category</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="display_box" style="display:none;">
+                    <div class="table-header">
+                        Manage Assets
+                    </div>
+                    <br />
+                    <div style="overflow:auto">
+                        <table class="table table-bordered table-striped table-hover nowrap">
+                            <tbody id="tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="display_error" style="display:none;">
+                    <span style="color:red;font-weight:bold">No data to display. Please click on 'New' to create</span>
+                </div>
+            </div>
+        </div>
+        <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+            <p style="position:absolute; top: 50%; left:50%;">
+                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+            </p>
+        </div>
+
+    }
+</section>
+
+<script>
+
+    function GetData() {
+        debugger
+        document.getElementById("ValidationCategoryId").style.display = "none";
+        $('#ValidationCategoryId').hide();
+        debugger
+        var AssetCategoryId = $('#AssetCategoryId').val();
+        if (AssetCategoryId > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+
+                url: '/SOperations/ManageAssetsDisplayData',
+                data: { AssetCategoryId: AssetCategoryId },
+                contentType: "application/json; charset=utf-8",
+                success: successFunc,
+                error: errorFunc
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            document.getElementById("display_box").style.display = "none";
+
+        }
+
+        function successFunc(data) {
+            debugger
+            var sno = 1;
+
+            if (data.length < 1) {
+                //alert('Data not available to display');
+                document.getElementById("display_error").style.display = "inline";
+                document.getElementById("display_box").style.display = "none";
+            }
+            else {
+                document.getElementById("display_box").style.display = "inline";
+                document.getElementById("display_error").style.display = "none";
+                var row = "";
+
+                row += "<tr>" +
+                    "<th>" + "S.No" + "</th>" +
+                    "<th>" + "Asset Name" + "</th>" +
+                    //"<th>" + "Received Date" + "</th>" +
+                    //"<th>" + "Amount" + "</th>" +
+                    "<th>" + "Number Of Assets" + "</th>" +
+                    "<th>" + "Location" + "</th>" +
+                    "<th>" + "Other Details" + "</th>" +
+                    "<th>" + "Received Date" + "</th>" +
+                    "<th>" + " " + "</th>" +
+                    "</tr>";
+                $.each(data, function (index, item) {
+
+                    var tdvalue = "<td></td>";
+                    if (item.Barcode == 1) {
+                        tdvalue = "<td>" + '<a href="/SOperations/ManageAssetsP?id=' + item.ManageAssetId + ' ">' + "Print" + '</a>' + "  ";
+
+                    }
+
+
+                    row += "<tr>" +
+                        "<td>" + sno++ + "</td>" +
+                        "<td>" + item.AssetName + "</td>" +
+                        //"<td>" + item.ReceivedDate + "</td>" +
+                        //"<td>" + item.Amount + "</td>" +
+                        "<td>" + item.NoOfAssets + "</td>" +
+                        "<td>" + item.Location + "</td>" +
+                        "<td>" + item.OtherDetails + "</td>" +
+                        "<td>" + item.RecievedDateString + "</td>" +
+                        "<td>" + '<a href="/SOperations/ManageAssetsE?id=' + item.ManageAssetId + ' " class="green"><i class="ace-icon fa fa-pencil  bigger-130"></i></a>' + "  " +
+                        //'<a href="/SOperations/ManageAssetsD?id=' + item.ManageAssetId + '&LocationId=' + item.ManageAssetId + '" id=manageAssetId>' + "Delete" + '</a>' + " | " +
+                        '<a onclick="manageAssetId(' + item.ManageAssetId + ')" class="red"><i class="ace-icon fa fa-trash-o bigger-130"></i> </a>' + "  " + " " +
+                        '<a href="/SOperations/ManageAssetsDet?id=' + item.ManageAssetId + ' " class="blue"><i class="ace-icon fa fa-info-circle bigger-130"></i></a>' + "</td>" +
+                        "</tr>";
+                });
+
+                $("#tbody").html(row);
+            }
+        }
+        function errorFunc() {
+            document.getElementById("display_box").style.display = "none";
+
+        }
+
+    };
+
+    window.onload = GetData;
+
+
+    function submittform() {
+
+        var nAssetCategoryId = $('#AssetCategoryId').val()
+        var validation = true;
+        if (nAssetCategoryId == null || nAssetCategoryId == "" || nAssetCategoryId == '') {
+            validation = false;
+            document.getElementById("ValidationCategoryId").style.display = "inline";
+            return validation;
+        }
+
+        else {
+            document.getElementById("ValidationCategoryId").style.display = "none";
+            return validation;
+        }
+    }
+
+
+</script>
+<script>
+    function manageAssetId(Value) {
+        debugger
+        if (Value > 0) {
+            $.ajax({
+                url: '/SOperations/ValidationForManageAssetsD',
+                data: { Id: Value },
+                success: function (data) {
+                    debugger
+                    var url = '/SOperations/ManageAssetsD?id=' + Value;
+                    var title = "Manage Asset ";
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+</script>

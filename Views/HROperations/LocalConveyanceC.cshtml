@@ -1,0 +1,279 @@
+﻿@model AsteriskBrowserAL.Models.ConveyanceViewModel
+@{
+    ViewBag.Title = "TravelAndCoveyance";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Local Conveyance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!-- /section:basics/content.breadcrumbs -->
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class=col-xs-3>
+            <h3>@Html.ActionLink("<< Conveyance", "Conveyance", new { strYearMonth = Model.MonthYear, bIsLocal = true })</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("LocalConveyanceC", "HROperations", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                <input class="form-control" type="hidden" value="@Model.StartDate.ToShortDateString()" id="dtStartDate" />
+                <input class="form-control" type="hidden" value="@Model.EndDate.ToShortDateString()" id="dtEndDate" />
+
+                <input type="hidden" id="StaffId" value="@Model.ReportingManagerId" name="StaffId" />
+                @Html.ValidationMessage("Message")
+
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Local Conveyance</h3>
+                        <button class="btn btn-primary pull-right" type="submit" style="width:120px;" onclick="return ValidateForm();">
+                            Send Request
+                        </button>
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+                    <div class="box-body">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Date</label>
+                                @*<div class="col-xs-3">
+                                    <div id="datepicker" class="input-group date">
+                                        <input class="form-control" type="text" id="ConveyanceDate" name="Date" autocomplete="off" placeholder="Conveyance Date" />
+                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+                                </div>*@
+                                <div class="col-xs-3">
+                                    <div id="datepicker" class="input-group date">
+                                        @if (Model != null && Model.Date.HasValue)
+                                        {
+                                            <input class="form-control" type="text" id="ConveyanceDate" value="@Model.Date.Value.ToShortDateString()" name="Date" autocomplete="off" placeholder="Schedule Date" />
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" type="text" id="ConveyanceDate" name="Date" autocomplete="off" placeholder="Conveyance Date" />
+                                        }
+                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vDate">
+                                    <label style="color:red;font-weight:bold;">required</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Branches Visited</label>
+                                @*<div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ListSelectedBranches, new SelectList(Model.ListBranch, "Institute", "Institute"), new { @class = "form-control select2", @multiple = "multiple", id = "subscriptionId", placeholder = "Branch" })
+                                </div>*@
+                                <div class="col-sm-3">
+                                    @Html.TextAreaFor(model => model.PlacesVisited, 3, 4, new { @class = "form-control" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vStatus">
+                                    <label style="color:red;font-weight:bold;">required</label>
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Reporting Manger</label>
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.ReportingManagerName, new { @class = "form-control", @disabled = "disabled" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vStatus">
+                                    <label style="color:red;font-weight:bold;">required</label>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">Purpose of Visiting</label>
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.PurposeOfVisiting, new { @class = "form-control", id = "purposeOfVisiting", placeholder = "Purpose of visiting" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vMarks">
+                                    <label style="color:red;font-weight:bold;">required</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">Mode Of Travel</label>
+
+                                <div class="col-xs-3">
+                                    @Html.DropDownListFor(model => model.ModeOfTravelling, new SelectList(Model.ListTravellingMode, "TravellingModeId", "TravellingMode"), "--- Select ---", new { @class = "form-control", placeholder = "TravellingMode" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vSubKnwl">
+                                    <label style="color:red;font-weight:bold;">required</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*KMS</label>
+
+                                <div class="col-xs-3">
+                                    @Html.TextBoxFor(model => model.KMS, new { @class = "form-control", id = "kms", placeholder = "KMS" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vTeaching">
+                                    <label style="color:red;font-weight:bold;">required</label>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right required" for="form-field-1">*Total Amount</label>
+
+                                <div class="col-xs-3">
+                                    @Html.TextBoxFor(model => model.Amount, new { @class = "form-control", @disabled = "disabled", id = "Amount", placeholder = "Amount" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vCommunication">
+                                    <label style="color:red;font-weight:bold;">required</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <input type="hidden" id="count" name="count" value="0" />
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    $(document).on('focus', '#datepicker', function () {
+        $("#datepicker").datepicker({
+            endDate: $('#dtEndDate').val(),
+            startDate: $('#dtStartDate').val(),
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+
+            todayHighlight: true
+        });
+
+    });
+
+
+    $('#ModeOfTravelling').change(function () {
+        var nValue = $('#ModeOfTravelling').val();
+        if (nValue != 1) {
+            $('#Amount').attr("disabled", "disabled");
+        }
+        else {
+            $('#Amount').removeAttr("disabled");
+        }
+    })
+
+    function TravelandConeyanceValidation() {
+        document.getElementById("count").value = "1";
+        var Date = document.getElementById("ConveyanceDate").value;
+        var subscriptionId = document.getElementById("subscriptionId").value;
+        //var travellingModeId = document.getElementById("travellingModeId").value;
+        var purposeOfVisiting = document.getElementById("purposeOfVisiting").value;
+        var kms = document.getElementById("kms").value;
+        var Amount = document.getElementById("Amount").value;
+
+        validate = true;
+
+        if (Date == "") {
+            document.getElementById("vDate").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("vDate").style.display = "none";
+        }
+
+        if (subscriptionId == "") {
+            document.getElementById("vStatus").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("vStatus").style.display = "none";
+        }
+        if (purposeOfVisiting == "") {
+            document.getElementById("vMarks").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("vMarks").style.display = "none";
+        }
+        //if (travellingModeId == "") {
+        //    document.getElementById("vSubKnwl").style.display = "inline";
+        //    validate = false;
+        //}
+        //else {
+        //    document.getElementById("vSubKnwl").style.display = "none";
+        //}
+        if (kms == "") {
+            document.getElementById("vTeaching").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("vTeaching").style.display = "none";
+        }
+
+        //if (travellingModelId != null && travellingModelId == 1) {
+        //    document.getElementById("vCommunication").style.display = "inline";
+        //    validate = false;
+        //}
+        //else {
+        //    document.getElementById("vCommunication").style.display = "none";
+        //}
+        return validate;
+        alert(validate);
+
+    };
+
+    function ValidateForm() {
+
+        var validationStatus = TravelandConeyanceValidation();
+
+        if (validationStatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //$('#travellingModeId').focus(function () {
+    //    $('#vDate').hide();
+    //});
+    $('#subscriptionId').focus(function () {
+        $('#vStatus').hide();
+    });
+
+    $('#subscriptionId').focus(function () {
+        $('#vStatus').hide();
+    });
+
+    $('#kms').focus(function () {
+        $('#vTeaching').hide();
+    });
+
+
+</script>

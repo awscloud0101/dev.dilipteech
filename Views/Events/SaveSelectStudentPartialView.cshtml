@@ -1,0 +1,77 @@
+﻿
+@model AsteriskBrowserAL.Models.EventsDetails
+
+@{
+    Layout = null;
+}
+<span style="color:red;font-weight:bold" id="Validation"></span>
+<br />
+<br />
+
+
+<div class="row">
+    @*<input type="hidden" value="@Model.SlotId" id="SlotId" name="SlotId" />*@
+
+
+    <div class="col-sm-12">
+        <label class="col-sm-4"><span style="font-weight:bold"></span>Student</label>
+        <div class="col-sm-6">
+
+            <select id="StudentId" name="StudentId" class="form-control"></select>
+            @*@Html.DropDownListFor(model => model.StudentId, new SelectList("lstStudents", "StudentId", "FullName"), new { @class = "form-control", id = "StudentId" })*@
+
+            @*@Html.DropDownList("lstStudents", null, "--Select--", new { @class = "form-control", @id = "lstStudents", required = "required" })*@
+
+            @*<select id="StudentId" name="StudentId" value = "@ViewBag.StudentName" class="form-control"></select>*@
+            @*<input type="text" name="StudentName" id="StudentId" spellcheck="false" oninput="removeError();" class="form-control" />*@
+            @*<input type="text" id="StudentId" name="StudentId" class="form-control" />*@
+            @*@Html.TextBoxFor(model => model.StudentId, new { @class = "form-control", id = "Subject", required = "required" })*@
+        </div>
+    </div>
+    <input type="hidden" value="@Model.CourseId" id="CourseId" />
+    <input style="display:none" id="SlotId" value="@Model.SlotId" />
+
+    @Html.HiddenFor(model => model.SlotId)
+</div>
+
+
+
+<script>
+    //window.onload = function (e) {
+    //    debugger
+    //    StudentData();
+    //}
+
+     $(document).ready(function () {
+        StudentData();
+    });
+
+
+    function StudentData() {
+        debugger
+        var CourseId = $('#CourseId').val();
+        var SlotId = $('#SlotId').val();
+        $.ajax({
+            
+            url: '/Events/GetStudents',
+            data: { CourseId: CourseId, SlotId : SlotId},
+            success: function (data) {
+
+                var BranchItems = $('#StudentId');
+
+                BranchItems.children().remove();
+
+                BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    BranchItems.append($("<option>").val(record.StudentId).text(record.FullName));
+                });
+
+                $('#StudentId').append(BranchItems);
+
+            },
+            aync: false
+        });
+    }
+    
+</script>

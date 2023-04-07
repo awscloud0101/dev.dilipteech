@@ -1,0 +1,68 @@
+﻿@model List<AsteriskBrowserAL.Models.ExaminationResultsData>
+@{               
+  ViewBag.Title = "ExamMarks";
+  Layout = "~/Views/Shared/Parent_Layout.cshtml";
+  int nSNo = 1;
+  int maxmarks = Model.Where(i => i.MaxMarks != null&&i.MaxMarks!=0 ).Select(i =>i.MaxMarks).FirstOrDefault()??0;
+  double TotaklMarks = Model.Where(i => i.DisplayMarksScored != null && i.DisplayMarksScored != "" && i.DisplayMarksScored != "A").Sum(i => Convert.ToDouble(i.DisplayMarksScored));
+}
+
+
+@if (null != Model && Model.Count() > 0)
+{
+    <div class="col-xs-12">
+        <div class="table-header">
+            <div class="txtTableHeader">
+                Examination Marks (@Model.Count())
+            </div>
+        </div>
+        <table class="table tbhover table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Subject")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Marks") (@maxmarks)
+                    </th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nSNo++)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PaperName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DisplayMarksScored)
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td></td>
+                    <td>Total</td>
+                    <td>@TotaklMarks</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+}
+else
+{
+    <div class="col-xs-12">
+        <span style="font-weight:bold;color:red">Data not available to display</span>
+    </div>
+}
+@Html.Action("DataTableScripts", "Base")
+
+

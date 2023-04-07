@@ -1,0 +1,97 @@
+﻿@model AsteriskBrowserAL.Models.RunPayRollModel
+
+@if (null != Model)
+{
+    if (null != Model.PayRollData && Model.PayRollData.Count() > 0)
+    {
+        <div id="formVal">
+        
+                    <div class="overflowscroll">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("Employee ID")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Employee Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Loss Of Pay")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Net Amount")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Pay")
+                                    </th>
+                                    <th></th>
+                                </tr>
+
+                                @for (int i = 0; i < Model.PayRollData.Count; i++)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.Hidden("lstRunPayroll.Index", (@i))
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].PayrollId", Model.PayRollData.ElementAt(i).PayrollId)
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].EmployeeId", Model.PayRollData.ElementAt(i).EmployeeId)
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].EmployeeName", Model.PayRollData.ElementAt(i).EmployeeName)
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].EmployeeNumber", Model.PayRollData.ElementAt(i).EmployeeNumber)
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].Month", Model.PayRollData.ElementAt(i).Month)
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].Year", Model.PayRollData.ElementAt(i).Year)
+                                            @Html.Hidden("lstRunPayroll[" + @i + "].IsTransfered", Model.PayRollData.ElementAt(i).IsTransfered)
+
+                                            @Model.PayRollData.ElementAt(i).EmployeeNumber
+                                        </td>
+                                        <td>
+                                            @Model.PayRollData.ElementAt(i).EmployeeName
+                                        </td>
+
+                                        @if (Model.PayRollData.ElementAt(i).IsTransfered == true)
+                                        {
+
+                                            <td>
+                                                @Model.PayRollData.ElementAt(i).LossOfPay
+                                                @Html.Hidden("lstRunPayroll[" + @i + "].LossOfPay", Model.PayRollData.ElementAt(i).LossOfPay)
+                                            </td>
+                                            <td>
+                                                @Model.PayRollData.ElementAt(i).NetAmount
+                                                @Html.Hidden("lstRunPayroll[" + @i + "].NetAmount", Model.PayRollData.ElementAt(i).NetAmount)
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" name="Priority" disabled="disabled" class="checkbox" />
+                                                @Html.Hidden("lstRunPayroll[" + @i + "].Priority", Model.PayRollData.ElementAt(i).Priority)
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                @Html.TextBox("lstRunPayroll[" + @i + "].LossOfPay", Model.PayRollData.ElementAt(i).LossOfPay, new { @type = "number", @min = "0" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBox("lstRunPayroll[" + @i + "].NetAmount", Model.PayRollData.ElementAt(i).NetAmount, new { @type = "number", @step = "Any" })
+                                            </td>
+                                            <td>
+                                                @Html.CheckBox("lstRunPayroll[" + @i + "].IsChecked", Model.PayRollData.ElementAt(i).IsChecked, new { @id = "PayId", @class="checkbox"})
+                                                @Html.Hidden("lstRunPayroll[" + @i + "].IsChecked", Model.PayRollData.ElementAt(i).IsChecked, new { @id = "PayId" })
+                                            </td>
+                                        }
+
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        
+
+
+    }
+
+}
+else
+{
+    <span style="color: red;"><b>Data not available</b></span>
+}
+

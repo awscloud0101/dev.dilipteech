@@ -1,0 +1,129 @@
+﻿
+@model AsteriskBrowserAL.Models.CoScholasticsResultsData
+
+@{
+    string UserRole = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+@if (null != Model && null!=Model.lstCoSholasticResults&& Model.lstCoSholasticResults.Count() > 0)
+{
+    
+    int nsno = 1;
+    <div class="widget-box">
+
+        
+                <div class="table-header">
+                    Records Found (@Model.lstCoSholasticResults.Count())
+
+
+                    <div style="float:right;">
+                        <button type="submit" name="Save" class="btn btn-info btn-minier P2" style="margin-top:2px">
+                            <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                        </button>
+                    </div>
+                </div>
+                @*<h3 class="box-title">Co-Scholastic Results</h3>
+                <button type="submit" class="btn btn-primary pull-right" style="width:80px;float:right;" id="save">Save</button>
+            </div>*@<!-- /.box-header -->
+        <!-- form start -->
+        <div class="widget-body">
+            <div class="widget-body table-responsive no-padding">
+                <div >
+                    <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                        <thead>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Roll Number")
+                                </th>
+                                @if (bIsCoastal)
+                                {
+                                    <th>
+                                        @Html.DisplayName("Registration Number")
+                                    </th>
+                                }
+                                <th>
+                                    @Html.DisplayName("Legacy Number")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Score")
+                                </th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.lstCoSholasticResults.Count(); i++)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.Hidden("lstCoScholasticResults.Index", (@i + 10))
+
+                                        @(nsno++)
+                                    </td>
+                                    <td>
+                                        @Html.Hidden("lstCoScholasticResults[" + (@i + 10) + "].StudentId", Model.lstCoSholasticResults.ElementAt(i).StudentId)
+                                        @Html.Hidden("lstCoScholasticResults[" + (@i + 10) + "].SubjectId", Model.lstCoSholasticResults.ElementAt(i).SubjectId)
+                                        @Html.Hidden("lstCoScholasticResults[" + (@i + 10) + "].ExamId", Model.lstCoSholasticResults.ElementAt(i).ExamId)
+                                        @Model.lstCoSholasticResults.ElementAt(i).DisplayName
+                                    </td>
+
+                                    <td>
+                                        @Model.lstCoSholasticResults.ElementAt(i).RollNumber
+                                    </td>
+                                    @if (bIsCoastal)
+                                    {
+                                        <td>
+                                            @Model.lstCoSholasticResults.ElementAt(i).OMRNumber
+                                        </td>
+                                    }
+                                    <td>
+                                        @Model.lstCoSholasticResults.ElementAt(i).LegacyNumber
+                                    </td>
+
+
+                                    <td>
+                                        @Html.DropDownList("lstCoScholasticResults[" + (@i + 10) + "].Marks", new SelectList(Model.lstGrading, "CoScholasticsMinScore", "CoScholasticsGrade", Model.lstCoSholasticResults.ElementAt(i).Marks), "-- select --", new { @class = "form-control textlength", onkeypress = "return isNumberKey(event)", @style = "width:100px" })
+                                    </td>
+
+
+
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+       
+}
+else
+{
+    <span style="color: red;"><b>No data to display</b></span>
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+</script>
+
+

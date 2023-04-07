@@ -1,0 +1,394 @@
+﻿@model AsteriskBrowserAL.Models.ConveyanceViewModel
+@{
+    int nsno = 1;
+    int nSno1 = 1;
+    ViewBag.Title = "LocalConveyance";
+}
+
+@*<section class="content">*@
+@*<div class="row">
+        <div class=col-xs-3>
+            <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("LocalConveyanceC", "HROperations")'">Apply Conveyance</button>
+        </div>
+    </div>*@
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-body">
+                <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("LocalConveyanceC", "HROperations", new { Model.MonthYear })'">Apply Conveyance</button>
+            </div>
+        </div>
+    </div>
+</div>
+@if (null != Model)
+{
+    <input type="hidden" id="MonthYear" name="MonthYear" value="@Model.MonthYear"/>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Applied Conveyances</h3>
+                    <button class="btn btn-primary pull-right" onclick="return Export();">Export To Excel</button>
+                </div>
+
+                <div class="box-body">
+                    <div style="overflow:auto;height:440px;">
+                        <div class="hideScrolling">
+                            <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;">
+
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Date")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Branches Visited")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Reporting Manager")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Purpose")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Travel Mode")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("KMS")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Amount")
+                                        </th>
+                                        <th></th>
+                                    </tr>
+
+                                    @foreach (var item in Model.ListConveyance)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @(nsno++)
+                                            </td>
+                                            @if (item.Date.HasValue)
+                                            {
+                                                <td>
+                                                    @item.Date.Value.ToString("dd-MMM-yyyy")
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                            }
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.BranchesVisited)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.ReportingManagerName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.PurposeOfVisiting)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.DisplayModeOfTravelling)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.KMS)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Amount)
+                                            </td>
+                                            <td>
+                                                @Html.ActionLink("Edit", "LocalConveyanceE", new { id = item.MeetingConveyanceId }) |
+                                                <a onclick="DeleteRecord(@item.MeetingConveyanceId)" style="cursor:pointer">Delete</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+    @*</section>*@
+
+    <div style="display:none;">
+        <table id="ConveyanceTableId">
+            <tr>
+                <td>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th colspan="8" rowspan="2">LOCAL CONVEYANCE FOR THE MONTH OF AUGUST'16</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th></th>
+                                <th align="left">Name </th>
+                                <td colspan="6">: @Model.EmployeeName</td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th align="left">Designation </th>
+                                <td colspan="6">: @Model.DesignationName</td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th align="left">Contact No </th>
+                                <td colspan="6" align="left">: @Model.ContactNumber</td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th align="left">BANK A/C DETAILS </th>
+                                <td colspan="6" align="left">: @Model.AccountNumber</td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th align="left">IFSC Code </th>
+                                <td colspan="6" align="left">: @Model.IFSCCode </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th colspan="8" rowspan="2"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+
+
+            <tr>
+                <td>
+                    <table border="1">
+                        <tbody>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Branches Visited")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Reporting Manager")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Purpose")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Mode of Travel")<br />(AUTO/BIKE/CAR/BUS/TRAIN/AIR)
+                                </th>
+                                <th>
+                                    @Html.DisplayName("KMS")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Amount")
+                                </th>
+
+                            </tr>
+
+                            @foreach (var item in Model.ListConveyance)
+                            {
+                                <tr>
+                                    <td>
+                                        @(nSno1++)
+                                    </td>
+                                    @if (item.Date.HasValue)
+                                    {
+                                        <td>
+                                            @item.Date.Value.ToString("dd-MMM-yyyy")
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.BranchesVisited)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ReportingManagerName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.PurposeOfVisiting)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DisplayModeOfTravelling)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.KMS)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Amount)
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th colspan="8" rowspan="2"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th></th>
+                                <th colspan="5" align="left">Employee Signature</th>
+                                <th colspan="2" align="left">Authorized By</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th colspan="8" rowspan="2"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th></th>
+                                <th colspan="5"></th>
+                                <th colspan="2" align="left">Name and Signature</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <script>
+
+        function Export() {
+            ExportDataToExcel('ConveyanceTableId');
+            return false;
+        }
+
+        function ExportDataToExcel(tableid) {
+
+
+            var filename = "Local Conveyance";
+            //creating a temporary HTML link element (they support setting file names)
+            var a = document.createElement('a');
+            //getting data from our div that contains the HTML table
+            var data_type = 'data:application/vnd.ms-excel';
+            var table_div = document.getElementById(tableid);
+            var table_html = table_div.outerHTML.replace(/ /g, '%20');
+            a.href = data_type + ', ' + table_html;
+            //setting the file name
+            a.orientation
+            a.download = filename + '.xls';
+            //triggering the function
+            a.click();
+            //just in case, prevent default behaviour
+            e.preventDefault();
+
+
+
+
+            return (sa);
+        }
+
+
+        function DeleteRecord(id) {
+            $.ajax({
+                url: '/HROperations/CheckingRecordExistance',
+                data: { id: id },
+                success: function (data) {
+                    if (data == "Y") {
+                        ConfirmDeleteRecord(id);
+                    }
+                    if (data == "N") {
+
+                    }
+                }, error: function () {
+
+                }
+            })
+        }
+
+        function ConfirmDeleteRecord(id) {
+            var Monthyear = $('#MonthYear').val();
+            var $dialog = $('<div></div>')
+            .html('Do you want to Delete?')
+
+            .dialog({
+                autoOpen: false,
+                title: 'Local Conveyance',
+                modal: true,
+                buttons: {
+                    "Yes": function () {
+                        $.ajax({
+                            url: '/HROperations/LocalConveyanceD',
+                            data: { id: id },
+                            success: function (data) {
+                                window.location.href = '/HROperations/Conveyance?MonthYear=' + Monthyear
+                            }
+                        })
+
+                        $dialog.dialog('close');
+                    },
+                    No: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            $dialog.dialog('open');
+            e.preventDefault();
+        }
+    </script>

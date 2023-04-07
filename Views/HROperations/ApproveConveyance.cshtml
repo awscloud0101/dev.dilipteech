@@ -1,0 +1,88 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffData>
+@{
+    ViewBag.Title = "ApproveConveyance";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Approve Conveyance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<section class="content">
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Applied Conveyances</h3>
+                </div><!-- /.box-header -->
+
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("MonthYear", null, "-- Select --", new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="ApproveConveyancePartial">
+
+            </div>
+        </div>
+    </div>
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+
+</section>
+
+
+
+<script>
+
+    $('#MonthYear').change(function () {
+        var strYearMonth = $('#MonthYear').val();
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/HROperations/StaffDetailsForConveyanceApproval',
+            data: { strYearMonth: strYearMonth },
+            success: function (data) {
+                $('#ApproveConveyancePartial').html(data);
+                $('#imagemodal').hide();
+            }, error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+    });
+     
+</script>

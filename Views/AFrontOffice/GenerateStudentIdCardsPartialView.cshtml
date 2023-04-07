@@ -1,0 +1,109 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StudentDetailsData>
+
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+
+    <style>
+        .overflowscroll {
+            height: 300px;
+            overflow-y: scroll;
+    
+        }
+   
+    </style>
+
+    <div class="table-header">
+        Records Found (@Model.Count())
+
+        <div style="float:right;margin-right:10px;" >
+            <button type="submit" class="btncustom P2" name="button" id="Save" value="Generate">
+                Generate
+            </button>
+        </div>
+    </div>
+    <div  class="overflowscroll">
+        <table class="table tbhover table-striped table-bordered dynamic-table dummy"  >
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Branch Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Section")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+
+                    <th>
+                        <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                    </th>
+                </tr>
+
+            </thead>
+            <tbody>
+
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+                    
+                    <tr>
+                        <td>
+                            @Html.Hidden("lstStudentsToGenerateIdCards.Index", (@i + 10))
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].Name", Model.ElementAt(i).Name)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].BranchAddress", Model.ElementAt(i).BranchAddress)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].BranchTelephoneNum", Model.ElementAt(i).BranchTelephoneNum)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].ClassName", Model.ElementAt(i).ClassName)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].FatherName", Model.ElementAt(i).FatherName)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].DateofBirthDisplay", Model.ElementAt(i).DateofBirthDisplay)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].MobileNumber", Model.ElementAt(i).MobileNumber)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].AdmissionNumber", Model.ElementAt(i).AdmissionNumber)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].Photo", Model.ElementAt(i).Photo)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].ClassNumber", Model.ElementAt(i).ClassNumber)
+                            @Html.Hidden("lstStudentsToGenerateIdCards[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                            @Model.ElementAt(i).BranchName
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).Section
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).Name
+                        </td>
+
+                        <td>
+                            @Html.CheckBox("lstStudentsToGenerateIdCards[" + (@i + 10) + "].IsChecked", Model.ElementAt(i).IsChecked, new { id = "Check" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+}
+else
+{
+    <span style="color: red;"><b>No sudents available to display</b></span>
+}
+
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+</script>

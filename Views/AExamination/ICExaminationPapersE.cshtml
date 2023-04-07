@@ -1,0 +1,415 @@
+﻿
+@model AsteriskBrowserAL.Models.ExaminationPapersViewModel
+
+@{
+    ViewBag.Title = "Edit ExaminationPapers";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Transactions
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">IC Examination Papers</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+
+<section class="content">
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- form start -->
+            @using (Html.BeginForm("ICExaminationPapersE", "AExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <span style="color:red;font-weight:bold;" id="Validation"></span>
+
+
+                    <div class="page-header">
+                        <h1>
+                            IC Examination Papers
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "ICExaminationPapers", new { CategoryId = Model.ICExaminationPapers.CategoryId })
+                            </small>
+                        </h1>
+                    </div><!-- /.page-header -->
+                    @Html.ValidationSummary(true)
+                    <span style="color: red;">@Html.ValidationMessage("Examination Papers")</span>
+                        @Html.HiddenFor(model => model.ICExaminationPapers.ICExaminationPaperId)
+
+                        <input type="hidden" id="OldSubId" value="@Model.ICExaminationPapers.SubjectId" />
+                        <input type="hidden" id="OldPaperName" value="@Model.ICExaminationPapers.PaperName" />
+
+                        @Html.HiddenFor(model => model.ICExaminationPapers.CategoryId)
+
+
+                        <input type="hidden" id="id" value="@Model.ICExaminationPapers.ICExaminationPaperId" />
+                        <input type="hidden" id="CategoryId" value="@Model.ICExaminationPapers.CategoryId" />
+
+                        <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Subject")</label>
+
+                                <div class="col-sm-5">
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.ICExaminationPapers.SubjectId, new SelectList(Model.AllSubjects, "SubjectId", "SubjectName"), "--- Select ---", new { @class = "form-control", id = "SubjectNameAndId", @style = "width:210px" })
+                                    </div>
+                                </div>
+
+                                <span class="col-sm-3" style="color:red;font-weight:bold;" id="EPSubjectNameAndId">
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("ICExamination Cycle")</label>
+
+                                <div class="col-sm-5">
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.ICExaminationPapers.CycleNumber, new SelectList(Model.lstICExaminationCycle, "ICExaminationCycleId", "CycleName"), "--- Select ---", new { @class = "form-control", id = "CycleNumber", @style = "width:210px" })
+                                    </div>
+                                </div>
+
+                                <span class="col-sm-3" style="color:red;font-weight:bold;" id="EPCycleNumber">
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Paper Name")</label>
+
+                                <div class="col-sm-5">
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(model => model.ICExaminationPapers.PaperName, new { @class = "form-control", placeholder = "Paper Name", id = "PaperName", @onchange = "removeError()", @style = "width:210px" })
+                                    </div>
+                                </div>
+
+                                <span class="col-sm-3" style="color:red;font-weight:bold;" id="EPPaperName">
+                                </span>
+
+                            </div>
+
+                            @if (null == @Model.ICExaminationPapers.ExamDate)
+                            {
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Exam Date")</label>
+                                    <div class="col-sm-5">
+                                        <div class="col-sm-6">
+                                            <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                <input class="form-control" type="text" style="width:170px" id="ExamDate" name="ExamDate" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="col-sm-3" style="color:red;font-weight:bold;" id="EPExamDate">
+                                    </span>
+                                </div>
+
+                            }
+                            else
+                            {
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Exam Date")</label>
+                                    <div class="col-sm-5">
+                                        <div class="col-sm-6">
+                                            <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                <input class="form-control" type="text" style="width:170px" id="ExamDate" name="ExamDate" value="@Model.ICExaminationPapers.ExamDate.Value.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="col-sm-3" style="color:red;font-weight:bold;" id="EPExamDate">
+                                    </span>
+                                </div>
+                            }
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Max Marks")</label>
+                                <div class="col-sm-5">
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(model => model.ICExaminationPapers.MaxMarks, new { @class = "form-control txtboxNum", placeholder = "Max Marks", id = "MaxMarks", onchange = "removeError()", @style = "width:210px" })
+                                    </div>
+                                </div>
+
+
+                                <span class="col-sm-3" style="color:red;font-weight:bold;" id="EPMaxMarks">
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Pass Marks")</label>
+
+                                <div class="col-sm-5">
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(model => model.ICExaminationPapers.PassMarks, new { @class = "form-control txtboxNum", placeholder = "Pass Marks", id = "PassMarks", onchange = "removeError()", @style = "width:210px" })
+                                    </div>
+                                </div>
+
+
+                                <span class="col-sm-3" style="color:red;font-weight:bold;" id="EPPassMarks">
+                                </span>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right"></label>
+
+                                <div class="col-sm-5">
+                                    <div class="col-sm-6">
+
+                                        @if (!Model.ICExaminationPapers.IsDailyExam.HasValue)
+                                        {
+                                            Model.ICExaminationPapers.IsDailyExam = false;
+                                        }
+
+                                        @Html.CheckBoxFor(model => model.ICExaminationPapers.IsDailyExam.Value, new { Name = "IsDailyExam" })
+
+                                        <span class="lbl bigger-120">Is Daily Exam</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <div class="col-md-offset-3 col-md-9">
+                                <button class="btn btn-success btn-sm" name="Save" onclick="return submitForm();" type="submit">
+                                    <i class="ace-icon fa fa-check bigger-50"></i>
+                                    Save
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <button class="btn btn-sm" type="reset">
+                                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                                    Reset
+                                </button>
+                            </div>
+
+                        </form>
+
+
+            }
+        </div>
+    </div>
+
+
+    <input type="hidden" id="OldSubjectNameAndId" name="OldSubjectNameAndId" value="@Model.ICExaminationPapers.SubjectId" />
+    <input type="hidden" id="OldPaperName" name="OldPaperName" value="@Model.ICExaminationPapers.PaperName" />
+    <input type="hidden" id="OldExamDate" name="OldExamDate" value="@Model.ICExaminationPapers.ExamDate.Value.ToShortDateString()" />
+    <input type="hidden" id="OldMaxMarks" name="OldMaxMarks" value="@Model.ICExaminationPapers.MaxMarks.Value" />
+    <input type="hidden" id="OldPassMarks" name="OldPassMarks" value="@Model.ICExaminationPapers.PassMarks.Value" />
+    <input type="hidden" id="OldCycleNumber" name="OldCycleNumber" value="@Model.ICExaminationPapers.CycleNumber" />
+</section>
+
+
+<script type="text/javascript">
+
+
+    $('#SubjectNameAndId').change(function () {
+        document.getElementById("EPSubjectNameAndId").innerHTML = "";
+    })
+
+    $('#CycleNumber').change(function () {
+        document.getElementById("EPCycleNumber").innerHTML = "";
+    })
+
+    $('#PaperName').focus(function () {
+        document.getElementById("EPPaperName").innerHTML = "";
+    })
+
+    $('#ExamDate').change(function () {
+        document.getElementById("EPExamDate").innerHTML = "";
+    })
+
+    $('#MaxMarks').focus(function () {
+        document.getElementById("EPMaxMarks").innerHTML = "";
+    })
+
+    $('#PassMarks').focus(function () {
+        document.getElementById("EPPassMarks").innerHTML = "";
+    })
+
+    function validateEP() {
+        debugger
+        var SubjectNameAndId = $('#SubjectNameAndId').val();
+        var CycleNumber = $('#CycleNumber').val();
+        var PaperName = document.getElementById("PaperName").value;
+        var ExamDate = document.getElementById("ExamDate").value;
+        var MaxMarks = document.getElementById("MaxMarks").value;
+        var PassMarks = document.getElementById("PassMarks").value;
+        validate = true;
+
+
+        if (SubjectNameAndId == "") {
+            document.getElementById("EPSubjectNameAndId").innerHTML = "Please select class";
+            validate = false;
+        }
+
+        if (CycleNumber == "") {
+            document.getElementById("EPCycleNumber").innerHTML = "Please select Cycle";
+            validate = false;
+        }
+
+        if (PaperName == "") {
+            document.getElementById("EPPaperName").innerHTML = "Please enter paper name";
+            validate = false;
+        }
+
+        if (ExamDate == "") {
+            document.getElementById("EPExamDate").innerHTML = "Please enter exam date";
+            validate = false;
+        }
+
+        if (MaxMarks == "") {
+            document.getElementById("EPMaxMarks").innerHTML = "Please enter max marks";
+            validate = false;
+        }
+
+        if (PassMarks == "") {
+            document.getElementById("EPPassMarks").innerHTML = "Please enter pass marks";
+            validate = false;
+        }
+
+
+        if (MaxMarks != "" && PassMarks != "") {
+            if (parseInt(MaxMarks) < parseInt(PassMarks)) {
+                document.getElementById("EPPassMarks").innerHTML = "Pass marks should be less than max marks";
+                validate = false;
+            }
+        }
+
+        if (validate == true) {
+
+            if (SubjectNameAndId != $('#OldSubId').val()) {
+                var status = IsExaminationPaperExisted();
+                validate = status;
+            }
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+        var validatestatus = validateEP();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function resetEP() {
+
+        document.getElementById("count").value = "0";
+        document.getElementById("EPSubjectNameAndId").style.display = "none";
+        document.getElementById("EPPaperName").style.display = "none";
+        document.getElementById("EPExamDate").style.display = "none";
+        document.getElementById("EPMaxMarks").style.display = "none";
+        document.getElementById("EPPassMarks").style.display = "none";
+
+        //var res = document.getElementById("OldHours").value;
+
+        document.getElementById("SubjectNameAndId").value = document.getElementById("OldSubjectNameAndId").value;
+        document.getElementById("PaperName").value = document.getElementById("OldPaperName").value;
+        document.getElementById("ExamDate").value = document.getElementById("OldExamDate").value;
+        document.getElementById("MaxMarks").value = document.getElementById("OldMaxMarks").value;
+        document.getElementById("PassMarks").value = document.getElementById("OldPassMarks").value;
+        document.getElementById("CycleNumber").value = document.getElementById("OldCycleNumber").value;
+
+        return false;
+    };
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var SubjectNameAndId = document.getElementById("SubjectNameAndId").value;
+        var PaperName = document.getElementById("PaperName").value;
+        var ExamDate = document.getElementById("ExamDate").value;
+        var MaxMarks = document.getElementById("MaxMarks").value;
+        var PassMarks = document.getElementById("PassMarks").value;
+
+        if (count != 0) {
+            if (SubjectNameAndId != "") {
+                document.getElementById("EPSubjectNameAndId").style.display = "none";
+            } else {
+                document.getElementById("EPSubjectNameAndId").style.display = "inline";
+            }
+
+
+            if (PaperName != "") {
+                document.getElementById("EPPaperName").style.display = "none";
+            } else {
+                document.getElementById("EPPaperName").style.display = "inline";
+            }
+
+            if (ExamDate != "") {
+                document.getElementById("EPExamDate").style.display = "none";
+            } else {
+                document.getElementById("EPExamDate").style.display = "inline";
+            }
+
+            if (MaxMarks != "") {
+                document.getElementById("EPMaxMarks").style.display = "none";
+            } else {
+                document.getElementById("EPMaxMarks").style.display = "inline";
+            }
+
+            if (PassMarks != "") {
+                document.getElementById("EPPassMarks").style.display = "none";
+            } else {
+                document.getElementById("EPPassMarks").style.display = "inline";
+            }
+
+
+
+            //if (Hours != -1) {
+            //    document.getElementById("EPHours").style.display = "none";
+            //} else {
+            //    document.getElementById("EPHours").style.display = "inline";
+            //}
+
+        }
+    };
+
+    $('#SubjectNameAndId').change(function () {
+        document.getElementById("EPSubjectNameAndId").innerHTML = "";
+        var SubName = $("#SubjectNameAndId option:selected").text();
+
+        if (SubName != "--- Select ---") {
+            document.getElementById("EPPaperName").innerHTML = "";
+            $('#PaperName').val(SubName);
+        }
+        else {
+            $('#PaperName').val("");
+        }
+
+    });
+
+    function IsExaminationPaperExisted() {
+        var Status = true;
+
+        $.ajax({
+
+            url: '/AExamination/ValidationForICExamPapersD',
+            data: { id: $('#id').val() },
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                    document.getElementById("Validation").innerHTML = "Results existed for " + $('#OldPaperName').val();
+                }
+
+            },
+            async: false
+        });
+
+        return Status;
+    }
+
+</script>

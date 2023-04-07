@@ -1,0 +1,245 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionData
+@{
+    int sno = 1;
+    string Message = "";
+    
+}
+@if (null != Model)
+{
+    <input type="hidden" name="FeeAmountId" value="@Model.FeeAmountId" />
+    <input type="hidden" name="TransportFeeAmountId" value="@Model.TransportFeeAmountId" />
+
+    Message = Model.Message;
+    if (!string.IsNullOrEmpty(Message))
+    {
+        <span style="color:red;font-weight:bold" id="Message"> @Message</span>
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold" id="Message"></span>
+
+    }
+    if (null != Model.AdmissionFeeStructure && Model.AdmissionFeeStructure.Count() > 0)
+    {
+
+        <div class="col-xs-12">
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <table class="table table-hover stripe">
+                                <thead>
+                                    <tr>
+                                        <th class="centerAlign">
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Particular Name")
+                                        </th>
+
+                                        <th class="rightAlign">
+                                            @Html.DisplayName("Amount")
+                                        </th>
+                                        <th class="rightAlign">
+                                            @Html.DisplayName("Discount")
+                                        </th>
+                                        <th class="rightAlign">
+                                            @Html.DisplayName("Paid Amount")
+                                        </th>
+                                        <th class="rightAlign">
+                                            @Html.DisplayName("Balance")
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody style="overflow: auto; height: 300px; ">
+                                    @if (null != Model)
+                                    {
+                                        for (int i = 0; i < Model.AdmissionFeeStructure.Count(); i++)
+                                        {
+                                            if (Model.AdmissionFeeStructure.ElementAt(i).InstallmentAmount > 0)
+                                            {
+                                                <tr>
+													<td class="centerAlign">
+														@Html.Hidden("AdmissionFeeStructure.Index", (@i + 10))
+														@sno
+														@Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].FeeparticularId", Model.AdmissionFeeStructure.ElementAt(i).FeeparticularId)
+														@Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].ParticularName", Model.AdmissionFeeStructure.ElementAt(i).ParticularName)
+														@Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].InstallmentAmount", Model.AdmissionFeeStructure.ElementAt(i).InstallmentAmount)
+														@Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].FeeAmountId", Model.AdmissionFeeStructure.ElementAt(i).FeeAmountId)
+														@Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].isAdmission", Model.AdmissionFeeStructure.ElementAt(i).IsAdmission)
+														@Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].isTransport", Model.AdmissionFeeStructure.ElementAt(i).isTransport)
+														@Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].IsHostel", Model.AdmissionFeeStructure.ElementAt(i).IsHostel)
+													</td>
+                                                    <td>
+                                                        @Model.AdmissionFeeStructure.ElementAt(i).ParticularName
+
+
+                                                    </td>
+                                                    <td class="rightAlign">
+                                                        @Model.AdmissionFeeStructure.ElementAt(i).InstallmentAmount
+                                                        @Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].InstallmentAmount", Model.AdmissionFeeStructure.ElementAt(i).InstallmentAmount)
+
+
+                                                     </td>
+                                                    <td class="rightAlign">
+
+                                                        @Model.AdmissionFeeStructure.ElementAt(i).DiscountAmount
+                                                        @Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].DiscountAmount", Model.AdmissionFeeStructure.ElementAt(i).DiscountAmount)
+
+                                                    </td>
+                                                    <td class="rightAlign">
+                                                        @Model.AdmissionFeeStructure.ElementAt(i).PaidAmount
+                                                        @Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].PaidAmount", Model.AdmissionFeeStructure.ElementAt(i).PaidAmount)
+                                                    </td>
+                                                    <td class="rightAlign">
+                                                        @Model.AdmissionFeeStructure.ElementAt(i).BalanceAmount
+                                                        @Html.Hidden("AdmissionFeeStructure[" + (@i + 10) + "].BalanceAmount", Model.AdmissionFeeStructure.ElementAt(i).BalanceAmount)
+                                                    </td>
+                                                </tr>
+
+                                                sno++;
+                                            }
+
+                                        }
+
+                                        if (Model.AdmissionFeeStructure.Where(t => t.TransactionTypeId == 0).Count() > 1)
+                                        {
+                                            List<AsteriskBrowserAL.Models.FeeParticularViewModel> TutionFeeResult = Model.AdmissionFeeStructure.Where(t => t.TransactionTypeId == 0).ToList();
+
+                                            <tr style="color:seagreen">
+                                                <td class="centerAlign">
+                                                    @sno
+                                                </td>
+                                                <td>
+                                                    <b>Total Tution Fee</b>
+
+                                                </td>
+                                                <td class="rightAlign">
+                                                    <b>@TutionFeeResult.Sum(s => s.InstallmentAmount)</b>
+                                                </td>
+                                                <td class="rightAlign">
+                                                    <b>@TutionFeeResult.Sum(s => s.DiscountAmount)</b>
+
+
+                                                </td>
+                                                <td class="rightAlign">
+                                                    <b>@TutionFeeResult.Sum(s => s.PaidAmount)</b>
+
+
+                                                </td>
+                                                <td class="rightAlign">
+                                                    <b>@TutionFeeResult.Sum(s => s.BalanceAmount)</b>
+                                                </td>
+                                            </tr>
+
+                                            sno++;
+                                        }
+
+
+                                        if (Model.AdmissionFeeStructure.Where(t => t.TransactionTypeId == 1).Count() > 1)
+                                        {
+                                            List<AsteriskBrowserAL.Models.FeeParticularViewModel> TransportResult = Model.AdmissionFeeStructure.Where(t => t.TransactionTypeId == 1).ToList();
+
+                                            <tr style="color:#ea5a11">
+                                                <td class="centerAlign">
+                                                    @sno
+                                                </td>
+                                                <td>
+                                                    <b>Total Transport Fee</b>
+
+                                                </td>
+                                                <td class="rightAlign">
+                                                    <b>@TransportResult.Sum(s => s.InstallmentAmount)</b>
+                                                </td>
+                                                <td class="rightAlign">
+                                                    <b>@TransportResult.Sum(s => s.DiscountAmount)</b>
+                                                </td>
+                                                <td class="rightAlign">
+                                                    <b>@TransportResult.Sum(s => s.PaidAmount)</b>
+
+
+                                                </td>
+                                                <td class="rightAlign">
+                                                    <b>@TransportResult.Sum(s => s.BalanceAmount)</b>
+                                                </td>
+                                            </tr>
+
+                                            sno++;
+                                        }
+
+                                        // Total
+
+                                        <tr>
+                                            <td class="centerAlign">
+                                                @sno
+                                            </td>
+                                            <td>
+                                                <b>Total</b>
+
+                                            </td>
+                                            <td class="rightAlign">
+                                                <b>@Model.AdmissionFeeStructure.Sum(s => s.InstallmentAmount)</b>
+                                            </td>
+                                            <td class="rightAlign">
+                                                <b>@Model.AdmissionFeeStructure.Sum(s => s.DiscountAmount)</b>
+                                            </td>
+                                            <td class="rightAlign">
+                                                <b>@Model.AdmissionFeeStructure.Sum(s => s.PaidAmount)</b>
+                                            </td>
+                                            <td class="rightAlign">
+                                                <b>@Model.AdmissionFeeStructure.Sum(s => s.BalanceAmount)</b>
+                                            </td>
+                                        </tr>
+
+                                    }
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <br />
+
+    }
+}
+
+
+<script>
+
+    $('#AdmissionAmount').keypress(function (e) {
+        document.getElementById("Message").innerHTML = ""
+        $("#AdmissionAmount").attr('maxlength', '6');
+        $("#AdmissionAmount").attr('minlength', '3');
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+
+    $("#ConcessionAmount").click(function () {
+        document.getElementById("Message").innerHTML = ""
+    })
+
+    $("#AdmissionConcession").click(function () {
+        document.getElementById("Message").innerHTML = ""
+    })
+
+
+    $("#InitialAmount").click(function () {
+        document.getElementById("Message").innerHTML = ""
+    })
+</script>

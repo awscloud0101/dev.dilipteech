@@ -1,0 +1,140 @@
+﻿@model AsteriskBrowserAL.Models.VehicleRoutePointViewModel
+@{
+    ViewBag.Title = "Route Point";
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Route Point</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+
+    <br />
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("TransportStudents", "AReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="widget-box">
+
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                Transport Student
+                            </h5>
+                           
+                        </div>
+                        <div class="widegt-body">
+                            <div class="widget-main">
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Transport Plan</label>
+                                            <div class="col-xs-6">
+                                                @Html.DropDownListFor(model => model.TransportPlanId, new SelectList(Model.IstTransportPlans, "TransportPlanId", "PlanName"), "--- Select ---", new { @class = "form-control", id = "TransportPlanId" })
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label class="col-xs-4">Route Point</label>
+                                            <div class="col-xs-6">
+                                                <select class="form-control" id="RoutePointId"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div id="TransportPlanData"></div>
+            }
+        </div>
+    </div>
+
+</section>
+
+<script>
+
+    $('#TransportPlanId').change(function () {
+        var TransportPlanId = $('#TransportPlanId').val()
+        if(TransportPlanId > 0)
+        {
+            GetRoutePoints();
+        }
+        else {
+            $('#TransportPlanData').html("");
+        }
+    })
+
+    $('#RoutePointId').change(function () {
+        debugger
+        var TransportPlanId = $('#TransportPlanId').val()
+        var RoutePointId = $('#RoutePointId').val()
+        if (TransportPlanId > 0 && RoutePointId > 0) {
+            GetTransportStudentsdata();
+        }
+        else {
+            $('#TransportPlanData').html("");
+        }
+    })
+    
+
+    function GetRoutePoints() {
+        var TransportPlanId = $('#TransportPlanId').val()
+        if (TransportPlanId > 0) {
+
+            $.ajax({
+                url: '/AReports/GetRoutePoints',
+                data: { TransportPlanId: TransportPlanId },
+                success: function (result) {
+                    Section = $("#RoutePointId")
+                    Section.children().remove();
+                    Section.append($("<option>").val("").text("--- Select ---"))
+                    $.each(result, function (e, record) {
+                        Section.append($("<option>").val(record.VehicleRoutePointId).text(record.RoutePoint))
+                    })
+                    $("#RoutePointId").append(Section)
+                },
+                async: false
+            })
+        }
+    }
+
+        function GetTransportStudentsdata() {
+            debugger
+            var TransportPlanId = $('#TransportPlanId').val()
+            var RoutePointId = $('#RoutePointId').val()
+            if (TransportPlanId > 0 && RoutePointId > 0) {
+                $('#imagemodal').show()
+                $.ajax({
+                    url: '/AReports/GetTransportStudents',
+                    data: { TransportPlanId: TransportPlanId, RoutePointId: RoutePointId },
+                    success: function (data) {
+                        $('#imagemodal').hide()
+                        $('#TransportPlanData').html(data);
+                    }
+                })
+
+            }
+        }
+     
+    
+</script>
+

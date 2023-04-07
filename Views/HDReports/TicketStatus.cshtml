@@ -1,0 +1,132 @@
+﻿@model AsteriskBrowserAL.Models.TicketStatusData
+@{
+    ViewBag.Title = "TicketStatus";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-desktop"></i>
+            <a href="#">  Help Desk</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Ticket Status</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("TicketStatusE", "HDReports", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Ticket Status</span>
+
+                    </div>
+
+
+                    <div class="widget-box">
+                   
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Date Range</label>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control pull-right" id="daterange" name="daterange" autocomplete="off" />
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Group</label>
+                                        <div class="col-sm-6">
+                                            <select class="form-control" id="GroupId"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="TicketStatusDetails"></div>
+                    }
+
+
+                </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger
+        GetGroupsDropDown()
+    });
+
+    function GetGroupsDropDown() {
+        $.ajax({
+            url: '/SeHelpDesk/GetGroupsDropDown',
+            success: function (Data) {
+                var Group = $('#GroupId')
+                Group.children().remove();
+                Group.append($("<option>").val("").text("--- Select ---"))
+                $.each(Data, function (i, record) {
+                    Group.append($("<option>").val(record.HDExecutiveGroupId).text(record.GroupName));
+                });
+                $('#GroupId').append(Group);
+            }
+        })
+       
+    
+    }
+
+    function GetTickesData() {
+        var dateRange = $('#daterange').val();
+        var GroupId = $('#GroupId').val();
+
+        if (dateRange != "" && GroupId > 0)
+            {
+
+        $('#imagesmodal').show();
+        $.ajax({
+            url: '/HDReports/GetTicketStatusData',
+            data: { DateRange: dateRange, GroupId: GroupId },
+            success: function (data) {
+                $('#TicketStatusDetails').html(data);
+            },
+        }).done(function () {
+            $('#imagesmodal').hide();
+        });
+        }
+        //    .done(function () {
+        //    $('#imagesmodal').hide();
+        //});
+    };
+
+    $('#GroupId').change(function () {
+        GetTickesData();
+    });
+
+    $('#daterange').change(function () {
+        GetTickesData();
+    });
+
+</script>

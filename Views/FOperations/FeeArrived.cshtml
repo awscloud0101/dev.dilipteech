@@ -1,0 +1,289 @@
+﻿
+@model AsteriskBrowserAL.Models.DiscountViewModel
+
+@{
+    ViewBag.Title = "Fee Arrears";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Agreed Fee</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <br />
+    @if (null != Model)
+    {
+        if (null != TempData["FeeArrears"])
+        {
+            <span style="color:green;font-weight:bold;" class="Validation">@Html.Raw(TempData["FeeArrears"])</span>
+        }
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Agreed Fee
+                        </h5>
+                    </div>
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                <div class="row">
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+
+                                            <div class="col-sm-6">
+                                                <select class="form-control" id="SubscriptionId"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                            <div class="col-sm-6">
+                                                <select class="form-control" id="ClassNumberId"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br />
+                                    <br />
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Academic Year")</label>
+
+                                            <div class="col-sm-6">
+                                                <select id="CboAcademicYear" tabindex="0" name="AcademicYearId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Status")</label>
+
+                                            <div class="col-sm-6">
+                                                <select class="form-control" id="CboStatus"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="SearchData" class="row">
+        </div>
+
+
+        if (null != Model)
+        {
+            <input style="display:none" id="SelBranch" value="@Model.SubscriptionId" />
+            <input style="display:none" id="SelClassNumber" value="@Model.CourseId" />
+            <input style="display:none" id="SelSatus" value="@Model.AcademicYearId" />
+        }
+        else
+        {
+
+            <input style="display:none" id="SelBranch" value="0" />
+            <input style="display:none" id="SelClassNumber" value="0" />
+            <input style="display:none" id="SelSatus" value="0" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        debugger
+        LoadBranchDropdown()
+        LoadStatusCombo()
+        LoadAcademicYear()
+    });
+
+    function LoadBranchDropdown() {
+        debugger
+        $.ajax({
+            url: '/AMicroSchedule/GetBranchesByDivisionDefineSchedule',
+            data: { DivisionId: 0, IsAll: true },
+            success: function (result) {
+                Branch = $("#SubscriptionId")
+                Branch.children().remove();
+                $.each(result, function (i, elm) {
+                    if (elm.SubscriptionId != 0) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    }
+                })
+                $("#SubscriptionId").append(Branch)
+                var SelSubscription = $("#SelBranch").val();
+                if (SelSubscription > 0 && SelSubscription != null) {
+                    document.getElementById('SubscriptionId').value = SelSubscription
+                    LoadClassDropdown();
+                }
+            },
+            async: false
+        })
+
+
+    }
+
+
+    $("#SubscriptionId").change(function () {
+        var BranchId = $("#SubscriptionId").val();
+        $("#ClassNumberId").html("")
+        $("#SearchData").html("");
+        $("#Validation").html("");
+        if (BranchId > -2) {
+            LoadClassDropdown();
+
+        }
+    })
+
+
+    function LoadClassDropdown() {
+        debugger
+        var SelClassId = $("#SelClassNumber").val();
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                Section = $("#ClassNumberId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                Section.append($("<option>").val("0").text("All"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassNumberId").append(Section)
+                var SelClassId = $("#SelClassNumber").val();
+                if (SelClassId > 0 && SelClassId != null) {
+                    document.getElementById('ClassNumberId').value = SelClassId
+                    GetStudentList();
+                }
+            },
+            async: false
+        })
+    }
+
+
+    $('#ClassNumberId').change(function () {
+        debugger
+        $("#SearchData").html("");
+        $("#Validation").html("");
+        if ($("#ClassNumberId").val() >= 0) {
+            GetStudentList();
+
+        }
+
+    });
+    $('#CboAcademicYear').change(function () {
+        $("#SearchData").html("");
+        $("#CboStatus").val("-1")
+        document.getElementById('Validation').innerHTML = ""
+    });
+    $('#CboStatus').change(function () {
+        debugger
+        $("#SearchData").html("");
+        $("#Validation").html("");
+        GetStudentList();
+
+    });
+
+    function GetStudentList() {
+        debugger
+        var SubscriptionId = $('#SubscriptionId').val();
+        var ClassNumberId = $('#ClassNumberId').val();
+        var Status = $('#CboStatus').val();
+        var CboAcademicYear = $('#CboAcademicYear').val();
+        if (SubscriptionId > 0 && ClassNumberId >= 0 && Status >= 0 && CboAcademicYear > 0) {
+            $.ajax({
+                url: '/FOperations/GetStudentsByClassFeeArrived',
+                data: { nSubscriptionId: SubscriptionId, nClassNumberId: ClassNumberId, Status: Status, CboAcademicYear: CboAcademicYear  },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchData").html(Data);
+                },
+
+            }).done(function () {
+
+            });
+
+        }
+        else {
+            $("#SearchData").html("");
+        }
+    }
+
+    function LoadStatusCombo() {
+
+        var StatusItems = $('#CboStatus');
+
+        StatusItems.children().remove();
+        StatusItems.append($("<option>").val("-1").text("--- Select ---"));
+        StatusItems.append($("<option>").val("0").text("Accepted"));
+        StatusItems.append($("<option>").val("1").text("Pending"));
+        StatusItems.append($("<option>").val("2").text("Rejected"));
+        //StatusItems.append($("<option>").val("3").text("All"));
+
+        $('#CboStatus').append(StatusItems);
+    }
+    function LoadAcademicYear() {
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                Obj = $("#CboAcademicYear")
+
+                Obj.children().remove();
+
+                $.each(result, function (i, elm) {
+                    Obj.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(Obj)
+                var SelAcademicYearId = $("#SelAcademicYearId").val();
+
+                if (SelAcademicYearId >= 0) {
+                    document.getElementById("CboAcademicYear").value = SelAcademicYearId;
+                }
+            }
+        })
+
+    }
+</script>
+
+
+
+
+
+
+
+
+
+

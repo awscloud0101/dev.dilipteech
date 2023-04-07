@@ -1,0 +1,272 @@
+﻿
+@model AsteriskBrowserAL.Models.StudentFeeRefundDataModel
+@{
+    int Sno = 1;
+}
+
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (null != Model.FeepaymentHistory && Model.FeepaymentHistory.Count() >= 1)
+{
+    Sno = 1;
+
+    <div class="table-header">
+        Records Found (@Model.FeepaymentHistory.Count())
+    </div>
+
+    <div style="overflow:auto;height:300px">
+        <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Particular")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Transaction Date")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Receipt Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Template Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Amount")
+                    </th>
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (var item in Model.FeepaymentHistory)
+                {
+                    <tr>
+                        <td>
+                            @Sno
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FeeParticularName)
+                        </td>
+
+                        <td>
+                            @item.TransactionDate.Value.ToString("dd - MMM - yyyy")
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ReceiptNo)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TemplateNumner)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DebitAmount)
+                        </td>
+
+                    </tr>
+                    Sno++;
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+
+    <div class="hr hr-18 dotted hr-double"></div>
+    <div class="col-xs-12" id="ParentRequestForm" style="display:none;">
+        <div class="widget-box">
+            <div class="widget-header widget-header-flat widget-header-small">
+                <h5 class="widget-title">Parent Request form</h5>
+                <div style="float:right">
+                    <button name="button" class="btn btn-info btn-minier P2" style="height:30px;" onclick="return SubmitForm()">
+                        Request
+                    </button>
+                </div>
+            </div>
+
+            @Html.HiddenFor(model => model.StudentId)
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span class=" red">*P</span>arent Request Amount</label>
+                                   
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.ParentRequestedAmount, new { @class = "form-control textlength txtboxNum", placeholder = "Parent Requset Amount", @id = "ParentAmount", @min = "0", @Maxlength = "6" })
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="PAmount">
+                                        <label style="color:red;font-weight:bold;font-size:12px;">Palese Enter Amount</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span class=" red">*P</span>arent Upload Files</label>
+                                   
+                                    <div class="col-sm-3">
+                                        <input type="file" id="File" name="UploadedFile" />
+                                    </div>
+
+                                    <div class="col-sm-5" style="display:none;" id="PUploadfiles">
+                                        <label style="color:red;font-weight:bold;font-size:12px;">Parent Upload Files</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span class=" red">*B</span>ranch Upload Files</label>
+                                  
+                                    <div class="col-sm-3">
+                                        <input type="file" id="BranchUploadedFile" name="BranchUploadedFile" />
+                                    </div>
+
+                                    <div class="col-sm-5" style="display:none;" id="bUploadfiles">
+                                        <label style="color:red;font-weight:bold;font-size:12px;">Branch Upload Files </label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span class=" red">*B</span>ranch Request Amount</label>            
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.BranchRequestAmount, new { @class = "form-control textlength txtboxNum", placeholder = "Branch Requset Amount", @id = "BranchAmount", @min = "0", @Maxlength = "6" })
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="fBranchAmount">
+                                        <label style="color:red;font-weight:bold;font-size:12px;">Please Enter Branch Amount</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Handover All Receipts")</label>
+                                    <div class="col-sm-3">
+                                        @Html.CheckBoxFor(model => model.IsReceipts, new { Name = "IsReceipts", @class = "checkbox" })
+                                        <input name="IsReceipts" type="hidden" value="false" />
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="Receipts">
+                                        <label style="color:red;font-weight:bold;font-size:12px;">Select handover Receipts</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+}
+
+
+<script type="text/javascript">
+
+    function validateFeeRefundRequest() {
+
+        var ParentRequestAmount = document.getElementById("ParentAmount").value;
+        var BranchrequestAmount = document.getElementById("BranchAmount").value;
+        var Parentfiles = document.getElementById("File").value;
+        var branchfiles = document.getElementById("BranchUploadedFile").value;
+
+        validate = true;
+
+        if (ParentRequestAmount == "") {
+            document.getElementById("PAmount").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("PAmount").style.display = "none";
+        }
+
+        if (BranchrequestAmount == "") {
+            document.getElementById("fBranchAmount").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("fBranchAmount").style.display = "none";
+        }
+
+        if (Parentfiles == "" || Parentfiles == null || Parentfiles == undefined) {
+            document.getElementById("PUploadfiles").style.display = "inline";
+            validate = false;
+        }
+        else{
+            document.getElementById("PUploadfiles").style.display = "none";
+        }
+
+        if (branchfiles == "" || branchfiles == null || branchfiles == undefined) {
+            document.getElementById("bUploadfiles").style.display = "inline";
+            validate = false;
+        }
+        else{
+            document.getElementById("bUploadfiles").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function SubmitForm() {
+        debugger
+        var validatestatus = validateFeeRefundRequest();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#ParentAmount').focus(function () {
+        $('#PAmount').hide();
+    });
+    $('#BranchAmount').focus(function () {
+        $('#fBranchAmount').hide();
+    });
+    $('#File').focus(function () {
+        $('#PUploadfiles').hide();
+    })
+    $('#BranchUploadedFile').focus(function () {
+        $('#bUploadfiles').hide();
+    })
+
+</script>
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    $(".txtboxNum").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+            // Allow: Ctrl+A
+        (e.keyCode == 65 && e.ctrlKey === true) ||
+            // Allow: Ctrl+C
+        (e.keyCode == 67 && e.ctrlKey === true) ||
+            // Allow: Ctrl+X
+        (e.keyCode == 88 && e.ctrlKey === true) ||
+            // Allow: home, end, left, right
+        (e.keyCode >= 35 && e.keyCode <= 39)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+
+</script>
+

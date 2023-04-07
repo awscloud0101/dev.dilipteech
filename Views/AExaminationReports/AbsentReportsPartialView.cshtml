@@ -1,0 +1,205 @@
+﻿@model List<AsteriskBrowserAL.Models.ExaminationResultsData>
+@{
+    int sno = 1;
+    int Total = 0;
+    int Boys = 0;
+    int Girls = 0;
+    if (null != Model)
+    {
+        Total = Model.Count();
+        Boys = Model.Where(s => s.GenderId == 0).Count();
+        Girls = Model.Where(s => s.GenderId == 1).Count();
+    }
+}
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+
+    .foo {
+        float: left;
+        width: 15px;
+        height: 15px;
+        margin: 5px;
+        border: 1px solid rgba(0, 0, 0, .2);
+    }
+</style>
+<div class="widget">
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="row">
+                <div class="col-xs-4">
+
+                </div>
+                <div class="col-xs-8">
+                    <div class="scrollable-horizontal" data-size="800" style="width:100%">
+                        <div id="Graph" style="height: 150px; width: 100%;"> </div>
+                    </div>
+                    <div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+
+            <div class="col-xs-12">
+
+                <div class="col-xs-2">
+                    <div class="foo" style="background-color:#C2365B"></div><label>Total: @Total </label>
+                </div>
+                <div class="col-xs-2">
+                    <div class="foo" style="background-color:#369ead"></div><label>Boys: @Boys</label>
+                </div>
+                <div class="col-xs-2">
+                    <div class="foo" style="background-color:#7f6084"></div><label>Girls: @Girls</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hr hr-18 dotted hr-double"></div>
+@if (null != Model)
+{
+    if (Model.Count() > 0)
+    {
+        <div class="box">
+            <div class="table-header">
+                Records Found (@Model.Count)
+                <div style="float:right;margin-right:0.5em">
+                    <a href="/AExaminationReports/AbsentReportPDF" value="PDF"><span class="btn btn-info btn-xs btn-danger">PDF</span></a>
+                    <button class="btn btn-info btn-xs btn-success" id="btnExport">Excel </button>
+                    <a onclick="PrintElem()" value="Print"><span class="btn btn-info btn-xs btn-warning" >Print</span></a>
+                </div>
+            </div>
+
+            <div class="box-body table-responsive no-padding">
+                <table class="table tbhover table-striped table-bordered dynamic-table" id="mytab1" style="font-size:14px;">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Admission Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Student Name")
+                            </th>
+                           
+                            <th>
+                                @Html.DisplayName("Class")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Exam Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Exam Date")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Status")
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                        <tr>
+                            <td>
+                                @(sno++)
+                            </td>
+                            <td>
+                                @item.BranchName
+                            </td>
+                            <td>
+                                @item.AdmissionNumber
+                            </td>
+                            <td>
+                                <a href="@Url.Action("GetStudentAbsentList", "AExaminationReports", new {nDivisionId= item.DivisionId, nBranchId = item.BranchId, nStudentId = item.StudentId })">@item.StudentName</a>
+                            </td>
+
+                           
+
+                            <td>
+                                @item.SectionName
+                            </td>
+
+                            <td>
+                                @item.ExamName
+                            </td>
+
+                            <td>
+                                @item.ExaminationDate
+                            </td>
+                            <td>
+                                @if (item.IsAbsent == true)
+                                    {
+                                    @Html.DisplayName("Absent")
+                                    }
+                                    else
+                                    {
+                                    @Html.DisplayName(" ")
+                                    }
+                            </td>
+
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold"> Data not available</span>
+    }
+    
+}
+
+</div>
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+    function PrintElem() {
+        debugger
+        $.ajax({
+            url: '/AExaminationReports/AbsentReportPDF',
+            data: { isPrint: true },
+            success: function (data) {
+                Popup(data);
+            }
+        })
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+

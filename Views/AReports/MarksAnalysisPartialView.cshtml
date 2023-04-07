@@ -1,0 +1,204 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    int[] nStudentAry;
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> lstExamPapers = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+    if (null != Model && Model.lstExamResults.Count() > 0)
+    {
+        var data = Model.lstExamResults.FirstOrDefault();
+
+        if (null != data)
+        {
+            lstExamPapers = data.lstExamResultsPaperWise.ToList();
+        }
+    }
+
+    string UserRole = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+
+    List<IGrouping<string, AsteriskBrowserAL.Models.ExaminationResultsData>> GroupedData = new List<IGrouping<string, AsteriskBrowserAL.Models.ExaminationResultsData>>();
+    if (null != Model)
+    {
+
+        GroupedData = Model.lstExamResults.GroupBy(p => p.BranchName).ToList();
+    }
+
+
+    AsteriskGMSEntities _db = null;
+    AsteriskGMSEntities _dbCentral = new AsteriskGMSEntities(AsteriskBrowserAL.Helpers.Utility.GetCentralDatabase());
+
+
+    if (null != Model)
+    {
+        var branch = _dbCentral.Branch.FirstOrDefault(b => b.SubscriptionId == Model.BranchId);
+
+        if (null != branch)
+        {
+            _db = new AsteriskGMSEntities(branch.DataBaseName);
+        }
+    }
+
+    int nPaperId = 0;
+    int nEntryCount = 0;
+    int nNonEntryCount = 0;
+    int nAbsentCount = 0;
+
+
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> lstStudentsWithMarks = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+    //if (null != Model )
+    //{
+    //    var classnumber = _dbCentral.ClassNumbers.FirstOrDefault(c => c.ClassNumbersId == Model.ClassNumber);
+
+    //        if(null!= classnumber)
+    //        {
+    //            lstStudentsWithMarks = classnumber.ClassNumberDisplay.ToList();
+    //        }
+    //}
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+
+@if (lstExamPapers.Count() > 0)
+{
+    if (null != Model && null != Model.lstExamResults && Model.lstExamResults.Count() > 0)
+    {
+        int nsno = 1;
+
+
+        <div class="table-header">
+
+            Records Found (@Model.lstExamResults.Count)
+
+            <div style="float:right;margin-right:10px;">
+
+                <button class="btncustom" id="btnExport">
+                  Download
+
+                </button>
+
+
+            </div>
+        </div>
+
+        <table id="tab1" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    @if (Model.IsCentral)
+                    {
+                    <th>
+                        @Html.DisplayName("Branch Name")
+                    </th>
+                    }
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Roll Number")
+                    </th>
+                    @if (bIsCoastal)
+                    {
+                    <th>
+                        @Html.DisplayName("Registration Number")
+                    </th>
+                    }
+                    <th>
+                        @Html.DisplayName("Legacy Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Class Name")
+                    </th>
+
+                    @if (null != lstExamPapers)
+                    {
+                        foreach (var type in lstExamPapers)
+                        {
+                    <th>
+                        @type.PaperName
+                    </th>
+                        }
+                    }
+                    <th>
+                        @Html.DisplayName("Total Marks")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Scored Marks")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Percentage")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Rank")
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.lstExamResults.Count(); i++)
+                {
+                <tr>
+                    <td>
+                        @(nsno++)
+                    </td>
+                    @if (Model.IsCentral)
+                        {
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).BranchName
+                        </td>
+                        }
+                    <td>
+                        @Model.lstExamResults.ElementAt(i).DisplayName
+                    </td>
+                    <td>
+                        @Model.lstExamResults.ElementAt(i).RollNumber
+                    </td>
+                    @if (bIsCoastal)
+                        {
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).OMRNumber
+                        </td>
+                        }
+                    <td>
+                        @Model.lstExamResults.ElementAt(i).LegacyNumber
+                    </td>
+                    <td>
+                        @Model.lstExamResults.ElementAt(i).ClassNumberName
+                    </td>
+
+                    @if (Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Count() > 0)
+                        {
+                            for (int j = 0; j < Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Count(); j++)
+                            {
+                        <td>@Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored</td>
+                            }
+                        }
+
+                    <td>
+                        @Model.lstExamResults.ElementAt(i).MaxMarks
+                    </td>
+                    <td>
+                        @Model.lstExamResults.ElementAt(i).MarksScored
+                    </td>
+
+                    <td>
+                        @Model.lstExamResults.ElementAt(i).AvgMarks
+                    </td>
+
+                    <td>
+                        @Model.lstExamResults.ElementAt(i).Rank
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+    }
+}
+else
+{
+    <span style="color: red;"><b>No exam papers available to display</b></span>
+}
+
+@Html.Action("DataTableScripts", "Base")

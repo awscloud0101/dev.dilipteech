@@ -1,0 +1,348 @@
+﻿@model AsteriskBrowserAL.Models.ExamShedulesData
+@{
+    ViewBag.Title = " Online Exam Schedules";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Online Examinations
+        </li>
+        <li class="active">Online Exam Schedules</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <div class="row">
+        @*<div class=col-xs-12>
+                <h3>@Html.ActionLink("<< Exam Schedule Details", "ExamSchedules", new { ClassNumber = Model.ClassNumber, TermNumber = Model.TermNumber, SubscriptionId = Model.SubscriptionId }) </h3>
+            </div>*@
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <span style="color:red;" id="Validation"></span>
+            <div class="box">
+                @using (Html.BeginForm("OnlineExamSchedulesC", "AOnlineExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+
+                    @Html.HiddenFor(model => model.ClassNumber)
+                    @Html.HiddenFor(model => model.SubscriptionId)
+
+                    <input type="hidden" id="SelSubId" value="@Model.SubscriptionId" />
+                    <input type="hidden" id="SelClass" value="@Model.ClassNumber" />
+                    <div class="page-header">
+
+                        <h1>
+                            Exam Schedules
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "OnlineExamSchedules", new { ClassNumber = @Model.ClassNumber, SubscriptionId = @Model.SubscriptionId })
+                            </small>
+                        </h1>
+                    </div>
+                    @*<div class="box-header">
+                            <h3 class="box-title">Examination Schedules</h3>
+                            <br />
+                            <br />
+                            <button class="btn btn-primary " style="width:80px" type="submit" onclick="return submitForm();">
+                                Create
+                            </button>
+                        </div>*@<!-- /.box-header -->
+                    <!-- form start -->
+
+                    <div class="box-body">
+
+                        <div class="form-group">
+
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Subject")</label>
+
+                            <div class="col-sm-3">
+                                @*@Html.DropDownListFor(model => model.SubjectId, new SelectList(Model.lstSubjects, "SubjectId", "SubjectName", Model.SubjectId), "---Select SubjectId---", new { @class = "form-control", id = "Subject" })*@
+                                <select id="SubjectId" name="SubjectId" class="form-control"></select>
+
+                            </div>
+
+                            <span class="col-sm-3" style="font-weight:bold;color:red;" id="SubjectVal"></span>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Exam Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.ExamName, new { @class = "form-control textlength", placeholder = "Exam Name", @id = "ExamName" })
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESExamName">
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Exam Date")</label>
+
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" name="ExamDate" id="ExamDate" autocomplete="off" placeholder="Select Exam Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <span class="col-sm-3" id="ESExamDate" style="color:red;font-weight:bold;">
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Start Time")</label>
+
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="timepicker" class="input-group time">
+                                            <input class="form-control" type="time" name="Starttime" id="Starttime" autocomplete="off" placeholder="Select Start Time" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-clock-o"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="col-sm-3" id="ESStarttime" style="color:red;font-weight:bold;">
+                            </span>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("End Time")</label>
+
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="timepicker" class="input-group time">
+                                            <input class="form-control" type="time" name="Endtime" id="Endtime" autocomplete="off" placeholder="Select End Time" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-clock-o"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="col-sm-3" id="ESEndtime" style="color:red;font-weight:bold;">
+                            </span>
+
+                        </div>
+                        @*<div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Duration Time")</label>
+
+                                <div class="col-sm-3">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="Durationtime1" class="input-group date">
+                                                <input class="form-control" type="number" name="Durationtime" id="Durationtime" autocomplete="off" placeholder="Duration Time in Minutes" />
+                                                <span class="input-group-addon"><i class="ace-icon time"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="col-sm-3" id="ESDurationtime" style="color:red;font-weight:bold;">
+                                </span>
+
+                            </div>*@
+
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                        <br />
+                        <div class="hr hr-18 dotted hr-double"></div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#datepicker').datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: false
+        });
+        $('#datepicker').datepicker('setStartDate', '+0d');
+        GetSubjects();
+    });
+
+    function submitForm() {
+        debugger;
+        var validatestatus = validateES();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function validateES() {
+        debugger
+        var validate = true;
+
+        var ExamName = document.getElementById("ExamName").value;
+        var SubjectId = $('#SubjectId').val();
+        var ExamDate = document.getElementById("ExamDate").value;
+        var Starttime = document.getElementById("Starttime").value;
+        var Endtime = document.getElementById("Endtime").value;
+
+        if (ExamName == "") {
+            document.getElementById("ESExamName").innerHTML = "Please enter exam name";
+            validate = false;
+        }
+        if (SubjectId == "null" || SubjectId == "" || SubjectId <= 0) {
+            document.getElementById("SubjectVal").innerHTML = "Please Select Subject"
+            Validation = false;
+        }
+
+        if (Starttime == "") {
+            document.getElementById("ESStarttime").innerHTML = "Please select Start Time";
+            validate = false;
+        }
+
+        if (Endtime == "") {
+            document.getElementById("ESEndtime").innerHTML = "Please select End Time.";
+            validate = false;
+        }
+        else {
+            debugger;
+            if (Endtime <= Starttime) {
+                document.getElementById("ESEndtime").innerHTML = "End Time should be greater than Start time";
+                validate = false;
+            }
+        }
+
+
+
+        if (ExamDate == "") {
+            document.getElementById("ESExamDate").innerHTML = "Please Select Exam Date";
+            validate = false;
+        }
+
+        if (validate == true) {
+            var status = IsExaminationExisted();
+            validate = status;
+        }
+
+        return validate;
+    };
+
+    function IsExaminationExisted() {
+        var Status = true;
+        var ExamDate = document.getElementById("ExamDate").value;
+        var SubjectId = $('#SubjectId').val();
+        $.ajax({
+
+            url: '/AOnlineExamination/IsExamScheduleExisted',
+            data: { ExamDate: ExamDate, type: "New", id: 0, ExamName: $('#ExamName').val(), SubId: $('#SelSubId').val(), ClassNumber: $('#SelClass').val(), Starttime: $('#Starttime').val(), SubjectId: SubjectId, Endtime: $('#Endtime').val()},
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                    document.getElementById("Validation").innerHTML = Data;
+                }
+            },
+            async: false
+        });
+
+        return Status;
+    }
+
+    function GetSubjects() {
+        debugger;
+        var Class = $('#SelClass').val();
+        if (Class != null) {
+            $.ajax({
+                url: '/AOnlineExamination/GetSubjects',
+                data: { Class: Class },
+                success: function (data) {
+                    var SubjectItems = $('#SubjectId');
+
+                    SubjectItems.children().remove();
+
+                    SubjectItems.append($("<option>").val("null").text("--- Select Subject ---"));
+
+                    $.each(data, function (i, record) {
+                        SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+                    });
+
+                    $('#SubjectId').append(SubjectItems);
+
+
+                },
+                aync: false
+            });
+
+        }
+    }
+    $('#SubjectId').change(function () {
+        document.getElementById("SubjectVal").innerHTML = "";
+    })
+    $('#ExamName').focus(function () {
+        document.getElementById("ESExamName").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    $('#Starttime').focus(function () {
+        document.getElementById("ESStarttime").innerHTML = "";
+    });
+
+    $('#ExamDate').change(function () {
+        document.getElementById("ESExamDate").innerHTML = "";
+    });
+
+    $('#Endtime').change(function () {
+        document.getElementById("ESEndtime").innerHTML = "";
+    });
+
+
+
+    //function OnClick() {
+
+    //    $('#ExamName').val("");
+    //    $('#Exam').val("");
+
+
+    //    if (CCEExamName != "--- Select ---") {
+    //        document.getElementById("ESExamName").innerHTML = "";
+    //        var NoOfCTs = $('#NoOfCTs').val();
+
+    //        $('#ExamName').val(CCEExamName + " - " + "CT" + (parseInt(NoOfCTs, 10) + 1))
+    //        $('#Exam').val(CCEExamName + " - " + "CT" + (parseInt(NoOfCTs, 10) + 1))
+    //    }
+    //}
+
+</script>
+

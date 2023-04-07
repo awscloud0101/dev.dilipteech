@@ -1,0 +1,145 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ExaminationResultsData>
+
+@{
+    Layout = null;
+    int sno = 1;
+    int count = Model.FirstOrDefault().lstResults.Count + 7;
+}
+
+
+<style>
+    table {
+        page-break-after: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    td {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tfoot {
+        display: table-footer-group;
+    }
+
+</style>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:18px;border-collapse:collapse;width:100%" border="1">
+            <thead>
+                <tr>
+                    <td colspan="@count">
+                        <div class="row">
+                            <div style="margin-left:0em;font-size:19px;font-weight:bold;margin-top:1em;">
+                                <table width="100%">
+                                    <tr>
+                                        <td align="center" style="width:33px;font-weight:bold">
+                                            <span style="font-size:32px;font-weight:bold">ALPHORES JUNIOR COLLEGE</span><br />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" style="width:33px;font-weight:bold">
+                                            <span style="font-size:28px;font-weight:bold">@Model.FirstOrDefault().InstituteName</span><br />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" style="width:33px;font-weight:bold">
+                                            <span style="font-size:25px;font-weight:bold"><u>All Examination Average Report</u></span><br />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" style="width:33px;font-weight:bold">
+                                            <table width="100%">
+                                                <tr>
+                                                    <td align="left" style="width:33px;font-weight:bold">@Model.FirstOrDefault().ClassNumberName </td>
+                                                    <td align="right" style="width:33px;font-weight:bold"> Date :@DateTime.Today.ToString("dd-MMM-yyyy") </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr style="margin-top:2em">
+                    <th>
+                        @Html.DisplayName("SNo")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Admission Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Section Name")
+                    </th>
+                    @foreach (var item in Model.FirstOrDefault().lstResults)
+                    {
+                        <th>
+                            @item.ExamName
+                        </th>
+                    }
+                    <th>
+                        Max Marks
+                    </th>
+                    <th>
+                        Grand Total
+                    </th>
+                    <th>
+                        Average
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(sno++)
+                        </td>
+                        <td>
+                            @item.AdmissionNumber
+                        </td>
+                        <td>
+                            @item.DisplayName
+                        </td>
+                        <td>
+                            @item.SectionName
+                        </td>
+                        @foreach (var items in item.lstResults)
+                        {
+                            <td>@items.TotalSum</td>
+                        }
+                        <td>
+                            @item.lstResults.Sum(s => s.MaxMarksSum)
+                        </td>
+                        <td>
+                            @item.lstResults.Sum(s => s.TotalSum)
+                        </td>
+                        <td>
+                            @{
+                                double TotalMarks = item.lstResults.Sum(s => s.TotalSum);
+                                double MaxMarks = item.lstResults.Sum(s => s.MaxMarksSum);
+                                double Average = (TotalMarks / MaxMarks) * 100;
+                            }
+                            @Math.Round(Average, 2)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

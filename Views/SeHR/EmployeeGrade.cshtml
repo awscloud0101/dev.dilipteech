@@ -1,0 +1,156 @@
+﻿@model IEnumerable<AsteriskBrowserAL.EmployeeGrade>
+
+@{
+    ViewBag.Title = "Employee Grade";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Employee Grade</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+<section class="content">
+ 
+    <br />
+
+
+    @if (null != TempData["EmployeeGrade"])
+    {
+        @Html.Raw(TempData["EmployeeGrade"])
+    }
+
+    @if (null != Model)
+    {
+        int nsno = 1;
+        <div class="table-header">
+            Employee Grade
+            <a class="view-header-btn  btn btn-info btn-xs P2" href="@Url.Action("EmployeeGradeC", "SeHR")" role="button" id="New"  style="float:right" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+            
+        </div>
+
+
+
+    <table class="table tbhover table-striped table-bordered dynamic-table">
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Grade Name")
+                </th>
+                <th>
+                    @Html.DisplayName("Priority")
+                </th>
+                <th>
+                    @Html.DisplayName("Periods Per Week")
+                </th>
+                <th>
+                    @Html.DisplayName("Periods Per Day")
+                </th>
+                <th>
+                    @Html.DisplayName("Status")
+                </th>
+                <th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @(nsno++)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.GradeName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Priority)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PeriodsPerWeek)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PeriodsPerDay)
+                    </td>
+                    <td>
+                        @Html.CheckBoxFor(modelItem => item.Status, new { @class = "checkbox" })
+                    </td>
+
+                    <td>
+                        <div class="hidden-sm hidden-xs action-buttons">
+                            <a class="green P2" href="@Url.Action("EmployeeGradeE", "SeHR", new { id = item.EmployeeGradeId })">
+                                <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                            </a>
+                            <a class="red P2" onclick="btnConfirm(@item.EmployeeGradeId)">
+                                <i class="ace-icon fa fa-trash-o bigger-130">
+                                </i>
+
+                            </a>
+                        </div>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+    }
+    else
+    {      <div class="table-header">
+         Employee Grade
+        <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("EmployeeGradeC", "SeHR")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+
+       </div>
+                    <span style="color: red;"><b>No Records Found(0)</b></span>
+    }
+</section>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+<script>
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeHR/ValidationForEmployeeGradeD',
+                data: { id: Value },
+                success: function (data) {
+
+                    var url = '/SeHR/EmployeeGradeD?id=' + Value;
+                    var title = "Grade";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+</script>
+

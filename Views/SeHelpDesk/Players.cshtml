@@ -1,0 +1,362 @@
+﻿@model AsteriskBrowserAL.Models.PlayersData
+@{
+    ViewBag.Title = "Pre Admission List";
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Settings
+        </li>
+        <li>
+            <i class=""></i>
+            Help Desk
+        </li>
+        <li class="active">Executives</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+<!-- CSS -->
+
+<section class="content">
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Players", "SeHelpDesk", FormMethod.Post))
+            {
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Executives</span>
+                    <div style="float:right;margin-right:10px;">
+                        <a id="AddButton" style="display:none" class="btncustom">Assign Executives</a>
+                    </div>
+
+                </div>
+                <div class="widget-box">
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="col-sm-6">
+                                <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Group</label>
+                                <div class="col-sm-6" style="font:12px arial;">
+                                    <select id="GroupId" name="GroupId" class="form-control"></select>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+
+                            @*<div class="col-sm-6">
+                                    <button type="button" id="AddButton" style="width:80px" class="btn btn-primary pull-right" data-toggle="modal" data-target="#myModal">Add</button>
+                                </div>*@
+                        </div>
+                    </div>
+                </div>
+
+                    <div id="SearchDiv" >
+                    </div>
+
+                    <div id="dialog-confirm" class="hide">
+                         
+                     
+                        <span id="error" style="color:red;"></span>
+                        <div class="row">
+                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Branch</label>
+                            <div class="col-sm-6" style="font:12px arial;">
+                                <select id="BranchId" name="BranchId" class="form-control"></select>
+                            </div>
+                            @*<div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Staff</label>
+                                        <div class="col-sm-6" style="font:12px arial;">
+                                            <input type="text" id="StaffSearch" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>*@
+                        </div>
+
+                        <span style="color:green;font-weight:bold;" id="SaveVal"></span>
+
+                        <div id="AddExecutivesPartialView">
+                        </div>
+                    
+                       
+                    </div>
+                
+
+
+            }
+        </div>
+    </div>
+
+
+</section>
+
+<input type="hidden" id="SaveCount" />
+
+<div id="DataTableScripts"></div>
+
+<script>
+
+
+    //onload Functions
+    function OnloadData() {
+        document.getElementById("AddButton").style.display = "none"
+
+        GetGroupsDropDown()
+        LoadBranchDropdown()
+    }
+    window.onload = OnloadData();
+
+    //end of onload Functions
+
+    //Players Creation
+    function LoadBranchDropdown() {
+        $.ajax({
+            url: '/Common/GetBranchesByDivisionId',
+            data: { DivisionId: -1, IsAll: true },
+            success: function (result) {
+                Branch = $("#BranchId")
+                Branch.children().remove();
+                Branch.append($("<option>").val("0").text("--Select--"))
+
+                $.each(result, function (i, elm) {
+                    Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                })
+                $("#BranchId").append(Branch)
+            }
+        })
+    }
+
+    $("#BranchId").change(function () {
+        document.getElementById("Validation").innerHTML = "";
+        $("#AddExecutivesPartialView").html("")
+
+        var BranchId = $("#BranchId").val()
+        if (BranchId > 0 || BranchId == -1) {
+            GetStaffToAdd()
+        }
+
+    })
+
+    $("#StaffSearch").autocomplete({
+        source: function (request, response) {
+            if (request.term.length >= 3) {
+                GetStaffToAdd()
+
+            }
+        },
+    });
+
+    function GetStaffToAdd() {
+        var BranchId = $("#BranchId").val()
+        var GroupId = $("#GroupId").val();
+
+        if (BranchId >= 0 && GroupId >= 0) {
+            $("#imagemodal").show();
+            $.ajax({
+                url: '/SeHelpDesk/GetPlayersWithoutGroup',
+                data: { BranchId: BranchId },
+                success: function (Data) {
+                    CallDataTableScripts(false);
+                    $("#AddExecutivesPartialView").html(Data)
+                }
+            }).done(function () {
+                $("#imagemodal").hide();
+            })
+        }
+        else {
+            $("#AddExecutivesPartialView").html("")
+
+        }
+
+    }
+
+
+
+    function SaveSelectedtStaff() {
+
+        $('#error').html("");
+
+        var Ids = "";
+        var result = $('#Check:checked');
+
+        $.each(result, function (i, result) {
+
+            if (parseInt(result.value) > 0) {
+                Ids += result.value + ",";
+            }
+        });
+
+        if (Ids != "") {
+            document.getElementById("SaveCount").value = 1
+            AddStaffToPlayers(Ids)
+        }
+        else {
+            $('#error').html("Please select staff to assign");
+        }
+    }
+
+    function AddStaffToPlayers(Data) {
+        var GroupId = $("#GroupId").val();
+        var BranchId = $("#BranchId").val();
+        $("#imagemodal").show();
+
+        $.ajax({
+            url: "/SeHelpDesk/SavePlayers",
+            data: { StaffIds: Data, GroupId: GroupId, BranchId: BranchId },
+            success: function (Data) {
+                $("#SearchDiv").html("");
+                $('#BranchId').val("0");
+
+                $("#AddExecutivesPartialView").html("")
+
+                $("#dialog-confirm").dialog("close");
+                CallDataTableScripts(false);
+                $("#imagemodal").hide();
+                $("#SearchDiv").html(Data);
+                //$("#AddExecutivesPartialView").html(Data)
+                //document.getElementById("SaveVal").innerHTML = "Data saved"
+
+            }
+        }).done(function () {
+            $("#imagemodal").hide();
+        })
+    }
+
+    function GetGroupsDropDown() {
+
+        $.ajax({
+            url: '/SeHelpDesk/GetGroupsDropDown',
+            success: function (Data) {
+                var Group = $('#GroupId')
+                Group.children().remove();
+                Group.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    Group.append($("<option>").val(record.HDExecutiveGroupId).text(record.GroupName));
+                });
+                $('#GroupId').append(Group);
+            }
+        })
+    }
+
+    $("#GroupId").change(function () {
+        document.getElementById("SaveCount").value = 0
+        $("#SearchDiv").html("")
+        document.getElementById("AddButton").style.display = "none"
+        GetPlayersInGroup(false)
+    })
+
+    function GetPlayersInGroup(IsRemove) {
+        var GroupId = $("#GroupId").val();
+        $("#SearchDiv").html("")
+        if (GroupId > 0) {
+            $("#imagemodal").show()
+            $.ajax({
+                url: '/SeHelpDesk/GetPlayersWithGroup',
+                data: { GroupId: GroupId, IsRemove: IsRemove },
+                success: function (Data) {
+
+                    CallDataTableScripts(false);
+
+                    $("#imagemodal").hide()
+                    $("#SearchDiv").html(Data)
+                    document.getElementById("AddButton").style.display = "inline"
+                }
+            })
+        }
+
+    }
+
+    //end of Players main View
+
+
+    //Remove players
+    function RemoveExecutives() {
+        var GroupId = $("#GroupId").val();
+        if (GroupId > 0) {
+            GetPlayersInGroup(true)
+        }
+    }
+
+    function RemovePlayersData(Data) {
+        var GroupId = $("#GroupId").val();
+        $("#imagemodal").show()
+        $.ajax({
+            url: "/SeHelpDesk/UpdatePlayers",
+            data: { StaffIds: Data, GroupId: GroupId },
+            success: function (Data) {
+                $("#imagemodal").hide()
+                $("#SearchDiv").html(Data)
+            }
+        })
+    }
+
+    //end of Remove players
+
+
+    function UpdateGroupStaff() {
+        var StaffCount = $("#SaveCount").val()
+
+        if (StaffCount > 0) {
+            GetPlayersInGroup(false)
+        }
+    }
+
+
+    $("#AddButton").click(function () {
+        debugger
+        document.getElementById("SaveCount").value = 0
+        $("#AddExecutivesPartialView").html("")
+
+        document.getElementById("SaveVal").innerHTML = ""
+
+        AddExecutives();
+    })
+
+    function AddExecutives() {
+        debugger
+        $("#dialog-confirm").removeClass('hide').dialog({
+
+            resizable: true,
+            draggable: true,
+                
+            width: '300',
+            modal: true,
+            title: "Add Executives",
+            title_html: true,
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                OverflowEvent: false;
+            },
+            buttons: [
+                {
+                    html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                    "class": "btn btn-minier",
+                    click: function () {
+                       
+                        $('#error').html("");
+
+                        $('#BranchId').val("0");
+
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+    }
+
+</script>
+
+  

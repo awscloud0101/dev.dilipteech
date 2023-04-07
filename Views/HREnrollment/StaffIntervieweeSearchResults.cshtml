@@ -1,0 +1,164 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StaffInterviewsData>
+@{
+    ViewBag.Title = "InterviewSchedule";
+    int Sno = 1;
+    string color = string.Empty;
+}
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (null != Model && Model.Count() > 0)
+{
+    <div class="table-header">
+Records Found (@Model.Count())
+    </div>
+    <table class="table tbhover table-striped table-bordered dynamic-table text-nowrap">
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Name")
+                </th>
+                <th>
+                    @Html.DisplayName("Status")
+                </th>
+                <th>
+                    Action
+                </th>
+                <th>
+                    @Html.DisplayName("Uploaded Date")
+                </th>
+                <th>
+                    @Html.DisplayName("Interviewer")
+                </th>
+                <th>
+                    @Html.DisplayName("Father Name")
+                </th>
+                <th>
+                    @Html.DisplayName("Mobile Number")
+                </th>
+                <th>
+                    @Html.DisplayName("Email Id")
+                </th>
+                <th>
+                    @Html.DisplayName("Qualifications")
+                </th>
+                <th>
+                    @Html.DisplayName("Additional Qualifications")
+                </th>
+                <th>
+                    @Html.DisplayName("Experience")
+                </th>
+                <th>
+                    @Html.DisplayName("Branch Interested")
+                </th>
+                <th>
+                    @Html.DisplayName("Subjects can Handle")
+                </th>
+                <th>
+                    @Html.DisplayName("Classes can Handle")
+                </th>
+
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+
+                <tr>
+                    <td style="text-align:right">
+                        @(Sno++)
+                    </td>
+                    <td>
+                        @item.DisplayName
+                    </td>
+
+
+                    @if (item.InteriviewStatus == 10)
+                    {
+                        <td>
+                            <span class="label label-danger">Denied</span>
+                        </td>
+                        <td>
+                            @Html.ActionLink("Re-Schedule", "InterviewScheduleC", new { id = item.StaffInterviewsId, nDepartment = item.DepartmentId, nStaff = item.Interviewer, objInterviewee = item.SearchInterviewee },new { Class="P2"})
+                        </td>
+                    }
+                    else
+                    {
+                        if (item.InteriviewStatus == 2)
+                        {
+                            <td>
+                                <span class="label label-info">Scheduled</span>
+                            </td>
+
+                        }
+                        else
+                        {
+                            <td>
+                                <span class="label label-info"></span>
+                            </td>
+
+                        }
+
+                        <td>
+                            @Html.ActionLink("Schedule", "InterviewScheduleC", new { id = item.StaffInterviewsId, objInterviewee = item.SearchInterviewee }, new { Class = "P2" })
+
+                        </td>
+                    }
+
+                    <td>
+                        @if (item.FirstInserted.HasValue)
+                        {
+                            @item.FirstInserted.Value.ToString("dd-MMM-yyyy")
+                        }
+                    </td>
+                    <td>
+                        @item.InterviewerName
+                    </td>
+                    <td>
+                        @item.FatherName
+                    </td>
+                    <td>
+                        @item.MobileNumber
+                    </td>
+                    <td>
+                        @item.EmailId
+                    </td>
+                    <td>
+                        @item.Qualifications
+                    </td>
+                    <td>
+                        @item.AdditionalQualifications
+                    </td>
+                    <td>
+                        @item.TotalExperience
+                    </td>
+                    <td>
+                        @item.BranchName
+                    </td>
+                    <td>
+                        @item.Subjects
+                    </td>
+                    <td>
+                        @item.ClassesCanHandle
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+
+
+
+}
+else
+{
+    <label style="color:red;">Data not available for selected search</label>
+}
+@Html.Action("DataTableScripts", "Base")

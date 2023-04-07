@@ -1,0 +1,169 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Division>
+@{
+    ViewBag.Title = "Divisions";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            General
+        </li>
+        <li class="active">Division</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+
+
+    <div class="">
+        <div class="table-header">
+           
+           
+        
+                &nbsp;
+                <small style="float:right;" class="textheader">
+                    @Html.ActionLink("Back to Divisions", "Divisions")
+                </small>
+           
+            
+        </div>
+    </div>
+
+        @*<div class="col-xs-12">
+            <h3>@Html.ActionLink("<<Back to Divisions ", "Divisions")</h3>
+        </div>*@
+  
+        @*<div class="row">
+                <div class="col-xs-12">
+                    <h3>@Html.ActionLink("New Division ", "DivisionsC")</h3>
+                </div>
+            </div>*@
+   
+
+        @if (Model != null)
+        {
+            int nsno = 1;
+
+            <div class="overflowscroll">
+                <div class="widget-box">
+                    <div class="row">
+                        <div class="col-xs-12">
+
+                            <div class="table-header">
+                                Division
+                              
+                                 
+                                        <a class=" btncustom" href="@Url.Action("DivisionsC", "SeGeneral")" role="button" id="New" name="New" style="float:right;margin-right:10px;">
+                                            Add
+                                        </a>
+                                    
+                             
+                            </div><!-- /.box-header -->
+                            <table class="table tbhover table-striped table-bordered dynamic-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Division Name")
+                                        </th>
+
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                            {
+
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+
+                                            @Html.DisplayFor(modelItem => item.DivisionName)
+
+                                        </td>
+
+
+                                        <td>
+                                            <div class="hidden-sm hidden-xs action-buttons">
+                                                <a class="green" href="@Url.Action("DivisionsE", "SeGeneral", new { id = item.DivisionId })">
+                                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                                </a>
+                                                <a class="red" onclick="btnConfirm(@item.DivisionId)">
+                                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                                </a>
+                                            </div>
+                                            @*@Html.ActionLink("Edit", "DivisionsE", new { id = item.DivisionId }) |
+                                                @Html.ActionLink("Delete", "DivisionsD", new { id = item.DivisionId })*@
+                                        </td>
+                                    </tr>
+
+
+                            }
+                                </tbody>
+
+                            </table>
+
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+                <span style="color: red;"><b>There are no Divisions</b></span>
+                }
+                @Html.Action("DataTableScripts", "Base")
+
+
+          
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeGeneral/ValidationForDivisionsD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SeGeneral/DivisionsD?id=' + Value;
+                    var title = "Divisions";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+

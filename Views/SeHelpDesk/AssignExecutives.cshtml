@@ -1,0 +1,209 @@
+﻿@model AsteriskBrowserAL.Models.DivisionViewModel
+@{
+    ViewBag.Title = "Executives";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Settings
+        </li>
+        <li>
+            <i class=""></i>
+            Help Desk
+        </li>
+        <li class="active">Executives</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+    @using (Html.BeginForm("AssignExecutives", "SeHelpDesk", FormMethod.Post))
+            {
+                    <!-- form start -->
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true)
+        <span id="SaveVal" style="color:green;font-weight:bold"></span>
+
+                <span id="ErrorId" style="color:red;font-weight:bold"></span>
+
+
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Assign Descendants</span>
+                    <div style="float:right;margin-right:10px;">
+                        <a class="P2" href="/SeHelpDesk/Players"><span class="btncustom">Executives</span></a>
+                    </div>
+
+                    <div  style="float:right;margin-right:10px;">
+                        <a><span id="Save" class="btncustom">Save</span></a>
+                    </div>
+                </div>
+
+                <div class="widget-box">
+
+          
+
+
+
+
+
+                 
+
+                    @*<div class="box-header">
+                            <h3 class="box-title col-sm-11">Assign Descendents</h3>
+                            <input type="button" class="btn btn-primary col-xs-1" style="float:right;display:none" name="button" value="Save" id="Save" />
+                        </div>*@
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 ">Group</label>
+                                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                            <select id="GroupId" name="GroupId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 ">Executives</label>
+                                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                            <select id="ExecutiveId" name="ExecutiveId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                         
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+                <div id="Descendents">
+
+                </div>
+
+
+
+            }
+
+        </div>
+        <input type="hidden" id="AssStaff" />
+        <input type="hidden" id="RemStaff" />
+
+    </div>
+
+</section>
+<script type="text/javascript">
+
+
+    function onloadData() {
+        document.getElementById("Save").style.display = "none";
+        GetGroupsDropDown();
+    }
+
+    function GetGroupsDropDown() {
+        $.ajax({
+            url: '/SeHelpDesk/GetGroupsDropDown',
+            success: function (Data) {
+                var Group = $('#GroupId')
+                Group.children().remove();
+                Group.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    Group.append($("<option>").val(record.HDExecutiveGroupId).text(record.GroupName));
+                });
+                $('#GroupId').append(Group);
+            }
+        })
+    }
+
+
+
+    $("#GroupId").change(function () {
+        document.getElementById("AssStaff").value = ""
+        document.getElementById("SaveVal").innerHTML = ""
+        document.getElementById("Save").style.display = "none"
+
+        document.getElementById("RemStaff").value = ""
+        $("#Descendents").html("")
+
+        GetExecutives()
+    })
+
+
+    function GetExecutives() {
+        var GroupId = $("#GroupId").val();
+        var PlayerId = $("#ExecutiveId").val();
+        if (GroupId > 0) {
+            $.ajax({
+                url: '/SeHelpDesk/GetExecutives',
+                data: { GroupId: GroupId, PlayerId: PlayerId },
+                success: function (result) {
+                    var Executives = $('#ExecutiveId')
+                    Executives.children().remove();
+                    Executives.append($("<option>").val("").text("--Select--"))
+                    $.each(result, function (i, record) {
+
+                        Executives.append($("<option>").val(record.PlayerId).text(record.EmployeeName));
+                    });
+                    $('#ExecutiveId').append(Executives);
+                }
+            })
+        }
+        else {
+            $("#ExecutiveId").html("");
+
+        }
+    }
+
+    $("#ExecutiveId").change(function () {
+        document.getElementById("AssStaff").value = ""
+        document.getElementById("RemStaff").value = ""
+        document.getElementById("SaveVal").innerHTML = ""
+        $("#Descendents").html("")
+        GetAllDesdnts()
+    })
+
+
+    function GetAllDesdnts() {
+        var PlayerId = $("#ExecutiveId").val();
+        var GroupId = $('#GroupId').val();
+        if (PlayerId > 0) {
+            document.getElementById("Save").style.display = "inline"
+            $.ajax({
+                url: '/SeHelpDesk/GetDescendents',
+                data: { PlayerId: PlayerId, nGroupId: GroupId },
+                success: function (result) {
+                    $("#Descendents").html(result)
+                },
+                async: false
+            })
+        }
+        else {
+            document.getElementById("Save").style.display = "none"
+
+        }
+    }
+
+
+
+
+
+    window.onload = onloadData();
+
+
+</script>
+

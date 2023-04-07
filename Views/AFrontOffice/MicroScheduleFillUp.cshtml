@@ -1,0 +1,185 @@
+﻿@model AsteriskBrowserAL.Models.TimeTableViewModel
+
+@{
+    ViewBag.Title = "Student Profile";
+}
+
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+<link rel="shortcut icon" href="../favicon.ico">
+<link href="~/assets/css/demo.css" rel="stylesheet" />
+<link href="~/assets/css/component.css" rel="stylesheet" />
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+<script src="~/assets/js/jquery.stickyheader.js"></script>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Front Office
+        </li>
+        <li class="active">Micro Plan Fill-Up</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+
+<section class="content">
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("MicroScheduleFillUp", "ATimeTable", FormMethod.Post))
+            {
+                <span style="color:red;font-weight:bold" id="toggleValidation"></span>
+                <span id="SaveVal" style="font-weight:bold;color:green"></span>
+                <input type="hidden" id="MinDate" name="Date" value="@Model.Date" />
+                <div class="table-header">
+                    <span style="font-family:calibri;">Micro Plan Fill-Up</span>
+                    <div class="inline action-buttons" style="float:right;">
+                        <a class="btn btn-info btn-minier P2" id="ViewData">View Data</a>
+                    </div>
+                </div>
+
+                <div class="widget-box">
+            
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <div class="col-xs-4">
+                                            <label for="form-field-1">Select Date</label>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" placeholder="Select Date" required="required" title="Please select the date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="col-xs-4">
+                                            <label for="form-field-1">Closed Date</label>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" value="@DateTime.Today.ToShortDateString()" id="ClosedDate" name="ClosedDate" autocomplete="off" placeholder="Select Date" required="required" title="Please select the date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                       
+                        </div>
+                    </div>
+                </div>
+
+                <div id="TimeTableToday">
+
+                </div>
+            }
+
+
+        </div>
+      
+
+    </div>
+
+</section>
+
+<link href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+
+<script type="text/javascript">
+
+    $(document).on('focus', '#Date', function () {
+        var date = $('#MinDate').val()
+        $(this).datepicker({
+            startDate: date,
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+
+    $(document).on('focus', '#ClosedDate', function () {
+        $(this).datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+    $('#Date').change(function () {
+        document.getElementById("SaveVal").innerHTML = "";
+        $('#TimeTableToday').html("");
+    })
+
+    function OnloadData() {
+        $("#ViewData").css("display", "none");
+    }
+
+    $("#Date").change(function () {
+        $("#ViewData").css("display", "inline");
+    })
+
+    $("#ViewData").click(function () {
+        $('#toggleValidation').html("");
+        $('#SaveVal').html("");
+
+        GetTimeTableTodayData()
+    })
+
+    function GetTimeTableTodayData() {
+
+        var Date = $("#Date").val();
+        $("#TimeTableToday").html("")
+        $("#imagemodal").show();
+        $.ajax({
+            url: '/AFrontOffice/GetTodayTimeTable',
+            data: { Date: Date },
+            success: function (result) {
+                $("#TimeTableToday").html(result)
+                $("#imagemodal").hide();
+            },
+        })
+    }
+    window.onload = OnloadData();
+</script>

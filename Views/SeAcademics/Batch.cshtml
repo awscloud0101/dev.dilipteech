@@ -1,0 +1,179 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Batch>
+
+@{
+    ViewBag.Title = "Batch";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Batch</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+            <h3><a role="button" onclick="return submitForm()">New</a> </h3>
+        </div>
+    </div>
+    <br />
+    @using (Html.BeginForm("Batch", "SeAcademics", FormMethod.Post))
+    {
+        if (null != TempData["Batch"])
+        {
+            @Html.Raw(TempData["Batch"])
+        }
+
+        <span style="color:red;" id="Combo"></span>
+        <div class="box">
+            <div class="box-header">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Select Class")</label>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("CourseId", null, "--Select Class--", new { onchange = "GetData()", @class = "form-control " })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="display_box" style="display:none;">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">Batch</h3>
+                        </div><!-- /.box-header -->
+                        <div class="box-body table-responsive no-padding">
+
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayName("Batch Name")
+                                        </th>
+
+                                        <th>
+                                            @Html.DisplayName("Start Date")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("End Date")
+                                        </th>
+
+                                        <th></th>
+                                    </tr>
+
+                                </thead>
+                                <tbody id="tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    }
+</section>
+
+<script>
+
+    $('#CourseId').change(function () {
+        document.getElementById("Combo").innerHTML = "";
+    });
+
+    function submitForm() {
+
+        var CourseId = $('#CourseId').val();
+
+        if (CourseId == "") {
+            document.getElementById("Combo").innerHTML = "Please select Class";
+            return false;
+        }
+        else {
+            window.location.href = '/SeAcademics/BatchC?CourseId=' + CourseId;
+        }
+    };
+
+    function GetData() {
+        var CourseId = $('#CourseId').val();
+
+        if (CourseId > 0) {
+
+            $.ajax({
+
+                url: '/SeAcademics/BatchData',
+                data: { CourseId: CourseId },
+                contentType: "application/json; charset=utf-8",
+                success: successFunc,
+                error: errorFunc
+            });
+        }
+        else {
+            document.getElementById("display_box").style.display = "none";
+
+        }
+
+        function successFunc(data) {
+
+            if (data.length < 1) {
+                //alert('Data not available to display');
+                document.getElementById("display_box").style.display = "none";
+            }
+            else {
+                document.getElementById("display_box").style.display = "inline";
+                var row = "";
+                $.each(data, function (index, item) {
+                    var dttt = new Date(parseInt(item.StartDate.replace("/Date(", "").replace(")/", ""), 10));
+
+                    var disDate = (dttt.getMonth() + 1) + '/' + dttt.getDate() + '/' + dttt.getFullYear();
+
+                    var dttt = new Date(parseInt(item.EndDate.replace("/Date(", "").replace(")/", ""), 10));
+
+                    var diDate = (dttt.getMonth() + 1) + '/' + dttt.getDate() + '/' + dttt.getFullYear();
+
+                    row += "<tr>" +
+                    "<td>" + item.BatchName + "</td>" +
+                    "<td>" + getFormattedDate(disDate) + "</td>" +
+                    "<td>" + getFormattedDate(diDate) + "</td>" +
+                    "<td>" + '<a href="/SeAcademics/BatchE?id=' + item.BatchId + ' ">' + "Edit" + '</a>' + " | " +
+                    '<a href="/SeAcademics/BatchD?id=' + item.BatchId + ' ">' + "Delete" + '</a>' + " | " +
+                    '<a href="/SeAcademics/BatchDet?id=' + item.BatchId + ' ">' + "Details" + '</a>' + "</td>" +
+                    "</tr>";
+                });
+
+                $("#tbody").html(row);
+            }
+        }
+
+        function errorFunc() {
+            document.getElementById("display_box").style.display = "none";
+        }
+        function getFormattedDate(input) {
+            var pattern = /(.*?)\/(.*?)\/(.*?)$/;
+            var result = input.replace(pattern, function (match, p1, p2, p3) {
+                var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                return (p2 < 10 ? "0" + p2 : p2) + " - " + months[(p1 - 1)] + " - " + p3;
+            });
+            return result;
+        }
+    };
+
+    window.onload = GetData;
+
+</script>
+
+

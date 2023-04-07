@@ -1,0 +1,142 @@
+﻿@model IEnumerable<AsteriskBrowserAL.PayrollCategoryComponents>
+
+@{
+    ViewBag.Title = "Payroll Category Components";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Payroll Components</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+
+<section class="content">
+
+
+    @if (null != TempData["PayrollCategoryComponents"])
+    {
+        @Html.Raw(TempData["PayrollCategoryComponents"])
+    }
+
+    @if (null != Model)
+    {
+        int nsno = 1;
+        <div class="table-header">
+            Payroll Components
+            <div style="float:right">
+                <a class="btn btn-info btn-xs P2" href="@Url.Action("PayrollCategoryComponentsC", "SeHR")" role="button" style="float:right" id="New" name="New"><i class="fa fa-plus-circle bigger-200 pull-right"></i></a>
+            </div>
+        </div>
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("SNo")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Component Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Employer Contribution")
+                    </th>
+
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CategoryName)
+                        </td>
+
+                        <td>
+                            @if (item.IsEmployerContribute.HasValue && item.IsEmployerContribute.Value == true)
+                            {
+                                <input type="checkbox" checked="checked" disabled="disabled" />
+                            }
+                            else
+                            {
+                                <input type="checkbox" disabled="disabled" />
+                            }
+                        </td>
+
+                        <td>
+                            <div>
+                                <a class="green P2" href="@Url.Action("PayrollCategoryComponentsE", "SeHR", new { id = item.PayrollCategoryComponentsId })">
+                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                </a>
+                                <a class="red P2" onclick="btnConfirm(@item.PayrollCategoryComponentsId)">
+                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                </a>
+
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+
+    }
+    else
+    {
+        <div class="table-header">
+            Payroll Category Components
+            <a class="view-header-btn btn btn-info btn-xs P2" href="@Url.Action("PayrollCategoryComponentsC", "SeHR")" role="button" style="float:right" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+        </div>
+        <span style="color: red;"><b>   Records Found (0) </b></span>
+
+    }
+</section>
+
+
+
+<script>
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeHR/ValidationForPayrollCategoryComponentsD',
+                data: { id: Value },
+                success: function (data) {
+                    var url = '/SeHR/PayrollCategoryComponentsD?id=' + Value;
+                    var title = "Payroll Components";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+</script>

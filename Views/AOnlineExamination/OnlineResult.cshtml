@@ -1,0 +1,129 @@
+﻿@model  IEnumerable<AsteriskBrowserAL.Models.OnlineResultsViewModel>
+
+@{
+    ViewBag.Title = "OnlineResult";
+    List<AsteriskBrowserAL.Models.OnlineResultsViewModel> res = ViewBag.Res;
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Online Examination
+        </li>
+        <li class="active">Results</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<section class="content">
+    @if (Model != null)
+    {
+        int SNo = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    Online Results
+                </div>
+                <div class="col-sm-8">
+                    <div style="overflow:auto; height:400px;">
+                        <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("Q No")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Your Answers")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Actual Answers")
+                                    </th>
+                                </tr>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(SNo++)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Answer)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.OrginalAnswer)
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="row">
+                        <b>Correct Ans:</b> <span style="color:green;font-weight:bold;margin-left:1em">@ViewBag.nrightAns</span><br />
+                        <b>Wrong Ans:</b> <span style="color:red;font-weight:bold;margin-left:1em">@ViewBag.nWrongAns</span><br />
+                        <b>Not Attempted :</b> <span style="color:black;font-weight:bold;margin-left:1em">@ViewBag.nNotAttemptedQsns</span>
+
+                    </div>
+
+                    <br />
+
+                    <div class="row">
+                        @if (res.Count() > 0)
+                        {
+
+                            foreach (var s in res)
+                            {
+                                if (ViewBag.IsNegative == true)
+                                {
+                                    double wrongmarks = 0.25;
+                                    double wans = s.WrongAns * wrongmarks;
+                                    double marksgained = s.rightAns - wans;
+                                    <label>Marks Gained in @s.SubjectName : </label><b><span style="color:green;font-weight:bold;margin-left:1em">@marksgained</span></b><br />
+                                }
+                                else
+                                {
+                                    <label>Marks Gained @*in @s.SubjectName*@ :</label><b><span style="color:green;font-weight:bold;margin-left:1em">@s.rightAns</span></b><br />
+                                }
+                            }
+
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+
+<script>
+    $(document).ready(function () {
+
+
+        function disableBack() { window.history.forward() }
+
+        window.onload = disableBack();
+        window.onpageshow = function (evt) { if (evt.persisted) disableBack() }
+
+        document.getElementById('OnlineLogin').style.display = "none";
+        document.getElementById('OnlineSearch').style.display = "none";
+        $('a[id="OnlineAsterisk"]').click(function () {
+            return false;
+        });
+    });
+
+
+</script>
+

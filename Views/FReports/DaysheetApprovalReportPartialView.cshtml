@@ -1,0 +1,60 @@
+﻿@model  AsteriskBrowserAL.Models.DaysheetViewModel
+
+@{
+    Layout = null;
+    int Sno = 1;
+}
+
+<div class="table-header">
+    Records Found (4)
+    <button class="btncustom" id="btnExport" style="float:right;margin-right:10px;margin-top:1px;">
+       Download
+    </button>
+</div>
+<table class="table tbhover table-striped table-bordered dynamic-table" id="TableOne">
+    <thead>
+        <tr>
+            <th rowspan="2">SNo</th>
+            <th rowspan="2">Branch</th>
+            <th rowspan="2">Name</th>
+            @foreach (String item in Model.lstDatesForMonth)
+            {
+                <th colspan="2" align="center">@item</th>
+            }
+        </tr>
+        <tr>
+            @for (int i = 0; i < Model.lstDatesForMonth.Count; i++)
+            {
+                <th>Time</th>
+                    <th>Date</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.lstDaysheetViewModel)
+            {
+            <tr>
+                <td> @Sno</td>
+                <td>@item.BranchName</td>
+                <td>@item.ApprovalName</td>
+                @foreach (var _dateData in item.lstDaySheetApprovalReport)
+                {
+                    <td>@_dateData.Time</td>
+                        <td>@_dateData.Status</td>
+                }
+            </tr>
+            Sno++;
+        }
+    </tbody>
+</table>
+
+@Html.Action("DataTableScripts", "Base", new { IsPage = false, allowScroll = true, strHeight = "350px" })
+
+
+
+
+<script>
+    $('#btnExport').click(function () {
+        window.location.href = "/FReports/ExcelDaySheetApprovalReportDT"
+    });
+</script>

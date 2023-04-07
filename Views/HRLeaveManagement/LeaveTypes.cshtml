@@ -1,0 +1,186 @@
+﻿@model IEnumerable<AsteriskBrowserAL.LeaveTypes>
+
+@{
+    ViewBag.Title = "Leave Types";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            LeaveManagement
+        </li>
+        <li class="active">Leave Types</li>
+    </ul><!-- /.breadcrumb -->
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+    @*<div class="row">
+        <div class="col-xs-12">
+
+            @*<h3>@Html.ActionLink("New Leave Type", "LeaveTypesC")</h3>*@
+    @*<button class="btn btn-primary" style="width:80px" type="button" onclick="location.href='@Url.Action("LeaveTypesC", "HRLeaveManagement")'">New</button>
+                <br />
+            </div>
+        </div>*@
+
+
+    <br />
+
+    @if (null != TempData["LeaveTypes"])
+    {
+        @Html.Raw(TempData["LeaveTypes"])
+    }
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="table-header">
+                Leave Types
+                <div style="float:right;margin-right:10px;">
+                    <a class="btncustom P2" href="@Url.Action("LeaveTypesC", "HRLeaveManagement" )" role="button">Add</a>
+                </div>
+            </div>
+            
+            <!-- /.box-header -->
+            @if (null != Model)
+            {
+                int nsno = 1;
+
+                <div class="widget-body table-responsive no-padding">
+                    <div class="hideScrolling">
+                        <table class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("SNo")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Leave Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Leave Code")
+                                    </th>
+                                    @*<th>
+                                    @Html.DisplayName("Carry Forward")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Half Days")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("No of Leaves")
+                                </th>*@
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.LeaveName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.LeaveCode)
+                                        </td>
+
+                                        @*<td>
+                                        @if (item.IsCarryForward.GetValueOrDefault() == true)
+                                        {
+                                            @Html.DisplayName("Yes")
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayName("No")
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (item.IsHalfDay.GetValueOrDefault() == true)
+                                        {
+                                            @Html.DisplayName("Yes")
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayName("No")
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ConsecutiveDaysCount)
+
+
+                                    </td>*@
+                                        <td>
+                                            <div>
+                                                <a class="green P2" href="@Url.Action("LeaveTypesE", "HRLeaveManagement", new { id = item.LeaveTypeId })">
+                                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                                </a>
+
+                                                <a class="red P2" onclick="btnConfirm(@item.LeaveTypeId)">
+                                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            else
+            {
+                <span style="color: red;"><b>Data is not available </b></span>
+            }
+        </div>
+    </div>
+    @Html.Action("DataTableScripts", "Base")
+
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/HRLeaveManagement/LeaveTypesDConfirm',
+                data: { id: Value },
+                success: function (data) {
+
+                    var url = '/HRLeaveManagement/LeaveTypesD?id=' + Value;
+                    var title = "Leave Types";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

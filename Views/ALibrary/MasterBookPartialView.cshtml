@@ -1,0 +1,91 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.MasterBooksViewData>
+
+
+@if (Model != null)
+{
+    if (Model.Count() > 0)
+    {
+
+        <div class="hr hr-18 dotted hr-double"></div>
+        int nsno = 1;
+        <div class="table-header">
+            Records Found (@Model.Count())
+            @*<button id="Generate" onclick="PrintElem('#mydiv')" class="btn btn-info btn-xs" style="float:right">
+                    <i class="ace-icon fa fa-print bigger-180"></i>
+                </button>*@
+        </div>
+
+        <table id="mytab1" class="table table-striped table-bordered table-hover">
+            <tbsody>
+                <tr>
+                    <th>
+                        @Html.DisplayName("SNo")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Book Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Book Location")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Other Details")
+                    </th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @item.MastertBookDataName
+                        </td>
+                        <td>
+                            @item.BookLocationName
+                        </td>
+                        <td>
+                            @item.OtherDetails
+                        </td>
+                        <td>
+                            <a class="green" href="@Url.Action("MasterBookC", "ALibrary", new { id =item.MastertBookDataId,BookCategoryId=item.BookCategoryId})">
+                                <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                            </a>
+
+                            <a class="red" @*onclick="btnConfirm(@item.MastertBookDataId )*@ name="delete" id="delete" href="@Url.Action("MasterBooksD", "ALibrary", new { id = item.MastertBookDataId })" style="display:none">
+                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbsody>
+        </table>
+    }
+    else
+    {
+        <span style="color:red">Data not available to display</span>
+    }
+}
+
+<script>
+
+    function btnConfirm(Value) {
+        debugger
+        if (Value > 0) {
+            $.ajax({
+                url: '/ALibrary/ValidationForMasterBookD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/ALibrary/MasterBooksD?id=' + Value;
+                    var title = "Master Books";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+
+</script>

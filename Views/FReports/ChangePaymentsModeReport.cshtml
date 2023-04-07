@@ -1,0 +1,271 @@
+﻿@model AsteriskBrowserAL.Models.FeeCorrectionViewModel
+@{
+    ViewBag.Title = "Approve Fee Correction";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active"> Payments Mode Reports</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<!--Main Content-->
+<section class="content">
+   
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("ExportPaymentmodesReport", "FReports", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <span style="color:red" id="Validation"> </span>
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Fee Correction History</span>
+                    <div class="" style="float:right;margin-right:10px;">
+                        <a class="btncustom P2" id="btnViewData2" onclick="GetData()">View Data</a>
+                    </div>
+
+                </div>
+
+
+
+                <div class="widget-box">
+         
+
+                    <input type="hidden" value="@Model.IsCentral" id="IsCentral" />
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            @if (Model.IsCentral)
+                            {
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboDivision" class="form-control" onchange="LoadBranchCombo()"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboBranch" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            
+                            }
+                            else
+                            {
+                                <input type="hidden" id="CboBranch" name="CboBranch" value="@Model.SubscriptionId" />
+                            }
+                            @*<div class="row">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Status</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboStatus" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>*@
+
+                        </div><!-- /.box-header -->
+
+
+                    </div>
+                </div>
+                <div id="PvApproveFeeCorrection">
+                </div>
+            }
+            @*<div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+                top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+                opacity: .8; filter: alpha(opacity=70);display:none">
+                            <p style="position:absolute; top: 50%; left:50%;">
+                                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+                            </p>
+                        </div>*@
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    function ONLOADDATA() {
+
+        LoadDivisionCombo();
+        //LoadStatusCombo();
+    }
+
+    window.onload = ONLOADDATA();
+
+    function LoadBranchCombo() {
+        var DivisionId = $('#CboDivision').val();
+
+        $('#PvApproveFeeCorrection').html("");
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+                    BranchItems.children().remove();
+
+                    $.each(data, function (i, record) {
+                        if (record.IsCentral != true) {
+                            BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                        }
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+                },
+                aync: false
+            })
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    }
+
+    $("#CboBranch").change(function () {
+        $('#PvApproveFeeCorrection').html("");
+    })
+
+    //$("#CboStatus").change(function () {
+    //    $('#PvApproveFeeCorrection').html("");
+    //})
+
+    //function LoadStatusCombo() {
+
+    //    var StatusItems = $('#CboStatus');
+
+    //    StatusItems.children().remove();
+    //    StatusItems.append($("<option>").val("-1").text("--- Select ---"));
+    //    StatusItems.append($("<option>").val("0").text("Pending"));
+    //    StatusItems.append($("<option>").val("1").text("Accepted"));
+    //    StatusItems.append($("<option>").val("2").text("Rejected"));
+    //    StatusItems.append($("<option>").val("3").text("All"));
+
+    //    $('#CboStatus').append(StatusItems);
+    //}
+
+    function LoadDivisionCombo() {
+
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (data) {
+                var BranchItems = $('#CboDivision');
+
+                BranchItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    BranchItems.append($("<option>").val(record.DivisionId).text(record.DivisionName));
+                });
+
+                $('#CboDivision').append(BranchItems);
+            },
+            aync: false
+        });
+    }
+
+    function GetData() {
+        debugger
+        var DivisionId = $('#CboDivision').val();
+        var SubscriptionId = $('#CboBranch').val();
+        //var Status = $('#CboStatus').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (DivisionId < 0) {
+            Message += "Division";
+            isValid = false;
+        }
+
+        if (SubscriptionId == "null" || SubscriptionId < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Branch";
+            isValid = false;
+        }
+
+        //if (Status < 0) {
+        //    if (!isValid)
+        //        Message += ",";
+
+        //    Message += " Status";
+        //    isValid = false;
+        //}
+
+        if (!isValid) {
+            $('#Validation').html(Message);
+            return;
+        }
+
+
+        $('#Validation').html("");
+        $('#imagemodal').show();
+        $.ajax
+            ({
+                url: '/FReports/GetFeeCorrectionData/',
+                data: { SubscriptionId: SubscriptionId },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#PvApproveFeeCorrection').html(data);
+                }
+
+            });
+
+    }
+
+    //function SaveStatus(ActionstatusId, nSubscriptionId, nAction, nRequestType) {
+    //    $('#imagemodal').show();
+    //    $.ajax({
+    //        error: function (jqXHR, textStatus, errorThrown) {
+    //            alert(errorThrown);
+    //            alert("An unexpected error occurred.Please try again later");
+    //            $('#imagemodal').hide();
+    //        },
+
+    //        url: '/FOperations/SaveApproveFeeCorrectionStatus/',
+    //        data: { nId: ActionstatusId, nSubscriptionId: nSubscriptionId, nAction: nAction, nRequestType: nRequestType },
+    //        success: function (data) {
+    //            $('#imagemodal').hide();
+    //            GetData();
+    //        },
+    //        aync: false
+    //    }).done(function () {
+    //        $('#imagemodal').hide();
+    //    });
+    //}
+
+    //function ApproveFC(Id, SubscriptionId, Action, RequestType) {
+    //    SaveStatus(Id, SubscriptionId, Action, RequestType);
+    //}
+
+    //function ResetControls() {
+
+    //}
+
+    // slight update to account for browsers not supporting e.which
+    function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
+
+</script>
+

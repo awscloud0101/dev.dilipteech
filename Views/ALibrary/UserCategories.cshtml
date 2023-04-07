@@ -1,0 +1,122 @@
+﻿@model List<AsteriskBrowserAL.UserCategory>
+
+@{
+    ViewBag.Title = "UserCategories";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">User Categories</li>
+    </ol>
+</section>
+<!-- /section:basics/content.breadcrumbs -->
+
+
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @if (null != TempData["UserCategoriesData"])
+            {
+                <span style="color:green;font-weight:bold;" id="UserCategoriesData">@TempData["UserCategoriesData"]</span>
+            }
+            @if (null != TempData["UserCategoriesData"])
+            {
+                <span style="color:green;font-weight:bold;" id="MaxNumOfBooksallowed">@TempData["MaxNumOfBooksallowed"]</span>
+            }
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("User Category")</span>
+                @{ Html.EnableClientValidation(); }
+                @using (Html.BeginForm("UserCategories", "ALibrary", FormMethod.Post))
+                {
+
+                    if (null != Model)
+                    {
+                        int sno = 1;
+                        <div class="table-header">
+                            Set Count
+                            <div style="float:right;">
+                                <button name="Save" class="btn btn-info btn-xs" value="Save" onclick="return submitForm()" type="submit"@*id="save"*@>
+                                    <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                                </button>                            
+                            </div>
+                            </div>
+                          
+         <div style="overflow:auto">
+               <table class="table tbhover table-striped table-bordered dynamic-table">
+                     <tbody>
+                      <tr>
+                          <th>
+                              @Html.DisplayName("SNO")
+                          </th>
+                    <th>
+                        @Html.DisplayName("Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Max Allowed Books")
+                    </th>
+
+                </tr>
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            @(sno++)
+                        </td>
+                       
+                        <td>
+                            @Html.Hidden("lstUsercategory.Index", (@i))
+                            @Html.Hidden("lstUsercategory[" + @i + "].UserCategoryId", Model.ElementAt(i).UserCategoryId)
+                            @Html.Hidden("lstUsercategory[" + @i + "].UserCategoryName", Model.ElementAt(i).UserCategoryName)
+                            @Model.ElementAt(i).UserCategoryName
+                        </td>
+                        <td>
+                            @Html.TextBox("lstUsercategory[" + @i + "].MaxNumOfBooks", Model.ElementAt(i).MaxNumOfBooks, new { @class = "form-control textbox", @type = "number", @min = "0", @max = "250", @style = "width:120px", maxlength = "3", @id = "textbox" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+                    }
+                    else
+                    {
+                            <span style="color: red;"><b>Data not available</b></span> }
+                            }
+
+                        </div>
+    </div>
+</section>
+
+<script>
+    //$('#save').click(function () {
+    //    debugger
+    //    var maxbooks = $('#textbox').val();
+    //    var bookvalidation = true;
+    //    if (maxbooks == 0 || maxbooks == "")
+    //    {
+    //        $('#valid').show();
+    //        bookvalidation = false;
+    //    }
+    //    return bookvalidation
+    //});
+    //$('#textbox').focus(function () {
+    //    $('#valid').hide();
+    //});
+    $('.textbox').click(function () {
+        $('#UserCategoriesData').hide();
+        $('#Success').hide();
+    })
+</script>
+

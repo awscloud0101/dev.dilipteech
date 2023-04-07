@@ -1,0 +1,149 @@
+﻿@model AsteriskBrowserAL.Models.YearWiseParticularsData
+
+@{
+    ViewBag.Title = "Create YearWiseParticulars";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            DCCR
+        </li>
+        <li class="active">Year Wise Particulars</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <span style="color:red;" id="Validation">@Html.ValidationMessage("YearWiseParticulars")</span>
+            @using (Html.BeginForm("YearWiseParticularsC", "DCCR", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" name="Exam" id="Exam" />
+                @Html.HiddenFor(model => model.FinancialYearId)
+                @Html.HiddenFor(model => model.GroupedParticularId)
+                @Html.HiddenFor(model => model.TransactionTypeId)
+
+                <input type="hidden" id="SelSubId" value="@Model.FinancialYearId" />
+                <input type="hidden" id="SelClass" value="@Model.GroupedParticularId" />
+                <input type="hidden" id="SelExamId" name="ExamId" value="@Model.TransactionTypeId" />
+
+
+                <div class="table-header">
+                
+                        Year Wise Particulars
+                        <small style="float:right;" class="textheader">
+                            @Html.ActionLink("Back to details", "YearWiseParticulars", new { Year = Model.FinancialYearId, GroupParticular = Model.GroupedParticularId, Transaction = Model.TransactionTypeId})
+                        </small>
+        
+                </div><!-- /.page-header -->
+
+                <!-- form start -->
+
+                <div class="widget-box row" style="padding:10px;">
+
+                    <form class="form-horizontal" role="form">
+
+                        <div class="form-group col-sm-6">
+                            <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Particular Name")</label>
+
+                            <div class="col-sm-6">
+                                @Html.TextBoxFor(model => model.ParticularName, new { @class = "form-control textlength", placeholder = "Particular Name", @id = "ParticularName" })
+                                <span class="" style="color:red;font-weight:bold;" id="ESParticularName">
+                                </span>
+                            
+                            </div>
+
+                           
+                        </div>
+
+
+
+                        <div class="form-group  col-sm-6">
+                            <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Particular Id")</label>
+
+                            <div class="col-sm-6">
+                                @Html.TextBoxFor(model => model.ParticularId, new { @class = "txtboxNum form-control", placeholder = "Particular Id", @id = "ParticularId", @maxlength = "3" })
+                                <span class="" style="color:red;font-weight:bold;" id="ESParticularId">
+                                </span>
+                            
+                            </div>
+
+                           
+                        </div>
+
+                      
+
+                        <div class="col-md-9">
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" name="Save" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+<script type="text/javascript">
+
+    function submitForm() {
+        var validatestatus = validateYearParticulars();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+    function validateYearParticulars() {
+
+        var validate = true;
+
+        var ParticularName = document.getElementById("ParticularName").value;
+
+        var ParticularId = document.getElementById("ParticularId").value;
+        //alert(StartDate);       
+
+
+        if (ParticularName == "") {
+            document.getElementById("ESParticularName").innerHTML = "Please enter Particular Name";
+            validate = false;
+        }
+
+
+
+        if (ParticularId == "") {
+            document.getElementById("ESParticularId").innerHTML = "Please enter Particular Id";
+            validate = false;
+        }
+
+        //if (validate == true) {
+        //    var status = IsMicroScheduleExisted();
+        //    validate = status;
+        //}
+
+        return validate;
+    };
+    </script>

@@ -1,0 +1,189 @@
+﻿
+@{
+    ViewBag.Title = "Receiving Qty";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Receiving Quantity</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<br />
+
+
+<style>
+    tr {
+        display: table-row;
+        vertical-align: inherit;
+        border-color: inherit;
+    }
+
+    .selected {
+        background-color: #ccc;
+    }
+</style>
+
+
+<section class="content">
+    <form id="myForm" method="post">
+        <div class="row">
+            <div class="col-xs-12">
+                @using (Html.BeginForm("ReceivingQty", "SOperations", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="widget-box">
+                                <div class="widget-header widget-header-flat widget-header-small">
+                                    <h5 class="widget-title">
+                                        Receiving Qty
+                                    </h5>
+
+                                    <div class="widget-toolbar no-border">
+                                        <div class="inline dropdown-hover">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <div class="col-sm-6">
+                                                    <input type="radio" name="rbReceivedType" checked="checked" value="Kit"><span style="margin-right:2em;">Kit</span>
+                                                    <input type="radio" name="rbReceivedType" value="Item" />Item
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div id="Items"></div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div id="Kits"></div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="KitDetails"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+</section>
+
+<script>
+    var rbReceivedType = "";
+
+    $(document).ready(function () {
+        GetDataOnrbClick();
+    });
+
+    $('input[name="rbReceivedType"]').click(function radioButton() {
+
+        $('#Kits').html("");
+        $('#Items').html("");
+        $('#KitDetails').html("");
+
+        rbReceivedType = $(this).val();
+        GetDataOnrbClick();
+    });
+
+    function GetDataOnrbClick() {
+        rbReceivedType = $('input[name=rbReceivedType]:checked', '#myForm').val();
+
+        if (rbReceivedType == "Kit") {
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+
+                url: '/SOperations/PopulateReceivedKits',
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $('#Kits').html(Data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+        }
+        else {
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+
+                url: '/SOperations/PopulateReceivedItems',
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $('#Items').html(Data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+        }
+    }
+
+
+    $(document).on("click", "#Tab1 tr", function (e) {
+
+        var val = $(this).find('#InventoryTransferId').val();
+
+        if (val > 0) {
+
+            $("#Tab1 tbody tr").children('td,th').css('background-color', 'transparent');
+            $(this).children('td,th').css('background-color', '#c4e2d1');
+
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+
+                url: '/SOperations/PopulateReceivedKitDetails',
+                data: { InventoryTransferId: val },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $('#KitDetails').html(Data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+        }
+
+    });
+
+</script>
+
+
+
+
+
+
+
+
+
+
+

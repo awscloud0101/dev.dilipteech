@@ -1,0 +1,160 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationPapersViewModel
+
+@{
+    ViewBag.Title = "Delete ExaminationPapers";
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    @*<div id="message" class="alert alert-info bigger-110">
+        </div>*@
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Transactions
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Examination Papers</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+
+
+    <div class="hr hr-18 dotted hr-double"></div>
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Exam Paper Details", "ExaminationPapers", new { ClassNumber = Model.ClassNumber, TermNumber = Model.TermNumber })</h3>
+        </div>
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="box">
+                @using (Html.BeginForm("ExaminationPapersD", "AExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+
+                    <div class="box-header">
+                        <h3 class="box-title">Examination Paper</h3>
+                        <br />
+                        <br />
+                        <button class="btn btn-primary" style="width:80px" onclick="return submitForm()" type="submit">
+                            Delete
+                        </button>
+                    </div><!-- /.box-header -->
+
+                    @Html.HiddenFor(model => model.ClassNumber)
+                    @Html.HiddenFor(model => model.TermNumber)
+                    @Html.HiddenFor(model => model.ExaminationPapers.ExaminationPapersId)
+
+                    <input id="id" type="hidden" value="@Model.ExaminationPapers.ExaminationPapersId" />
+
+                    <div class="table-header">
+                        Records Found (1)
+                    </div>
+                    <table id="dynamic-table" class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayName("Paper Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Exam Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Max. Marks")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Pass Marks")
+                                </th>
+                                @*<th>
+                                        @Html.DisplayName("Start Time")
+                                    </th>*@
+                                <th>
+                                    @Html.DisplayName("Duration")
+                                </th>
+                     
+                            <tr>
+
+                                <td>
+                                    @Html.DisplayFor(model => model.ExaminationPapers.PaperName)
+                                </td>
+                                @if (Model.ExaminationPapers.ExamDate == null)
+                            {
+                            <td></td>
+                            }
+                            else
+                            {
+                            <td>
+                                @Model.ExaminationPapers.ExamDate.Value.ToString("dd-MMM-yyyy")
+                            </td>
+                            }
+                                <td>
+                                    @Html.DisplayFor(model => model.ExaminationPapers.MaxMarks)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(model => model.ExaminationPapers.PassMarks)
+                                </td>
+                                @*<td>
+                                        @Html.DisplayFor(model => model.ExaminationPapers.StartTime)
+                                    </td>*@
+                                <td>
+                                    @Html.DisplayFor(model => model.ExaminationPapers.Duration)
+                                </td>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function submitForm() {
+        var valid = true;
+
+        var Id = $('#id').val();
+
+        if (Id > 0) {
+            $.ajax({
+
+                url: '/AExamination/ValidationForExamPapersD',
+                data: { id: Id },
+                success: function (data) {
+                    if (data != "") {
+                        document.getElementById('Validation').innerHTML = data;
+                        valid = false;
+                    }
+                },
+                async: false
+            })
+        }
+
+        return valid;
+    }
+
+</script>
+

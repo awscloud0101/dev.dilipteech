@@ -1,0 +1,246 @@
+﻿@model AsteriskBrowserAL.Models.TicketStatusData
+@{
+    int sno = 1;
+    string style = string.Empty;
+
+}
+<script src="~/assets/js/canvasjs.js"></script>
+<script src="~/assets/js/excanvas.js"></script>
+<script src="~/assets/js/canvasjs.min.js"></script>
+<script src="~/assets/js/jquery.canvasjs.js"></script>
+<script src="~/assets/js/jquery.canvasjs.min.js"></script>
+
+
+
+<div class="row overflowscroll">
+    <div class="col-xs-12">
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-header">
+                    Tickets Count (@(Model.NewTicketsCount + Model.ProcessTicketsCount + Model.SolvedTicketsCount + Model.RejectedTicketsCount))
+                </div><!-- /.box-header -->
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                @("S.No")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Status")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Count")
+                            </th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td>1</td>
+                            <td>New</td>
+                            <td>
+                                <span class="badge badge-purple">@Model.NewTicketsCount</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>In-Process</td>
+                            <td><span class="badge badge-warning">@Model.ProcessTicketsCount</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Resolved</td>
+                            <td><span class="badge badge-success">@Model.SolvedTicketsCount</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Rejected</td>
+                            <td><span class="badge badge-danger">@Model.RejectedTicketsCount</span></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-6">
+                <div id="chartContainer" style="height:232px; width:320px;">
+                </div>
+            </div>
+        </div>
+
+        <div class="hr hr-18 dotted hr-double"></div>
+
+        @if (null != Model)
+        {
+            if (null != Model.lstStatusData && Model.lstStatusData.Count() > 0)
+            {
+                <div class="table-header">
+                    Ticket Status
+                    <div style="float:right">
+                        <button type="submit" class="btn btn-info btn-minier">
+                            <i class="ace-icon fa fa-share bigger-160"></i>
+                        </button>
+                    </div>
+                </div><!-- /.box-header -->
+                <div style="overflow:auto; height:330px;">
+                    <table class="table table-striped table-bordered table-hover dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @("S.No")
+                                </th>
+                                <th>
+                                    @("Ticket No.")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Ticket Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Ticket Owner")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Status Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Status Owner")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Status")
+                                </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+
+                            @foreach (var item in Model.lstStatusData)
+                            {
+                                <tr>
+                                    <td>
+                                        @(sno++)
+                                    </td>
+                                    <td>
+                                        @item.TicketNumber
+                                    </td>
+                                    <td>
+                                        @if (item.TicketDate.HasValue)
+                                        {
+                                            @item.TicketDate.Value.ToString("dd-MMM-yyyy")
+                                        }
+                                    </td>
+                                    <td>
+                                        @item.HdTicketOwnerName
+                                    </td>
+                                    <td>
+                                        @if (item.StatusDate.HasValue)
+                                        {
+                                            @item.StatusDate.Value.ToString("dd-MMM-yyyy")
+                                        }
+                                    </td>
+                                    <td>
+                                        @item.HdTicketStatusOwnerName
+                                    </td>
+                                    <td>
+                                        @if (item.HDStatusId == 1)
+                                        {
+                                            <span class="label label-purple arrowed-right arrowed-in">@item.HDStatusName</span>
+                                        }
+                                        @if (item.HDStatusId == 2)
+                                        {
+                                            <span class="label label-warning">@item.HDStatusName</span>
+
+                                        } @if (item.HDStatusId == 3)
+                                        {
+                                            <span class="label label-success arrowed-in arrowed-in-right">@item.HDStatusName</span>
+
+                                        } @if (item.HDStatusId == 4)
+                                        {
+                                            <span class="label label-danger arrowed">@item.HDStatusName</span>
+                                        }
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div style="color:red;font-weight:bold">Data not available to display</div>
+            }
+        }
+        else
+        {
+            <div style="color:red;font-weight:bold">Data not available to display</div>
+        }
+
+
+    </div>
+
+
+</div>
+
+@if (null != Model)
+{
+    <input type="hidden" id="NewCount" value="@Model.NewTicketsCount" />
+    <input type="hidden" id="InProcessCount" value="@Model.ProcessTicketsCount" />
+    <input type="hidden" id="ResolvedCount" value="@Model.SolvedTicketsCount" />
+    <input type="hidden" id="RejectedCount" value="@Model.RejectedTicketsCount" />
+}
+
+
+
+
+@Html.Action("DataTableScripts", "Base")
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var NewCount = $('#NewCount').val();
+        var InProcessCount = $('#InProcessCount').val();
+        var ResolvedCount = $('#ResolvedCount').val();
+        var RejectedCount = $('#RejectedCount').val();
+
+
+        var chart = new CanvasJS.Chart("chartContainer", {
+            //title: {
+            //    text: "Ticket Status"
+            //},
+            colorSet: "greenShades",
+            axisY: {
+                suffix: " "
+            },
+            legend: {
+                verticalAlign: 'bottom',
+                horizontalAlign: "center"
+            },
+            data: [
+            {
+                type: "column",
+                bevelEnabled: false,
+                indexLabel: "{y}",
+                dataPoints: [
+			 { label: "New", y: parseInt(NewCount, 10), color: "#9585BF" },
+     { label: "In-Process", y: parseInt(InProcessCount, 10), color: "#f39c12" },
+     { label: "Resolved", y: parseInt(ResolvedCount, 10), color: "#00a65a" },
+     { label: "Rejected", y: parseInt(RejectedCount, 10), color: "#dd4b39" }
+
+                ]
+            }
+            ]
+        });
+
+        chart.render();
+    });
+</script>
+
+
+
+
+
+
+
+

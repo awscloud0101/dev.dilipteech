@@ -1,0 +1,149 @@
+﻿@model List<AsteriskBrowserAL.Models.ExaminationResultsData>
+@{
+    int sno = 1;
+}
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+@if (null != Model)
+{
+    if (Model.Count() > 0)
+    {
+        <div class="box">
+            <div class="table-header">
+                Records Found (@Model.Count)
+                <div style="float:right">
+                    <a href="/AExaminationReports/AbsentReportStudentWise?Status=2" value="PDF"><span class="btn btn-info btn-xs btn-danger">PDF</span></a>
+                    <a href="/AExaminationReports/AbsentReportStudentWise?Status=0" value="Excel"><span class="btn btn-info btn-xs btn-success">Excel</span></a>
+                    <a onclick="PrintElem()" value="Print"><span class="btn btn-info btn-xs btn-warning">Print</span></a>
+                </div>
+            </div>
+
+            <div class="box-body table-responsive no-padding">
+                <table class="table tbhover table-striped table-bordered dynamic-table" id="mytab1" style="font-size:14px;">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Admission No")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Student Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Class")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Exam Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Exam Date")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Subject Name")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Status")
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @(sno++)
+                                </td>
+                                <td>
+                                    @item.BranchName
+                                </td>
+
+                                <td>
+                                    @item.AdmissionNumber
+                                </td>
+
+                                <td>
+                                    @item.StudentName
+                                </td>
+
+                                <td>
+                                    @item.SectionName
+                                </td>
+
+                                <td>
+                                    @item.ExamName
+                                </td>
+
+                                <td>
+                                    @item.ExaminationDate
+                                </td>
+
+                                <td>
+                                    @item.SubjectName
+                                </td>
+
+                                <td>
+                                    @if (item.IsAbsent == true)
+                                    {
+                                        @Html.DisplayName("Absent")
+                                    }
+                                    else
+                                    {
+                                        @Html.DisplayName(" ")
+                                    }
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold"> Data not available</span>
+    }
+
+}
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+    function PrintElem() {
+        debugger
+        $.ajax({
+            url: '/AExaminationReports/AbsentReportStudentWise',
+            type: 'post',
+            data: { Status: 1 },
+            success: function (data) {
+                Popup(data);
+            }
+        })
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+

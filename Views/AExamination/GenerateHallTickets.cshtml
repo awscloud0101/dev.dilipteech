@@ -1,0 +1,213 @@
+﻿@model AsteriskBrowserAL.Models.HallTicket
+
+@{
+    ViewBag.Title = "Hall Tickets";
+}
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="~/script/jquery-2.0.3.js"></script>
+<script src="~/script/jquery-ui.js"></script>
+<script src="~/js/jquery-1.10.2.js"></script>
+<script src="~/js/jquery-ui.js"></script>
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Examination
+        </li>
+        <li class="active">Generate Hall Ticket</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<form id="myForm" method="post">
+    <section class="content">
+        <div class="row">
+            <div class=col-xs-3>
+            </div>
+        </div>
+       
+        <div style="color:red;font-weight:bold;" id="Validation"></div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    <span style="font-family:calibri;">Generate Hall Ticket</span>
+
+
+                </div>
+                <div class="widget-box">
+                
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                    <div class="col-sm-6">
+                                        <select id="Sectionid" name="Sectionid" class="form-control"></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Examination</label>
+                                    <div class="col-sm-6">
+                                        <select id="ExaminationId" name="ExaminationId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="SearchDiv"></div>
+
+
+            </div>
+        </div>
+    </section>
+
+</form>
+
+<script>
+
+    function OnloadData() {
+        LoadClassDropdown();
+    }
+
+    function LoadClassDropdown() {
+        // var SelClassId = $("#SelClassId").val();
+        $.ajax({
+            url: '/AExamination/GetSectionDropDown',
+            success: function (result) {
+
+                var SectionItems = $("#Sectionid")
+                SectionItems.children().remove();
+                SectionItems.append($("<option>").val("null").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    SectionItems.append($("<option>").val(record.SectionId).text(record.SectionCode))
+                });
+
+                $("#Sectionid").append(SectionItems);
+
+                //if (sectionId > 0) {
+                //    document.getElementById("Sectionid").value = sectionId;
+                //    GetStudentData();
+                //}
+            },
+            async: false
+        })
+    }
+
+    $('#Sectionid').change(function () {
+        GetExaminations();
+    })
+
+    function GetExaminations() {
+        var Sectionid = $('#Sectionid').val();
+
+        if (Sectionid > 0) {
+            $.ajax({
+
+                url: '/AExamination/GetExaminationsByClassNumber',
+                data: { Sectionid: Sectionid },
+                success: function (data) {
+
+                    var ExaminationItems = $('#ExaminationId');
+
+                    ExaminationItems.children().remove();
+
+                    ExaminationItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        ExaminationItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+
+                    });
+
+                    $('#ExaminationId').append(ExaminationItems);
+                },
+                aync: false
+            });
+        }
+    }
+
+    //function OnloadData() {
+    //    ExaminationDropdown();
+    //}
+
+    function ExaminationDropdown() {
+        // var SelClassId = $("#SelClassId").val();
+        $.ajax({
+            url: '/AExamination/GetExaminationsByClassNumber',
+            success: function (result) {
+
+                var ExaminationItems = $("#ExaminationId")
+                ExaminationItems.children().remove();
+                ExaminationItems.append($("<option>").val("null").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    ExaminationItems.append($("<option>").val(record.ExaminationId).text(record.ExamCode))
+                });
+
+                $("#ExaminationId").append(ExaminationItems);
+
+                //if (sectionId > 0) {
+                //    document.getElementById("Sectionid").value = sectionId;
+                //    GetStudentData();
+                //}
+            },
+            async: false
+        })
+    }
+    $('#ExaminationId').change(function () {
+
+        GetStudents();
+    })
+    function GetStudents() {
+        var ExaminationId = $('#ExaminationId').val();
+
+        var SectionId = $("#Sectionid").val();
+
+        if (ExaminationId > 0) {
+
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/AExamination/GetStudentsForHalticket',
+                data: { SectionId: SectionId },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                   
+                    $("#SearchDiv").html(data)
+                },
+                aync: false
+            })
+        }
+    }
+
+    window.onload = OnloadData();
+
+    $('#Sectionid').change(function () {
+        document.getElementById('Validation').innerHTML = ""
+    })
+
+    $('#ExaminationId').change(function () {
+        document.getElementById('Validation').innerHTML = ""
+    })
+
+</script>

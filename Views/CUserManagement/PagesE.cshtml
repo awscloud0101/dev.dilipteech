@@ -1,0 +1,217 @@
+﻿@model Pages
+@{
+    ViewBag.Title = "Edit Pages";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Controls
+        </li>
+        <li>
+            <i class=""></i>
+            CUserManagement
+        </li>
+        <li class="active">Pages</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Page Details", "Pages", new { nModuleId = Model.ModuleId })</h3>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color: red;">@Html.ValidationMessage("PagesE")</span>
+
+            <div class="box">
+                <!-- form start -->
+                @using (Html.BeginForm("PagesE", "CUserManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.ValidationSummary(true)
+                    <div class="box-body">
+                        <div class="box-header">
+
+                            <button class="btn btn-primary pull-right" type="submit" style="width:80px;float:right;" onclick="return submitForm();">
+                                Save
+                            </button>
+                        </div>
+
+                        @Html.HiddenFor(model => model.PageId)
+                        @Html.HiddenFor(model => model.ModuleId)
+
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Page Name")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.PageName, new { @class = "form-control col-sm-5 textlength", placeholder = "PageName", @id = "PageName", @onchange = "removeError();" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vPageName">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Unique Name")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.UniqueName, new { @class = "form-control col-sm-5 textlength", placeholder = "UniqueName", @id = "UniqueName", @onchange = "removeError();" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vUniqueName">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("PageURI")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.PageURI, new { @class = "form-control col-sm-5 textlength", placeholder = "PageURI", @id = "PageURI", @onchange = "removeError();" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vPageURI">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("POrderId")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.POrderId, new { @class = "form-control col-sm-5 textlength", placeholder = "POrderId", @id = "POrderId", @onchange = "removeError();" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vPOrderId">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("PBURL")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.PBURL, new { @class = "form-control col-sm-5 textlength", placeholder = "PBURL", @id = "PBURL", @onchange = "removeError();" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vPBURL">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("PIcon")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.PIcon, new { @class = "form-control col-sm-5 textlength", placeholder = "PIcon", @id = "PIcon", @onchange = "removeError();" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="vPIcon">
+                                    <label style="color:red;font-weight:bold;"> Required </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    function ValidateForm() {
+        var bValidationPass = true;
+
+        var strPageName = $('#PageName').val();
+        var strUniqueName = $('#UniqueName').val();
+        var strPageURI = $('#PageURI').val();
+        var strPOrderId = $('#POrderId').val();
+        var strPBURL = $('#PBURL').val();
+        var strPIcon = $('#PIcon').val();
+
+        if (strPageName == "" || strPageName == null || strPageName == undefined) {
+            strPageName = false;
+            $('#vPageName').show();
+        }
+        if (strUniqueName == "" || strUniqueName == null || strUniqueName == undefined) {
+            strUniqueName = false;
+            $('#vUniqueName').show();
+        }
+        if (strPageURI == "" || strPageURI == null || strPageURI == undefined) {
+            bValidationPass = false;
+            $('#vstrPageURI').show();
+        }
+        if (strPOrderId == "" || strPOrderId == null || strPOrderId == undefined) {
+            bValidationPass = false;
+            $('#vstrPOrderId').show();
+        }
+        if (strPBURL == "" || strPBURL == null || strPBURL == undefined) {
+            bValidationPass = false;
+            $('#vstrPBURL').show();
+        }
+        if (strPIcon == "" || strPIcon == null || strPIcon == undefined) {
+            bValidationPass = false;
+            $('#vstrPIcon').show();
+        }
+
+        return bValidationPass;
+    }
+
+
+    $('#PageName').focus(function () {
+        $('#vPageName').hide();
+    })
+    $('#UniqueName').focus(function () {
+        $('#vUniqueName').hide();
+    })
+
+    $('#PageURI').focus(function () {
+        $('#vPageURI').hide();
+    })
+    $('#strPOrderId').focus(function () {
+        $('#vstrPOrderId').hide();
+    })
+    $('#strPBURL').focus(function () {
+        $('#vstrPBURL').hide();
+    })
+    $('#strPIcon').focus(function () {
+        $('#vstrPIcon').hide();
+    })
+    function submitForm() {
+
+        var validatestatus = ValidateForm();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+</script>
+
+
+
+

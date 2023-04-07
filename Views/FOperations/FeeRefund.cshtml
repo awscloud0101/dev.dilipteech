@@ -1,0 +1,553 @@
+﻿@model AsteriskBrowserAL.FeeRefundDetails
+@{
+    ViewBag.Title = "Miscellaneous Fee";
+
+    List<SelectListItem> PaymentMode = new List<SelectListItem>()
+        {
+        new SelectListItem()
+        {
+        Text = "Cash",
+        Value = "1"
+        },
+
+        new SelectListItem()
+        {
+        Text = "Cheque",
+        Value = "3"
+        },
+        new SelectListItem()
+        {
+        Text = "Swipe",
+        Value = "5"
+        },
+        new SelectListItem()
+        {
+        Text = "Online",
+        Value = "6"
+        }
+        };
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Fee Refund</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("FeeRefund", "FOperations", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(model => model.FeeRefundId.Value)
+                <input type="hidden" id="FeeRefundId" name="FeeRefundId" value="@Model.FeeRefundId.Value" />
+                <input type="hidden" id="dtStartDate" value="@Model.FirstInserted.GetValueOrDefault()" />
+                <input type="hidden" id="dtEndDate" value="@Model.LastUpdated.GetValueOrDefault()" />
+
+
+                <div class="page-header">
+                    <h1>
+                         Fee Refund
+                        <small style="float:right;">
+                            @Html.ActionLink("Back to details", "FeeRefundRequest")
+                        </small>
+                    </h1>
+                </div>
+
+                <span id="dValidation" style="color:red;font-weight:bold;"></span>
+
+
+            <!-- form start -->
+                <form class="form-horizontal" role="form">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Amount")</label>
+
+                        <div class="col-sm-3">
+                            <label>@Model.Amount</label>
+                          @*  @Html.TextAreaFor(model => model.Amount, new { @class = "form-control col-sm-5 textlength", @id = "txtTitle", placeholder = "Title" })*@
+                        </div>
+
+                        @*<div class="col-sm-3" style="display:none;" id="TitleVal">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>*@
+
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Remarks")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextAreaFor(model => model.Remarks, new { @class = "form-control col-sm-5 textlength", @id = "Desc", placeholder = "Description" })
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="DescriptionVal">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Amount")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.Amount, new { @class = "form-control textlength txtboxNum", @id = "Amount", placeholder = "Amount", maxlength = "10" })
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="AmountVal">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Transaction Date")</label>
+
+                        <div class="col-sm-3">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div id="MFdatepicker" class="input-group date">
+                                        <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" placeholder="Select Date" />
+                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3" style="display:none;" id="DateVal">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+
+                    @*<div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Receipt")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.Receipt, new { @class = "form-control col-sm-5 textlength", @id = "Receipt", placeholder = "Receipt", maxlength = "19" })
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="ReceiptVal">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+
+                    </div>*@
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Payment Mode")</label>
+
+                                            <div class="col-sm-3">
+                                                @Html.DropDownList("PaymentMode", PaymentMode, new { @class = "form-control col-sm-5", onchange = "GetPaymentModeControls();" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div id="paymode" style="display:none;">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Bank Name")</label>
+
+                                        <div class="col-sm-3">
+                                            <select id="Bank" name="BankId" class="form-control col-sm-6"></select>
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="fBank">
+                                            <label style="color:red;font-weight:bold;font-size:12px;"> Please Select Bank </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-3 control-label no-padding-right">
+                                            <label id="dd">DD #</label>
+                                            <label id="chequeId">Cheque #</label>
+
+                                            <label id="account">Account #</label>
+                                            <label id="batch">Batch #</label>
+                                            <label id="online">Transaction Id</label>
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            @Html.TextBox("ChequeNo", null, "", new { @class = "form-control col-sm-6 textlength", onkeypress = "return isNumberKey(event)", @min = "6", @maxlength = "6", @id = "cheque", })
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="fChequeNo">
+                                            <label style="color:red;font-weight:bold;font-size:12px;">Required</label>
+                                        </div>
+                                        <span style="color:red;font-weight:bold;font-size:12px;" id="ChequeNoVal"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <div class="row">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Dated")</label>
+
+
+                                        <div class="col-sm-3">
+
+                                            <div id="Chdatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                <input class="form-control" type="text" name="ChequeDate" id="ChequeDate" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-3" style="display:none;" id="fChequeDate">
+                                            <label style="color:red;font-weight:bold;font-size:12px;">Required</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <br />
+                    <div class="hr hr-18 dotted hr-double"></div>
+                    <div class="col-md-offset-3 col-md-9">
+                        <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                            <i class="ace-icon fa fa-check bigger-50"></i>
+                            Save
+                        </button>
+                        &nbsp; &nbsp; &nbsp;
+                        <button class="btn btn-sm" type="reset">
+                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                            Reset
+                        </button>
+                    </div>
+
+
+                </form>
+            }
+        </div>
+
+
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        LoadBanks();
+        SetDepositDateLimit();
+    });
+
+
+    function SetDepositDateLimit() {
+
+        $('#MFdatepicker').datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: false
+        });
+
+        $('#Chdatepicker').datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: false
+        });
+
+
+        var StartDate = new Date($('#dtStartDate').val());
+
+        var EndDate = new Date($('#dtEndDate').val());
+
+        $('#MFdatepicker').datepicker('setStartDate', '+0d');
+        $('#Chdatepicker').datepicker('setStartDate', '+0d');
+    }
+
+
+    function LoadBanks() {
+
+        $.ajax({
+            url: '/Common/GetBanks',
+            success: function (data) {
+
+                var ObjBank = $('#Bank');
+
+                ObjBank.children().remove();
+
+                ObjBank.append($("<option>").val("0").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    ObjBank.append($("<option>").val(record.BankId).text(record.BankName));
+                });
+
+                $('#Bank').append(ObjBank);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+    }
+
+    function CheckReceiptNoExistance() {
+
+        var Receipt = document.getElementById("Receipt").value;
+        $('#imagemodal').show();
+        var IsValid = true;
+
+        $.ajax({
+            url: '/FOperations/IsFinanceIncomeReceiptExisted',
+            data: { ReceiptNo: Receipt },
+            success: function (data) {
+
+                if (data == true) {
+                    IsValid = false;
+                    $('#dValidation').html('Receipt Number already existed.Please try another one');
+                }
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            },
+            async: false
+
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+
+        return IsValid;
+    }
+
+
+    function validateMisc() {
+
+        var Discription = document.getElementById("Desc").value;
+        var Date = document.getElementById("Date").value;
+        var Amount = document.getElementById("Amount").value;
+
+        validate = true;
+
+
+        if (Discription == "") {
+            document.getElementById("DescriptionVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("DescriptionVal").style.display = "none";
+        }
+
+        if (Date == "") {
+            document.getElementById("DateVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("DateVal").style.display = "none";
+        }
+
+        if (Amount == "" && Amount > 0) {
+            document.getElementById("AmountVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("AmountVal").style.display = "none";
+        }
+
+        //if (Receipt == "") {
+        //    document.getElementById("ReceiptVal").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("ReceiptVal").style.display = "none";
+        //}
+
+
+        if (validate == true)
+            validate = validatePaymentMode();
+
+        return validate;
+    };
+
+    function submitForm() {
+        debugger
+        var validatestatus = validateMisc();
+        if (validatestatus == false) {
+            return false;
+        } else {
+
+            debugger
+
+            validatestatus = CheckReceiptNoExistance();
+
+            if (validatestatus == false)
+                return false;
+
+            $('#imagemodal').show();
+            return true;
+        }
+    };
+
+    function resetImportantDay() {
+        document.getElementById("count").value = "0";
+        document.getElementById("dateimportantday").style.display = "none";
+        document.getElementById("descrImportantday").style.display = "none";
+
+        document.getElementById("Desc").value = "";
+        document.getElementById("Amount").value = "";
+        document.getElementById("Date").value = "";
+        ocument.getElementById("Receipt").value = "";
+
+        return false;
+    };
+
+    $('#txtTitle').focus(function () {
+        $('#TitleVal').hide();
+    });
+
+    $('#ImportantDate').focus(function () {
+        $('#dateimportantday').hide();
+    });
+    $('#Desc').focus(function () {
+        $('#descrImportantday').hide();
+    });
+    $('#Date').focus(function () {
+        document.getElementById("DateVal").style.display = "none";
+    });
+    $('#Desc').focus(function () {
+        document.getElementById("DescriptionVal").style.display = "none";
+    });
+    $('#Amount').focus(function () {
+        document.getElementById("AmountVal").style.display = "none";
+    });
+    $('#Receipt').focus(function () {
+        document.getElementById("ReceiptVal").style.display = "none";
+    });
+
+</script>
+
+<script type="text/javascript">
+
+    function validatePaymentMode() {
+
+        var validate = true;
+
+        var paymentMode = document.getElementById("PaymentMode").value;
+
+        if (paymentMode > 1) {
+
+            var ChequeDate = document.getElementById("ChequeDate").value;
+            var ChequeNo = document.getElementById("cheque").value;
+            var Bank = document.getElementById("Bank").value;
+
+            if (ChequeDate == "") {
+                document.getElementById("fChequeDate").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fChequeDate").style.display = "none";
+            }
+
+            if (ChequeNo == "") {
+                document.getElementById("fChequeNo").style.display = "inline";
+                validate = false;
+            } else if (paymentMode == 2 || paymentMode == 3 && ChequeNo.length < 6) {
+                document.getElementById("ChequeNoVal").innerHTML = "Length must be six digits"
+                validate = false;
+            }
+            else if (paymentMode == 5 && ChequeNo.length < 4) {
+                document.getElementById("ChequeNoVal").innerHTML = "Length must be four digits"
+                validate = false;
+            }
+            else {
+                document.getElementById("fChequeNo").style.display = "none";
+                document.getElementById("ChequeNoVal").innerHTML = "";
+            }
+
+            if (Bank == "0") {
+                document.getElementById("fBank").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fBank").style.display = "none";
+            }
+
+            return validate;
+        }
+    }
+
+    function GetPaymentModeControls() {
+
+        var paymentMode = document.getElementById("PaymentMode").value;
+
+        if (paymentMode == 1) {
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('paymode').style.display = 'none'
+            document.getElementById("fChequeDate").style.display = "none";
+            document.getElementById("fChequeNo").style.display = "none";
+            document.getElementById("fBank").style.display = "none";
+
+        }
+        else if (paymentMode == 2) {
+            document.getElementById('dd').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 3) {
+            document.getElementById('chequeId').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '6');
+        }
+        else if (paymentMode == 4) {
+            document.getElementById('account').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 5) {
+            document.getElementById('batch').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '4');
+        }
+        else if (paymentMode == 6) {
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            $("#cheque").attr('maxlength', '8');
+        }
+
+    }
+
+</script>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,112 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentDetailsData>
+@using AsteriskBrowserAL.Helpers;
+@{
+	bool bIsCentral = Utility.IsCentral();
+}
+
+@if (null != Model && Model.Count() > 0)
+{
+	int nsno = 1;
+
+	<span style="color:red;font-weight:bold" id="Valid"></span>
+
+	<div class="hr hr-18 dotted hr-double"></div>
+
+	<div class="table-header">
+
+		Records Found (@Model.Count())
+
+		<div style="float:right">
+
+			<button name="btnType" value="Generate" onclick="return SubmitForm()" class="btn btn-info btn-xs P2" id="Generate">
+				Download
+			</button>
+		</div>
+	</div>
+	@*<div class="box-header">
+			<h3 class="box-title">Progress Card</h3>
+			<button type="submit" class="btn btn-primary pull-right" style="width:80px;float:right;" id="save">Print</button>
+		</div>*@<!-- /.box-header -->
+	<!-- form start -->
+	<div style="overflow:auto;height:400px">
+		<table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+			<thead>
+				<tr>
+					<th>
+						@Html.DisplayName("SNo")
+					</th>
+					<th>
+						@Html.DisplayName("Student Name")
+					</th>
+					<th>
+						<input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for (int i = 0; i < Model.Count(); i++)
+				{
+					<tr>
+						<td>
+							@Html.Hidden("lstStudents.Index", (@i + 10))
+							@(nsno++)
+						</td>
+						<td>
+							@Html.Hidden("lstStudents[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+							@Html.Hidden("lstStudents[" + (@i + 10) + "].BloodGroupName", Model.ElementAt(i).BloodGroupName)
+							@Html.Hidden("lstStudents[" + (@i + 10) + "].FatherName", Model.ElementAt(i).FatherName)
+							@Html.Hidden("lstStudents[" + (@i + 10) + "].DisplayName", Model.ElementAt(i).DisplayName)
+							@Html.Hidden("lstStudents[" + (@i + 10) + "].AdmissionNumber", Model.ElementAt(i).AdmissionNumber)
+							@Model.ElementAt(i).Name
+						</td>
+
+						<td>
+							@Html.CheckBox("lstStudents[" + (@i + 10) + "].IsForReport", Model.ElementAt(i).IsForReport, new { id = "Check" })
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+}
+else
+{
+	<span style="color: red;"><b>No sudents available to display</b></span>
+}
+
+
+<script type="text/javascript">
+	$('#Selectall').change(function () {
+
+		document.getElementById("Valid").innerHTML = "";
+
+		if ($(this).prop('checked')) {
+			$('tbody tr td #Check').each(function () {
+				$(this).prop('checked', true);
+			});
+		} else {
+			$('tbody tr td #Check').each(function () {
+				$(this).prop('checked', false);
+			});
+		}
+	});
+
+
+	function SubmitForm() {
+		debugger;
+		var nCount = 0;
+		$('tbody tr td #Check').each(function () {
+			if ($(this).is(':checked')) {
+				nCount += 1;
+			}
+		});
+
+		if (nCount == 0) {
+			document.getElementById("Valid").innerHTML = "Please select student(s)";
+			return false;
+		}
+	}
+
+</script>

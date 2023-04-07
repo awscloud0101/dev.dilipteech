@@ -1,0 +1,396 @@
+﻿
+@model AsteriskBrowserAL.Models.FundsTransferViewModel
+@{
+    ViewBag.Title = "Fund Transfer Edit";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Petty Cash
+        </li>
+        <li class="active">Funds transfer Edit</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+
+
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("FundsTransferEditView", "FPettyCash", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="EndDate" value="@Model.TransactionDate" />
+                    <input type="hidden" name="FirstInserted" value="@Model.FirstInserted" />
+                    <input type="hidden" name="LastUpdated" value="@Model.LastUpdated" />
+                    <input type="hidden" name="PettyCashId" value="@Model.PettyCashId" />
+
+                    <div class="table-header">
+                     
+                            Funds Transfer Edit
+                            <small style="float:right;" class="textheader">
+                                @Html.ActionLink("Back to details", "FundsTransferEdit", new { nDivisionId = Model.DivisionId, nBranchId = Model.ToBranch, dtStartDate = Model.FirstInserted, dtEndDate = Model.LastUpdated })
+                            </small>
+                     
+                    </div><!-- /.page-header -->
+
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("FundTransfer")</span>
+                    
+
+
+                        <div class="overflowscroll" style="overflow-x:hidden;">
+
+                            <div class="widget-box row" style="padding:10px">
+
+                                <form class="form-horizontal" role="form">
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Select Date</label>
+
+                                                <div class="col-sm-6">
+                                                    <div id="datepicker" class="input-group date">
+                                                        <input class="form-control" type="text" value="@Model.TransactionDate.GetValueOrDefault().ToShortDateString()" id="dtTransactionDate" name="TransactionDate" autocomplete="off" placeholder="Select Date" />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6" style="display:none;" id="TDateVal">
+                                                <label style="color:red;font-weight:bold;"> Select Date</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+                                    <div class="row" style="padding-top:3px;">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Cash Card</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.CashCardId, new SelectList(Model.LstCashCards, "CashCardId", "DisplayCashCard", Model.CashCardId), new { @class = "form-control", id = "CboCashCard" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-12" for="form-field-1">
+                                                    <span style="font-weight:bold" id="CashCardAmount"> </span>
+                                                </label>
+                                            </div>
+
+                                            <div class="col-sm-6" style="display:none;" id="CashCardIdVal">
+                                                <label style="color:red;font-weight:bold;"> Select Cash Card</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Petty Cash Head</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.PettyCashHeadId, new SelectList(Model.lstPettyCashHead, "PettyCashHeadId", "Name", Model.PettyCashHeadId), new { @class = "form-control", id = "PettyCashHeadId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-12" for="form-field-1">
+                                                    <span style="font-weight:bold" id="AmountInBank"> </span>
+                                                </label>
+                                            </div>
+
+                                            <div class="col-sm-6" style="display:none;" id="HeadVal">
+                                                <label style="color:red;font-weight:bold;"> Select Petty Cash Head </label>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="SelectedBranchId" name="ToBranch" value="@Model.ToBranch" />
+                                        <input type="hidden" name="DivisionId" value="@Model.DivisionId" />
+
+
+
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-xs-12">
+
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">@Html.Label("Amount")</label>
+                                                <div class="col-xs-6">
+                                                    @Html.TextBoxFor(model => model.Amount, new { @class = "form-control txtboxNum", autocomplete = "off", placeholder = "Amount", @value = Model.Amount })
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-sm-6" style="display:none;" id="AmountVal">
+                                                <label style="color:red;font-weight:bold;"> Enter Amount </label>
+                                            </div>
+
+                                        </div>
+
+
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">@Html.Label("Description")</label>
+                                                <div class="col-xs-6">
+                                                    @Html.TextBoxFor(model => model.Description, new { @class = "form-control", autocomplete = "off", placeholder = "Description", @value = Model.Description })
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3" style="display:none;" id="DesVal">
+                                                <label style="color:red;font-weight:bold;"> Enter Description </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                   
+
+                                    <div class="col-md-9">
+                                        <div class="hr hr-18 dotted hr-double"></div>
+                                        <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                            <i class="ace-icon fa fa-check bigger-50"></i>
+                                            Save
+                                        </button>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                }
+
+                <div id="FundTransferDIV"></div>
+                <input type="hidden" id="count" name="count" value="0" />
+            }
+        </div>
+    </div>
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+</section>
+
+<script type="text/javascript">
+
+
+
+
+    $(document).on('focus', '#datepicker', function () {
+        $("#datepicker").datepicker({
+            endDate: $('#EndDate').val(),
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+    $('#PettyCashHeadId').change(function () {
+
+        var HeadId = $('#PettyCashHeadId').val();
+        var nSubscriptionId = $('#SelectedBranchId').val();
+        var CardId = $('#CboCashCard').val();
+
+        document.getElementById('AmountInBank').innerHTML = "";
+
+        if (HeadId > 0) {
+            $.ajax({
+
+                url: '/FPettyCash/GetCashinBankByHeadIdBySubscriptionId',
+                data: { nHeadId: HeadId, SubscriptionId: nSubscriptionId, nCardId: CardId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+
+                    debugger
+                    document.getElementById('AmountInBank').innerHTML = data.Message;
+                    document.getElementById('AmountInBank').value = data.CashInBank;
+
+                },
+                aync: false
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    });
+
+    $('#CboCashCard').change(function () {
+
+        var nCashCardId = $('#CboCashCard').val();
+        var nSubscriptionId = $('#SelectedBranchId').val();
+
+        document.getElementById("CashCardIdVal").style.display = "none";
+        document.getElementById('CashCardAmount').innerHTML = "";
+
+        if (nCashCardId > 0) {
+
+            document.getElementById('AmountInBank').innerHTML = "";
+            $('#PettyCashHeadId :nth-child(1)').prop('selected', true);
+
+            $.ajax({
+
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    $('#imagemodal').hide();
+                },
+
+                url: '/FPettyCash/GetCashInBankByHeadIdByCardIdandSubscriptionId',
+                data: { nCardId: nCashCardId, SubscriptionId: nSubscriptionId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+
+                    debugger
+                    document.getElementById('CashCardAmount').innerHTML = data.Message;
+                    document.getElementById('CashCardAmount').value = data.CashInBank;
+                },
+                aync: false
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+
+        $.ajax({
+
+            url: '/FPettyCash/FundTransferGridData',
+            data: { nBranchId: $('#BranchId').val() },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#FundTransferDIV').html(data);
+            }
+
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+
+    });
+
+
+    function FundTransfer() {
+        var BranchId = $('#BranchId').val();
+        if (BranchId > 0) {
+            window.location.href = '/FPettyCash/TransferFundToBranch?nBranchId=' + BranchId;
+        }
+    }
+
+    function validateFundsTransfer() {
+
+        document.getElementById("count").value = "1";
+        var Desc = document.getElementById("Description").value;
+        var Amount = $('#Amount').val(); //parseInt($('#DivisionId').val());
+        var HeadId = $('#PettyCashHeadId').val();
+
+        var dtDate = $('#dtTransactionDate').val();
+        var CashCardId = $('#CboCashCard').val();
+
+        validate = true;
+
+        if (dtDate == "") {
+            document.getElementById("TDateVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("TDateVal").style.display = "none";
+        }
+
+        if (Desc == "") {
+            document.getElementById("DesVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("DesVal").style.display = "none";
+        }
+
+        if (Amount == "null" || Amount < 0) {
+            document.getElementById("AmountVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("AmountVal").style.display = "none";
+        }
+
+        if (HeadId == "null" || HeadId < 1) {
+            document.getElementById("HeadVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("HeadVal").style.display = "none";
+        }
+
+        if (CashCardId == "null" || CashCardId < 1) {
+            document.getElementById("CashCardIdVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("CashCardIdVal").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateFundsTransfer();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+    $('#dtTransactionDate').focus(function () {
+        $('#TDateVal').hide();
+    });
+
+    $('#CboCashCard').focus(function () {
+        $('#CashCardIdVal').hide();
+    });
+
+    $('#Description').focus(function () {
+        $('#DesVal').hide();
+    });
+
+    $('#PettyCashHeadId').focus(function () {
+        $('#HeadVal').hide();
+    });
+
+    $('#Amount').focus(function () {
+        $('#AmountVal').hide();
+    });
+
+</script>
+

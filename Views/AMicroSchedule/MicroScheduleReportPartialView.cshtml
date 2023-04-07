@@ -1,0 +1,330 @@
+﻿@model AsteriskBrowserAL.Models.MicroScheduleData
+@{
+    List<IGrouping<string, AsteriskBrowserAL.Models.MicroScheduleData>> GroupedData = new List<IGrouping<string, AsteriskBrowserAL.Models.MicroScheduleData>>();
+    int sno = 1;
+    if (null != Model)
+    {
+        if (null != Model && Model.MicroScheduleDetailsData.Count() > 0)
+        {
+            GroupedData = Model.MicroScheduleDetailsData.GroupBy(p => p.BranchName).ToList();
+        }
+    }
+
+}
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .textalign{
+        width:250px;
+
+
+    }
+    
+    
+    
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+
+   
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+
+    @@font-face {
+        font-family: 'ANUPM___';
+        src: url('../../assets/fonts/ANUPM___.TTF') format('truetype');
+    }
+
+    .AnuFont {
+        font-family: ANUPM___;
+        font-size: 20px;
+    }
+
+    @@font-face {
+        font-family: 'NEOGANLI';
+        src: url('../../assets/fonts/NEOGANLI.TTF') format('truetype');
+    }
+
+    .NEOGANLI {
+        font-family: NEOGANLI;
+        font-size: 20px;
+    }
+
+
+    .dataTables_scrollBody{
+        overflow-x:hidden;
+        overflow-y:scroll;
+
+    }
+</style>
+
+
+
+
+@if (null != Model)
+{
+    if (null != Model.MicroScheduleDetailsData && Model.MicroScheduleDetailsData.Count() > 0)
+    {
+        <div class="table-header">
+            Records Found (@Model.MicroScheduleDetailsData.Count)
+            <div style="float:right;margin-right:10px;">
+
+                <button class="btncustom" id="btnExport">
+                    Download
+
+                </button>
+
+            </div>
+        </div>
+
+
+        <div class="overflowscroll" style="overflow-x:hidden;">
+
+            <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;overflow-x:hidden">
+                <thead style="font-size:14px;overflow-x:hidden">
+                    <tr>
+                        <th>
+                            S.No.
+                        </th>
+                        @if (Model.IsCentral)
+                    {
+                            <th>
+                                @Html.DisplayName("Branch Name")
+                            </th>
+                        }
+
+                        <th>
+                            @Html.DisplayName("Class Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Subject Name")
+                        </th>
+
+                        <th>
+
+                            @Html.DisplayName("Topic Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Date")
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody  style="font-size:14px;overflow-x:hidden">
+                    @foreach (var item in Model.MicroScheduleDetailsData)
+                    {
+                        <tr>
+                            <td>
+                                @(sno++)
+                            </td>
+                            @if (Model.IsCentral)
+                        {
+                                <td>
+                                    @item.BranchName
+                                </td>
+                            }
+                            <td>
+                                @item.ClassName
+                            </td>
+                            <td>
+                                @item.SubjectName
+                            </td>
+                            <td style="display:block;">
+                                <p class="textalign">
+                                    @if (item.SubjectName.ToUpper().Contains("TELUGU"))
+                                    {
+                                        <span class="AnuFont">@item.Topic</span>
+                                    }
+                                    else if (item.SubjectName.ToUpper().Contains("HINDI"))
+                                    {
+                                        <span class="NEOGANLI">@item.Topic</span>
+                                    }
+                                    else
+                                    {
+                                        @item.Topic
+                                    }
+                                </p>
+                            </td>
+                            <td>
+                                @item.SyllabusDate.Value.ToString("dd - MMM - yyyy")
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+
+
+    }
+    else
+    {
+        <div style="color:red;font-weight:bold">Data not available to display</div>
+    }
+}
+else
+{
+    <div style="color:red;font-weight:bold">Data not available to display</div>
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+
+
+
+@*<body>
+        <div id="mydiv" style="display:none">
+
+            @if (null != Model)
+            {
+
+                if (null != Model.MicroScheduleDetailsData && Model.MicroScheduleDetailsData.Count() > 0)
+                {
+                    int nsno = 1;
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <img class=" col-xs-11" id="avatar" width="50" height="43" src="@Model.InstituteDetails.InstituteLogo" style="margin-bottom:-1.5em;" />
+                            <b style="font-weight:bold; margin-left:0.3em; font-size:20px; font-family:'Segoe UI'">@Model.InstituteDetails.InstituteName</b>
+                        </div>
+                        <div style="margin-left:3.7em; font-family:'Segoe UI'"><b>@Model.InstituteDetails.InstituteAddress</b></div>
+                        <br />
+
+                        <hr style="width:100%; margin-bottom:-0.5em" />
+                        <hr style="width:100%;" />
+                        <div align="center" style="font:12%; font-family:'Segoe UI'"><b>Micro-Schedule Report </b></div>
+                        <hr style="width:100%;" />
+
+                        @foreach (var g in GroupedData)
+                        {
+                            <hr style="width:100%; margin-top:-0.5em" />
+
+                            <div align="left" style="font-weight:bold; margin-left:0.4em; font-family:'Segoe UI'; font-size:14px;"><b>@g.Key</b></div>
+                            <hr style="width:100%;" />
+                        }
+                        <div class="col-xs-12 box-body table-responsive">
+                            <table class="table table-hover" rules="rows" cellpadding="5" style="width:675px; font-size:12px;">
+
+                                <tbody>
+                                    <tr style="font-size:13px; font-family:'Segoe UI'; font-weight:bold; text-align:left;">
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        @if (Model.IsCentral)
+                                        {
+                                            <th>
+                                                @Html.DisplayName("Branch Name")
+                                            </th>
+                                        }
+
+                                        <th>
+                                            @Html.DisplayName("Topic Name")
+                                        </th>
+
+                                        <th>
+                                            @Html.DisplayName("Date")
+                                        </th>
+
+                                    </tr>
+
+
+                                    @foreach (var item in Model.MicroScheduleDetailsData)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @(nsno++)
+                                            </td>
+                                            @if (Model.IsCentral)
+                                            {
+                                                <td>
+                                                    @item.BranchName
+                                                </td>
+                                            }
+
+
+                                            <td>
+                                                @item.Topic
+                                            </td>
+                                            <td>
+                                                @item.SyllabusDate.Value.ToString("dd - MMM - yyyy")
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+
+
+                    </div>
+                }
+
+            }
+
+
+        </div>
+    </body>*@
+
+<script type="text/javascript">
+
+    //$("#btnExport").click(function (e) {
+    //    ExportToExcel('tbMicroScheduleReport');
+    //});
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+<script type="text/javascript">
+    function PrintElem(elem) {
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'mydiv', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+
+
+
+
+
+
+

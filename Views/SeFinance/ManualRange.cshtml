@@ -1,0 +1,262 @@
+﻿@model List<AsteriskBrowserAL.Models.RangeViewData>
+@{
+    ViewBag.Title = "Manual Rage";
+    int sno = 1;
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Manual Range</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+    hideScrolling:hover {
+        overflow: auto;
+    }
+</style>
+<!--Main Content-->
+<section class="content">
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ManualRange", "SeFinance", FormMethod.Post))
+            {
+
+
+                if (null != TempData["ManualRange"])
+                {
+
+                    <p align="center">
+                        <span class="savedinfo">
+
+
+
+                            <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                            <br />
+                                     @Html.Raw(TempData["ManualRange"])
+                            <br />
+
+                            <a href="" class="cls1 btncustom">Close</a>
+                            <script>
+
+                                $(document).ready(function () {
+                                    $(".cls1").click(function () {
+
+                                        $(".savedinfo").css("display", "none")
+                                    });
+
+
+
+                            </script>
+                        </span>
+                    </p>
+
+
+                }
+                <span style="color: red;">@Html.ValidationMessage("ManualRange")</span>
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    <span id="Validation" style="color:red;font-weight:bold"></span>
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Manual Range</span>
+                        <div  style="float:right;margin-right:10px;">
+                            <button name="Save" class="btncustom P2" onclick="return submitForm()">
+                               Save
+                            </button>       </div>
+
+                    </div>
+
+
+
+
+
+
+                   
+    <div>
+        <table class="table tbhover table-striped table-bordered dynamic-table" id="mytab1">
+            <thead>
+                <tr>
+                    <th rowspan="2" style="vertical-align:middle">
+                       S.No.
+</th>
+<th rowspan="2" style="vertical-align:middle">
+    @Html.DisplayName("Branch")
+</th>
+<th colspan="2" style="vertical-align:middle">
+    @Html.DisplayName("Current Range")
+</th>
+
+<th rowspan="2" style="vertical-align:middle">
+
+</th>
+<th colspan="2" style="vertical-align:middle">
+    @Html.DisplayName("Next Range")
+</th>
+<th rowspan="2" style="vertical-align:middle">
+</th>
+</tr>
+<tr>
+    <th style="font-size:14px;">I Start Number</th>
+    <th style="font-size:14px;">I End Number</th>
+    <th style="font-size:14px;">II Start Number</th>
+    <th style="font-size:14px;">II End Number</th>
+</tr>
+</thead>
+<tbody>
+
+    @for (int i = 0; i < Model.Count(); i++)
+                {
+                <tr>
+                    @Html.Hidden("ManualRangeList.Index", (@i + 10))
+                    @Html.Hidden("ManualRangeList[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                    @Html.Hidden("ManualRangeList[" + (@i + 10) + "].ManuvalReceiptRangeId", Model.ElementAt(i).ManuvalReceiptRangeId)
+                    <td>
+                        @(sno++)
+                    </td>
+                    <td>
+                        @Model.ElementAt(i).BranchName
+
+                    </td>
+                    <td>
+                        @Html.TextBox("ManualRangeList[" + (@i + 10) + "].StartNumber", Model.ElementAt(i).StartNumber, new { @class = "form-control textlength txtboxNum", @min = "0", @maxlength = "12", @style = "width:120px", @id = "startnumber", name = @Model.ElementAt(i).SubscriptionId })
+                        @Html.Hidden("ManualRangeList[" + (@i + 10) + "].StartNumber", Model.ElementAt(i).StartNumber)
+
+                    </td>
+
+                    <td>
+
+                        @Html.TextBox("ManualRangeList[" + (@i + 10) + "].EndNumber", Model.ElementAt(i).EndNumber, new { @class = "form-control textlength txtboxNum", min = "0", @maxlength = "12", @style = "width:120px", @id = "endnumber", name = @Model.ElementAt(i).SubscriptionId })
+                        @Html.Hidden("ManualRangeList[" + (@i + 10) + "].EndNumber", Model.ElementAt(i).EndNumber)
+
+                    </td>
+                    <td>
+                        @*@Html.ActionLink("Make In-Active", "MakeManualInActive", new { id = Model.ElementAt(i).ManuvalReceiptRangeId, nSubscriptionId = @Model.ElementAt(i).SubscriptionId })*@
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <a class="P2" href="@Url.Action("MakeManualInActive", "SeFinance", new { id = Model.ElementAt(i).ManuvalReceiptRangeId, nSubscriptionId = @Model.ElementAt(i).SubscriptionId })"><span class="btn btn-info btn-minier">Make In-Active</span></a>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        @if (Model.ElementAt(i).StartNumber == 0)
+                        {
+                            @Html.TextBox("ManualRangeList[" + (@i + 10) + "].SecStartNumber", Model.ElementAt(i).SecStartNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "12", @style = "width:120px", @id = "secStartNumber", @disabled = "disabled", name = @Model.ElementAt(i).SubscriptionId })
+                            @Html.Hidden("ManualRangeList[" + (@i + 10) + "].SecStartNumber", Model.ElementAt(i).SecStartNumber)
+                            }
+                            else
+                            {
+
+                            @Html.TextBox("ManualRangeList[" + (@i + 10) + "].SecStartNumber", Model.ElementAt(i).SecStartNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "12", @style = "width:120px", @id = "secStartNumber", name = @Model.ElementAt(i).SubscriptionId })
+                            @Html.Hidden("ManualRangeList[" + (@i + 10) + "].SecStartNumber", Model.ElementAt(i).SecStartNumber)
+                            }
+
+                    </td>
+
+                    <td>
+                        @if (Model.ElementAt(i).EndNumber == 0)
+                        {
+                            @Html.TextBox("ManualRangeList[" + (@i + 10) + "].SecEndNumber", Model.ElementAt(i).SecEndNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "12", @style = "width:120px", @id = "secEndNumber", @disabled = "disabled", name = @Model.ElementAt(i).SubscriptionId })
+                            @Html.Hidden("ManualRangeList[" + (@i + 10) + "].SecEndNumber", Model.ElementAt(i).SecEndNumber)
+                            }
+                            else
+                            {
+                            @Html.TextBox("ManualRangeList[" + (@i + 10) + "].SecEndNumber", Model.ElementAt(i).SecEndNumber, new { @class = "form-control textlength txtboxNum", @maxlength = "12", @style = "width:120px", @id = "secEndNumber", name = @Model.ElementAt(i).SubscriptionId })
+                            @Html.Hidden("ManualRangeList[" + (@i + 10) + "].SecEndNumber", Model.ElementAt(i).SecEndNumber)
+                            }
+
+                    </td>
+                    <td>
+                        @if (Model.ElementAt(i).StartNumber > 0 && Model.ElementAt(i).EndNumber > 0)
+                        {
+                            @*@Html.ActionLink("Details", "ManualRangeDetails", new { nSubscriptionId = @Model.ElementAt(i).SubscriptionId })*@
+
+                            <a class="blue P2" href="@Url.Action("ManualRangeDetails", "SeFinance", new { nSubscriptionId = @Model.ElementAt(i).SubscriptionId })">
+                                <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                            </a>
+
+                            }
+
+
+                    </td>
+                </tr>
+
+                }
+
+</tbody>
+</table>
+</div>
+                }
+            }
+
+    </div>
+                </div>
+        </section>
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+        <script type="text/javascript">
+
+            var valid;
+
+            function getvalue() {
+                var StartNumber = 0;
+                var EndNumber = 0;
+                var SecondStartNumber = 0;
+                var SecondEndNumber = 0;
+                var isvalid = true;
+
+                $('#mytab1 tr').each(function (index) {
+                    StartNumber = $(this).find('#startnumber').val();
+                    EndNumber = $(this).find('#endnumber').val();
+
+                    SecondStartNumber = $(this).find('#secStartNumber').val();
+                    SecondEndNumber = $(this).find('#secendNumber').val();
+
+                    if ((parseInt(StartNumber) > parseInt(EndNumber)) || (parseInt(SecondStartNumber) > parseInt(SecondEndNumber))) {
+                        document.getElementById("Validation").innerHTML = "please enter less than  end number";
+                        isvalid = false;
+                        return isvalid;
+                    }
+                    if (isvalid == true) {
+                        document.getElementById("Validation").innerHTML = "";
+                    }
+                })
+
+
+                return isvalid;
+            }
+
+            function submitForm() {
+                var validApplicationRange = getvalue();
+                if (validApplicationRange == false) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+        </script>

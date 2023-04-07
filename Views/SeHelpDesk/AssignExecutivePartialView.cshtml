@@ -1,0 +1,367 @@
+﻿@model AsteriskBrowserAL.Models.PlayersData
+@{
+    int sno = 1;
+    int ASno = 1;
+}
+
+
+<div class="row overflowscroll">
+    
+
+
+
+        <div class="col-sm-6">
+            <div class="table-header">
+                UnAssigned Descendants
+
+                <div style="float:right;margin-right:10px;">
+                    <button name="button" id="Assign" type="submit" value="Assign" class="btncustom">
+                        Add
+                    </button>
+                </div>
+
+
+
+            </div>
+
+            @*<div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        UnAssigned Descendants
+                    </h5>
+                    <div class="widget-toolbar no-border">
+                        <div class="inline action-buttons">
+                            <a id="Assign" value="Assign"><span class="btn btn-info btn-minier">Assign</span></a>
+                        </div>
+                    </div>
+                </div>*@
+
+            @*<div class="box-header">
+                    <input type="button" id="Assign" class="btn btn-primary pull-right" value="Assign" />
+
+                    <h3 class="box-title">UnAssigned Descendants</h3>
+                </div>*@<!-- /.box-header -->
+            <!-- form start -->
+
+            <div style="overflow:auto;height:300px;">
+                <table class="table table-striped table-bordered table-hover dynamic-table" style="font-size:14px;" id="AssignTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="SelectAssignall" />   @Html.DisplayName("Select")
+                            </th>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Staff")
+                            </th>
+                            @*<th>
+                                    @Html.DisplayName("Branch Name")
+                                </th>*@
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        @if (null != Model)
+                        {
+                            if (Model.AllDescendents.Count() > 0)
+                            {
+                                for (int i = 0; i < Model.AllDescendents.Count(); i++)
+                                {
+                                    var Data = Model.AllDescendents.ElementAt(i);
+                                    if (null != Data)
+                                    {
+                        <tr>
+                            <td>
+                                <input type="checkbox" id="CheckA" name="CheckA" value=@Model.AllDescendents.ElementAt(i).PlayerId />
+                            </td>
+                            <td>
+                                @sno
+                            </td>
+
+                            <td>
+                                @Model.AllDescendents.ElementAt(i).EmployeeName
+                            </td>
+                            @*<td>
+                                    @Model.AllDescendents.ElementAt(i).BranchName
+                                </td>*@
+
+                        </tr>
+                                        sno++;
+                                    }
+
+                                }
+                            }
+                        }
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+
+            <div class="table-header">
+                Assigned Descendants
+                <div style="float:right;margin-right:10px;">
+                    <button name="button" id="RemoveButton" onclick="return RemoveData()" type="submit" value="Assign" class="btncustom">
+                        Remove
+                    </button>
+                </div>
+            </div>
+            @*<div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        Assigned Descendants
+                    </h5>
+                    <div class="widget-toolbar no-border">
+                        <div class="inline action-buttons">
+                            <a id="RemoveButton" value="Remove" onclick="RemoveData()"><span class="btn btn-info btn-minier">Remove</span></a>
+                        </div>
+                    </div>
+                </div>*@
+            @*<div class="box-header">
+
+
+                    <input type="button" class="btn btn-primary pull-right" value="Remove" id="RemoveButton" onclick="RemoveData()" />
+
+                    <h3 class="box-title">Assigned Descendants</h3>
+                </div>*@<!-- /.box-header -->
+            <!-- form start -->
+
+            <div style="overflow:auto;height:300px;">
+
+                <table class="table table-striped table-bordered table-hover dynamic-table" style="font-size:14px;" id="RemoveTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="SelectRemoveall" />   @Html.DisplayName("Select")
+                            </th>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Staff")
+                            </th>
+                            @*<th>
+                                    @Html.DisplayName("Branch Name")
+                                </th>*@
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        @if (null != Model)
+                    {
+                        if (Model.AssignedDescendents.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.AssignedDescendents.Count(); i++)
+                            {
+                                var Data = Model.AssignedDescendents.ElementAt(i);
+                                if (Data != null)
+                                {
+
+                        <tr>
+                            <td>
+                                <input type="checkbox" id="CheckR" name="CheckR" value=@Model.AssignedDescendents.ElementAt(i).PlayerId />
+                            </td>
+                            <td>
+                                @ASno
+                            </td>
+
+                            <td>
+                                @Model.AssignedDescendents.ElementAt(i).EmployeeName
+                            </td>
+                            @*<td>
+                                    @Model.AssignedDescendents.ElementAt(i).BranchName
+                                </td>*@
+
+                        </tr>
+                                    ASno++;
+                                }
+
+                            }
+                        }
+                    }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
+</div>
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+<script>
+    $('#SelectRemoveall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #CheckR').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #CheckR').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+    $('#SelectAssignall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #CheckA').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #CheckA').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+
+    $("#Assign").click(function () {
+        var Ids = " ";
+        var CheckedVal = $('#CheckA:checked');
+        var AssignStaff = $("#AssStaff").val()
+
+        var RemoveStaff = $("#RemStaff").val()
+
+        var arryFinalRemov = new Array();
+        var arryRemov = new Array();
+        var strArryRemove = ""
+        if (RemoveStaff != "") {
+            arryRemov = RemoveStaff.split(',')
+        }
+
+        $.each(CheckedVal, function (i, result) {
+            Ids += result.value + ",";
+
+            if (arryRemov.length > 0) {
+                var index = arryRemov.indexOf(result.value);
+                if (index > -1) {
+                    arryRemov.splice(index, 1);
+                }
+            }
+        });
+
+
+        if (arryRemov.length > 0) {
+            $.each(arryRemov, function (i, result) {
+                strArryRemove += result + ",";
+            });
+
+        }
+
+        if (Ids != "") {
+            document.getElementById("RemStaff").value = strArryRemove;
+            document.getElementById("AssStaff").value += Ids;
+
+            var AStaff = $("#AssStaff").val()
+            var RStaff = $("#RemStaff").val()
+            var GroupId = $("#GroupId").val()
+            PlayerId = $("#ExecutiveId").val()
+
+            $.ajax({
+                url: "/SeHelpDesk/UpdateStaffExecutives",
+                data: { PlayerId: PlayerId, AssignedStaff: AStaff, RemovingStaff: RStaff, GroupId: GroupId },
+                success: function (Data) {
+                    $("#Descendents").html("");
+
+                    $("#Descendents").html(Data);
+                }
+            })
+        }
+
+        return false;
+    })
+
+
+
+    function RemoveData() {
+        var Ids = " ";
+        var CheckedVal = $('#CheckR:checked');
+        var AssignStaff = $("#AssStaff").val()
+
+        var RemoveStaff = $("#RemStaff").val()
+
+        var arryFinalAssign = new Array();
+        var arryAssign = new Array();
+
+        if (AssignStaff != "") {
+            arryAssign = AssignStaff.split(',')
+        }
+
+        $.each(CheckedVal, function (i, result) {
+            Ids += result.value + ",";
+            var index = arryAssign.indexOf(result.value);
+            if (index > -1) {
+
+                arryAssign.splice(index, 1);
+            }
+
+        });
+
+        var strArryAssign = ""
+        if (arryAssign.length > 0) {
+            $.each(arryAssign, function (i, a) {
+                if (a > 0) {
+                    strArryAssign += a + ",";
+                }
+
+            });
+
+        }
+
+        if (Ids != "") {
+            document.getElementById("RemStaff").value += Ids;
+            document.getElementById("AssStaff").value = strArryAssign;
+
+            var AStaff = $("#AssStaff").val()
+            var RStaff = $("#RemStaff").val()
+            var PlayerId = $("#ExecutiveId").val()
+            $.ajax({
+                url: "/SeHelpDesk/UpdateStaffExecutives",
+                data: { PlayerId: PlayerId, AssignedStaff: AStaff, RemovingStaff: RStaff },
+                success: function (Data) {
+                    $("#Descendents").html("");
+
+                    $("#Descendents").html(Data);
+
+                },
+                Error: function () {
+
+                }
+            })
+        }
+
+        return false;
+    }
+
+    $("#Save").click(function () {
+        var CheckedVal = $('#CheckR:not(:checked');
+        var AStaff = $("#AssStaff").val()
+        var RStaff = $("#RemStaff").val()
+        var SelStaff = "";
+        $.each(CheckedVal, function (i, result) {
+            SelStaff += result.value + ","
+        })
+
+        var PlayerId = $("#ExecutiveId").val();
+        $.ajax({
+            url: '/SeHelpDesk/SaveDescendants',
+            data: { PlayerId: PlayerId, SelStaff: SelStaff },
+            success: function (result) {
+                document.getElementById("SaveVal").innerHTML = "Data Saved"
+            }
+        })
+
+
+    })
+
+
+</script>
+

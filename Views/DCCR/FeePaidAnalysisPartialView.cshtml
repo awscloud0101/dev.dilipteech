@@ -1,0 +1,139 @@
+﻿@model List<AsteriskBrowserAL.Models.FeePaidAnalysisViewModel>
+@{
+    Layout = null;
+    ViewBag.Title = "";
+
+    List<string> lstFinacialYears = ViewBag.lstFinancialYears;
+
+    int DateCount = 0;
+    int PaidAnalysisHeadCount = ViewBag.PaidAnalysisHeadCount;
+
+    if (Model != null)
+    {
+        DateCount = Model.ElementAt(0).lstHeadWise.ElementAt(0).lstDateWise.Select(t => t.DisplayDate).Distinct().Count();
+    }
+
+}
+
+
+@Html.Action("DataTableScripts", "Base")
+
+<section>
+
+    @if (null != Model)
+    {
+
+
+
+  
+
+        int nsno = 1;
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+
+        if (Model.Count() > 0)
+        {
+            
+            <div class="overflowscroll">
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+
+                <thead>
+                    <tr>
+                        <th>
+                        </th>
+
+                        <th>
+                        </th>
+
+                        @foreach (string strHeadName in Model.ElementAt(0).lstHeadWise.Select(t => t.HeadName).Distinct().ToList())
+                        {
+                            <th colspan="@(DateCount *3)">
+                                @Html.DisplayFor(t => strHeadName)
+                            </th>
+                        }
+
+                    </tr>
+
+                    <tr>
+                        <th></th>  @*SNo*@
+
+                        <th></th> @*Branch Name*@
+                        @{
+                            DateCount = 0;
+                        }
+
+                        @for (int i = 1; i <= PaidAnalysisHeadCount; i++)
+                        {
+                            foreach (var ObjDate in Model.ElementAt(0).lstHeadWise.ElementAt(0).lstDateWise.Select(t => t.DisplayDate).Distinct().ToList())
+                            {
+                                DateCount++;
+
+                                <th colspan="3" style="text-align:center">
+                                    @Html.DisplayFor(t => ObjDate)
+                                </th>
+                            }
+                        }
+
+                    </tr>
+
+                    <tr>
+                        <th>@Html.DisplayName("SNO")</th>  @*SNo*@
+
+                        <th>@Html.DisplayName("Branch Name")</th> @*Branch Name*@
+
+                        @for (int i = 1; i <= DateCount; i++)
+                        {
+                            foreach (var ObjYear in lstFinacialYears)
+                            {
+                                <th>
+                                    @Html.DisplayFor(t => ObjYear)
+                                </th>
+                            }
+                        }
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    @foreach (AsteriskBrowserAL.Models.FeePaidAnalysisViewModel objViewModel in Model)
+                    {
+                        <tr>
+                            <td>
+                                @(nsno++)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(t => objViewModel.BranchName)
+                            </td>
+
+                            @foreach (AsteriskBrowserAL.Models.HeadWisePaidAnalysis objHeadwise in objViewModel.lstHeadWise)
+                            {
+                                foreach (AsteriskBrowserAL.Models.DateWisePaidAnalysis objDatewise in objHeadwise.lstDateWise)
+                                {
+                                    <td>
+                                        @Html.DisplayFor(t => objDatewise.Value)
+                                    </td>
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+            </div>
+
+
+                            }
+                            else
+                            {  <span style="color:red;font-weight:bold;">Data is not available</span>
+                                }
+                            }
+                            else
+                            {
+                                <span style="color:red;font-weight:bold;">Data is not available</span>
+                            }
+
+</section>

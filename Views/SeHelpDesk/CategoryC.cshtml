@@ -1,0 +1,153 @@
+﻿@model AsteriskBrowserAL.Models.HDCategoryModelView
+
+@{
+    ViewBag.Title = "Create Category";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Settings
+        </li>
+        <li>
+            <i class=""></i>
+            Help Desk
+        </li>
+        <li class="active">Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                @using (Html.BeginForm("CategoryC", "SeHelpDesk", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+
+
+
+                    <span style="color: red;">@Html.ValidationMessage("Category")</span>
+
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Category</span>
+
+                        <small style="float:right;font-weight:bold;" class="textheader">
+                            @Html.ActionLink("Back to details", "Category")
+                        </small>
+
+                    </div>
+
+
+
+                  
+                    <div class="widget-box" style="padding:10px;">
+                        <form class="form-horizontal" role="form">
+                            <div class="box-body">
+                                <div class="box-header">
+
+                                </div><!-- /.box-header -->
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary(true)
+                                <input type="hidden" name="PriorityId" value="@Model.PriorityId" />
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Category Name")</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.CategoryName, new { @class = "form-control col-sm-5 textlength", placeholder = "Category Name", id = "CategoryName" })
+                                    </div>
+
+                                    <div class="col-sm-3" style="display:none;" id="categoryname">
+                                        <label style="color:red;font-weight:bold;"> Please Enter  Category Name </label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="hr hr-18 dotted hr-double"></div>
+                                        <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                            <i class="ace-icon fa fa-check bigger-50"></i>
+                                            Save
+                                        </button>
+
+                                        &nbsp; &nbsp; &nbsp;
+                                        <button class="btn btn-sm" type="reset">
+                                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                                            Reset
+                                        </button>
+                                    </div>
+                                </div>
+                         
+
+                                
+
+                            </div>
+                        </form>
+                    </div>
+                    
+                }
+            </div>
+        </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+<script type="text/javascript">
+    function validateHdCategory() {
+
+        document.getElementById("count").value = "1";
+        var CategoryName = document.getElementById("CategoryName").value;
+
+        validate = true;
+
+        if (CategoryName == "") {
+            document.getElementById("categoryname").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("categoryname").style.display = "none";
+        }
+
+
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateHdCategory();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#CategoryName').click(function () {
+        document.getElementById('categoryname').style.display = "none"
+    })
+
+
+
+
+    $(document).on("click", "[type='checkbox']", function (e) {
+        if (this.checked) {
+            $(this).attr("value", "true");
+        } else {
+            $(this).attr("value", "false");
+        }
+    });
+</script>

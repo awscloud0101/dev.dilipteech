@@ -1,0 +1,97 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionData
+@{
+    ViewBag.Title = "AttendanceView";
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+<script src="~/Scripts/canvasjs.min.js"></script>
+
+
+<section class="content">
+    <div class="box-body">
+        <div class="box-body table-responsive no-padding">
+            <div class="col-xs-12">
+                <div class="scrollable-horizontal" style="margin-top:1em">
+                    <div id="GraphDiv" style="height: 200px; ">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12" style="margin-top:5em">
+                <div id="PartialAttendanceView"> </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<input type="hidden" value="@DateTime.Today" id="TodayDate" />
+<script>
+    $(document).ready(function () {
+        StudentAttendanceReport();
+        StudentAttendanceGraph();
+    });
+    function StudentAttendanceReport() {
+        var TodayDate = $('#TodayDate').val()
+
+        var split_1 = TodayDate.split(' ')
+        var split_2 = split_1[0].split('/')
+
+        var Month = split_2[2] + "-" + split_2[0]
+
+        var SectionId = 0;
+        if (TodayDate != null || TodayDate != "") {
+            $.ajax({
+                url: '/Parent/StudentAttendanceReport',
+                data: { Date: Month, SectionId: SectionId, Status: 1 },
+                async: false,
+                success: function (data) {
+                    $("#PartialAttendanceView").html(data)
+                }
+            })
+        }
+    }
+    function StudentAttendanceGraph() {
+        var Absent = [];
+        var Present = [];
+        var Working = [];
+        var Percentage = [];
+
+        CanvasJS.addColorSet("Colors", ["firebrick", "dodgerblue", "olivedrab"]);
+        $.getJSON("/Parent/StudentAttendanceGraph/", function (data) {
+            debugger
+            for (var i = 0; i <= data.AbsentList.length - 1; i++) {
+                Absent.push({ label: data.AbsentList[i].MonthName, y: parseInt(data.AbsentList[i].AbsentDays), toolTipContent: "AbsentDays: {y}<br/>Month:{label}" });
+            }
+            for (var i = 0; i <= data.presentList.length - 1; i++) {
+                Present.push({ label: data.presentList[i].MonthName, y: parseInt(data.presentList[i].PresentDays), toolTipContent: "PresentDays: {y}<br/>Month:{label}" });
+            }
+            for (var i = 0; i <= data.WorkingDayList.length - 1; i++) {
+                Working.push({ label: data.WorkingDayList[i].MonthName, y: parseInt(data.WorkingDayList[i].WorkingDays), toolTipContent: "WorkingDays: {y}<br/>Month:{label}" });
+            }
+            //for (var i = 0; i <= data.PercentageList.length - 1; i++) {
+            //    Percentage.push({ label: data.PercentageList[i].MonthName, y: parseInt(data.PercentageList[i].Percentage), toolTipContent: "Percentage: {y}<br/>Month:{label}" });
+            //}
+            var chart = new CanvasJS.Chart("GraphDiv", {
+                colorSet: "Colors",
+                width: 980,
+                axisX: {
+                    labelFontColor: "black",
+                    labelFontWeight: "bold",
+
+                }, axisY: {
+                    labelFontColor: "black",
+                    labelFontWeight: "bold",
+                },
+                data: [{
+                    type: "column",
+                    dataPoints: Absent
+                }, {
+                    type: "column",
+                    dataPoints: Present
+                }, {
+                    type: "column",
+                    dataPoints: Working
+                }]
+            });
+            chart.render();
+        });
+    }
+</script>

@@ -1,0 +1,193 @@
+﻿ @model AsteriskBrowserAL.Models.StudentCategoryActiveStudent
+    @{
+    ViewBag.Title = "ActiveInActiveRequest";
+
+    }
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Active/InActive Request</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+    <section class="content">
+    
+        @using (Html.BeginForm("ActiveInActiveRequest", "AStudent", FormMethod.Post))
+        {
+
+
+
+            <div class="table-header">
+                <span style="font-family:calibri;">           Active InActive Request</span>
+
+
+            </div>
+            <div class="widget-box">
+
+               <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label no-padding-right">@Html.Label("Class")</label>
+                                    <div class="col-sm-6">
+                                        <select id="ClassNumber" name="ClassNumber" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label no-padding-right">@Html.Label("Section")</label>
+                                    <div class="col-sm-6">
+                                        <select id="SectionId" name="SectionId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                    </div>
+                </div>
+                </div>
+                <br />
+                <div id="SearchDiv"></div>
+                }
+        @if (null != Model)
+        {
+            <input type="hidden" id="SelClassId" name="ClassNumber" value="@Model.ClassNumber" />
+            <input type="hidden" id="SelSectionId" name="BatchId" value="@Model.BatchId" />
+        }
+        else
+        {
+            <input type="hidden" id="SelClassId" name="ClassNumber" />
+            <input type="hidden" id="SelSectionId" name="BatchId" />
+        }
+</section>
+
+
+    <script>
+
+        function onloadData() {
+            LoadClassNumberDropdown();
+
+            var SelClass = $('#SelClassId').val();
+            var SelSection = $('#SelSectionId').val();
+            document.getElementById("ClassNumber").value = SelClass;
+            document.getElementById("SelSectionId").value = SelSection;
+          
+            if ((SelClass == "" || SelClass == null || SelClass == "null") && (SelSection == "" || SelSection == null || SelSection == "null")) {
+                GetStudents();
+            }
+        }
+
+        window.onload = onloadData();
+        function LoadClassNumberDropdown() {
+
+            $.ajax({
+                url: "/AStudent/GetClassNumbers",
+                success: function (result) {
+                    var ClassNumber = $("#ClassNumber")
+                    ClassNumber.children().remove();
+                    ClassNumber.append($("<option>").val("-1").text("--select--"))
+                    $.each(result, function (e, record) {
+                        ClassNumber.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+
+                    })
+                    $("#ClassNumber").append(ClassNumber)
+                    var SelClassid = $("#SelClassId").val();
+                
+                    if (SelClassid >= 0 && SelClassid!="") {
+                        document.getElementById("ClassNumber").value = SelClassid
+                        LoadSectionDropdown()
+                    }
+                    
+                }
+            })
+
+        }
+
+        $("#ClassNumber").change(function () {
+            LoadSectionDropdown();
+        })
+
+        function LoadSectionDropdown() {
+            var SelClassNumber = $("#ClassNumber").val()
+            if (SelClassNumber > 0) {
+                $.ajax({
+                    url: "/AStudent/GetSectionslist",
+                    data: { Classnumber: SelClassNumber },
+                    success: function (result) {
+                        var Batch = $("#SectionId")
+                        Batch.children().remove();
+                        Batch.append($("<option>").val("-1").text("--select--"))
+                        $.each(result, function (e, record) {
+                            Batch.append($("<option>").val(record.SectionId).text(record.SectionCode))
+                        })
+                        $("#SectionId").append(Batch)
+                        var SelSectionid = $("#SelSectionId").val();
+                   
+                    if (SelSectionid >= 0 && SelSectionid!="") {
+                        document.getElementById("SectionId").value = SelSectionid
+                        GetStudents()
+                      }
+                    }
+                })
+            }
+            else {
+                document.getElementById("SectionId").value = ""
+                $("#SectionId").html("")
+            }
+        }
+
+        $("#SectionId").change(function () {
+        
+            GetStudents();
+        })
+
+        function GetStudents() {
+            debugger
+            var Selsection = $("#SectionId").val()
+            var SelClassNumber = $("#ClassNumber").val()
+            if (Selsection > 0) {
+                $.ajax({
+                    url: "/AStudent/GetStudentslistBySection",
+                    beforeSend: function () {
+                        $('#imagemodal').show();
+                    },
+                    data: { SectionId: Selsection, Classnumber: SelClassNumber },
+                    success: function (res) {
+                        $("#SearchDiv").html(res)
+                    }
+                }).done(function () {
+                    $('#imagemodal').hide()
+                });
+            }
+        }
+
+        function Selectall() {
+            $('.CheckBox').each(function () {
+
+                this.checked = true;
+            });
+
+        };
+        window.onload = Selectall();
+
+        function selectnone() {
+            $('.CheckBox').each(function () {
+                this.checked = false;
+            });
+        };
+        window.onload = selectnone();
+
+    </script>
+

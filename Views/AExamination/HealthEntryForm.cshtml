@@ -1,0 +1,166 @@
+﻿@model AsteriskBrowserAL.Models.HealthEntryFormModel
+
+@{
+    ViewBag.Title = "Health Entry Form";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Health Entry Form</li>
+    </ul>
+}
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+
+        </div>
+    </div>
+
+
+
+    @using (Html.BeginForm("HealthEntryForm", "AExamination", FormMethod.Post,new { nClassNumber = ViewBag.SectionId, TermNumberId =ViewBag.TermNumberId }))
+    {
+        if (null != TempData["HealthEntryForm"])
+        {
+           
+
+            <p align="center">
+                <span class="savedinfo">
+
+
+
+                    <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                    <br />
+                    <span style="color:green;font-weight:bold;">@Html.Raw(TempData["HealthEntryForm"])</span>
+
+
+                    <br />
+
+                    <a href="" class="cls1 btncustom">Close</a>
+                    <script>
+
+                        $(document).ready(function () {
+                            $(".cls1").click(function () {
+
+                                $(".savedinfo").css("display", "none")
+                            });
+
+
+
+                    </script>
+                </span>
+            </p>
+
+
+        }
+
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Health Record</span>
+
+
+                </div>
+                <div class="widget-box">
+          
+                    <div class="widget-body">
+                        <div class="widget-main">
+                           
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Section")</label>
+
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.SectionId, new SelectList(Model.lstSections, "SectionId", "SectionCode"), "-- Select --", new { @class = "form-control", id = "ClassNumber" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Term")</label>
+
+                                                <div class="col-sm-6">
+
+                                                    @Html.DropDownListFor(model => model.TermNumber, new SelectList(Model.lstTerms, "TermNumber", "TermName"), "-- Select --", new { @class = "form-control", @id = "TermNumber" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+                    <div id="SearchData">
+                    </div>
+                    }
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        var ClassNumberId = $('#ClassNumber').val();
+        var TermNumberId = $('#TermNumber').val();
+
+        if (ClassNumberId > 0 && TermNumberId > 0) {
+            GetStudentList();
+        }
+    });
+
+    $('#TermNumber').change(function () {
+        GetStudentList();
+    })
+
+    $('#ClassNumber').change(function () {
+        GetStudentList();
+    })
+
+    function GetStudentList() {
+        var ClassNumberId = $('#ClassNumber').val();
+        var TermNumberId = $('#TermNumber').val();
+        if (ClassNumberId > 0 && TermNumberId > 0) {
+            $.ajax({
+                url: '/AExamination/GetStudentsByClass',
+                data: { nSection: ClassNumberId, nTermNumberId: TermNumberId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $("#SearchData").html(Data);
+                },
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+
+        }
+        else {
+            $("#SearchData").html("");
+        }
+    }  
+</script>
+
+
+
+
+
+
+

@@ -1,0 +1,84 @@
+﻿@model List<AsteriskBrowserAL.Models.CategoryWiseLeaveCount>
+@{
+
+}
+
+<section>
+
+    @if (Model != null)
+    {
+
+        using (Html.BeginForm("SaveLeaveTypeCount", "HRLeaveManagement", FormMethod.Post))
+        {
+            int nsno = 1;
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="table-header">
+                        Records Found(@Model.Count)
+                        <div style="float:right;margin-right:10px;" >
+                            <button class="btncustom" type="submit">
+                            Save
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflowscroll">
+
+                        <table class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+
+                                <tr>
+                                    <td>
+                                        S.No.
+                                    </td>
+                                    <td>
+                                        @Html.DisplayName("Leave Type")
+                                    </td>
+                                    <td>
+                                        @Html.DisplayName("Leave Count")
+                                    </td>
+                                    <td>
+                                        @Html.DisplayName("Annual Count")
+                                    </td>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @for (int i = 0; i < Model.Count(); i++)
+                                {
+                                    @Html.Hidden("LstCWCount.Index", (@i))
+                                    @Html.Hidden("LstCWCount[" + (@i) + "].LeaveTypeId", Model.ElementAt(i).LeaveTypeId)
+                                    @Html.Hidden("LstCWCount[" + (@i) + "].LeaveTypeName", Model.ElementAt(i).LeaveTypeName)
+                                    @Html.Hidden("LstCWCount[" + (@i) + "].CategoryId", Model.ElementAt(i).CategoryId)
+                                    @Html.Hidden("LstCWCount[" + (@i) + "].LeaveCount", Model.ElementAt(i).LeaveCount)
+
+                                    <tr>
+                                        <td>@(nsno++)</td>
+
+                                        <td>
+                                            @Model.ElementAt(i).LeaveTypeName
+                                        </td>
+
+                                        <td>
+                                            @Model.ElementAt(i).LeaveTypeCount
+                                        </td>
+
+                                        <td>
+                                            @Html.Hidden("LstCWCount[" + (@i) + "].LeaveTypeId", Model.ElementAt(i).LeaveTypeId)
+                                            @Html.Hidden("LstCWCount[" + (@i) + "].CategoryId", Model.ElementAt(i).CategoryId)
+                                            @Html.TextBox("LstCWCount[" + (@i) + "].LeaveCount", Model.ElementAt(i).LeaveCount, new { @class = "textlength txtboxNum", min = "0", @Maxlength = "3", @style = "width:120px" })
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        }
+    }
+    @Html.Action("DataTableScripts", "Base")
+</section>

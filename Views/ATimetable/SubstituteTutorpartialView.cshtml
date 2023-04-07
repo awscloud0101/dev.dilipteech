@@ -1,0 +1,407 @@
+﻿@model AsteriskBrowserAL.Models.TimeTableViewModel
+<link rel="shortcut icon" href="../favicon.ico">
+<link href="~/assets/css/normalize.css" rel="stylesheet" />
+<link href="~/assets/css/demo.css" rel="stylesheet" />
+<link href="~/assets/css/component.css" rel="stylesheet" />
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+<script src="~/assets/js/jquery.stickyheader.js"></script>
+
+
+<style>
+    .fontVal {
+        font-size: 14px;
+    }
+
+    #MovableTable tr:hover {
+        background: !important;
+    }
+
+    #MovableTable td:hover {
+        background: #c4e2d1;
+    }
+
+    #MovableTable table tr {
+        cursor: pointer;
+    }
+
+    .bgClassG {
+        background-color: #78AB46;
+        border: 1px solid #ddd;
+    }
+
+    .bgClassR {
+        background-color: #FC5555;
+        border: 1px solid #ddd;
+    }
+
+    .selectedTd {
+        background: #c4e2d1;
+    }
+
+    .MyDiv {
+        text-align: left;
+        position: relative;
+        color: #EEE;
+        font-size: 12px;
+        font-family: Times;
+        display: inline-block;
+        border: none;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        padding: 8px;
+        margin: 5px;
+    }
+</style>
+
+@{
+    var random = new Random();
+}
+
+<div class="col-sm-12" id="MovableTable">
+    <table class="table-bordered overflow-y Movable">
+        <thead>
+            <tr>
+                <th>
+                    <span>
+                        Periods/
+                    </span>
+                    <br />
+                    <span>
+                        Sections
+                    </span>
+                </th>
+                @foreach (var c in Model.ClassTimings)
+                {
+                    <th class="title">
+                        <span>
+                            @c.ItemName
+                        </span>
+                        <br />
+                        <span>
+                            ( @c.ItemStartTime - @c.ItemEndTime )
+                        </span>
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PeriodTimingsData)
+            {
+                <tr>
+                    <th class="time">
+                        <span>
+                            @item.ClassName
+                        </span>
+                        <br />
+                        <span>
+                            @item.SectionName
+                        </span>
+                    </th>
+
+                    @foreach (var p in item.PeriodTimings)
+                    {
+
+                        var color = String.Format("#{0:X6}", random.Next(0x1000000)); // = "#A197B9"
+
+                        <td>
+                            @if (null != p.lstMondayTutorsWithSubject && p.lstMondayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstMondayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    string DivId = p.PeriodsId + "-M" + "-" + d.TutorId;
+
+                                    <a id="@DivId" onclick="GetSubstituteStaff(this.id)" class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </a>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstTuesdayTutorsWithSubject && p.lstTuesdayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstTuesdayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    string DivId = p.PeriodsId + "-T" + "-" + d.TutorId;
+
+                                    <a id="@DivId" onclick="GetSubstituteStaff(this.id)" class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </a>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstWednesdayTutorsWithSubject && p.lstWednesdayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstWednesdayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    string DivId = p.PeriodsId + "-W" + "-" + d.TutorId;
+
+                                    <a id="@DivId" onclick="GetSubstituteStaff(this.id)" class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </a>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstThursdayTutorsWithSubject && p.lstThursdayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstThursdayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+
+                                    string DivId = p.PeriodsId + "-TH" + "-" + d.TutorId;
+
+                                    <a id="@DivId" onclick="GetSubstituteStaff(this.id)" class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </a>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstFridayTutorsWithSubject && p.lstFridayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstFridayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    string DivId = p.PeriodsId + "-F" + "-" + d.TutorId;
+
+                                    <a id="@DivId" onclick="GetSubstituteStaff(this.id)" class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </a>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstSaturdayTutorsWithSubject && p.lstSaturdayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstSaturdayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    string DivId = p.PeriodsId + "-S" + "-" + d.TutorId;
+
+                                    <a id="@DivId" onclick="GetSubstituteStaff(this.id)" class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </a>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstSundayTutorsWithSubject && p.lstSundayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstSundayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    string DivId = p.PeriodsId + "-SU" + "-" + d.TutorId;
+
+                                    <a id="@DivId" onclick="GetSubstituteStaff(this.id)" class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </a>
+                                    <br />
+                                }
+                            }
+                        </td>
+                    }
+                </tr>
+
+            }
+        </tbody>
+
+
+    </table>
+</div>
+@*<input type="hidden" name="SelectedStaffandSubject" id="SelectedStaffandSubject" />*@
+
+
+<script>
+
+    var Content = "";
+
+    function GetSubstituteStaff(Period) {
+        debugger
+        var Day = $("#Date").val();
+
+        if (Period != "") {
+            $("#imagemodal").show();
+
+            $("#MovableTable tbody tr td  ").removeClass("selectedTd");
+            $("#" + Period).closest("td").addClass("selectedTd")
+
+            //document.getElementById(Period).style.background = "#438EB9"
+            //document.getElementById("SelectedStaffandSubject").value = Period //on div double click storing the Div Id
+            $.ajax({
+                url: '/ATimetable/GetSubstituteStaffByPeriod',
+                data: { Period: Period, Day: Day },
+                success: function (result) {
+
+                    Content = result;
+
+                    //$('#SelectedStaffandSubject').html(result);
+                    $('#imagemodal').hide();
+
+                    debugger
+                    SubstituteTutorDialogue()
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+
+    function SubstituteTutorDialogue() {
+        debugger
+        $('#dValidation').html(Content);
+        //var $dialog = $('#SelectedStaffandSubject')
+        $("#dialog-confirm").removeClass('hide')
+       .dialog({
+           resizable: false,
+           draggable: false,
+           width: '700',
+           modal: true,
+           title: 'Substitute Tutor',
+           open: function (event, ui) {
+               debugger
+               $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+           },
+           title_html: true,
+           buttons: [
+               {
+                   html: "Save",
+                   "class": "btn btn-danger btn-minier",
+                   click: function () {
+                       debugger
+                       $(this).dialog("close");
+                       SaveSubstituteTutor();
+                   }
+               }
+               ,
+               {
+                   html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                   "class": "btn btn-minier",
+                   click: function () {
+                       $(this).dialog("close");
+                   }
+               }
+           ]
+       });
+
+    }
+</script>

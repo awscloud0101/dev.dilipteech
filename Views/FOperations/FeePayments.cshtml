@@ -1,0 +1,1705 @@
+﻿@model AsteriskBrowserAL.Models.FeePaymentsData
+@{
+    AsteriskBrowserAL.Models.FeePaymentsData feepayment = new AsteriskBrowserAL.Models.FeePaymentsData();
+    ViewBag.Title = "FeePayments";
+
+    List<SelectListItem> PaymentMode = new List<SelectListItem>()
+{
+new SelectListItem()
+{
+Text = "Cash",
+Value = "1"
+},
+new SelectListItem()
+{
+Text = "Bank Deposit",
+Value = "2"
+},
+new SelectListItem()
+{
+Text = "Cheque",
+Value = "3"
+},
+new SelectListItem()
+{
+Text = "Bank Transfer",
+Value = "4"
+},
+new SelectListItem()
+{
+Text = "Swipe Debit Card",
+Value = "5"
+},
+new SelectListItem()
+{
+Text = "Online",
+Value = "6"
+},
+new SelectListItem()
+{
+Text = "UPI",
+Value = "7"
+},
+new SelectListItem()
+{
+Text = "Swipe Credit Card",
+Value = "8"
+}
+};
+
+    string UserRole = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Fee Payments</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style>
+    .ui-widget.ui-widget-content {
+        border: 1px solid #c5c5c5;
+        width: 19em;
+    }
+</style>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+<style>
+    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+        box-sizing: border-box;
+        list-style: none;
+        margin: 0;
+        padding: 0 5px;
+        width: 100%;
+    }
+
+    .select2-container .select2-selection--multiple .select2-selection__rendered {
+        display: inline-block;
+        overflow: hidden;
+        padding-left: 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+
+<div id="CancelTxnDialog" class="hide">
+    <div class="widget-body">
+        <div class="widget-main">
+            <span style="color:red;" id="CancelValidation"></span>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="col-sm-4">
+                        <label class="control-label no-padding-right" for="form-field-1">@Html.Label("Plutus Txn Id")</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <select class="form-control textlength txtboxNum select2" id="CancelPlutusTxnId" type="text" name="CancelPlutusTxnId"></select>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="col-sm-4">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Amount")</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input readonly="readonly" class="form-control textlength txtboxNum" id="CancelAmount" type="text" name="CancelAmount" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div><!-- #dialog-confirm -->
+@*@Html.Action("DatePickerScripts","Base")*@
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("FeePayments", "FOperations", FormMethod.Post))
+            {
+
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                <input type="hidden" id="PlutusTransactionReferenceID" name="PlutusTransactionReferenceID" />
+
+                <input type="hidden" id="FtsTemplateNumberId" spellcheck="false" class="form-control" />
+                <input type="hidden" id="FtsManualReceiptNoId" spellcheck="false" class="form-control" />
+                <input type="hidden" id="ManualReceiptDate" spellcheck="false" class="form-control" />
+                <input type="hidden" id="ManualDescription" spellcheck="false" class="form-control" />
+
+                <input type="hidden" id="cntrlIsRegualr" value="@ViewBag.Type" />
+                <input type="hidden" id="m_StudentId" />
+                <input type="hidden" id="AdmissionNo" value="@ViewBag.AdmissionNo" />
+                <input type="hidden" id="m_AcadamicYearId" />
+
+                <input type="hidden" id="cntrlIsSwipeAllow" value="@ViewBag.IsSwipeAllow" />
+                <input type="hidden" id="DataBaseName" value="@ViewBag.DataBaseName" />
+                <div class="table-header">
+                    Fee Payments
+
+
+                    <div title="Re-Print" class="inline action-buttons" style="float:right;">
+
+                        @*@if (UserRole == "AC")
+                            {*@
+                        <a id="Print" href="@Url.Action("FeePaymentsPrint", "FOperations")" class="btn btn-info btn-minier P2">
+                            <i class="fa fa fa-print"> | Print</i>
+                        </a>
+                        @*<a id="DivFeeDetails" class="btn btn-info btn-minier P2">
+                                <i>Student Details</i>
+                            </a>*@
+                        @*}*@
+                        @*else
+                            {
+                                <a id="Print" class="btn btn-info btn-minier P2">
+                                    <i class="fa fa fa-print bigger-160"></i>
+                                </a>
+                            }*@
+
+                    </div>
+
+                </div>
+                <div class="widget-box">
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Transaction Date")</label>
+                                            <div class="col-sm-6">
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div id="datepicker" class="input-group date">
+                                                            @if (null != ViewBag.TransactionDate)
+                                                            {
+                                                                <input class="form-control" type="text" value="@ViewBag.TransactionDate" disabled="disabled" id="TransactionDate" name="TransactionDate" autocomplete="off" placeholder="Select Date" />
+                                                            }
+                                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2" style="display:none;" id="fTransactionDate">
+                                                <label style="color:red;font-weight:bold;font-size:12px;">Select Date</label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Class")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownList("CboClass", (IEnumerable<SelectListItem>)ViewBag.Classes, "-- Select Class --", new { @class = "form-control col-sm-5" })
+                                            </div>
+
+                                            <div class="col-sm-2" style="display:none;" id="fClass">
+                                                <label style="color:red;font-weight:bold;font-size:12px;">Select Class</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Admission No")</label>
+
+                                            <div class="col-sm-6">
+                                                <input type="text" name="AdmissionNumber" id="AdmissionNumberId" spellcheck="false" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Student")</label>
+
+                                            <div class="col-sm-6">
+                                                <input type="text" name="StudentName" id="StudentId" spellcheck="false" class="form-control" />
+                                            </div>
+                                            <div class="col-sm-2" style="display:none;" id="fStudent">
+                                                <label style="color:red;font-weight:bold;font-size:12px;">Select Student</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Parent")</label>
+
+                                            <div class="col-sm-6">
+                                                <input type="text" name="ParentName" id="ParentId" spellcheck="false" class="form-control" />
+
+                                            </div>
+                                            <div class="col-sm-2" style="display:none;" id="fParent">
+                                                <label style="color:red;font-weight:bold;font-size:12px;">Select Parent</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4" id="studentDetails" style="display:none;">
+                                    <div class="col-sm-12" style="font-family: 'Segoe UI'">
+
+                                        <b><span style="font-size:12px" id="AcademicYear"></span> </b>
+
+                                        <h4>
+                                            <span>
+                                                <b id="StudentName"></b>
+                                                <b style="margin-top:15px" id="CourseName"></b>
+                                            </span>
+                                        </h4>
+                                        <h3>
+                                            <span id="spnamt" style="display:none;">
+                                                <i class="fa fa-inr"></i>&nbsp;<b id="amount"></b><b style="font-size:14px;">  Due</b>
+                                            </span>
+                                        </h3>
+                                        <h5 id="guardianName"></h5>
+
+                                        <i class="fa fa-mobile" id="Mobile"> </i>
+                                        <br />
+                                        <i id="AddressLineOne"></i><br />
+                                        <i id="AddressLineTwo"></i><br />
+                                        <br />
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <br />
+
+                            <div class="col-md-6">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <input type="radio" id="Regular" name="Due" value="true" checked="checked"><b> &nbsp; &nbsp;Regular</b>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <input type="radio" id="Special" name="Due" value="false"><b> &nbsp; &nbsp;Special</b>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div>
+                    <label style="color:red;" id="FeePaymentsMsg"></label><br />
+                </div>
+
+                <div id="listpayments"></div>
+
+                <span id="SwipeValidation" style="color:red"></span>
+
+                <div class="col-xs-12" id="divpaymentMode">
+                    <div class="row">
+                        <div class="widget-box">
+                            <div class="widget-header widget-header-flat widget-header-small">
+                                <h5 class="widget-title">Payment Mode</h5>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Payment Mode")</label>
+                                                    <div class="col-sm-3">
+                                                        @Html.DropDownList("PaymentMode", PaymentMode, new { @class = "form-control col-sm-5", onchange = "GetPaymentModeControls();SelectionModeValidate();" })
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <input type="button" style="display:none" id="InitiatePayment" value="Initiate Payment" class="btn btn-info btn-minier P2" />
+                                                    </div>
+                                                    <div style="margin-left:-4em" class="col-sm-2">
+                                                        <input type="button" style="display:none" id="CancelTxn" value="Cancel Initiated Payment" class="btn btn-info btn-minier P2" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="paymode" style="display:none;">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Bank Name")</label>
+
+                                                        <div class="col-sm-3">
+                                                            @Html.DropDownList("Bank", null, "--Select Bank--", new { @class = "form-control col-sm-6", @id = "bank", @onchange = "removeError();" })
+                                                        </div>
+                                                        <div class="col-sm-3" style="display:none;" id="fBank">
+                                                            <label style="color:red;font-weight:bold;font-size:12px;"> Please Select Bank </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-sm-3">
+                                                            <label id="dd">DD #</label>
+                                                            <label id="chequeId">Cheque #</label>
+
+                                                            <label id="account">Account #</label>
+                                                            <label id="batch">Invoice No #</label>
+                                                            <label id="online">Transaction Id</label>
+                                                        </div>
+
+                                                        <div class="col-sm-3">
+                                                            @Html.TextBox("ChequeNo", null, "", new { @class = "form-control col-sm-6 textlength", onkeypress = "return isNumberKey(event)", @min = "6", @maxlength = "6", @id = "cheque", @onchange = "removeError();" })
+                                                        </div>
+                                                        <div class="col-sm-3" style="display:none;" id="fChequeNo">
+                                                            <label style="color:red;font-weight:bold;font-size:12px;">Required</label>
+                                                        </div>
+                                                        <span style="color:red;font-weight:bold;font-size:12px;" id="ChequeNoVal"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group ">
+                                                    <div class="row">
+                                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Dated")</label>
+
+
+                                                        <div class="col-sm-3">
+                                                            <div class="input-group date" data-date-format="dd/mm/yyyy">
+                                                                @*<input class="form-control" type="text" name="ChequeDate" id="ChequeDate" autocomplete="off" placeholder="Select Date" />*@
+                                                                <input class="form-control" type="text" value="@ViewBag.TransactionDate" id="ChequeDate" name="ChequeDate" autocomplete="off" placeholder="Select Date" />
+                                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-sm-3" style="display:none;" id="fChequeDate">
+                                                            <label style="color:red;font-weight:bold;font-size:12px;">Required</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-xs-12" id="divReceiptMode">
+                    <div class="row">
+                        <div class="widget-box">
+                            <div class="widget-header widget-header-flat widget-header-small">
+                                <h5 class="widget-title">Receipt Mode</h5>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <input type="radio" id="Online" name="ReceiptMOde" value="true" checked="checked"><b> &nbsp; &nbsp;Online Receipt</b>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <input type="radio" id="Manual" name="ReceiptMOde" value="false"><b> &nbsp; &nbsp;Manual Receipt</b>
+
+                                                    <label id="SelectedManualNo" style="text-align:center"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="divTemplateTwo" style="display:none"></div>
+                <div id="divManualReceiptNoTwo" style="display:none"></div>
+            }
+
+        </div>
+
+        <input type="hidden" id="count" name="count" value="0" />
+        <input type="hidden" id="MobileNumber" value="" />
+        <input type="hidden" id="StudentName1" value="" />
+    </div>
+</section>
+<br />
+<br />
+<br />
+<br />
+
+<script type="text/javascript">
+
+    var Studentid = 0;
+
+    window.onload = function (e) {
+
+        var AdmissionNumber = $('#AdmissionNo').val();
+
+        if ($('#AdmissionNo').val().trim()) {
+            AutoFillStudentData(AdmissionNumber, "AdmissionNumber");
+        }
+        else {
+            EnableDiableControls(false);
+        }
+    }
+
+
+    function EnableDiableControls(enable) {
+
+        ResetControls(0);
+
+        if (enable == true) {
+            $("#AdmissionNumberId").removeAttr("disabled");
+            $("#StudentId").removeAttr("disabled");
+            $("#ParentId").removeAttr("disabled");
+        } else {
+            $("#AdmissionNumberId").attr("disabled", "disabled");
+            $("#StudentId").attr("disabled", "disabled");
+            $("#ParentId").attr("disabled", "disabled");
+        }
+    }
+
+    function SetDebitAmount() {
+
+        document.getElementById('FeePaymentsMsg').innerHTML = "";
+
+        var dtotalDueAmount = $('#dTotalDueAmount').val();
+        var dDebitAmount = $('#DebitAmount').val();
+
+        if (parseFloat(dDebitAmount) < 1) {
+            document.getElementById('FeePaymentsMsg').innerHTML = "Enter amount";
+            return;
+        }
+        else if (parseFloat(dDebitAmount) > parseFloat(dtotalDueAmount)) {
+
+            document.getElementById('FeePaymentsMsg').innerHTML = "Entered amount is exceeding the actual payable amount";
+            $('#DebitAmount').val('0')
+            return;
+        }
+
+        var studentId = $('#m_StudentId').val();
+        var AcadamicYearId = $('#m_AcadamicYearId').val();
+
+        var IsRegular = false;
+
+        if ($('#Regular').is(':checked')) {
+            IsRegular = true;
+        }
+
+        CalulateDebitAmount(studentId, IsRegular, AcadamicYearId);
+    }
+
+    $('#Regular').click(function () {
+
+        var Value = $('#cntrlIsRegualr').val();
+        if (Value == true)
+            return;
+
+        $('#spnamt').hide();
+        $('#DebitAmount').val('0')
+        var studentId = $('#m_StudentId').val();
+        var AcadamicYearId = $('#m_AcadamicYearId').val();
+
+        if (studentId > 0) {
+            GetStudentFeeDetails(studentId, true, true, AcadamicYearId);
+        }
+    });
+
+    $('#Special').click(function () {
+
+        var Value = $('#cntrlIsRegualr').val();
+
+        if (Value == false)
+            return;
+
+        $('#spnamt').hide();
+        $('#DebitAmount').val('0')
+        var studentId = $('#m_StudentId').val();
+        var AcadamicYearId = $('#m_AcadamicYearId').val();
+
+        if (studentId > 0) {
+            GetStudentFeeDetails(studentId, true, false, AcadamicYearId);
+        }
+    });
+
+    $('#CboClass').change(function () {
+
+        var Classnumber = $('#CboClass').val();
+
+        if (Classnumber == "") {
+            EnableDiableControls(false);
+        }
+        else {
+            EnableDiableControls(true);
+        }
+    });
+
+    $("#AdmissionNumberId").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetControls(0);
+        };
+    });
+
+    $("#StudentId").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetControls(0);
+        };
+    });
+
+    $("#ParentId").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetControls(0);
+        };
+    });
+
+    function ResetControls(value) {
+
+
+        if (window.location.href.indexOf('?') > 1) {
+            window.location.href = '/FOperations/FeePayments'
+            return;
+        }
+
+        if (value != 1) {
+            $('#AdmissionNumberId').val('');
+        }
+        if (value != 2) {
+            $('#StudentId').val('');
+        }
+        if (value != 3) {
+            $('#ParentId').val('');
+        }
+
+        $('#m_StudentId').val('');
+        $('#studentDetails').val('')
+        $('#listpayments').val('')
+        $('#DebitAmount').val('0')// Resetting the amount (Fee Payment Partial)
+
+        $('#SwipeValidation').html("");
+        $("#cheque").val("");
+        document.getElementById('FeePaymentsMsg').innerHTML = "";
+        document.getElementById("studentDetails").style.display = "none";
+        document.getElementById("listpayments").style.display = "none";
+        document.getElementById("divReceiptMode").style.display = "none";
+        document.getElementById("divpaymentMode").style.display = "none";
+    }
+
+    //auto complete AdmissionNumber
+    $("#AdmissionNumberId").autocomplete(
+        {
+            source: function (request, response) {
+
+                ResetControls(1);
+
+                if (request.term.length < 3) {
+                    return;
+                }
+                $('#imagemodal').show();
+                var nSectionId = document.getElementById("CboClass").value;
+                $.ajax({
+                    url: "/FOperations/GetAdmissionNumber",
+                    type: "POST",
+                    dataType: "json",
+                    data: { nSectionId: nSectionId, strVal: request.term },
+                    success: function (json) {
+                        response($.map(json, function (data, id) {
+                            return {
+                                label: data.AdmissionNumber,
+                                value: data.AdmissionNumber,
+                                id: data.AdmissionNumberId,
+                            };
+                        }));
+                        $('#imagemodal').hide();
+                    },
+                });
+            },
+            minLength: 3,
+            select: function SelectEvent(event, ui) {
+
+                admissionId = ui.item.value;
+                AutoFillStudentData(ui.item.value, "AdmissionNumber");
+            }
+        });
+
+    $("#ParentId").autocomplete(
+        {
+            source: function (request, response) {
+                ResetControls(3);
+
+                if (request.term.length < 3) {
+                    return;
+                }
+
+                $('#imagemodal').show();
+                var nSectionId = document.getElementById("CboClass").value;
+                $.ajax({
+                    url: "/FOperations/GetParentName",
+                    data: { nSectionId: nSectionId, strVal: request.term },
+                    success: function (json) {
+                        response($.map(json, function (data, id) {
+                            return {
+                                label: data.FatherName,
+                                value: data.FatherName,
+                                id: data.ParentId,
+                            };
+                        }));
+
+                        $('#imagemodal').hide();
+                    }
+                });
+            },
+            minLength: 3,
+            select: function SelectEvent(event, ui) {
+                AutoFillStudentData(ui.item.id, "ParentName");
+            }
+        });
+
+    $("#StudentId").autocomplete(
+        {
+            source: function (request, response) {
+                ResetControls(2);
+
+                if (request.term.length < 3) {
+                    return;
+                }
+
+                $('#imagemodal').show();
+                var ClassNumber = document.getElementById("CboClass").value;
+
+                $.ajax({
+                    url: "/FOperations/GetStudentName",
+                    data: { nClassNumber: ClassNumber, strVal: request.term },
+                    success: function (json) {
+                        response($.map(json, function (data, id) {
+                            return {
+                                label: data.FirstName,
+                                value: data.FirstName,
+                                id: data.StudentId,
+                            };
+                        }));
+
+                        $('#imagemodal').hide();
+                    }
+                });
+            },
+            minLength: 3,
+            select: function SelectEvent(event, ui) {
+                AutoFillStudentData(ui.item.id, "StudentName");
+            }
+        });
+
+    function AutoFillStudentData(strval, type) {
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/FOperations/GetStudentDetailsByType',
+            data: { strVal: strval, type: type },
+            success: function (data) {
+                objStudent = data;
+
+                $("#AdmissionNumberId").val(data.AdmissionNumber);
+                $("#StudentId").val(data.FirstName);
+                $("#ParentId").val(data.FatherName);
+                Studentid = data.StudentId;
+                $('#m_StudentId').val(data.StudentId);
+                AcademicYearId = data.AcademicYearId;
+                $('#m_AcadamicYearId').val(data.AcademicYearId)
+
+
+                if ($('#CboClass').val() == "")
+                    $('#CboClass').val(data.CourseId);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            },
+        }).done(function () {
+            $('#imagemodal').hide();
+            GetStudentDetails(Studentid);
+        });
+    };
+
+    function validateNum(e) {
+        //if the letter is not digit then display error and don't type anything
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            //display error message
+            return false;
+        }
+    };
+
+
+    function CalulateDebitAmount(studentId, IsRegular, AcadamicYearId) {
+
+        document.getElementById("cntrlIsRegualr").innerHTML = IsRegular;
+
+        if (IsRegular == true) {
+            $('#cntrlIsRegualr').val('1');
+        }
+        else {
+            $('#cntrlIsRegualr').val('0');
+        }
+
+        var DebitAmount = $('#DebitAmount').val();
+
+        if (studentId > 0) {
+
+            $('#imagemodal').show();
+
+            $.ajax({
+                url: "/FOperations/GetFeeDetails",
+                type: "POST",
+                data: { studentId: studentId, IsRegular: IsRegular, DebitAmount: DebitAmount, AcademicYearId: AcadamicYearId },
+                success: function (coldata) {
+                    $('#imagemodal').hide();
+                    document.getElementById('listpayments').style.display = 'inline'
+                    $('#listpayments').html('');
+                    $('#listpayments').html(coldata);
+
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        };
+    }
+
+    function GetStudentFeeDetails(studentId, Showloader, IsRegular, AcademicYearId) {
+        debugger
+        document.getElementById("amount").innerHTML = "";
+
+        document.getElementById("cntrlIsRegualr").innerHTML = IsRegular;
+
+        if (Showloader == true) {
+            document.getElementById('listpayments').style.display = 'none'
+        }
+
+        if (IsRegular == true) {
+            $('#cntrlIsRegualr').val('1');
+        }
+        else {
+            $('#cntrlIsRegualr').val('0');
+        }
+
+        if (studentId < 1) {
+            document.getElementById("studentDetails").style.display = "none";
+            $('#tbodyId').empty();
+        }
+
+        var DebitAmount = $('#DebitAmount').val();
+        var AcademicYearId = $('#m_AcadamicYearId').val();
+
+        if (studentId > 0) {
+
+            if (Showloader == true) {
+                $('#imagemodal').show();
+            }
+
+            $.ajax({
+                url: "/FOperations/GetFeeDetails",
+                type: "POST",
+                data: { studentId: studentId, IsRegular: IsRegular, DebitAmount: DebitAmount, AcademicYearId: AcademicYearId },
+
+                success: function (coldata) {
+                    $('#imagemodal').hide();
+
+                    document.getElementById('listpayments').style.display = 'inline'
+                    document.getElementById("divReceiptMode").style.display = "inline";
+                    document.getElementById("divpaymentMode").style.display = "inline";
+
+                    $('#listpayments').html(coldata);
+
+                    // getting the due amount from feepayment partialview and populating to the amount
+                    var dtotalDueAmount = $('#dTotalDueAmount').val();
+
+                    if (parseFloat(dtotalDueAmount) >= 0) {
+                        $('#spnamt').show();
+                        document.getElementById("amount").innerHTML = GetAmountWithCommas(dtotalDueAmount);
+                    }
+                    else {
+                        $('#spnamt').hide();
+                    }
+
+                    document.body.style.cursor = 'default';
+                },
+                error: function () {
+                    document.body.style.cursor = 'default';
+                    $('#imagemodal').hide();
+                },
+
+            }).done(function () {
+
+                var Value = $('#cntrlIsRegualr').val();
+
+                if (Value == 1) {
+                    $('#Regular').prop('checked', true);
+                    $('#Special').prop('checked', false);
+
+                } else {
+                    $('#Regular').prop('checked', false);
+                    $('#Special').prop('checked', true);
+                }
+
+                $('#imagemodal').hide();
+            });
+        };
+    }
+
+    function GetPaymentModeControls() {
+        debugger
+        $("#cheque").attr('readonly', false);
+        document.getElementById('InitiatePayment').style.display = 'none';
+        document.getElementById('CancelTxn').style.display = 'none';
+
+        var paymentMode = document.getElementById("PaymentMode").value;
+        if (paymentMode == 1) {
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('paymode').style.display = 'none'
+
+        }
+        else if (paymentMode == 2) {
+            document.getElementById('dd').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 3) {
+            document.getElementById('chequeId').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '6');
+
+        }
+        else if (paymentMode == 4) {
+            document.getElementById('account').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 5 || paymentMode == 8) {
+            document.getElementById('batch').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '6');
+
+            //var IsOnline = $("#Online").prop('checked');
+
+            //if (IsOnline) {
+            //    //  $("#cheque").attr('readonly', true);
+            //    document.getElementById('InitiatePayment').style.display = 'inline';
+            //    document.getElementById('CancelTxn').style.display = 'inline';
+            //}
+
+            //// Is Swipe Allowed
+            //var cntrlIsSwipeAllow = $('#cntrlIsSwipeAllow').val()
+            //if (cntrlIsSwipeAllow == "value") {
+            //    $("#cheque").attr("readonly", "readonly");
+            //}
+            ////
+        }
+        else if (paymentMode == 6 || paymentMode == 7) {
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            $("#cheque").attr('maxlength', '12');
+        }
+    }
+
+    $('#InitiatePayment').click(function () {
+
+        debugger
+
+        $('#FeePaymentsMsg').html("");
+        $('#SwipeValidation').html("");
+
+        var dtotalDueAmount = $('#dTotalDueAmount').val();
+        var dDebitAmount = "";
+
+        if ($('#DebitAmount').val() < 1 && $('#Regular').is(':checked')) {
+            document.getElementById('FeePaymentsMsg').innerHTML = "Enter amount";
+            return;
+        }
+        else if ($('#Regular').is(':checked')) {
+            var ValidateSet = IsAmountSet();
+
+            if (ValidateSet == false)
+                return;
+            else
+                dDebitAmount = $('#DebitAmount').val();
+        }
+        else if ($('#Special').is(':checked')) {
+            var ValidateSet = IsSpecialAmountEntered();
+
+            if (ValidateSet == false)
+                return;
+            else {
+                dDebitAmount = GetSpecialFeeAmount();
+            }
+        }
+
+        if (parseFloat(dDebitAmount) > parseFloat(dtotalDueAmount)) {
+            document.getElementById('FeePaymentsMsg').innerHTML = "Entered amount is exceeding the actual payable amount";
+            $('#DebitAmount').val('0')
+            return;
+        }
+
+        var Student = document.getElementById("m_StudentId").value;
+
+        if (dDebitAmount > 0 && Student > 0) {
+            $('#imagemodal').show();
+
+            $.ajax({
+                url: '/FOperations/InitiateSwipePayment',
+                data: { DebitAmount: dDebitAmount, StudentId: Student },
+                success: function (data) {
+                    $('#imagemodal').hide();
+
+                    if (data.Error != "") {
+                        $('#SwipeValidation').html("Payment not initiated.");
+                        $('#PlutusTransactionReferenceID').val(0);
+                        $("#cheque").val("");
+                    }
+                    else if (data.ResponseCode == 0 && data.PlutusTransactionReferenceID > 0) {
+                        $('#SwipeValidation').html("Payment is initiated. Please do payment in the swipe machine with the Plutus txn Id " + data.PlutusTransactionReferenceID)
+                        $('#PlutusTransactionReferenceID').val(data.PlutusTransactionReferenceID);
+                        $("#cheque").val(data.PlutusTransactionReferenceID);
+                        $("#InitiatePayment").attr("disabled", "disabled");
+                        $("#DebitAmount").attr("readonly", "readonly");
+                        $("#cheque").attr("readonly", "readonly");
+                        $("#PaymentMode").attr("disabled", "disabled");
+                        $("#DebitAmountSetClick").attr("disabled", "disabled");
+                    }
+                    else {
+                        $('#SwipeValidation').html(data.ResponseMessage);
+                        $('#PlutusTransactionReferenceID').val(0);
+                        $("#cheque").val("");
+                    }
+                },
+                error: function () {
+                    document.body.style.cursor = 'default';
+                    $('#imagemodal').hide();
+                },
+
+            });
+        }
+    });
+
+
+
+    function LoadPlutusTxnIds() {
+        var studentId = $('#m_StudentId').val();
+
+        if (studentId > 0) {
+            $.ajax({
+                url: '/FOperations/GetPlutusTxnIds',
+                data: { StudentId: studentId },
+                success: function (data) {
+
+                    var PlutusTxnIds = $('#CancelPlutusTxnId');
+                    PlutusTxnIds.children().remove();
+                    PlutusTxnIds.append($("<option>").val("0").text("--- Select ---"));
+                    $.each(data, function (i, record) {
+                        PlutusTxnIds.append($("<option>").val(record.SwipeTransactionId).text(record.PlutusTransactionReferenceID));
+                    });
+
+                    $('#CancelPlutusTxnId').append(PlutusTxnIds);
+                    $('#CancelPlutusTxnId').val(0);
+
+                    //$('#SwipeValidation').html("");
+                },
+                aync: false
+            });
+        }
+    }
+
+    $('#CancelPlutusTxnId').change(function () {
+        debugger
+        var id = $(this).val();
+
+        if (id > 0) {
+            $.ajax({
+                url: '/FOperations/GetAmountByPlutusTxnIds',
+                data: { Id: id },
+                success: function (data) {
+                    debugger
+                    $('#CancelAmount').val(data);
+                },
+                aync: false
+            });
+        }
+    })
+
+    $('#CancelTxn').click(function () {
+        debugger
+        $('#CancelPlutusTxnId').select2("val", "")
+
+        $('#CancelPlutusTxnId').children().remove();
+        $('#CancelValidation').html("");
+        $('#CancelAmount').val("");
+
+        LoadPlutusTxnIds();
+
+        var $dialog = $('#CancelTxnDialog').removeClass('hide')
+
+            .dialog({
+                resizable: false,
+                draggable: false,
+                width: '700',
+                modal: true,
+                title: 'Cancel Initiated Txn',
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                },
+                title_html: true,
+                buttons: [
+                    {
+                        html: "Cancel",
+                        "class": "btn btn-danger btn-minier",
+                        click: function () {
+                            debugger
+                            $('#imagemodal').show();
+                            var TxnId = $('#CancelPlutusTxnId').val();
+
+                            if (!(TxnId > 0)) {
+                                $('#CancelValidation').html("Please select Plutus Txn Id");
+                                $('#imagemodal').hide();
+                                return;
+                            }
+
+                            var CancelAmount = $('#CancelAmount').val();
+
+                            if (!(CancelAmount > 0)) {
+                                $('#CancelValidation').html("Please enter initiated amount");
+                                $('#imagemodal').hide();
+                                return;
+                            }
+
+                            var status = CancelInitiatedPayment(TxnId);
+
+                            document.getElementById('SwipeValidation').innerHTML = status;
+
+                            $('#imagemodal').hide();
+
+                            $(this).dialog("close");
+                        }
+                    },
+                    {
+                        html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                        "class": "btn btn-minier",
+                        click: function () {
+                            $('#CancelPlutusTxnId').select2("val", "")
+                            $('#CancelPlutusTxnId').children().remove();
+                            $('#CancelValidation').html("");
+                            $('#CancelAmount').val("");
+                            $(this).dialog("close");
+                        }
+                    }
+                ]
+            });
+
+    });
+
+    function CancelInitiatedPayment(SwipeTransactionId) {
+
+        var valid = "";
+
+        var TxnId = $('#PlutusTransactionReferenceID').val();
+
+        $.ajax({
+            url: "/FOperations/CancelInitiatedTxn",
+            data: { SwipeTransactionId: SwipeTransactionId },
+            success: function (data) {
+                debugger
+                if (data.PlutusTransactionReferenceID == TxnId) {
+                    $("#InitiatePayment").prop("disabled", false);
+                    $("#DebitAmount").prop("readonly", false);
+                    $("#cheque").prop("readonly", false);
+                    $("#cheque").val("");
+                    $("#PaymentMode").prop("disabled", false);
+                    $("#DebitAmountSetClick").prop("disabled", false);
+                }
+
+                valid = data.ResponseMessage;
+            },
+            error: function () {
+                document.body.style.cursor = 'default';
+            },
+            async: false
+        })
+
+        return valid;
+    }
+
+    function GetStudentDetails(studentId) {
+        document.getElementById("studentDetails").style.display = "none";
+        var result = studentId;
+        var AcademicYearId = $('#m_AcadamicYearId').val();
+        if (result > 0) {
+
+            $('#imagemodal').show();
+
+            $.ajax({
+                url: '/FOperations/GetStudentDetails',
+                data: { studentId: result },
+                success: function (StudentDetails) {
+                    document.getElementById("studentDetails").style.display = "inline";
+                    document.getElementById("StudentName").innerHTML = StudentDetails.FullName;
+                    document.getElementById("CourseName").innerHTML = StudentDetails.CourseName;
+                    document.getElementById("guardianName").innerHTML = StudentDetails.GuardianName;
+                    document.getElementById("AddressLineOne").innerHTML = StudentDetails.AddressLineOne;
+                    document.getElementById("AddressLineTwo").innerHTML = StudentDetails.AddressLineTwo;
+                    document.getElementById("Mobile").innerHTML = "  " + StudentDetails.MobileNumber;
+                    document.getElementById("AcademicYear").innerHTML = " Academic Year  : " + StudentDetails.DisplayAcademicYear;
+                },
+                error: function () {
+                    document.body.style.cursor = 'default';
+                    $('#imagemodal').hide();
+                },
+
+            }).done(function () {
+                $('#imagemodal').hide();
+
+                if ($('#cntrlIsRegualr').val() == "1")
+                    GetStudentFeeDetails(studentId, true, true, AcademicYearId);
+                else
+                    GetStudentFeeDetails(studentId, true, false, AcademicYearId);
+
+            });
+        }
+        else {
+            document.getElementById("studentDetails").style.display = "none";
+        }
+    };
+
+    function GetAmountWithCommas(total) {
+
+        $.ajax({
+            url: '/FOperations/GetAmountInWords',
+            data: { amount: total },
+            success: function (data) {
+                total = data.stringwithCommas;
+            },
+            async: false,
+        });
+        return total;
+    }
+
+
+    $('#cheque').keypress(function (key) {
+        var regex = new RegExp("^[a-zA-Z0-9]+$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    });
+
+</script>
+
+
+@*Validation and Saving part*@
+<script type="text/javascript">
+
+    function ValidateFeePayment() {
+        var paymentMode = document.getElementById("PaymentMode").value;
+
+        document.getElementById("count").value = "1";
+
+        var TransactionDate = document.getElementById("TransactionDate").value;
+        var Class = document.getElementById("CboClass").value;
+        var Student = document.getElementById("StudentId").value;
+        var ChequeDate = document.getElementById("ChequeDate").value;
+        var ChequeNo = document.getElementById("cheque").value;
+        var Bank = document.getElementById("bank").value;
+        var totalDebitAmount = $('#DebitAmount').val();
+        var vrRegularValue = document.getElementById("cntrlIsRegualr").value;
+        var StudentId = document.getElementById("m_StudentId").value;
+
+        if (vrRegularValue == 1) {
+            IsRegular = true;
+        }
+        else {
+            IsRegular = false;
+        }
+
+        validate = true;
+
+        if (totalDebitAmount < 1 && vrRegularValue == 1) {
+            validate = false;
+
+            document.getElementById('FeePaymentsMsg').innerHTML = "Please Enter Amount";
+
+            return validate;
+        }
+
+        if (paymentMode == 1) {
+
+            if (TransactionDate == "") {
+                document.getElementById("fTransactionDate").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fTransactionDate").style.display = "none";
+            }
+            if (Class == "") {
+                document.getElementById("fClass").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fClass").style.display = "none";
+            }
+
+            if (Student == "" || Student < 1) {
+                document.getElementById("fStudent").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fStudent").style.display = "none";
+            }
+
+            return validate;
+        }
+
+        if (paymentMode > 1) {
+            if (TransactionDate == "") {
+                document.getElementById("fTransactionDate").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fTransactionDate").style.display = "none";
+            }
+            if (ChequeDate == "") {
+                document.getElementById("fChequeDate").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fChequeDate").style.display = "none";
+            }
+
+            if (ChequeNo == "") {
+                document.getElementById("fChequeNo").style.display = "inline";
+                validate = false;
+            } else if (paymentMode == 2 || paymentMode == 3 && ChequeNo.length < 6) {
+                document.getElementById("ChequeNoVal").innerHTML = "Length must be six digits"
+                validate = false;
+            }
+            else if (paymentMode == 5 && ChequeNo.length < 4) {
+                document.getElementById("ChequeNoVal").innerHTML = "Length must be four digits"
+                validate = false;
+            }
+            else if (paymentMode == 3) {
+                $.ajax({
+                    url: '/FOperations/GetStudentAllowforStudent',
+                    data: { StudentId: StudentId },
+                    async: false,
+                    success: function (data) {
+                        if (data == false) {
+                            document.getElementById('FeePaymentsMsg').innerHTML = "Please approve the allow cheque payment in central office ";
+                            validate = false;
+
+                        }
+                    }
+                })
+            }
+            else if (paymentMode == 6) {
+                $.ajax({
+                    url: '/FOperations/GetStudentAllowforOnlineTransactionId',
+                    data: { ChequeNo: ChequeNo, ChequeDate: ChequeDate },
+                    async: false,
+                    success: function (data) {
+                        if (data == false) {
+                            document.getElementById('FeePaymentsMsg').innerHTML = "This TransactionId already exists ";
+                            validate = false;
+
+                        }
+                    }
+                })
+            }
+            else {
+                document.getElementById("fChequeNo").style.display = "none";
+                document.getElementById("ChequeNoVal").innerHTML = "";
+            }
+
+            if (Bank == "") {
+                document.getElementById("fBank").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fBank").style.display = "none";
+            }
+
+            return validate;
+        }
+    };
+
+    function submitForm() {
+        debugger
+        var validatestatus = ValidateFeePayment();
+
+        if (validatestatus == false) {
+            return false;
+        } else {
+
+
+
+            var ValidateSet = false;
+
+            if ($('#Regular').is(':checked')) {
+                 var cntrlIsSwipeAllow = $('#cntrlIsSwipeAllow').val()
+                if (cntrlIsSwipeAllow == "value") {
+                    ValidateSet = IsSpecialAmountEntered();
+                }
+                else {
+                    ValidateSet = IsAmountSet();
+                }
+            }
+
+            if ($('#Special').is(':checked')) {
+                ValidateSet = IsSpecialAmountEntered();
+            }
+
+            if (ValidateSet == true) {
+                debugger
+                if (IsSwipeOnlinePayment() == true) {
+                    var TxnId = $('#PlutusTransactionReferenceID').val();
+
+                    if (TxnId > 0) {
+                        var status = GetTxnStatus(TxnId, "Upload");
+
+                        if (status != "") {
+                            document.getElementById('FeePaymentsMsg').innerHTML = status;
+                        }
+                        else {
+                            SaveAndValidePayment();
+                            //var TemplateNo = PerformTemplateOperation(); //        In Feepayment PartialView opening the template then saving the data
+                        }
+                    }
+                    else {
+                        SaveAndValidePayment();
+                        //var TemplateNo = PerformTemplateOperation();
+                        //document.getElementById("FeePaymentsMsg").innerHTML = "Please initiate the payment";
+                    }
+                }
+                else {
+                    SaveAndValidePayment();
+                    //var TemplateNo = PerformTemplateOperation(); //        In Feepayment PartialView opening the template then saving the data
+                }
+            }
+
+            return false;
+        }
+    };
+
+    function SaveAndValidePayment() {
+        if (IsSwipeOnlinePayment() == true) {
+            var TxnId = $('#PlutusTransactionReferenceID').val();
+            var ChequeNo = $('#cheque').val();
+
+            if (TxnId > 0) {
+                PaymentDialogue(TxnId);
+            }
+            else if (ChequeNo > 0) {
+                SaveFeePayment();
+            }
+            else {
+                document.getElementById("FeePaymentsMsg").innerHTML = "Invoice No should not be empty";
+            }
+        }
+        else {
+            SaveFeePayment(); // In Feepayment PartialView
+        }
+    }
+
+
+    $('#DebitAmount').focus(function () {
+
+        $('#FeePaymentsMsg').html('');
+    });
+
+
+    $('#chkManualRcpt').click(function () {
+        $('#fManualReceiptNo').hide();
+    });
+
+    $('#ChequeDate').focus(function () {
+        $('#fChequeDate').hide();
+    });
+    $('#cheque').focus(function () {
+        $('#fChequeNo').hide();
+        document.getElementById("ChequeNoVal").innerHTML = "";
+    });
+
+    $('#bank').focus(function () {
+        $('#fBank').hide();
+    });
+
+    $('#ManualReceiptNo').focus(function () {
+        $('#fManualReceiptNo').hide();
+    });
+
+    $('#BatchId').focus(function () {
+        $('#fClass').hide();
+    });
+
+    $('#StudentId').focus(function () {
+        $('#fStudent').hide();
+    });
+
+    $('#TransactionDate').focus(function () {
+        $('#fTransactionDate').hide();
+    });
+
+    function SelectionModeValidate() {
+        var paymentMode = document.getElementById("PaymentMode").value;
+
+        if (paymentMode == 1) {
+            document.getElementById("fChequeDate").style.display = "none";
+            document.getElementById("fChequeNo").style.display = "none";
+            document.getElementById("fBank").style.display = "none";
+            document.getElementById("fClass").style.display = "none";
+            document.getElementById("fStudent").style.display = "none";
+        }
+    }
+</script>
+
+@*//Print Part*@
+<script type="text/javascript">
+
+
+    $(document).on('focus', '#Chequedatepicker', function () {
+
+
+
+        $(this).datepicker({
+            startDate: "1/1/1900",
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true,
+        });
+
+    });
+
+
+
+    function OpenPrintDialog(studentId, aryRecpts) {
+
+
+        PrintFeePayments(studentId, aryRecpts, "yes");
+
+
+        //var $dialog = $('<div></div>')
+        //.html('Do you want to print with header?')
+
+        //.dialog({
+        //    autoOpen: false,
+        //    title: 'Fee Payments',
+        //    modal: true,
+        //    buttons: {
+        //        "Yes": function () {
+        //            $dialog.dialog('close');
+        //            PrintFeePayments(studentId, aryRecpts, "yes");
+        //        },
+        //        No: function () {
+        //            $(this).dialog("close");
+        //            PrintFeePayments(studentId, aryRecpts, "No");
+        //        },
+        //    }
+        //});
+
+        //$dialog.dialog('open');
+    }
+
+    function PrintFeePayments(studentId, ReceiptNo, Iswithhead) {
+
+        var IsRegular;
+
+        var vrRegularValue = document.getElementById("cntrlIsRegualr").value;
+
+        if (vrRegularValue == 1) {
+            IsRegular = true;
+        }
+        else {
+            IsRegular = false;
+        }
+
+        $('#imagemodal').show();
+
+        document.body.style.cursor = 'wait';
+        $.ajax({
+
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+            },
+
+            url: '/FOperations/PrintFeepaymentsOnSaving',
+            data: { aryReceipt: ReceiptNo, bFromPrint: false, IsRegular: IsRegular },
+            type: 'POST',
+            success: function (data) {
+
+
+                $('#mydiv').html(data);
+
+                if (Iswithhead == "No") {
+                    $('#iswithheader1').hide();
+                    $('#iswithheader').hide();
+                }
+
+                $('#imagemodal').hide();
+
+                PrintElem('#mydiv');
+                document.body.style.cursor = 'default';
+
+            },
+            error: function (data) {
+                document.body.style.cursor = 'default';
+            }
+        }).done(function () {
+
+        });
+
+
+        function PrintElem(elem) {
+            Popup($(elem).html());
+        }
+
+        function Popup(data) {
+
+            var mywindow = window.open('', 'my div', 'height=300,width=600');
+            mywindow.document.write('<p></p>');
+            mywindow.document.write(data);
+            mywindow.document.write('<p></p>');
+
+            var is_chrome = Boolean(mywindow.chrome);
+
+            if (is_chrome) {
+                setTimeout(function () { // wait until all resources loaded
+                    mywindow.document.close();
+                    mywindow.focus();
+                    mywindow.print();
+                    mywindow.close();
+                    $("#Save").removeAttr("disabled");
+
+                    window.location.href = '/FOperations/FeePayments?AdmissionNo=' + $("#AdmissionNumberId").val() + '&Type=' + $("#cntrlIsRegualr").val();
+
+                }, 2050);
+            } else {
+                mywindow.document.close();
+                mywindow.focus();
+                mywindow.print();
+                mywindow.close();
+                $("#Save").removeAttr("disabled");
+
+                window.location.href = '/FOperations/FeePayments?AdmissionNo=' + $("#AdmissionNumberId").val() + '&Type=' + $("#cntrlIsRegualr").val();
+
+            }
+
+            return true;
+        }
+    };
+
+    function getFormattedDate(input) {
+        var pattern = /(.*?)\/(.*?)\/(.*?)$/;
+        var result = input.replace(pattern, function (match, p1, p2, p3) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return (p2 < 10 ? "0" + p2 : p2) + "-" + months[(p1 - 1)] + "-" + p3;
+        });
+        return result;
+    }
+
+    $('#DivFeeDetails').click(function () {
+        debugger
+        var StudentId = document.getElementById("m_StudentId").value;
+        var DataBaseName = document.getElementById("DataBaseName").value;
+        if (StudentId > 0)
+            //GetPayments(Student)
+            window.location.href = "/AStudent/StudentDetailsD?StudentId=" + StudentId + "&DatabasePath=" + DataBaseName;
+
+    });
+
+
+</script>
+
+
+<div id="PrintDiv" style="display:none;">
+    <div id="mydiv" style="height:100%">
+    </div>
+</div>
+
+
+<script>
+    $(document).on('focus', '#ChequeDate', function () {
+
+
+        $(this).datepicker({
+            startDate: "1/1/1900",
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+    $(".select2").select2();
+
+</script>

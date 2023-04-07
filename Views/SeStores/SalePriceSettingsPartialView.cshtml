@@ -1,0 +1,81 @@
+﻿@model AsteriskBrowserAL.Models.SalePriceSettingsViewModel
+
+@if (null != Model)
+{
+    if (null != Model.lstPrices && Model.lstPrices.Count() > 0)
+    {
+        int nSno = 1;
+
+        <div style="overflow:auto;height:400px;width:100%">
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>@("S.No")</th>
+
+                        @if (Model.IsKit)
+                    {
+                    <th>
+                        @Html.DisplayName("Kit Name")
+                    </th>
+                    }
+                    else
+                    {
+                    <th>
+                        @Html.DisplayName("Item Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("SKU Code")
+                    </th>
+
+                    }
+                        <th>
+                            @Html.DisplayName("Sale Price")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.lstPrices.Count(); i++)
+                {
+                <tr>
+                    @Html.Hidden("lstItem.Index", (@i))
+                    @Html.Hidden("lstItem[" + @i + "].SalePriceSettingId", Model.lstPrices.ElementAt(i).SalePriceSettingId)
+                    @Html.Hidden("lstItem[" + @i + "].InventoryKitId", Model.lstPrices.ElementAt(i).InventoryKitId)
+                    @Html.Hidden("lstItem[" + @i + "].InventorySubCategoryItemId", Model.lstPrices.ElementAt(i).InventorySubCategoryItemId)
+                    @Html.Hidden("lstItem[" + @i + "].ItemName", Model.lstPrices.ElementAt(i).ItemName)
+                    @Html.Hidden("lstItem[" + @i + "].SKUCode", Model.lstPrices.ElementAt(i).SKUCode)
+                    <td>
+                        @(nSno++)
+                    </td>
+                    @if (Model.IsKit)
+                        {
+                        <td>
+                            @Model.lstPrices.ElementAt(i).KitName
+                        </td>
+                        }
+                        else
+                        {
+                        <td>
+                            @Model.lstPrices.ElementAt(i).ItemName
+                        </td>
+                        <td>
+                            @Model.lstPrices.ElementAt(i).SKUCode
+                        </td>
+                        }
+
+                    <td>
+                        @Html.TextBox("lstItem[" + @i + "].Price", Model.lstPrices.ElementAt(i).Price, new { @class = "form-control textlength txtboxNum", @min = "0", @max = "100000", @maxlength = "7", @style = "width:180px" })
+                    </td>
+                </tr>
+
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {<span style="color: red;"><b>Data not available</b></span> }
+}
+else
+{<span style="color: red;"><b>Data not available</b></span> }
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+

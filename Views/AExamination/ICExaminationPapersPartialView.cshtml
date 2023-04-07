@@ -1,0 +1,132 @@
+﻿
+@model IEnumerable<AsteriskBrowserAL.Models.ExaminationPapersData>
+@{
+    ViewBag.Title = "ICExaminationPapersPartialView";
+    int nSno = 1;
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (null != Model && Model.Count() > 0)
+{
+
+    <div class="table-header">
+        Records found (@Model.Count())
+    </div>
+
+    <table class="table tbhover table-striped table-bordered dynamic-table">
+
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Is Daily Exam")
+                </th>
+                <th>
+                    @Html.DisplayName("Paper Name")
+                </th>
+                <th>
+                    @Html.DisplayName("Cycle Name")
+                </th>
+                <th>
+                    @Html.DisplayName("Exam Date")
+                </th>
+                <th>
+                    @Html.DisplayName("Max. Marks")
+                </th>
+                <th>
+                    @Html.DisplayName("Pass Marks")
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+<tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @(nSno++)
+            </td>
+            <td>
+                @Html.CheckBoxFor(modelItem => item.IsDaily, new { disabled = "disabled" })
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaperName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CycleName)
+            </td>
+            <td>
+                @if (item.ExamDate.HasValue)
+                    {
+                    @item.ExamDate.Value.ToString("dd-MMM-yyyy")
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaxMarks)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PassMarks)
+            </td>
+            <td>
+
+                <div class="hidden-sm hidden-xs action-buttons">
+                    <a class="green P2" href="@Url.Action("ICExaminationPapersE", "AExamination", new { id = item.ExaminationPapersId })">
+                        <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                    </a>
+                    <a class="red P2" onclick="btnConfirm(@item.ExaminationPapersId)">
+                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    }
+</tbody>
+       
+    </table>
+      
+}
+else
+{
+    <span style="font-weight:bold;color:red">Data not available to display</span>
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true }
+)
+
+<script>
+
+    function btnConfirm(Value) {
+
+        debugger
+        if (Value > 0) {
+            $.ajax({
+                url: '/AExamination/ValidationForICExamPapersD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/AExamination/ICExaminationPapersD?id=' + Value;
+                    var title = "IC Examination Papers";
+                  
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

@@ -1,0 +1,272 @@
+﻿@model AsteriskBrowserAL.Models.PettyCashReportViewModel
+@{
+    ViewBag.Title = "Funds Transfer Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Funds Transfer Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+ 
+
+    <div class="row">
+        <div class=col-xs-12>
+
+            @using (Html.BeginForm("ExcelExoprtForFundTransfer", "FReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Funds Transfer Report</span>
+                        <div class="" style="float:right;margin-right:10px;">
+
+                            <a class="btncustom P2" id="ViewData" onclick="GetData();">View Data</a>
+                           
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <div class="widget-box">
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <input type="hidden" id="IsCentral" value="@Model.IsCentral.ToString()" />
+                                <input type="hidden" id="SelBranch" value="@Model.SubscriptionId" />
+
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4">Division</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                          
+
+                                <div class="row">
+
+                                    <div class="col-xs-12">
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">From Date</label>
+                                            <div class="col-sm-6">
+                                                <div id="datepicker" class="input-group date">
+                                                    <input class="form-control" type="text" id="FromDate" name="FromDate" autocomplete="off" placeholder="From Date" />
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">To Date</label>
+                                            <div class="col-sm-6">
+                                                <div id="datepicker" class="input-group date">
+                                                    <input class="form-control" type="text" id="ToDate" name="ToDate" autocomplete="off" placeholder="To Date  " />
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="FundTransferReportDIV"></div>
+
+                }
+            }
+
+        </div>
+    </div>
+
+</section>
+
+
+<script type="text/javascript">
+
+    var DisplayValidation = "";
+    $('#DivisionId').change(function () {
+
+        var ressDivisionId = $('#DivisionId').val();
+
+        if (ressDivisionId == 0) {
+            var BranchItems = $('#BranchId');
+
+            BranchItems.children().remove();
+            $('#BranchId').append("");
+        }
+
+        var resDivisionId = $('#DivisionId').val();
+        if (resDivisionId < -1 || resDivisionId == "null" || resDivisionId == 0) {
+            $('#FundTransferReportDIV').html("");
+            return;
+        }
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId > 0 || DivisionId == -1) {
+
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+                    //BranchItems.append($("<option>").val(-1).text("All Branches"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+
+    });
+
+
+
+    function GetData() {
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        var IsCentral = $("#IsCentral").val();
+        var BranchId = $('#BranchId').val()
+        if (IsCentral == "False") {
+            var SelBranch = $("#SelBranch").val();
+
+            BranchId = SelBranch;
+        }
+
+
+        var Validation = ValidateFundsTransfer();
+
+        if (Validation == false) {
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+
+            $.ajax({
+
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#imagemodal').hide();
+                },
+
+                url: '/FReports/FundsTransferReportPartialView',
+                data: { DivisionId: $('#DivisionId').val(), BranchId: BranchId, FromDate: $('#FromDate').val(), ToDate: $('#ToDate').val() },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#FundTransferReportDIV').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+    function ValidateFundsTransfer() {
+        var IsCentral = $("#IsCentral").val();
+
+        var valid = true;
+        var Division = $('#DivisionId').val();
+        if (IsCentral == "True") {
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+
+
+        var dtFromDate = $('#FromDate').val();
+        if (dtFromDate == "") {
+            valid = false;
+            DisplayValidation += "From Date, ";
+        }
+
+        var dtToDate = $('#ToDate').val();
+        if (dtToDate == "") {
+            valid = false;
+            DisplayValidation += "To Date, ";
+        }
+
+        return valid;
+
+    };
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+

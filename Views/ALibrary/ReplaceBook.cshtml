@@ -1,0 +1,214 @@
+﻿@model AsteriskBrowserAL.Models.ManageBooksViewData
+
+
+@{
+    ViewBag.Title = "ReplaceBook";
+}
+
+@if (null != TempData["datasaved"])
+{
+    <span style="color:green;font-weight:bold">@TempData["datasaved"]</span>
+}
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ReplaceBook", "ALibrary", FormMethod.Post))
+            {
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Replace Book
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="form-group">
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Books</label>
+                                        <div class="col-sm-3">
+                                            @Html.DropDownList("BookDetailsId", null, "--Select Book--", new { @class = "form-control", @onchange = "GetbarCode()", @name = "BookDetailsId", id = "BookDetailsId" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Accession Number</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.AccessionNumber, new { @class = "form-control col-sm-5", @readonly = true, @id = "AccessionNumber" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Books Category</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.BookCategoryName, new { @class = "form-control col-sm-5", @readonly = true, id = "BookCategoryName" })
+                                            @Html.HiddenFor(model => model.BookCategoryId, new { @class = "form-control col-sm-5", @id = "BookCategoryId" })
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br /><u>
+                                    <h3> Replace With</h3>
+                                </u>
+                                <br /><br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Book Name</label>
+                                        <div class="col-sm-3">
+                                            @Html.DropDownList("MasterBookDataId", null, "--Select--", new { @class = "form-control", @name = "MasterBookDataId", @id = "MasterBookDataId" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Publication</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.Publication, new { @class = "form-control col-sm-5" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Published Date")</label>
+                                        <div class="col-sm-3">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                        @Html.TextBoxFor(model => model.PublishedDate, new { @class = "form-control col-sm-5", id = "PublishedDate", @name = "PublishedDate", @autocomplete = "off", @placeholder = "Select Date", @width = "30px" })
+                                                        <span class="input-group-addon "><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Purchase Date")</label>
+                                        <div class="col-sm-3">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                        @Html.TextBoxFor(model => model.PurchaseDate, new { @class = "form-control col-sm-5", id = "purchaseDate", @name = "purchaseDate", @autocomplete = "off", @placeholder = "Select Date" })
+                                                        <span style="margin-left:0%" class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Edition")</label>
+                                        <div class="col-sm-3">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    @Html.TextBoxFor(model => model.Edition, new { @class = "form-control col-sm-5" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Author")</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.Author, new { @class = "form-control col-sm-5", @id = "Author" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Cost / Price")</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.Price, new { @class = "form-control col-sm-5", @id = "Price" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Location")</label>
+                                        <div class="col-sm-3">
+                                            @Html.DropDownList("BookLocationId", null, "--Select Location--", new { @class = "form-control col-sm-5", @id = "BookLocationId" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">ISBN Number</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.ISBN, new { @class = "form-control col-sm-5", @id = "ISBN" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Remarks")</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.Remark, new { @class = "form-control col-sm-5" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-12">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("")</label>
+                                            <div class="col-sm-3">
+                                               &emsp;&emsp;&emsp; <input type="submit" value="Replace" class="btn btn-success" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+
+    function GetbarCode() {
+        debugger
+        $("#AccessionNumber").val('');
+        $("#BookCategoryName").val('');
+        var BookCode = $('#BookDetailsId').val();
+        $.ajax({
+            url: '/ALibrary/GetReplaceBookDetails',
+            data: { BookCode: BookCode },
+            success: function (data) {
+                if (data == "") {
+                }
+                else {
+                    $.each(data, function (i, data) {
+                        $("#AccessionNumber").val(data.AccessionNumber);
+                        $("#BookCategoryName").val(data.BookName);
+                        $("#BookCategoryId").val(data.BookCategoryId);
+                    });
+                }
+
+            }
+        })
+    }
+</script>

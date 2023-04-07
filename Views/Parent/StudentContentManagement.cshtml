@@ -1,0 +1,182 @@
+﻿
+@model AsteriskBrowserAL.Models.StudentAssignmentUploadData
+@{
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+
+@{
+    ViewBag.Title = "Student Content Management";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm("StudentContentManagement", "Parent", FormMethod.Post))
+    {
+        @Html.ValidationMessage("StudentContentManagement")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Student Content Management
+                        </h5>
+
+
+                    </div>
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Subject</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.SubjectId, new SelectList(Model.lstAllSubjects, "SubjectId", "SubjectName"), "-- Select --", new { @class = "form-control", id = "SubjectId" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Chapters</label>
+                                            <div class="col-sm-6">
+                                                <select id="Chapters" name="Chapters" class="form-control"></select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+
+
+                                <br />
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div id="SearchData" class="row">
+        </div>
+
+
+        if (null != Model)
+        {
+
+            <input style="display:none" id="SelSubId" value="@Model.SubscriptionId" />
+            <input style="display:none" id="SelStudentId" value="@Model.StudentId" />
+
+        }
+        else
+        {
+
+
+            <input style="display:none" id="SelSubId" value="0" />
+
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+    var SubjectItems = $('#SubjectId');
+    var Chapters = $('#Chapters');
+
+    $(document).ready(function () {
+        debugger
+
+        var SelSubjectId = $('#SubjectId').val();
+
+        if (SelSubjectId > 0) {
+            GetChapters();
+        }
+    });
+
+
+    $('#SubjectId').change(function () {
+
+        $("#SearchData").html("");
+        document.getElementById('Chapters').value = "0";
+        var SubjectId = $('#SubjectId').val();
+
+        if (SubjectId > 0) {
+            GetChapters();
+        }
+
+    });
+
+
+    $('#Chapters').change(function () {
+        $("#SearchData").html("");
+
+        var nSubjectId = $('#SubjectId').val();
+        var ContentIndexId = $('#Chapters').val();
+
+        if (nSubjectId > 0 && ContentIndexId > 0) {
+            GetAssignment();
+        }
+    });
+
+    function GetChapters() {
+        var SubjectId = $('#SubjectId').val();
+        var BranchId = $('#SelSubId').val();
+        $.ajax({
+            url: '/AExamination/GetContentIndex',
+            data: { BranchId: BranchId, SubjectId: SubjectId },
+            success: function (data) {
+
+                Chapters.children().remove();
+
+                Chapters.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+
+                    Chapters.append($("<option>").val(record.ContentIndexId).text(record.ContentName));
+                });
+
+                $('#Chapters').append(Chapters);
+            },
+            aync: false
+        });
+    }
+
+
+    function GetAssignment() {
+        $("#SearchData").html("");
+
+        var BranchId = $('#SelSubId').val();
+        var StudentId = $('#SelStudentId').val();
+        var ContentIndexId = $('#Chapters').val();
+        $('#imagemodal').show();
+        if (BranchId >= 0 && ContentIndexId > 0) {
+            $.ajax({
+                url: '/Parent/GetContentManagementbySubject',
+                data: { BranchId: BranchId, ContentIndexId: ContentIndexId, StudentId: StudentId },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchData").html(Data);
+                }
+            });
+        }
+    }
+
+</script>
+
+
+
+
+
+

@@ -1,0 +1,106 @@
+﻿
+@model AsteriskBrowserAL.Models.ZoomTimeTableModel
+@{
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+        </div>
+    </div>
+    <br />
+    @if (Model != null)
+    {
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="table-header">
+                    Holidays (@Model.lstZoomTimeTableModel.Count())
+                </div>
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Period")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Subjects")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Link")
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @for (int i = 0; i < Model.lstZoomTimeTableModel.Count(); i++)
+                        {
+                            string Link = Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.Link;
+                            int SubjectId = Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.SubjectId;
+                            int ClassTimingId = Model.lstZoomTimeTableModel.ElementAt(i).ClassTimingId;
+                            int SatffId = Model.lstZoomTimeTableModel.ElementAt(i).SectionId;
+                            <tr>
+
+                                <td>
+                                    @Html.Hidden("StudentList.Index", (@i + 10))
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @Html.Hidden("StudentList[" + (@i + 10) + "].ClassTimingId", Model.lstZoomTimeTableModel.ElementAt(i).ClassTimingId)
+                                    @Html.Hidden("StudentList[" + (@i + 10) + "].SectionId", Model.lstZoomTimeTableModel.ElementAt(i).SectionId)
+                                    @Model.lstZoomTimeTableModel.ElementAt(i).PeriodName
+                                </td>
+                                <td>
+                                    @Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.SubjectName
+                                </td>
+
+                                @if (Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.IsShow)
+                                {
+                            <td>
+                                <input type="hidden" id="SubjectId" name="SubjectId" value="@Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.SubjectId" />
+                                <input type="hidden" id="Link" name="Link" value="@Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.Link" />
+                                @*@Html.ActionLink("Live Class", "Attendance", new { Link = Link, SubjectId = SubjectId }, new { target = "_blank" })*@
+                            <a href="@Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.Link" target="_blank">
+                                @*@Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.SubjectName*@
+                                Live Class
+                            </a>
+                                @*@Html.ActionLink(" Live Class", "Attendance", "Parent", null, new { Link = Link, ClassTimingId = ClassTimingId, target = "_blank", })*@
+                                @*<a class="green P2" href="@Url.Action("Attendance", "Parent", new {target = "_blank",@class = "btn btn-primary fa fa-list", Link = Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.Link,ClassTimingId =  Model.lstZoomTimeTableModel.ElementAt(i).ClassTimingId})">Live Class</a>*@
+                                @*<a href="@Model.lstZoomTimeTableModel.ElementAt(i).MLiveClasses.Link" target="_blank">Live Class</a>*@
+                                @*<a href="@Url.Action("Attendance",new {Link = Link, SubjectId = SubjectId}) target="_blank" class="autoOpen">Live Class</a>*@
+                            </td>
+
+                                }
+                                else
+                                {
+                                    <td>Live Class</td>
+                                }
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    }
+    else
+    {
+        <span style="color: red;"><b>There are no Holidays</b></span>
+    }
+</section>
+
+@Html.Action("DataTableScripts", "Base")

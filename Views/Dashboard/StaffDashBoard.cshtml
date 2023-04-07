@@ -1,0 +1,507 @@
+﻿@model AsteriskBrowserAL.Models.SubscriptionsData
+
+@{
+    ViewBag.Title = "Index";
+    int i = 1;
+}
+
+@*<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>*@
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+<script type="text/javascript">
+    google.load("visualization", "1", { packages: ["corechart"] });
+</script>
+
+
+
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <br />
+            @using (Html.BeginForm("Index", "Dashboard"))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="StaffId" value="@Model.StaffDashboard.StaffDetails.StaffId" />
+                    if (null != Model.StaffDashboard)
+                    {
+                        <div class="row">
+
+                            <div class="col-sm-6">
+                                <div class="box" style="height:345px">
+                                    <div class=" box box-primary box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Employee Details</h3>
+                                        </div><!-- /.box-header -->
+                                        <div class="box-body">
+                                            @if (null != Model.StaffDashboard.StaffDetails)
+                                            {
+
+                                                <div class="col-sm-4">
+                                                    <span class="profile-picture">
+                                                        <img class="editable img-responsive" width="120" height="200" src="~/Content/images/NoPhoto.jpg" />
+                                                    </span>
+
+                                                </div>
+
+                                                <div class="col-sm-8">
+                                                    <div class="box-body table-responsive no-padding" style="height: 290px;overflow:auto">
+                                                        <table id="dynamic-table" class="table table-hover">
+                                                            <tbody>
+
+                                                                <tr>
+                                                                    <td style="color:#0174DF" class="col-sm-3"><b> Name </b></td>
+                                                                    <td class="col-sm-5"><b>@Model.StaffDashboard.StaffDetails.FirstName</b></td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td style="color:#0174DF" class="col-sm-3"><b>Father Name </b></td>
+                                                                    <td class="col-sm-5"><b>@Model.StaffDashboard.StaffDetails.FatherName</b></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="color:#0174DF" class="col-sm-3"><b>Mother Name</b></td>
+                                                                    <td class="col-sm-5"><b>@Model.StaffDashboard.StaffDetails.MotherName</b></td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td style="color:#0174DF" class="col-sm-3"><b>Mobile No. </b></td>
+                                                                    <td class="col-sm-5"><b>@Model.StaffDashboard.StaffDetails.MobileNumber</b></td>
+
+
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="color:#0174DF" class="col-sm-3"><b>Joining Date </b></td>
+                                                                    <td class="col-sm-5"><b>@Model.StaffDashboard.StaffDetails.JoiningDate.Value.ToString("dd - MMM - yyyy")</b></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="color:#0174DF" class="col-sm-3"><b>Designation </b></td>
+                                                                    <td class="col-sm-5"><b>@Model.StaffDashboard.StaffDetails.JobTitle</b></td>
+
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+
+                                                    </div>
+                                                </div>
+                                            }
+
+                                        </div><!-- /.box-body -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="box" style="height:345px">
+                                    <div class="box box-primary box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Time Table</h3>
+                                        </div><!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="box-body table-responsive no-padding" style="height:280px;overflow:auto;">
+
+                                                <table id="dynamic-table" class="table table-striped table-bordered table-hover">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th>
+                                                                MON
+                                                            </th>
+                                                            <th>
+                                                                TUE
+                                                            </th>
+                                                            <th>
+                                                                WED
+                                                            </th>
+                                                            <th>
+                                                                THU
+                                                            </th>
+                                                            <th>FRI</th>
+                                                            <th>SAT</th>
+                                                            <th>SUN</th>
+                                                        </tr>
+                                                        @if (null != Model.StaffDashboard.TutorTimeTableData && Model.StaffDashboard.TutorTimeTableData.Count() > 0)
+                                                        {
+
+                                                        <!--Monday-->
+                                                            foreach (var t in Model.StaffDashboard.TutorTimeTableData)
+                                                            {
+                                                                <tr>
+                                                                    <td><b>Period: @i</b></td>
+
+                                                                    <td>
+                                                                        @if (null != t.Monday)
+                                                                        {
+                                                                            @t.BatchName
+                                                                            <br />@t.Monday
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @t.Monday
+                                                                        }
+
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (null != t.Tuesday)
+                                                                        {
+                                                                            @t.BatchName
+                                                                            <br />
+                                                                            @t.Tuesday
+
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @t.Tuesday
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (null != t.Wednesday)
+                                                                        {
+                                                                            @t.BatchName<br />@t.Wednesday
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @t.Wednesday
+                                                                        }
+
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (null != t.Thursday)
+                                                                        {
+                                                                            @t.BatchName<br />@t.Thursday
+
+
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @t.Thursday
+
+
+
+                                                                        }
+                                                                        <
+                                                                        <
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (null != t.Friday)
+                                                                        {
+                                                                            @t.BatchName<br />@t.Friday
+
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @t.Friday
+
+                                                                        }
+                                                                        <
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (null != t.Saturday)
+                                                                        {
+                                                                            @t.BatchName<br />@t.Saturday
+
+
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @t.Saturday
+
+
+
+                                                                        }
+
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (null != t.Sunday)
+                                                                        {
+                                                                            @t.BatchName<br />@t.Sunday
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @t.Sunday
+
+                                                                        }
+                                                                    </td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                        i = i + 1;
+                                                            }
+                                                        }
+                                                    </tbody>
+                                                </table>
+
+
+                                            </div>
+                                        </div><!-- /.box-body -->
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-sm-6">
+                                <div class="box" style="height:150px">
+                                    <div class="box box-primary box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Notifications</h3>
+                                        </div><!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="row">
+                                                @if (null != Model.StaffDashboard.NotificationsData && Model.StaffDashboard.NotificationsData.Count() > 0)
+                                                {
+                                                    <marquee style="color: green">
+                                                        @foreach (var n in Model.StaffDashboard.NotificationsData)
+                                                        {
+                                                            <b>@n.Date.ToString("dd - MMM - yyyy") : <i>@n.Description</i></b>
+
+                                                        }
+                                                    </marquee>
+                                                }
+
+
+                                            </div>
+
+                                        </div><!-- /.box-body -->
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="box">
+                                    <div class="box box-primary box-solid" style="height:200px">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Events</h3>
+                                        </div><!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="box-body" style="height:160px; overflow:auto">
+                                                @if (null != Model.StaffDashboard.EventsData && Model.StaffDashboard.EventsData.Count() > 0)
+                                                {
+                                                    foreach (Events e in Model.StaffDashboard.EventsData)
+                                                    {
+                                                        <events>
+                                                            <events>
+                                                                <span style="color:green;"><b><i>@e.Event</i></b></span>
+                                                                <br />
+                                                            </events>
+                                                        </events>
+                                                    }
+                                                }
+
+
+                                                @*<marquee> <span style="color:red;"><b>Swachh Bharat programme on 2nd August at 4PM</b></span></marquee>
+                                                    <br />
+                                                    <span style="color:green;"><b>School Annual day celebrations on 3rd August</b></span>*@<marquee><span style="color:red;"><b></b></span></marquee>
+                                                <br />
+                                                <span style="color:green;"><b></b></span><marquee><span style="color:red;"><b></b></span></marquee>
+                                                <br />
+                                                <span style="color:green;"><b></b></span><marquee><span style="color:red;"><b></b></span></marquee>
+                                                <br />
+                                                <span style="color:green;"><b></b></span><marquee><span style="color:red;"><b></b></span></marquee>
+                                                <br />
+                                                <span style="color:green;"><b></b></span><marquee><span style="color:red;"><b></b></span></marquee>
+                                                <br />
+                                                <span style="color:green;"><b></b></span><marquee><span style="color:red;"><b></b></span></marquee>
+                                                <br />
+                                                <span style="color:green;"><b></b></span><marquee><span style="color:red;"><b></b></span></marquee>
+                                                <br />
+                                                <span style="color:green;"><b></b></span>
+                                            </div><!-- /.box-body -->
+                                        </div><!-- /.box-body -->
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+
+
+                        if (null != Model.StaffDashboard.TicketsData)
+                        {
+
+                            <div class="row">
+                                <!--Inventory-->
+                                <div class="box" style="height:350px;">
+                                    <div class="box box-primary box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Help Desk</h3>
+                                        </div><!-- /.box-header -->
+                                        <div class="box-body">
+
+                                            <div class="row">
+                                                <div class="col-lg-3 col-xs-6">
+                                                    <!-- small box -->
+                                                    <div class="small-box bg-aqua">
+                                                        <div class="inner">
+                                                            <h3>@Model.StaffDashboard.TicketsData.nNewTicket</h3>
+                                                            <p>New Tickets</p>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="fa fa-ticket"></i>
+                                                        </div>
+                                                        <a href="/THelpDesk/OpenTicket" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                                                    </div>
+                                                </div><!-- ./col -->
+                                                <div class="col-lg-3 col-xs-6">
+                                                    <!-- small box -->
+                                                    <div class="small-box bg-green">
+                                                        <div class="inner">
+                                                            <h3>@Model.StaffDashboard.TicketsData.nSolvedTicket</h3>
+                                                            <p>Solved</p>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="fa fa-check"></i>
+                                                        </div>
+                                                        <a href="/THelpDesk/OpenTicket" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                                                    </div>
+                                                </div><!-- ./col -->
+                                                <div class="col-lg-3 col-xs-6">
+                                                    <!-- small box -->
+                                                    <div class="small-box bg-yellow">
+                                                        <div class="inner">
+                                                            <h3>@Model.StaffDashboard.TicketsData.nProcessTicket</h3>
+                                                            <p>In Process</p>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="fa fa-bar-chart"></i>
+                                                        </div>
+                                                        <a href="/THelpDesk/OpenTicket" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                                                    </div>
+                                                </div><!-- ./col -->
+                                                <div class="col-lg-3 col-xs-6">
+                                                    <!-- small box -->
+                                                    <div class="small-box bg-red">
+                                                        <div class="inner">
+                                                            <h3>@Model.StaffDashboard.TicketsData.nRejectedTicket</h3>
+                                                            <p>Rejected</p>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="fa fa-times"></i>
+                                                        </div>
+                                                        <a href="/THelpDesk/OpenTicket" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                                                    </div>
+                                                </div><!-- ./col -->
+                                            </div>
+
+
+
+                                        </div><!-- /.box-body -->
+                                    </div>
+                                    <!-- TO DO List -->
+
+
+
+
+
+                                </div>
+
+                            </div>
+                        }
+
+                        <div class="row">
+                            <div class="box" style="height:240px">
+                                <div class="box box-primary box-solid">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Attendance</h3>
+                                    </div><!-- /.box-header -->
+                                    <div class="box-body">
+                                        <div class="col-sm-12" style="height:190px">
+                                            <div class="col-sm-12" style="height:190px;overflow:auto">
+                                                <div class="row">
+                                                    <div class="col-sm-6" id="chartAttendance" style="height: 180px;">
+                                                        <script type="text/javascript">
+                                                            $(function () {
+
+                                                                var Id = $("#StaffId").val();
+                                                                $.ajax({
+                                                                    type: 'POST',
+                                                                    data: { StaffId: Id },
+                                                                    url: '@Url.Action("GetAttendanceForStaffChart")',
+                                                                    success: function (chartsdata) {
+                                                                        // Callback that creates and populates a data table,
+                                                                        // instantiates the pie chart, passes in the data and
+                                                                        // draws it.
+
+                                                                        var data = new google.visualization.DataTable();
+
+                                                                        data.addColumn('string', 'Month');
+                                                                        data.addColumn('number', 'Days Present');
+
+                                                                        for (var i = 0; i < chartsdata.length; i++) {
+                                                                            data.addRow([chartsdata[i].Month, chartsdata[i].DaysPresent]);
+                                                                        }
+                                                                        // Instantiate and draw our chart, passing in some options
+                                                                        var chart = new google.visualization.LineChart(document.getElementById('chartAttendance'));
+
+                                                                        chart.draw(data,
+                                                                          {
+                                                                              title: "Attendance Report",
+                                                                              position: "top",
+                                                                              fontsize: "14px",
+                                                                              chartArea: { width: '50%' },
+                                                                          });
+                                                                    },
+
+                                                                });
+                                                            })
+
+                                                        </script>
+                                                    </div>
+                                                    @if (null != Model.StaffDashboard.Attendance)
+                                                    {
+                                                        <div class="col-sm-6 box-body table-responsive no-padding" style="height: 180px;">
+                                                            <table id="dynamic-table" class="table table-hover">
+                                                                <tbody>
+                                                                    <!-- width="50" style="overflow-y:hidden;overflow-x:auto">-->
+                                                                    <tr>
+                                                                        <th>Month</th>
+                                                                        <!-- <th>Paper</th>-->
+                                                                        <th>Total Working Days</th>
+                                                                        <th>Days Present</th>
+                                                                    </tr>
+
+
+                                                                    @foreach (var a in Model.StaffDashboard.Attendance)
+                                                                    {
+                                                                        <tr>
+                                                                            <td>@a.Month</td>
+                                                                            <td>@a.TotalWorkingDays </td>
+                                                                            <td>@a.DaysPresent</td>
+                                                                        </tr>
+                                                                    }
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        </div><!-- /.box-body -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    }
+
+                }
+
+            }
+        </div>
+    </div>
+
+
+
+
+
+
+
+</section>

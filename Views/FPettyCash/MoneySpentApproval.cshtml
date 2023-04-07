@@ -1,0 +1,287 @@
+﻿@model AsteriskBrowserAL.Models.MoneySpentCorrection
+
+@{
+    ViewBag.Title = "MoneySpentApproval";
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            PettyCash
+        </li>
+        <li class="active"> Money Spent Approval</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<!--Main Content-->
+<section class="content">
+
+    @using (Html.BeginForm())
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Money Spent Approval</span>
+                    <div class="" style="float:right;margin-right:10px;">
+                        <a class="P2" id="btnViewData2" name="ViewData" onclick="return GetData();">
+                        <span class="btncustom">View Data</span></a>
+                    </div>
+
+                </div>
+
+
+
+
+                <div class="widget-box">
+
+           
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            @*<div class="box">
+                                <div class="box-header">
+                                    <input type="button" class="btn btn-primary pull-right" id="btnViewData2" style="min-width:80Px" value="View Data" onclick="GetData()" />
+                                    <h4>Money Spent Approval</h4>
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-12">
+
+                                        </div>
+                                    </div>*@
+
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboDivision" class="form-control" onchange="LoadBranchCombo()"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboBranch" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Status</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboStatus" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div><!-- /.box-header -->
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+                    
+                    <div id="PvMoneySpentApproval">
+                        </div>
+                    
+                    }
+
+</section>
+
+<script type="text/javascript">
+
+    function ONLOADDATA() {
+
+        LoadDivisionCombo();
+        LoadStatusCombo();
+
+    }
+
+    window.onload = ONLOADDATA();
+
+    function LoadBranchCombo() {
+        $('#PvMoneySpentApproval').html("");
+        var DivisionId = $('#CboDivision').val();
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+                    BranchItems.children().remove();
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+                },
+                aync: false
+            })
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    }
+
+    function LoadStatusCombo() {
+
+        var StatusItems = $('#CboStatus');
+
+        StatusItems.children().remove();
+        StatusItems.append($("<option>").val("-1").text("--- Select ---"));
+        StatusItems.append($("<option>").val("0").text("Pending"));
+        StatusItems.append($("<option>").val("1").text("Accepted"));
+        StatusItems.append($("<option>").val("2").text("Rejected"));
+        StatusItems.append($("<option>").val("3").text("All"));
+
+        $('#CboStatus').append(StatusItems);
+    }
+
+    function LoadDivisionCombo() {
+
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (data) {
+                var BranchItems = $('#CboDivision');
+
+                BranchItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    BranchItems.append($("<option>").val(record.DivisionId).text(record.DivisionName));
+                });
+
+                $('#CboDivision').append(BranchItems);
+            },
+            aync: false
+        });
+    }
+
+    function PopulateData() {
+        var VrDate = $('#Date').val();
+        if (VrDate == "" || VrDate == "undefined" || VrDate == "null") {
+
+            $('#DateVal').show();
+            return;
+        }
+
+
+    }
+
+    function GetData() {
+
+        var DivisionId = $('#CboDivision').val();
+        var SubscriptionId = $('#CboBranch').val();
+        var Status = $('#CboStatus').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (DivisionId < 0) {
+            Message += "Division";
+            isValid = false;
+        }
+
+        if (SubscriptionId == "null" || SubscriptionId < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Branch";
+            isValid = false;
+        }
+
+        if (Status < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Status";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return;
+        }
+
+        document.getElementById("Validation").innerHTML = "";
+
+        $('PvMoneySpentApproval').html('');
+
+        $.ajax
+       ({
+           error: function (jqXHR, textStatus, errorThrown) {
+               alert(errorThrown);
+               $('PvMoneySpentApproval').html('');
+               $('#imagemodal').hide();
+           },
+
+           url: '/FPettyCash/GetMoneySpentCorrectionData/',
+           data: { DivisionId: DivisionId, SubscriptionId: SubscriptionId, StatusId: Status },
+           beforeSend: function () {
+               $('#imagemodal').show();
+           },
+           success: function (data) {
+               $('#imagemodal').hide();
+               $('#PvMoneySpentApproval').html(data);
+           }
+
+       })
+         ;
+    }
+
+    function SaveStatus(Actionstatus, nSubscriptionId, nAction, nRequestType) {
+        $('#imagemodal').show();
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                alert("An unexpected error occurred.Please try again later");
+                $('#imagemodal').hide();
+            },
+
+            url: '/FPettyCash/SaveMoneySpentApproval/',
+            data: { nId: Actionstatus, nSubscriptionId: nSubscriptionId, nAction: nAction, nRequestType: nRequestType },
+
+            success: function (data) {
+                $('#imagemodal').hide();
+                GetData();
+            },
+            aync: false
+        })
+           
+        ;
+    }
+
+    function ApprovePC(Id, SubscriptionId, Action, RequestType) {
+        SaveStatus(Id, SubscriptionId, Action, RequestType);
+    }
+
+
+</script>
+
+

@@ -1,0 +1,679 @@
+﻿@using AsteriskBrowserAL.Helpers
+@{
+    string UserRole = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+}
+
+
+<link rel="shortcut icon" href="../favicon.ico">
+<link href="~/assets/css/normalize.css" rel="stylesheet" />
+<link href="~/assets/css/demo.css" rel="stylesheet" />
+<link href="~/assets/css/component.css" rel="stylesheet" />
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+<script src="~/assets/js/jquery.stickyheader.js"></script>
+
+
+
+<style>
+    .fontVal {
+        font-size: 14px;
+        color: black;
+    }
+
+    #MovableTable tr:hover {
+        background: !important;
+    }
+
+    #MovableTable td:hover {
+        background: #c4e2d1;
+    }
+
+    #MovableTable table tr {
+        cursor: pointer;
+    }
+
+    .toggle {
+        position: relative;
+        /*top: -10px;
+        right: -10px;*/
+        /*width: 27px;
+        height: 27px;*/
+    }
+
+    input[type=checkbox]:disabled {
+        background-color: #EFAD62;
+    }
+
+    input[type=checkbox].ace.ace-switch.ace-switch-6.red + .lbl::before {
+        font-family: FontAwesome;
+        content: "\f00d";
+        text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+        box-shadow: none;
+        border-width: 0;
+        font-weight: lighter;
+        font-size: 16px;
+        border-radius: 12px;
+        display: inline-block;
+        background-color: #FC5555;
+        color: #F2F2F2;
+        width: 52px;
+        height: 22px;
+        line-height: 21px;
+        text-indent: 32px;
+        -webkit-transition: background .25s ease;
+        -o-transition: background .25s ease;
+        transition: background .25s ease;
+    }
+
+    input[type=checkbox].ace.ace-switch.ace-switch-6.green:checked + .lbl::before {
+        content: "\f00c";
+        text-indent: 6px;
+        color: #FFF;
+        border-color: #B7D3E5;
+        background-color: #78AB46;
+    }
+
+    input[type=checkbox].ace.ace-switch.ace-switch-6.check:checked + .lbl::before {
+        content: "\f00c";
+        text-indent: 6px;
+        color: #FFF;
+        border-color: #B7D3E5;
+        background-color: #EFAD62;
+    }
+
+    .bgClass {
+        background-color: #c4e2d1; /*#78AB46;*/
+        border: 1px solid #ddd;
+    }
+
+    .bgClass1 {
+        background-color: #c4e2d1; /*#FC5555;*/
+        border: 1px solid #ddd;
+    }
+
+    .selectedTd {
+        background: #c4e2d1;
+    }
+
+    .MyDiv {
+        text-align: left;
+        position: relative;
+        color: #EEE;
+        font-size: 12px;
+        font-family: Times;
+        display: inline-block;
+        border: none;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        padding: 8px;
+        margin: 5px;
+    }
+</style>
+
+@{
+    var random = new Random();
+    string bgColor = "";
+}
+
+<div class="col-sm-12" id="MovableTable">
+    <table id="table" class="table-bordered overflow-y Movable">
+        <thead>
+            <tr>
+                <th>
+                    <span>
+                        Periods/
+                    </span>
+                    <br />
+                    <span>
+                        Sections
+                    </span>
+                </th>
+                @foreach (var c in Model.ClassTimings)
+                {
+                    <th class="title">
+                        <span>
+                            @c.ItemName
+                        </span>
+                        <br />
+                        <span>
+                            ( @c.ItemStartTime - @c.ItemEndTime )
+                        </span>
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PeriodTimingsData)
+            {
+                <tr>
+                    <th class="time">
+                        <span>
+                            @item.ClassName
+                        </span>
+                        <br />
+                        <span>
+                            @item.SectionName
+                        </span>
+                    </th>
+
+                    @foreach (var p in item.PeriodTimings)
+                    {
+                        var color = String.Format("#{0:X6}", random.Next(0x1000000)); // = "#A197B9"
+
+                        <td>
+                            @if (null != p.lstMondayTutorsWithSubject && p.lstMondayTutorsWithSubject.Count > 0)
+                            {
+                                foreach (var d in p.lstMondayTutorsWithSubject)
+                                {
+                                    bgColor = "bgClass1";
+
+                                    if (d.SyllabusStatus > 0)
+                                    {
+                                        bgColor = "bgClass";
+                                    }
+
+                                    int PeriodId = p.PeriodsId;
+                                    int StaffId = Utility.IsNumeric(d.TutorId) ? Convert.ToInt32(d.TutorId) : 0;
+
+                                    <div id="Monday" class="MyDiv @bgColor">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay (@d.TutorDisplay)
+                                        </span>
+                                        <br />
+
+                                        <label class="toggle">
+
+                                            @if (d.SyllabusStatus == 0)
+                                            {
+                                                <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 green" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 1)
+                                            {
+                                                <input id="@PeriodId" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 red" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 2)
+                                            {
+                                                if (UserRole == "SA" || UserRole == "AH" || UserRole == "AE")
+                                                {
+                                                    <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+                                                else
+                                                {
+                                                    <input id="@PeriodId" checked="checked" disabled="disabled" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+
+                                                <span class="lbl"></span>
+                                            }
+
+                                        </label>
+                                    </div>
+                                }
+                            }
+                            else if (null != p.lstTuesdayTutorsWithSubject && p.lstTuesdayTutorsWithSubject.Count > 0)
+                            {
+                                foreach (var d in p.lstTuesdayTutorsWithSubject)
+                                {
+                                    bgColor = "bgClass1";
+
+                                    if (d.SyllabusStatus > 0)
+                                    {
+                                        bgColor = "bgClass";
+                                    }
+
+                                    int PeriodId = p.PeriodsId;
+                                    int StaffId = Utility.IsNumeric(d.TutorId) ? Convert.ToInt32(d.TutorId) : 0;
+
+                                    <div id="Monday" class="MyDiv @bgColor">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay (@d.TutorDisplay)
+                                        </span>
+                                        <br />
+
+                                        <label class="toggle">
+
+                                            @if (d.SyllabusStatus == 0)
+                                            {
+                                                <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 green" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 1)
+                                            {
+                                                <input id="@PeriodId" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 red" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 2)
+                                            {
+                                                if (UserRole == "SA" || UserRole == "AH" || UserRole == "AE")
+                                                {
+                                                    <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+                                                else
+                                                {
+                                                    <input id="@PeriodId" checked="checked" disabled="disabled" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+
+                                                <span class="lbl"></span>
+                                            }
+
+                                        </label>
+                                    </div>
+                                }
+                            }
+                            else if (null != p.lstWednesdayTutorsWithSubject && p.lstWednesdayTutorsWithSubject.Count > 0)
+                            {
+                                foreach (var d in p.lstWednesdayTutorsWithSubject)
+                                {
+                                    bgColor = "bgClass1";
+
+                                    if (d.SyllabusStatus > 0)
+                                    {
+                                        bgColor = "bgClass";
+                                    }
+
+                                    int PeriodId = p.PeriodsId;
+                                    int StaffId = Utility.IsNumeric(d.TutorId) ? Convert.ToInt32(d.TutorId) : 0;
+
+                                    <div id="Monday" class="MyDiv @bgColor">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay (@d.TutorDisplay)
+                                        </span>
+                                        <br />
+
+                                        <label class="toggle">
+
+                                            @if (d.SyllabusStatus == 0)
+                                            {
+                                                <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 green" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 1)
+                                            {
+                                                <input id="@PeriodId" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 red" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 2)
+                                            {
+                                                if (UserRole == "SA" || UserRole == "AH" || UserRole == "AE")
+                                                {
+                                                    <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+                                                else
+                                                {
+                                                    <input id="@PeriodId" checked="checked" disabled="disabled" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+
+                                                <span class="lbl"></span>
+                                            }
+
+                                        </label>
+                                    </div>
+                                }
+                            }
+                            else if (null != p.lstThursdayTutorsWithSubject && p.lstThursdayTutorsWithSubject.Count > 0)
+                            {
+                                foreach (var d in p.lstThursdayTutorsWithSubject)
+                                {
+                                    bgColor = "bgClass1";
+
+                                    if (d.SyllabusStatus > 0)
+                                    {
+                                        bgColor = "bgClass";
+                                    }
+
+                                    int PeriodId = p.PeriodsId;
+                                    int StaffId = Utility.IsNumeric(d.TutorId) ? Convert.ToInt32(d.TutorId) : 0;
+
+                                    <div id="Monday" class="MyDiv @bgColor">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay (@d.TutorDisplay)
+                                        </span>
+                                        <br />
+
+                                        <label class="toggle">
+
+                                            @if (d.SyllabusStatus == 0)
+                                            {
+                                                <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 green" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 1)
+                                            {
+                                                <input id="@PeriodId" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 red" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 2)
+                                            {
+                                                if (UserRole == "SA" || UserRole == "AH" || UserRole == "AE")
+                                                {
+                                                    <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+                                                else
+                                                {
+                                                    <input id="@PeriodId" checked="checked" disabled="disabled" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+
+                                                <span class="lbl"></span>
+                                            }
+
+                                        </label>
+                                    </div>
+                                }
+                            }
+                            else if (null != p.lstFridayTutorsWithSubject && p.lstFridayTutorsWithSubject.Count > 0)
+                            {
+                                foreach (var d in p.lstFridayTutorsWithSubject)
+                                {
+                                    bgColor = "bgClass1";
+
+                                    if (d.SyllabusStatus > 0)
+                                    {
+                                        bgColor = "bgClass";
+                                    }
+
+                                    int PeriodId = p.PeriodsId;
+                                    int StaffId = Utility.IsNumeric(d.TutorId) ? Convert.ToInt32(d.TutorId) : 0;
+
+                                    <div id="Monday" class="MyDiv @bgColor">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay (@d.TutorDisplay)
+                                        </span>
+                                        <br />
+
+                                        <label class="toggle">
+
+                                            @if (d.SyllabusStatus == 0)
+                                            {
+                                                <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 green" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 1)
+                                            {
+                                                <input id="@PeriodId" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 red" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 2)
+                                            {
+                                                if (UserRole == "SA" || UserRole == "AH" || UserRole == "AE")
+                                                {
+                                                    <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+                                                else
+                                                {
+                                                    <input id="@PeriodId" checked="checked" disabled="disabled" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+
+                                                <span class="lbl"></span>
+                                            }
+
+                                        </label>
+                                    </div>
+                                }
+                            }
+                            else if (null != p.lstSaturdayTutorsWithSubject && p.lstSaturdayTutorsWithSubject.Count > 0)
+                            {
+                                foreach (var d in p.lstSaturdayTutorsWithSubject)
+                                {
+                                    bgColor = "bgClass1";
+
+                                    if (d.SyllabusStatus > 0)
+                                    {
+                                        bgColor = "bgClass";
+                                    }
+
+                                    int PeriodId = p.PeriodsId;
+                                    int StaffId = Utility.IsNumeric(d.TutorId) ? Convert.ToInt32(d.TutorId) : 0;
+
+                                    <div id="Monday" class="MyDiv @bgColor">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay (@d.TutorDisplay)
+                                        </span>
+                                        <br />
+
+                                        <label class="toggle">
+
+                                            @if (d.SyllabusStatus == 0)
+                                            {
+                                                <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 green" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 1)
+                                            {
+                                                <input id="@PeriodId" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 red" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 2)
+                                            {
+                                                if (UserRole == "SA" || UserRole == "AH" || UserRole == "AE")
+                                                {
+                                                    <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+                                                else
+                                                {
+                                                    <input id="@PeriodId" checked="checked" disabled="disabled" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+
+                                                <span class="lbl"></span>
+                                            }
+
+                                        </label>
+                                    </div>
+                                }
+                            }
+                            else if (null != p.lstSundayTutorsWithSubject && p.lstSundayTutorsWithSubject.Count > 0)
+                            {
+                                foreach (var d in p.lstSundayTutorsWithSubject)
+                                {
+                                    bgColor = "bgClass1";
+
+                                    if (d.SyllabusStatus > 0)
+                                    {
+                                        bgColor = "bgClass";
+                                    }
+
+                                    int PeriodId = p.PeriodsId;
+                                    int StaffId = Utility.IsNumeric(d.TutorId) ? Convert.ToInt32(d.TutorId) : 0;
+
+                                    <div id="Monday" class="MyDiv @bgColor">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay (@d.TutorDisplay)
+                                        </span>
+                                        <br />
+
+                                        <label class="toggle">
+
+                                            @if (d.SyllabusStatus == 0)
+                                            {
+                                                <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 green" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 1)
+                                            {
+                                                <input id="@PeriodId" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 red" type="checkbox">
+                                                <span class="lbl"></span>
+                                            }
+                                            else if (d.SyllabusStatus == 2)
+                                            {
+                                                if (UserRole == "SA" || UserRole == "AH" || UserRole == "AE")
+                                                {
+                                                    <input id="@PeriodId" checked="checked" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+                                                else
+                                                {
+                                                    <input id="@PeriodId" checked="checked" disabled="disabled" onchange="GetSyllabus(this.id, @StaffId,this.checked,Monday,@d.SyllabusStatus)" name="switch-field-1" class="ace ace-switch ace-switch-6 check" type="checkbox">
+                                                }
+
+                                                <span class="lbl"></span>
+                                            }
+
+                                        </label>
+                                    </div>
+                                }
+                            }
+
+
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+@*<input type="hidden" name="SelectedStaffandSubject" id="SelectedStaffandSubject" />*@
+
+
+<div id="id" style="display:none"></div>
+
+<script>
+
+    var Content = "";
+
+    function GetSyllabus(Period, StaffId, toggle, day, OldSyllabusId) {
+        $('#toggleValidation').html("");
+        $('#SaveVal').html("");
+
+        debugger
+        var Day = $("#Date").val();
+
+        if (Period != "") {
+            $("#imagemodal").show();
+
+            //$("#MovableTable tbody tr td").removeClass("selectedTd");
+            //$("#" + Period).closest("td").addClass("selectedTd")
+
+            //if (toggle == false) {
+            //    SaveTopic(OldSyllabusId, Period, StaffId, false, 0);
+            //}
+            //else {
+            //document.getElementById(Period).style.background = "#438EB9"
+            //document.getElementById("SelectedStaffandSubject").value = Period //on div double click storing the Div Id
+
+            $.ajax({
+                url: '/AFrontOffice/GetSyllabusForMicroPlanFillUp',
+                data: { dtDate: Day, PeriodId: Period, IsChecked: toggle, OldSyllabusId: OldSyllabusId, StaffId: StaffId },
+                success: function (result) {
+                    debugger
+
+                    $('#id').html(result);
+
+                    var length = $('select#SyllabusId option').length;
+
+                    if (length > 0) {
+                        if (length == 2) {
+
+                            var Syllabus = $('#SyllabusId option').eq(1).val();
+
+                            SaveTopic(OldSyllabusId, Period, StaffId, false, Syllabus);
+                        }
+                        else {
+                            $('#id').html("");
+                            OpenSyllabusDialogue(result, OldSyllabusId, Period, StaffId);
+                        }
+                    }
+                    else {
+                        $('#toggleValidation').html("Syllabus not found");
+                        GetTimeTableTodayData();
+
+                        //$('.selectedTd').find('#' + Period + '').prop("checked", false);
+                    }
+
+                    $('#id').html("");
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+            //}
+        }
+    }
+
+    function OpenSyllabusDialogue(result, OldSyllabusId, Period, StaffId) {
+        debugger
+        $('#dValidation').html(result);
+        //var $dialog = $('#SelectedStaffandSubject')
+        $("#dialog-confirm").removeClass('hide')
+       .dialog({
+           resizable: false,
+           draggable: false,
+           width: '700',
+           modal: true,
+           title: 'Fill Up',
+           open: function (event, ui) {
+               debugger
+               $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+           },
+           title_html: true,
+           buttons: [
+               {
+                   html: "Save",
+                   "class": "btn btn-danger btn-minier",
+                   click: function () {
+                       debugger
+
+                       if ($('#SyllabusId').val() < 1) {
+                           $('#SyllabusValidation').html("Please select topic");
+                       }
+                       else {
+                           $(this).dialog("close");
+                           SaveTopic(OldSyllabusId, Period, StaffId, true, 0);
+                       }
+                   }
+               }
+               ,
+               {
+                   html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                   "class": "btn btn-minier",
+                   click: function () {
+                       $(this).dialog("close");
+
+                       //$('.selectedTd').find('#' + Period + '').prop("checked", false);
+
+                       GetTimeTableTodayData();
+                   }
+               }
+           ]
+       });
+    }
+
+    function SaveTopic(OldSyllabusId, Period, StaffId, IsDialog, PresentSyllabusId) {
+        debugger
+        var SyllabusId = 0;
+        if (IsDialog == true) {
+            SyllabusId = $('#SyllabusId').val();
+        }
+        else {
+            SyllabusId = PresentSyllabusId;
+        }
+
+        var SelPeriodId = Period;
+        var SelStaffId = StaffId;
+        var ClosedDate = $('#ClosedDate').val();
+        var FillDate = $("#Date").val();
+
+        if (SyllabusId > 0 || (SelPeriodId > 0 && SelStaffId > 0)) {
+            $("#imagemodal").show();
+            $.ajax({
+
+                url: '/AFrontOffice/SaveTeachersDiary',
+                data: { SyllabusId: SyllabusId, PeriodId: SelPeriodId, StaffId: SelStaffId, ClosedDate: ClosedDate, OldSyllabusId: OldSyllabusId, FillDate: FillDate },
+                success: function (result) {
+                    debugger
+                    document.getElementById("SaveVal").innerHTML = result;
+                    GetTimeTableTodayData();
+                    $("#imagemodal").hide();
+                },
+            });
+        }
+
+    }
+
+</script>

@@ -1,0 +1,136 @@
+﻿@model List<AsteriskBrowserAL.Models.BranchTransferViewModel>
+@{
+    var Status = "";
+    ViewBag.Title = "Approve Branch Transfers";
+}
+<section class="content">
+
+    @if (Model != null && Model.Count > 0)
+    {
+   
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+        int nsno = 1;
+        <div class="overflowscroll">
+
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                            S.No.
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("From Branch")
+                        </th>
+                        <th>
+                            @Html.DisplayName("To Branch")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Requested Date")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Student Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Parent Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Class Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Remarks")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Status")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                {
+                        <tr>
+                            <td>
+                                @(nsno++)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FromBranchName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ToBranchName)
+                            </td>
+
+                            <td>
+                                @item.FirstInserted.ToString("dd-MMM-yyyy hh:mm tt")
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.StudentDetails)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ParentName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DisplayClassNumber)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Reason)
+                            </td>
+
+                            <td>
+                                @if (item.Actionstatus == 0)
+                                {
+                                    Status = "Pending";
+                                }
+                                @if (item.Actionstatus == 1)
+                                {
+                                    Status = "Accepted " + item.ActionDescription;
+                                }
+                                @if (item.Actionstatus == 2)
+                                {
+                                    Status = "Rejected " + item.ActionDescription;
+                                }
+
+                                @Html.DisplayName(Status)
+                            </td>
+
+                            @if (item.Actionstatus == 0)
+                            {
+                                <td>
+                                    <a role="button" id="lnkApprove" onclick="ApproveBD(@item.BatchTransferId,@item.FromBranch ,@item.ToBranch,1)">Approve</a>
+                                </td>
+                                <td>
+                                    |
+                                </td>
+                                <td>
+                                    <a role="button" id="lnkReject" onclick="ApproveBD(@item.BatchTransferId, @item.FromBranch,@item.ToBranch,2)">Reject</a>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    }
+    else
+    {
+        <span style="color: red;"><b>Data not available</b></span>
+        @*<div class="hr hr-18 dotted hr-double"></div>
+
+        <div class="table-header">
+            Records Found (0)
+        </div>*@
+    }
+
+</section>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })

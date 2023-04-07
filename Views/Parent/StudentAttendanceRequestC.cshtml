@@ -1,0 +1,207 @@
+﻿@model AsteriskBrowserAL.Models.NewTicketModelData
+@{
+    ViewBag.Title = "ComplaintBox";
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+
+
+
+
+<style>
+
+    .message-form {
+        border: none;
+    }
+</style>
+@Html.Action("DatePickerScripts", "Base")
+@using (Html.BeginForm("StudentAttendanceRequestC", "Parent", FormMethod.Post, new { @class = "form-horizontal message-form col-xs-12", id = "id-message-form", enctype = "multipart/form-data" }))
+{
+
+    <input type="hidden" name="FromPlayerId" id="FromPlayerId" />
+    <input type="hidden" name="ToPlayerId" id="ToPlayerId" />
+    <input type="hidden" value="@Model.FromPlayerId" id="SelFromPlayerId" />
+    <input type="hidden" value="@Model.ToPlayerId" id="SelToPlayerId" />
+    <input type="hidden" value="@Model.FromPlayerName" id="SelFromPlayerName" />
+    <input type="hidden" value="@Model.ToPlayerName" id="SelToPlayerName" />
+    <input type="hidden" value="@Model.GroupId" id="SelGroupId" />
+
+
+
+    <div class="table-header" style="margin-top:-20px;">
+        <span style="font-family:calibri;">Attendance Request</span>
+        <small style="float:right;" class="textheader">
+            @Html.ActionLink("Back to Details", "StudentAttendanceRequest", new { })
+        </small>
+    </div>
+
+    <div class="widget-box row overflowscroll" style="padding:10px;height:450px;overflow-x:hidden;">
+
+        <br />
+        <div class="row ">
+
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="col-sm-6 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Name")</label>
+
+                    <div class="col-sm-6">
+                        @Html.TextBoxFor(model => model.UserName, new { @class = "form-control textlength", @readonly = "readonly", placeholder = "Exam Name", @id = "ExamName" })
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="row">
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="col-sm-6 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Start Date")</label>
+
+                    <div class="col-sm-6">
+                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input class="form-control" type="text" name="StartDate" id="StartDate" autocomplete="off" placeholder="Select Start Date" />
+                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="col-sm-6 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("End Date")</label>
+
+                    <div class="col-sm-6">
+                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input class="form-control" type="text" name="EndDate" id="EndDate" autocomplete="off" placeholder="Select Start Date" />
+                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <div class="row">
+
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="col-sm-6 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Reason")</label>
+
+                    <div class="col-sm-6">
+                        <select class="form-control" id="Reason" name="Reason"></select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+
+            </div>
+        </div>
+
+        <div>
+
+            <div class="hr hr-8 dotted"></div>
+
+
+
+
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right">
+                    <span style="color:red;font-weight:bold">*</span>Comment
+                </label>
+
+                <div class="col-sm-9">
+                    @Html.TextAreaFor(model => model.Description, 10, 20, new { @class = "form-control textlength", id = "Description" })
+                </div>
+            </div>
+
+            <div class="hr hr-8 dotted"></div>
+
+            <div class="">
+                <small id="Validation" style="color:red;font-weight:bold;font-size:small"></small>
+
+
+
+                <button class="btn btn-success btn-sm P2" onclick="return SubmitForm();" type="submit">
+                    <i class="ace-icon fa fa-check "></i>
+                    Send
+                </button>
+
+                &nbsp;
+                <button class="btn btn-sm P2" type="reset">
+                    <i class="ace-icon fa fa-undo"></i>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        LoadReasons()
+    });
+    function LoadReasons() {
+
+        var StatusItems = $('#Reason');
+
+        StatusItems.children().remove();
+        StatusItems.append($("<option>").val("0").text("--- Select ---"));
+        StatusItems.append($("<option>").val("1").text("College Day Visit"));
+        StatusItems.append($("<option>").val("2").text("Field Trip"));
+        StatusItems.append($("<option>").val("3").text("Illness"));
+        StatusItems.append($("<option>").val("4").text("Medical"));
+
+        $('#Reason').append(StatusItems);
+    }
+
+    function SubmitForm() {
+        var valid = true;
+        var StartDate = $('#StartDate').val();
+        var EndDate = $('#EndDate').val();
+        var Reason = $('#Reason').val();
+        var Description = $('#Description').val();
+        
+        if (Reason == "" || Reason == "0") {
+            valid = false;
+        }
+        if (StartDate == "" || EndDate =="") {
+            valid = false;
+        }
+
+        if (Description == "") {
+            valid = false;
+        }
+       
+        if (valid == false) {
+            document.getElementById("Validation").innerHTML = "Fields marked with (*) are mandatory"
+        }
+        else {
+            $("#id-message-form").submit();
+        }
+        //$("#imagemodal").show()
+        return valid;
+    }
+</script>
+
+
+

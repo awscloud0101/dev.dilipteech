@@ -1,0 +1,130 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Houses>
+
+@{
+    ViewBag.Title = "Houses";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Houses</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+    <br />
+    <br />  
+    @if (null != TempData["Houses"])
+    {
+        @Html.Raw(TempData["Houses"])
+    }
+
+    @if (null != Model)
+    {
+        <span style="color:red;font-weight:bold" id="Validation"></span>
+
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                    <div class="table-header">
+                          Houses                       
+                        <a class="view-header-btn  btn btn-info btn-xs P2" style="float:right" href="@Url.Action("HousesC", "SeAcademics")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+                       @* <a class="view-header-btn  btn btn-info btn-xs" href=" @Url.Action("HousesC", "SeAcademics")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+                        </div><!-- /.box-header -->
+                <table id="dynamic-table" class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("House Name")
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.HouseName)
+                                </td>
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="green P2" href="@Url.Action("HousesE", "SeAcademics", new { id = item.HouseId })">
+                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                        </a>
+                                        <a class="red P2" onclick="btnConfirm(@item.HouseId)">
+                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                        </a>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+                        }
+                </table>
+
+                </div>
+            </div>
+
+    }
+    else
+    {
+        <div class="table-header">
+            Houses
+            <a class="view-header-btn btn btn-info btn-xs" href="@Url.Action("HousesC", "SeAcademics")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+        </div>
+        <span style="color: red;"><b>   Records Not Found (0) </b></span>
+    }
+    @Html.Action("DataTableScripts", "Base")
+</section>
+<script>
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeAcademics/ValidationForHousesD',
+                data: { id: Value },
+                success: function (data) {
+
+                    var url = '/SeAcademics/HousesD?id=' + Value;
+                    var title = "Houses";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+

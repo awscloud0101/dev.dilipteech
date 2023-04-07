@@ -1,0 +1,92 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.MagazineDetailsData>
+@{
+    ViewBag.Title = "Return Book";
+}
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Magazine Status</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("MagazineStatus", "ALibrary", FormMethod.Post))
+            {
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">Magazine Status</h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Magazine status</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownList("MagazineDetails", null, "--Select --", new { id = "MagazineCode", @class = "form-control select2" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br><br>
+
+                        </div>
+                    </div>
+                </div>
+                    <div id="MagazineDetailsData"></div>
+            }
+            <div class="hr hr-18 dotted hr-double"></div>
+        </div>
+    </div>
+
+</section>
+<script>
+    $('#MagazineCode').change(function () {
+        debugger
+        GetMagazineDetails();
+    })
+    function GetMagazineDetails() {
+        debugger
+        $('#MagazineDetailsData').hide()
+        var MagazineCode = $('#MagazineCode').val();
+        if (MagazineCode != "") {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/GetMagazineDetialsMagazinecode',
+                data: { MagazineCode: MagazineCode, },
+                success: function (data) {
+                    $('#MagazineDetailsData').show()
+                    $('#MagazineDetailsData').html(data);
+                    $('#imagemodal').hide();
+                }
+                  
+
+            })
+        }
+    }
+    $(document).ready(function () {
+        GetMagazineDetails()
+    })
+
+</script>

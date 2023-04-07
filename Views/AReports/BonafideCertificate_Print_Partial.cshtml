@@ -1,0 +1,161 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentDetailsData>
+@{
+    int n = 0;
+}
+
+<body>
+    <div style="display:none" id="mydiv">
+        @if (null != Model && Model.Count() > 0)
+        {
+            foreach (var StudentsData in Model)
+            {
+                if (n % 2 == 0)
+                {
+                    <br />
+                }
+                else
+                {
+                    <br />
+                    <br />
+                }
+
+                @*<div style="padding-left: 0px;position: relative; left: 0; top: 0;font-family:'Segoe UI'">
+
+                        <img src="" height="670" width="1000" style="position: relative;top: 0;left: 0;" />
+
+                        @if (!string.IsNullOrWhiteSpace(StudentsData.Photo))
+                        {
+                            <img src="@StudentsData.Photo" style="position: absolute;top: 73px;left: 723px;border-radius:35px;padding: 20px;width: 132px;height: 137px;" />
+                        }
+                        else
+                        {
+                            <img src="~/Content/images/NoPhoto.jpg" style="position: absolute;top: 73px;left: 723px;border-radius:35px;padding: 20px;width: 132px;height: 137px;" />
+                        }
+
+                        <div style="position: absolute;top: 20%;left: 7%;font-size:16px;">
+                            <p>@StudentsData.DisplayBonafideNumber</p>
+                        </div>
+
+                        <div style="position: absolute;top: 39.5%;left: 48%;font-size:20px;">
+                            <p>@(StudentsData.Name + " (" + StudentsData.AdmissionNumber + ")")</p>
+                        </div>
+
+                        <div style="position: absolute;top: 47.2%;left: 38%;font-size:20px;">
+                            <p>@StudentsData.FatherName</p>
+                        </div>
+
+                        <div style="position: absolute;top: 55.8%;left: 72%;font-size:20px;">
+                            <p>@StudentsData.BonafideClass</p>
+                        </div>
+
+                        <div style="position: absolute;top: 64%;left:28%;font-size:20px;">
+                            <p>@StudentsData.BonafideYear</p>
+                        </div>
+                        <div style="position: absolute;top: 72.2%;left: 28%;font-size:20px;">
+                            <p>@StudentsData.DateofBirthDisplay</p>
+                        </div>
+
+                    </div>*@
+
+                <div style="padding-left: 0px;position: relative; left: 0; top: 0;font-family:'Segoe UI'">
+
+                    <img src="" height="670" width="1000" style="position: relative;top: 0;left: 0;" />
+
+                    @if (!string.IsNullOrWhiteSpace(StudentsData.Photo))
+                    {
+                        <img src="@StudentsData.Photo" style="position: absolute;top: 73px;left: 723px;border-radius:35px;padding: 20px;width: 132px;height: 137px;" />
+                    }
+                    else
+                    {
+                        <img src="~/Content/images/NoPhoto.jpg" style="position: absolute;top: 73px;left: 723px;border-radius:35px;padding: 20px;width: 132px;height: 137px;" />
+                    }
+
+                    <div style="position: absolute;top: 20%;left: 7%;font-size:16px;">
+                        <p>@StudentsData.DisplayBonafideNumber</p>
+                    </div>
+
+                    <div style="position: absolute;top: 39.5%;left:8%;font-size:20px;">
+                        <p> this is certify that Master/Kumari: @(StudentsData.Name + " (" + StudentsData.AdmissionNumber + ")")</p>
+                    </div>
+
+                    <div style="position: absolute;top: 47.2%;left:8%;font-size:20px;">
+                        <p>son/daughter of sri: @StudentsData.FatherName</p>
+                    </div>
+
+                    <div style="position: absolute;top: 55.8%;left:8%;font-size:20px;">
+                        <p>is /was bonafide student of this school studied in Class @StudentsData.BonafideClass</p>
+                    </div>
+
+                    <div style="position: absolute;top: 64%;left:8%;font-size:20px;">
+                        <p>  During the year @StudentsData.BonafideYear His/Her Date of birth accourding to our</p>
+                    </div>
+                    <div style="position: absolute;top: 72.2%;left: 8%;font-size:20px;">
+                        <p> offiece  Recods is @StudentsData.DateofBirthDisplay. His/Her conduct is satisfactory.</p>
+                    </div>
+
+                </div>
+                if (n < (Model.Count() - 1) && (n % 2 != 0))
+                {
+                    <div style="page-break-after: always;">
+                    </div>
+                }
+
+                n++;
+            }
+
+
+
+        }
+        else
+        {
+            <span style="color:red;font-weight:bold">Students not available</span>
+        }
+
+
+    </div>
+
+</body>
+
+<script>
+    function onloadData() {
+        PrintElem('#mydiv');
+    }
+
+    window.onload = onloadData();
+
+    function PrintElem(elem) {
+
+        Popup(document.getElementById("mydiv").innerHTML)
+    }
+
+    function Popup(data) {
+
+        var mywindow = window.open('', 'my div', 'size=potrait;width: 50%;margin=0;padding=0;');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        var is_chrome = Boolean(mywindow.chrome);
+
+        if (is_chrome) {
+            setTimeout(function () { // wait until all resources loaded
+                mywindow.document.close();
+                mywindow.focus();
+                mywindow.print();
+                mywindow.close();
+                window.location.href = "/AReports/BonafideCertificate?IsGenereated=" + true;
+
+            }, 2050);
+        } else {
+            mywindow.document.close();
+            mywindow.focus();
+            mywindow.print();
+            mywindow.close();
+            window.location.href = "/AReports/BonafideCertificate?IsGenereated=" + true;
+
+        }
+
+        return true;
+    }
+</script>
+

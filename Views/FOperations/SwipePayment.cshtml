@@ -1,0 +1,141 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.SwipePaymentData>
+@{
+    ViewBag.Title = "Cancel Swipe Open Txns";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Cancel Swipe Open Txns</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+    <br />
+    @if (null != TempData["Status"])
+    {
+        <span style="color: red;">
+            @Html.Raw(TempData["Status"])
+        </span>
+    }
+
+    @if (Model != null)
+    {
+        int nsno = 1;
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="table-header">
+                    Cancel Swipe Open Txns
+                </div>
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Student Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Admission Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Transaction Date")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Amount")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Plutus Txn Id")
+                            </th>
+
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @item.StudentName
+                                </td>
+                                <td>
+                                    @item.AdmissionNumber
+                                </td>
+                                <td>
+                                    @if (item.TransactionDate.HasValue)
+                                    {
+                                        @item.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                                    }
+                                </td>
+                                <td>
+                                    @item.Amount
+                                </td>
+                                <td>
+                                    @item.PlutusTransactionReferenceID
+                                </td>
+
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <button type="button" onclick="location.href='/FOperations/CancelSwipeOpenedTxn?SwipeTransactionId='+@item.SwipeTransactionId +''" class="btn btn-white btn-danger btn-sm">Cancel</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+
+            @Html.Action("DataTableScripts", "Base")
+
+    }
+    else
+    {
+
+        <span style="color: red;"><b>There are no open transactions</b></span>
+    }
+
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/ACalendar/ValidationForHolidaysD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/ACalendar/HolidaysD?id=' + Value;
+                    var title = "Holidays";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

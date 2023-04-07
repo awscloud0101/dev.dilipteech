@@ -1,0 +1,102 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffAttendanceAnalysisModel>
+@{
+    int sno = 1;
+}
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+
+@if (Model != null&& Model.Count>0)
+{
+    <div class="table-header">
+        Records Found (@Model.Count())
+        <div style="float:right;margin-right:10px;">
+            <button class="btncustom" id="btnExport">
+                Download
+            </button>
+        </div>
+    </div>
+    <div class="overflowscroll">
+        <table class="table tbhover table-striped table-bordered dynamic-table" id="tab1">
+            <thead>
+                <tr>
+                    <th>
+                        SNo
+                    </th>
+                    <th>
+                       Branch Name
+                    </th>
+                   <th>
+                       Total Staff
+                   </th>
+                    <th>
+                       InTime
+                    </th>
+                    <th>
+                      Late
+                    </th>
+                    <th>
+                       Absent
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                   
+
+                    <tr>
+                        <td>
+                            @(sno++)
+                        </td>
+                        <td>
+
+                           
+                            @Html.ActionLink(@item.BranchName, "StaffAttendanceByBranch", new { BranchId =@item.SubscriptionId, Date =Convert.ToDateTime(@item.AtteandanceDate), DivisionId = @item.DivisionId})
+                        </td>                        
+                            <td>
+                                @item.TotalStaff
+                            </td>
+                        <td>
+                            @item.Intime
+                        </td>
+                        <td>
+                            @item.Latetime
+                        </td>
+                        <td>
+                            @item.Absent
+                        </td>                        
+                    </tr>
+                                }
+
+            </tbody>
+        </table>
+
+    </div>
+
+                                }
+                                else
+                                {
+                                    <span style="color: red;"><b>Data not available</b></span>
+                                }
+
+
+
+<script type="text/javascript">
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+

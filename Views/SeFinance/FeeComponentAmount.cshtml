@@ -1,0 +1,163 @@
+﻿@model AsteriskBrowserAL.FeeComponentHistory
+@{
+    ViewBag.Title = "Fee Component Amount";
+    var ComponetId = Model.FeeComponentId;
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active"> Fee Component Amount</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+
+    <div class="main-header">
+        <h3>@Html.ActionLink("<< Fee Components", "FeeComponents")</h3>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("FeeComponetAmountC", "SeFinance", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" id="ComponentId" value="@Model.FeeComponentId">
+
+                @Html.HiddenFor(model => model.FeeComponentId)
+
+                <div class="box">
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("Component")</span>
+
+                    <div class="box-header">
+                        <h3 class="box-title">Add Component Amount</h3>
+                        <br />
+                        <div>
+                            <button class="btn btn-primary pull-right" type="submit" style="width:80px;" onclick="return submitForm();">
+                                Save
+                            </button>
+                        </div>
+
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+
+                    <div class="box-body">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Amount")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control textlength txtboxNum", @id = "txtComponentAmount", placeholder = "Amount" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="lblAmount">
+                                <label style="color:red;font-weight:bold;"> Required</label>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Select Date")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" id="ComponentDate" name="Date" autocomplete="off" placeholder="Select Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="lblDate">
+                                <label style="color:red;font-weight:bold;"> Required</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+    function validateCategory() {
+
+        var Amount = document.getElementById("txtComponentAmount").value;
+        var dtDate = document.getElementById("ComponentDate").value;
+
+        validate = true;
+
+        if (Amount == "") {
+            document.getElementById("lblAmount").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("lblAmount").style.display = "none";
+        }
+
+        if (dtDate == "") {
+            document.getElementById("lblDate").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("lblDate").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateCategory();
+
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+    function GoToDetails() {
+        var ComponentId = $('#ComponentId').val();
+        alert(ComponentId);
+        window.location.href = '/SeFinance/FeeComponentDetails?nFeeComponetId=' + ComponetId;
+    }
+
+
+    $('#txtComponentAmount').focus(function () {
+        $('#lblAmount').hide();
+    });
+    $('#datepicker').focus(function () {
+        $('#lblDate').hide();
+    });
+
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+
+
+
+

@@ -1,0 +1,230 @@
+﻿@model AsteriskBrowserAL.Models.MicroScheduleData
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("MicroScheduleWeeklyStatusReport", "AReports", FormMethod.Post))
+            {
+                <input type="hidden" id="IsCentral" value="@Model.IsCentral.ToString()" name="IsCentral" />
+                <input type="hidden" id="SelStudent" />
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Micro Schedule Weekly Status Report
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            @if (Model.IsCentral)
+                            {
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                        <div class="col-sm-6">
+                                            <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="BranchId" name="BranchId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.SubscriptionId" />
+                            }
+
+                            <br />
+                            <input type="hidden" id="DivisionId" />
+                            <input type="hidden" id="BranchId" />
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                    <div class="col-sm-6">
+                                        <select name="Section" id="SectionId" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Week</label>
+                                    <div class="col-sm-6">
+                                        <select name="WeekNumberId" id="WeekNumberId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div id="SearchViewDiv">
+                </div>
+            }
+
+          
+        </div>
+    </div>
+</section>
+
+<script>
+
+
+    function OnloadData() {
+        debugger
+        var IsCentral = $('#IsCentral').val();
+
+
+        if (IsCentral == "False") {
+            var SubscriptionId = $("#BranchId").val();
+            debugger
+            GetSectionDropDown();
+        }
+        else
+        {
+            LoadDivisionDropdown()
+        }
+    }
+
+    function LoadDivisionDropdown() {
+        debugger
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: false },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+                LoadBranchDropdown();
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        var Division = $("#DivisionId").val();
+        LoadBranchDropdown();
+    })
+
+
+    function LoadBranchDropdown() {
+        var DivisionId = $("#DivisionId").val()
+        var isall = true;
+        if (DivisionId > 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                },
+                async: false
+            })
+        }
+        else {
+            document.getElementById("BranchId").value = ""
+            $("#BranchId").html("")
+            $("#SectionId").html("")
+        }
+    }
+
+    $("#BranchId").change(function () {
+        debugger
+        GetSectionDropDown();
+    })
+
+    function GetSectionDropDown() {
+        var isall = true;
+        var SubscriptionId = $("#BranchId").val();
+        $.ajax({
+            url: '/AReports/GetSectionDropDownList',
+            data: { IsAll: false, SubscriptionId: SubscriptionId },
+            success: function (Data) {
+                var SectionDRP = $('#SectionId')
+                SectionDRP.children().remove();
+                SectionDRP.append($("<option>").val("").text("--Select--"))
+                SectionDRP.append($("<option>").val("-1").text("All"))
+
+                $.each(Data, function (i, record) {
+                    SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+                $('#SectionId').append(SectionDRP);
+            }
+        })
+    }
+
+
+    $('#SectionId').change(function () {
+        debugger
+        var SectionId = $('#SectionId').val();
+        if (SectionId >= -1){
+        GetWeekDropDown();
+        }
+    });
+
+
+    function GetWeekDropDown() {
+        $.ajax({
+            url: '/ATimetable/LoadWeeksData',
+            success: function (result) {
+                Section = $("#WeekNumberId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.WeekDaysId).text(record.WeekName))
+                })
+
+                $("#WeekNumberId").append(Section)
+
+            },
+            async: false
+        })
+    }
+
+    $('#WeekNumberId').change(function () {
+        debugger
+        $('#SearchViewDiv').html("");
+        var nWeek = $("#WeekNumberId").val();
+        if (nWeek != "") {
+            GetWeekWiseData();
+        }
+    });
+
+    function GetWeekWiseData() {
+        debugger
+        var nBranchId = $('#BranchId').val();
+        var nDivisionid = $('#DivisionId').val();
+        var nIsCentral = $('#IsCentral').val();
+        var nWeek = $("#WeekNumberId").val();
+        var sectionid = $("#SectionId").val();
+        if (IsCentral == "True") {
+            IsCentral = true;
+        }
+        else {
+            IsCentral = false;
+            Divisionid = 0;
+        }
+
+        $("#imagemodal").show();
+        $.ajax({
+            url: "/AReports/GetStaffStatusData",
+            data: {BranchId: nBranchId, WeekId: nWeek, nSectionId: sectionid },
+            success: function (Data) {
+                $("#imagemodal").hide();
+                $("#SearchViewDiv").html(Data);
+            }
+        })
+
+    }
+
+    window.onload = OnloadData();
+</script>

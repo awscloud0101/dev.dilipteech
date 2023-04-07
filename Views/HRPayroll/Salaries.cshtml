@@ -1,0 +1,258 @@
+﻿@model AsteriskBrowserAL.Models.RunPayRollModel
+@{
+    ViewBag.Title = "Salaries";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Payroll
+        </li>
+        <li class="active">Salaries</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<section class="content">
+    <br />
+    @using (Html.BeginForm())
+    {
+        <div class="box">
+            <div class="box-body">
+                <div class="row">
+
+                    <div class="col-xs-12">
+                        <br />
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Division")</label>
+
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.ListDivisions, "DivisionId", "DivisionName"), "--- Select ---", new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Branch")</label>
+
+                                    <div class="col-sm-6">
+                                        <select id="Branches" name="Branches" class="form-control" onchange="GetMonthDropdown();"></select>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Month")</label>
+
+                                    <div class="col-sm-6">
+                                        <select id="YearAndMnth" class="form-control" onchange="GetPayrollData();"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        @*<div class="form-group">
+                                <div class="row">
+                                    <label class="col-sm-2 control-label no-padding-right" for="form-field-1">@Html.Label("Month")</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.DropDownList("YearAndMnth", null, "--- Select ---", new { @class = "form-control col-sm-5", onchange = "GetPayrollData();" })
+                                    </div>
+
+                                </div>
+                            </div>*@
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <span style="color: red;font-weight:bold;">@Html.ValidationMessage("Salaries")</span>
+        <span id="pe" style="display:none;color:red;font-weight:bold"></span>
+        <span id="error" style="display:none;color:red;font-weight:bold">Select An Entity</span>
+        <span id="error1" style="display:none;color:red;font-weight:bold">Enter Amount</span>
+        <span id="error2" style="display:none;color:red;font-weight:bold">Select Both Amount and Employee To Transfer</span>
+
+        <div id="DivId" style="display:none;">
+            <div class="box">
+
+                <div class="box-header">
+                    <h3 class="box-title">Payrolls</h3>
+                    <br />
+                    <br />
+                    <input class="btn btn-primary" style="width:90px;" type="button" name="Calculate" value="Calculate" id="Calculate" />
+                    <input class="btn btn-primary" style="width:80px;" type="submit" name="Transfer" value="Transfer" id="Transfer" onclick="return TransferSalries();" />
+
+                    <input class="btn btn-primary" name="Button" type="button" style="display:none;" value="Bank Statement" id="BankStatement" onclick="GetBanckStatement();" />
+                    <input class="btn btn-primary" name="Button" type="button" style="display:none;" value="SalaryStatement" id="SalaryStatment" />
+                    <br /><br />
+
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h6 class="box-title">Absent Policy</h6>
+                                </div>
+                                <div class="box-body">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-6">No.of Absents for 1 LOP</label>
+                                        <div>
+                                            <input type="number" min="0" style="width:50px;" name="Absents" id="AbsentsVal" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h6 class="box-title">Late Policy</h6>
+                                </div>
+                                <div class="box-body">
+                                    <div class="col-xs-12">
+                                        <label class="col-sm-6">No.of Late's for 1 LOP</label>
+                                        <div>
+                                            <input type="number" min="0" style="width:50px;" name="Late" id="LateVal" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                </div><!-- /.box-header -->
+
+                <div id="SearchDiv">
+                    @if (null != Model)
+                    {
+                        //@Html.Partial("Salaries_PartialView", Model)
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+            <p style="position:absolute; top: 50%; left:50%;">
+                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+            </p>
+        </div>
+    }
+</section>
+
+
+<script>
+
+    $('#DivisionId').change(function () {
+        $('#DivId').hide();
+        $('#Branches').empty();
+        $('#Branches').append($("<option>").val("null").text("--- Select ---"));
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#Branches');
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+                    $('#Branches').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    function GetMonthDropdown() {
+        $('#DivId').hide();
+        var branch = $('#Branches').val();
+        $.ajax({
+            url: '/HRPayroll/GetMonthsUsingBranch',
+            data: { nBranch: branch },
+            success: function (data) {
+                var listItems = "";
+                listItems += "<option value='" + 0 + "' selected='true'> --- Select --- </option>"
+                $.each(data, function (i, data) {
+                    listItems += "<option value='" + data.MonthValue + "'>" + data.MonthName + "</option>";
+                });
+                $("#YearAndMnth").html(listItems);
+
+            }
+        })
+    }
+
+    function GetPayrollData() {
+        $('#pe').hide();
+        $('#error').hide();
+        $('#error1').hide();
+        $('#error2').hide();
+
+        var monthNdyear = $("#YearAndMnth").val();
+
+        if (monthNdyear == "" || monthNdyear == null) {
+            document.getElementById('DivId').style.display = "none"
+            return;
+        };
+
+        if (monthNdyear == "0") {
+            $('#DivId').hide();
+        }
+
+        var n_Year;
+        var result = monthNdyear.split('-');
+        if (result != "0") {
+
+        }
+        var n_Year = result[0];
+        var n_Month = result[1];
+
+        var branch = $('#Branches').val();
+        if (branch == undefined || branch == null || branch == "")
+            branch = 0;
+        debugger
+        $.ajax({
+            url: '/HRPayroll/GetRunpayRoles',
+            data: { nBranch: branch, YearMonth: monthNdyear, chkLatePolicy: "", chkAbsentPolicy: "", nNoOfAbsentdays: 0, nNoOfAbLOP: 0, nNoOfLatedays: 0, nNoOfLtLOP: 0 },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (Data) {
+                if (Data.length > 0) {
+                    $("#SearchDiv").html(Data)
+                    document.getElementById('DivId').style.display = "inline"
+                }
+                else {
+                    document.getElementById('DivId').style.display = "none"
+                }
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            },
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+    };
+
+</script>
+

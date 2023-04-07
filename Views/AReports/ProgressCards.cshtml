@@ -1,0 +1,174 @@
+﻿@model AsteriskBrowserAL.Models.ProgressCard
+@{
+    ViewBag.Title = "Progress Card";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Progress Card</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ProgressCard", "AReports", FormMethod.Post))
+            {
+                <span style="color:red;" id="Validation"></span>
+                <div class="widget-box">
+                    <div class="widget-body">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                Progress Card
+                            </h5>
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                            <div class="col-sm-6">
+                                                @if (null != Model)
+                            {
+                                if (null != Model.lstSections)
+                                {
+                                    @Html.DropDownListFor(model => model.SectionId, new SelectList(Model.lstSections, "SectionId", "SectionCode"), "--- Select ---", new { @class = "form-control", id = "SectionId" })
+                                }
+                                else
+                                {
+                                    <select id="SectionId" style="width:200px;" class="form-control"></select>
+                                }
+                            }
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Examination</label>
+                                            <div class="col-sm-6">
+                                                <select id="ExaminationId" name="ExaminationId" style="width:200px;" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @*<div class="row">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Student</label>
+                                                <div class="col-sm-6">
+                                                    <input type="text" id="StudentId" style="width:200px;" class="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>*@
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="Students"></div>
+                        }
+                    </div>
+                </div>
+                <input type="hidden" id="SelSectionId" value="@Model.SectionId" />
+                <input type="hidden" id="SelExaminationId" value="@Model.ExaminationId" />
+            }
+            </div>
+        </div>
+    </section>
+
+
+    <script>
+
+        var StudentId = "";
+
+        function onloadData() {
+            var SectionId = $("#SelSectionId").val()
+            if (SectionId > 0) {
+                GetExaminations();
+            }
+        }
+
+        $('#SectionId').change(function () {
+            document.getElementById("Validation").innerHTML = "";
+            $('#ExaminationId').empty();
+
+            var SectionId = $('#SectionId').val();
+
+            if (SectionId == "" || SectionId < 1) {
+
+                $('#Students').html("");
+            }
+            else {
+                GetExaminations();
+                $('#Students').html("");
+            }
+        });
+
+        function GetExaminations() {
+            var SectionId = $('#SectionId').val();
+            var SelExaminationId = $("#SelExaminationId").val()
+
+            if (SectionId > 0) {
+                $.ajax({
+                    url: '/AReports/GetExaminationsBySection',
+                    data: { SectionId: SectionId },
+                    success: function (data) {
+                        var ExaminationItems = $('#ExaminationId');
+                        ExaminationItems.children().remove();
+                        ExaminationItems.append($("<option>").val("null").text("--- Select ---"));
+                        $.each(data, function (i, record) {
+                            if (record.IsUnitTest == 1) {
+                                ExaminationItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+                            }
+                        });
+                        $('#ExaminationId').append(ExaminationItems);
+                        if (SelExaminationId > 0) {
+                            document.getElementById("ExaminationId").value = SelExaminationId;
+                            GetStudents()
+                        }
+                    },
+                    aync: false
+                });
+            }
+        }
+
+        $('#ExaminationId').change(function () {
+            GetStudents()
+        });
+
+        function GetStudents() {
+
+            var ExamId = $("#ExaminationId").val();
+            var SectionId = $("#SectionId").val();
+
+
+            if (ExamId < 0 || SectionId < 0)
+                return;
+
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/AReports/GetStudentsForProgressCard',
+                data: { SectionId: SectionId },
+                success: function (Data) {
+                    $('#Students').html(Data);
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    </script>
+

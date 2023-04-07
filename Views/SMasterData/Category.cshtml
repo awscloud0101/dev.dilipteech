@@ -1,0 +1,131 @@
+﻿@model IEnumerable<AsteriskBrowserAL.InventoryCategory>
+@{
+    ViewBag.Title = "Category";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Master Data
+        </li>
+        <li class="active">Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+<section class="content">
+  <br/>
+    <div class="table-header">
+        Category
+        <div style="float:right">
+            <a class="view-header-btn  btn btn-info btn-xs P2" href="@Url.Action("CategoryC", "SMasterData")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+
+        </div>
+
+    </div>
+    @if (Model != null)
+    {
+        int nsno = 1;
+      
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                       S.No.
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Code")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Category Name")
+                                    </th>
+
+                                    <th></th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+
+                                @foreach (var item in Model)
+                            {
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Description)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.CategoryName)
+                                        </td>
+
+
+                                        <td>
+                                            <div class="hidden-sm hidden-xs action-buttons">
+                                                <a class="green P2" href="@Url.Action("CategoryE", "SMasterData", new { id = item.InventoryCategoryId })">
+                                                    <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                                </a>
+                                                <a class="red P2" onclick="btnConfirm(@item.InventoryCategoryId)">
+                                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                            }
+
+                            </tbody>
+                        </table>
+
+
+                    </div>
+             
+    }
+    else
+    {
+        <span style="color: red;"><b>There are no Categories</b></span>
+    }
+   
+</section>
+
+
+@Html.Action("DataTableScripts","Base")
+
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SMasterData/ValidationForCategoryD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SMasterData/CategoryD?id=' + Value;
+                    var title = "Category";
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

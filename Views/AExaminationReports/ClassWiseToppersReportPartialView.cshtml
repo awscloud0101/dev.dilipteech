@@ -1,0 +1,103 @@
+﻿@model List<AsteriskBrowserAL.Models.ToppersByClassVM>
+@{
+    Layout = null;
+    int i = 1;
+}
+
+@if (Model.Count() > 0)
+{
+    <section class="content">
+        <!-- /.box-header -->
+        <br />
+        <br />
+        <div class="col-xs-12">
+            <div class="table-header">
+                Records Found (@Model.Count())
+                <div style="float:right;">
+                    <a value="PDF" id="PDFClick"><span class="btn btn-info btn-xs btn-danger">PDF</span></a>
+                    <button class="btn btn-info btn-xs btn-success" type="submit" id="Excelbtn" onclick="location.href='@Url.Action("ExportExcelClassWiseReport", "AExaminationReports")'">Excel</button>
+                    <a onclick="PrintElem()" value="Print"><span class="btn btn-info btn-xs btn-warning">Print</span></a>
+                </div>
+            </div>
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayName("SNo")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Branch Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Section Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Average Marks For Student")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Top Rank")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@i </td>
+                            <td>@item.branchName </td>
+                            <td>@item.SectionName </td>
+                            <td>@item.Average </td>
+                            <td>
+                                @("Rank "+i)
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+else
+{
+    <span style="color:red;font-weight:bold">No Records Found</span>
+}
+
+
+<script>
+
+    $('#PDFClick').click(function () {
+        $('#Status').val(1)
+        $('#StatusClick').submit();
+    })
+    $('#Excelbtn').click(function () {
+        $('#Status').val(0)
+    })
+    
+    function PrintElem() {
+        debugger
+        $.ajax({
+            url: '/AExaminationReports/ExportExcelClassWiseReport',
+            type:'POST',
+            data: { Status: 2 },
+            success: function (data) {
+                Popup(data);
+            }
+        })
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>

@@ -1,0 +1,146 @@
+﻿@model AsteriskBrowserAL.Models.BiometricStaffAttendance
+@{
+    //ViewBag.Title = "Biometric Attendance Report";
+    //var result = Model.GroupBy(s => s.DayNumber).ToList();
+    //var result1 = result.FirstOrDefault();
+    int sno = 1;
+    string style = "";
+    string strEmpName = "";
+}
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+
+@if (Model != null)
+{
+    <div class="table-header">
+        Records Found (@Model.lstData.Count())
+        <button class="btncustom" id="btnExport" style="float:right;margin-right:10px;">
+            Download
+        </button>
+    </div>
+            <div  class="overflowscroll">
+                <table class="table tbhover table-striped table-bordered dynamic-table" id="tab1">
+                    <thead>
+                        <tr>
+                            <th>
+                                SNo
+                            </th>
+                            <th>
+                                Employee Name
+                            </th>
+                            @for (int i = 1; i <= Model.Days; i++)
+                {
+                                <th>@(i)</th>
+                            }
+                            <th>
+                                Total Leaves/Absent
+                            </th>
+                            <th>
+                                Holidays
+                            </th>
+                            <th>
+                                No of working Days
+                            </th>
+                            <th>
+                                No of Days Present(P)
+                            </th>
+                            <th>No of Days Late(LT)</th>
+                            <th>
+                                No of Days Absent(A)
+                            </th>
+                            <th>
+                               I
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model.lstData)
+                        {
+                            if (item.IsRoamingStaff == true)
+                            {
+                                style = "background-color:coral";
+                            }
+                            else
+                            {
+                                style = "";
+                            }
+
+                            <tr style="@style">
+                                <td>
+                                    @(sno++)
+                                </td>
+                                <td>
+
+                                    @{
+                                        strEmpName = item.StaffName + " (" + item.EmployeeNumber + ")";
+                                    }
+
+                                    @Html.ActionLink(strEmpName, "BiometricStaffInAndOutTimings", new { Id = item.StaffId, Month = item.Month, Year = item.Year, DivisionId = item.DivisionId, SubId = item.SubscriptionId, IsRoamingStaff = item.IsRoamingStaff })
+                                </td>
+                                @foreach (var Status in item.lstStatus)
+                                {
+                                    if (Status.IsManual)
+                                    {
+                                        style = "background-color:#1DA7E8";
+                                    }
+                                    else
+                                    {
+                                        style = "";
+                                    }
+
+                                    <td style="@style">
+                                        @Status.Status
+                                    </td>
+                                }
+                                <td>@item.TLeaves</td>
+                                <td>@item.HolidaysCount</td>
+                                <td>@item.TotalWorkingDays</td>
+                                <td>@item.Presentdays</td>
+                               
+                                <td>@item.LatedaysCount</td>
+                                <td>@item.AbsentCount</td>
+                                <td>@item.IntimeDays</td>
+                            </tr>
+                                        }
+
+                    </tbody>
+                </table>
+
+            </div>
+
+                                        }
+                                        else
+                                        {
+                                            <span style="color: red;"><b>Data not available</b></span>
+                                        }
+<script type="text/javascript">
+
+    function submitform() {
+        $.ajax({
+            url: '/AReports/BiometrcAttendanceReport',
+            data: {},
+            success: function (result) {
+            }
+        })
+    };
+
+    $('#btnExport').click(function () {
+        window.location.href = "/AReports/ExcelBiometrcAttendanceReportDT"
+        var Data = $("#tab1").html();
+    });
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>

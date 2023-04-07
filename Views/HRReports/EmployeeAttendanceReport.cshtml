@@ -1,0 +1,238 @@
+﻿@model AsteriskBrowserAL.Models.StaffAttendanceRegister
+
+@{
+    ViewBag.Title = "Staff Attendance";
+}
+
+@section breadcrumb{
+
+    <ul class="breadcrumb">
+
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Report
+        </li>
+        <li class="active">Staff Attendance Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+  
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ExportEmployeeAttendanceReport", "HRReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Staff Attendance</span>
+
+                    </div>
+                        <div class="widget-box">
+                      
+                            <!-- form start -->
+                            <div class="widget-body">
+                                <div class="widget-main">
+
+                                    @if (Model.IsCentral)
+                                    {
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-4">Division</label>
+                                                    <div class="col-sm-6">
+                                                        @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-4">Branch</label>
+                                                    <div class="col-sm-6">
+                                                        <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" id="BranchId" name="SubscriptionId" style="width:200px;" class="form-control" value="@Model.SubscriptionId" />
+                                    }
+
+                                
+
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Department</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.DepartmentId, new SelectList(Model.lstDepartment, "DepartmentId", "DepartmentName"), new { @class = "form-control", id = "DepartmentId" })
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+                                                <div class="col-xs-6">
+                                                    <div id="datepicker" class="input-group date">
+                                                        <input class="form-control" type="text" id="AttendanceDate" name="AttendanceDate" autocomplete="off" placeholder="Select Date" />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        }
+
+                        <div id="SearchData"></div>
+
+
+                        }
+                    </div>
+    </div>
+</section>
+
+@Html.Action("DatePickerScripts", "Base")
+
+<script type="text/javascript">
+
+    var lastJQueryTS = 0;
+
+    $(document).ready(function () {
+        debugger
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0)
+         {
+            LoadBranches();
+        }
+
+    });
+
+    $('#BranchId').change(function () {
+        $('#SearchData').html("");
+        GetAttendanceData();
+    });
+
+    $('#DepartmentId').change(function () {
+        $('#SearchData').html("");
+        GetAttendanceData();
+    });
+
+
+    $('#DivisionId').change(function () {
+        $('#SearchData').html("");
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            LoadBranches()
+        }
+    });
+
+    function LoadBranches() {
+        var DivisionId = $('#DivisionId').val();
+
+        $.ajax({
+
+            url: '/Common/GetBranchesByDivisionId',
+            data: { DivisionId: DivisionId },
+            success: function (data) {
+
+                var BranchItems = $('#BranchId');
+
+                BranchItems.children().remove();
+
+                BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                });
+
+                $('#BranchId').append(BranchItems);
+            },
+            aync: false
+        });
+    }
+
+
+    function getFormattedDate(input) {
+        var pattern = /(.*?)\/(.*?)\/(.*?)$/;
+        var result = input.replace(pattern, function (match, p1, p2, p3) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return (p2 < 10 ? "0" + p2 : p2) + " - " + months[(p1 - 1)] + " - " + p3;
+        });
+        return result;
+    }
+
+    $('#AttendanceDate').change(function () {
+
+        $('#SearchData').html("");
+
+        var send = true;
+        if (typeof (event) == 'object') {
+
+            if (event.timeStamp - lastJQueryTS < 300) {
+                send = false;
+            }
+
+            lastJQueryTS = event.timeStamp;
+        }
+
+        if (send) {
+            GetAttendanceData();
+        }
+    });
+
+
+    function GetAttendanceData() {
+        debugger
+        var DivisionId = $('#DivisionId').val();
+        var BranchId = $('#BranchId').val();
+
+        var Date = $('#AttendanceDate').val();
+
+        if (parseInt(BranchId) >= -1 && Date != "")
+        {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/HROperations/GetStaffAttendanceData',
+                data: { BranchId: $('#BranchId').val(), Date: Date, DepartmentId: $('#DepartmentId').val(), bIsReport : true},              
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#SearchData').html(data);
+                }
+            })
+        }
+
+
+    }
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+

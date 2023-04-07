@@ -1,0 +1,140 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.BookOverallReport>
+@{
+    ViewBag.Title = "OverallMagazine";
+}
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Library Magazine Report</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+
+
+@if (Model != null)
+{
+    if (Model.Count() > 0)
+    {
+
+        <div class="hr hr-18 dotted hr-double"></div>
+        int nsno = 1;
+        <div class="table-header">
+            Records Found (@Model.Count())
+            <div style="float:right;">
+                <button class="btn btn-info btn-xs" type="submit" onclick="location.href='@Url.Action("OverallMagazineExcelReport", "ALibrary")'">
+                    <i class="ace-icon fa fa-share bigger-180"></i>
+                </button>
+            </div>
+        </div>
+        <table id="mytab1" class="table table-hover table-bordered table-striped nowrap dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("SNo")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Accession Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Magazine Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Magazine Category")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Publisher")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Periodicity Name")
+                    </th>
+                    @*<th>
+                        @Html.DisplayName("Edition")
+                    </th>*@
+                    <th>
+                        @Html.DisplayName("Price")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Status")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Status Date")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Remarks")
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @item.BookCode
+                        </td>
+                        <td>
+                            @item.BookName
+                        </td>
+                        <td>
+                            @item.BookCategoryName
+                        </td>
+
+                        <td>
+                            @item.Publication
+                        </td>
+                        <td>
+                            @item.Periodicity
+                        </td>
+                        @*<td>
+                            @item.Edition
+                        </td>*@
+                        <td>
+                            @item.price
+                        </td>
+                        <td>
+                            @item.BookStatus
+                        </td>
+                        <td>
+                            @item.ReplaceDate
+                        </td>
+                        <td>
+                            @item.remarks
+                        </td>
+
+                    </tr>
+
+                }
+
+            </tbody>
+        </table>
+
+    }
+    else
+    {
+        <span style="color: red;"><b>No records to display</b></span>
+    }
+}
+<script>
+
+    $('#btnExcel').click(function () {
+        $.ajax({
+            url: '/ALibrary/OverallMagazineExcelReport',
+        })
+    })
+
+</script>
+
+@Html.Action("DataTableScripts", "Base")
+

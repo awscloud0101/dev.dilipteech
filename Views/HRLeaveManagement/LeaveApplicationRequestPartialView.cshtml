@@ -1,0 +1,263 @@
+﻿
+@model AsteriskBrowserAL.Models.LeaveApplicationViewData
+
+@{
+//int StaffId = 0;
+//StaffId = Model.StaffId;
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+
+<section class="content">
+
+    <br />
+
+    @if (null != TempData["LeaveApplicationC"])
+    {
+        <span style="color: red;">
+            @Html.Raw(TempData["LeaveApplicationC"])
+        </span>
+    }
+    <h4>
+        <span style="color: red; padding-left:100px; font-size:14px">
+            @Html.Raw(ViewBag.Message)
+        </span>
+    </h4>
+
+    @using (Html.BeginForm("LeaveApplication", "HRLeaveManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        @Html.ValidationSummary(true)
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Leave Application</span>
+
+                        @if (ViewBag.Message == "")
+                        {
+                                <div style="float:right;margin-right:10px;">
+                                    <a class="btncustom P2" onclick="location.href='@Url.Action("LeaveApplicationC", "HRLeaveManagement", new { StaffId = Model.StaffId })'" role="button">@*<i class="fa fa-plus-circle bigger-200"></i>*@Apply Leave</a>
+                                </div>
+                        }
+                        else
+                        {
+                            <div></div>
+                        }
+                    </div>
+
+
+                    <table id="showData" class="table tbhover table-striped table-bordered dynamic-table">
+
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div>@Html.DisplayName("Leave Type")</div>
+                                </th>
+
+                                <th>
+                                    <div>@Html.DisplayName("Total Count")</div>
+                                </th>
+
+                                <th>
+                                    <div>@Html.DisplayName("Pending")</div>
+                                </th>
+
+                                <th>
+                                    <div>@Html.DisplayName("Leaves Utilized")</div>
+                                </th>
+                                <th>
+                                    <div>@Html.DisplayName("Leaves Remained")</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyId">
+                            @foreach (var item in Model.ListLeaveDetails)
+                            {
+                                <tr>
+                                    <td align="center">
+                                        @Html.DisplayFor(modelitem => item.LeaveTypeName)
+                                    </td>
+                                    <td align="center">
+                                        @Html.DisplayFor(modelitem => item.TotalLeaves)
+                                    </td>
+
+                                    <td align="center">
+                                        @Html.DisplayFor(modelitem => item.PendingCount)
+                                    </td>
+                                    <td align="center">
+                                        @Html.DisplayFor(modelitem => item.LeavesUtilized)
+                                    </td>
+                                    <td align="center">
+                                        @Html.DisplayFor(modelitem => item.LeavesRemained)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br />
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="widget-box">
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Leave History</span>
+                    </div>
+
+                    @if (Model.ListStaffLeavesData.Count() > 0)
+                    {
+
+                        int nsno = 1;
+
+                        @*<div class="table-header">
+                                Records Found (@Model.ListStaffLeavesData.Count())
+                            </div>*@
+
+                        <table id="showData" class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("SNo")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Leave Date")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Leave Type")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Type")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Reporting To")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Remarks")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Status")
+                                    </th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="tbodyId">
+                                @foreach (var item in Model.ListStaffLeavesData)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+
+                                        <td>
+                                            @item.DisplayLeaveDate
+                                        </td>
+
+                                        <td>
+                                            @item.LeaveName
+                                        </td>
+
+                                        <td>
+                                            @item.DisplayLeaveType
+                                        </td>
+
+                                        <td>
+                                            @item.ReportingToName
+                                        </td>
+                                        <td>
+                                            @item.Remarks
+                                        </td>
+
+
+                                        <td>
+                                            @item.DisplayStatus
+                                        </td>
+
+                                        @if (item.IsApproved == 0)
+                                        {
+                                            <td>
+                                                <div class="hidden-sm hidden-xs action-buttons">
+                                                    <a class="red" onclick="btnConfirm(@item.LeaveId)">
+                                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div>
+                            <br />
+                            <p> <b> &nbsp; Leaves are not utilized yet  </b></p>
+                        </div>
+                    }
+                </div>
+
+
+            </div>
+        </div>
+
+    }
+
+</section>
+<script>
+
+    function btnConfirm(Value) {
+
+        if (Value > 0) {
+            $.ajax({
+                url: '/HRLeaveManagement/ValidationForLeaveApplicationD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    if (data != "") {
+                        OpenDialog(data, url, title);
+                        return;
+                    }
+
+                    var url = '/HRLeaveManagement/DeleteLeaveApplication?LeaveId=' + Value;
+                    var title = "Leave Application";
+
+                    OpenDialog(data, url, title);
+
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

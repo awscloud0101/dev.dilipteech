@@ -1,0 +1,125 @@
+﻿    @model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@if (null != Model)
+{
+    if (null != Model.lstResults && Model.lstResults.Count() > 0)
+    {
+        @Html.ValidationSummary(true)
+    <input type="hidden" id="AvgMarks" value="@Model.AvgMarks" />
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">Examination Results</h3>
+            </div><!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+                <div style="overflow:auto; height:150px;">
+                    <table class="table table-hover table-striped table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    @Html.DisplayName("Student")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Marks")
+                                </th>
+                            </tr>
+
+                            @foreach (var item in Model.lstResults)
+                            {
+                                <tr>
+                                    <td>
+                                        @item.StudentName
+                                    </td>
+                                    <td>
+                                        @item.MarksScored
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    else
+    {<span style="color: red;"><b>Data not available</b></span> }
+
+
+}
+else
+{<span style="color: red;"><b>Data not available</b></span> }
+
+
+<script>
+    google.charts.setOnLoadCallback(drawVisualization);
+
+    function drawVisualization() {
+        debugger
+        var Results = @Html.Raw(Json.Encode(Model.lstResults));
+        var AvgMarks = $('#AvgMarks').val();
+        var data = new google.visualization.DataTable();
+
+        data.addColumn('string', 'StudentName');
+        data.addColumn('number', 'MarksScored');
+        data.addColumn('number', 'AvgMarks');
+
+        $.each(Results, function (i, record) {
+            data.addRow([record.StudentName, parseInt(record.MarksScored,10),parseInt(AvgMarks,10)]);
+        });
+
+        var options = {
+            title: 'Student Marks - SubjectWise',
+            position: "top",
+            vAxis: { title: 'Marks' },
+            hAxis: { title: 'Student',
+                slantedText: true,
+                slantedTextAngle: 90,
+                showTextEvery:1},
+            seriesType: 'bars',
+            series: { 1: { type: 'line' } },
+            position: "top"
+        };
+
+        var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+</script>
+
+
+    @*<script type="text/javascript">
+        debugger
+        google.charts.setOnLoadCallback(drawChart);
+
+        alert('3');
+        function drawChart() {
+            var Results = @Html.Raw(Json.Encode(Model));
+
+            // Some raw data (not necessarily accurate)
+            data.addColumn('string', 'StudentName');
+            data.addColumn('number', 'MarksScored');
+            data.addColumn('number', 'AvgMarks');
+
+            for (var i = 0; i < Results.length; i++) {
+                data.addRow([Results[i].StudentName, Results[i].MarksScored, Results[i].AvgMarks]);
+            }
+            // Instantiate and draw our chart, passing in some options
+            var chart = new google.visualization.ComboChart(document.getElementById('ColumnChart'));
+            //var chart1 = new google.visualization.PieChart(document.getElementById('piechart1'));
+
+            chart.draw(data,
+              {
+
+                  title: "Column Chart of Google Chart in Asp.net",
+                  position: "top",
+                  fontsize: "14px",
+                  seriesType: 'bars',
+
+                  series: { 2: { type: 'line' } },
+                  series: { 1: { type: 'line' } },
+                  chartArea: { width: '50%' },
+              });
+        }
+    </script>*@
+    <body>
+        <div id="chart_div" style="width: 900px; height: 250px;"></div>
+    </body>

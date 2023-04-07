@@ -1,0 +1,199 @@
+﻿@model AsteriskBrowserAL.SlabSettings
+
+@{
+    ViewBag.Title = "SlabSettingsC";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">SlabSettings</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm("SlabSettingsE", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("SlabSettings")</span>
+
+                @*<div class="page-header">
+                        <br />
+                        <h1>
+                            Subject
+                        </h1>
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "Subject")
+                            </small>
+
+                    </div>*@
+
+                <div class="page-header">
+                    <h1>
+                        SlabSettings
+                        <small style="float:right;">
+                            @Html.ActionLink("Back to details", "SlabSettings", new { ComponentId = @ViewBag.selectd_ComponentId })
+                        </small>
+                    </h1>
+                </div>
+
+
+
+                @*<h3 class="box-title">Subjects</h3>
+                        <br />
+                        <br />
+
+                    </div>*@<!-- /.box-header -->
+                <!-- form start -->
+                @Html.HiddenFor(model => model.PayrollCategoryComponentId)
+                <form class="form-horizontal" role="form">
+
+                    @if (ViewBag.selectd_ComponentId > 0)
+                    {
+                    @Html.HiddenFor(m => m.SlabSettingsId);
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Min. Amount")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.MinAmount, new { autocomplete = "off", @class = "form-control col-sm-5", placeholder = "Min.Amount Name", @id = "MinAmount" })
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="desSubjectName">
+                                <label style="color:red;font-weight:bold;"> Please Enter  Min.Amount </label>
+                            </div>
+                            @*<div class="col-sm-3">
+                                    <span style="color: red;font-weight: bold;">@Html.ValidationMessage("SubjectName")</span>
+                                </div>*@
+
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Max.Amount")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.MaxAmount, new { autocomplete = "off", @class = "form-control col-sm-5", placeholder = "Max Amount", @id = "MaxAmount" })
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="desCode">
+                                <label style="color:red;font-weight:bold;"> Please Enter Max.Amount </label>
+                            </div>
+                            @*<div class="col-sm-3">
+                                    <span style="color: red;font-weight: bold;">@Html.ValidationMessage("SubjectCode")</span>
+                                </div>*@
+
+                        </div>
+                    if(ViewBag.selectd_ComponentTypeId > 1)
+                    {
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Fixed Amount")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.FixedAmount, new { autocomplete = "off", @class = "form-control  txtboxNum col-sm-5", @min = "0", placeholder = "Fixed Amount", @id = "FixedAmount" })
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="desWeekly">
+                                <label style="color:red;font-weight:bold;"> Please Enter  Fixed Amount </label>
+                            </div>
+                            @*<div class="col-sm-3">
+                                    <span style="color: red;font-weight: bold;">@Html.ValidationMessage("MaxWeeklyClasses")</span>
+                                </div>*@
+
+                        </div>
+                    }
+
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    }
+                </form>
+            </div>
+        </div>
+    }
+
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+    function validateStudentSubjects() {
+
+        document.getElementById("count").value = "1";
+        var MinAmount = document.getElementById("MinAmount").value;
+        var MaxAmount = document.getElementById("MaxAmount").value;
+        var FixedAmount = document.getElementById("FixedAmount").value;
+
+        validate = true;
+
+        if (MinAmount == "") {
+            document.getElementById("desSubjectName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desSubjectName").style.display = "none";
+        }
+        if (MaxAmount == "") {
+            document.getElementById("desCode").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desCode").style.display = "none";
+        }
+        if (FixedAmount == "") {
+            document.getElementById("desWeekly").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desWeekly").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+        var validatestatus = validateStudentSubjects();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#Code').click(function () {
+        $('#desCode').hide();
+
+    });
+    $('#SubjectName').click(function () {
+        $('#desSubjectName').hide();
+    });
+
+    $('#Weekly').click(function () {
+        $('#desWeekly').hide();
+    });
+
+</script>
+
+
+
+
+
+
+
+

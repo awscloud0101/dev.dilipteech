@@ -1,0 +1,205 @@
+﻿@model  AsteriskBrowserAL.Models.StudentAttendanceViewModel
+@{
+
+}
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+
+
+@if (null != Model.ListStudentAttendanceData)
+{
+    int sno = 1;
+    if (Model.ListStudentAttendanceData.Count() > 0)
+    {
+        <div class="table-header">
+            Records Found (@Model.ListStudentAttendanceData.Count())
+            <div style="float:right;margin-right:10px;">
+                <button class="btncustom P2" id="btnExport">
+                    Download
+
+                </button>
+            </div>
+        </div>
+ 
+
+        <div class="overflowscroll" style="overflow-x:hidden;height:300px;">
+
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                            S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Branch Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Class")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Section")
+                        </th>
+
+
+                        <th>
+                            @Html.DisplayName("Total Strength")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Present Strength")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Absent Strength")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Present Percentage")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Absent Percentage")
+                        </th>
+
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model.ListStudentAttendanceData)
+                    {
+                        <tr>
+                            <td>
+                                @(sno++)
+                            </td>
+                            <td>
+                                @item.BranchName
+                            </td>
+
+                            <td>
+                                @item.ClassName
+                            </td>
+
+                            <td>
+                                @item.SectionName
+                            </td>
+
+
+                            <td>
+                                @item.StudentCount
+                            </td>
+
+                            <td>
+                                @item.PresentCount
+                            </td>
+
+                            <td>
+                                @item.AbsentCount
+                            </td>
+
+                            <td>
+                                @item.PresentPercentage
+                            </td>
+
+                            <td>
+                                @item.AbsentPercentage
+                            </td>
+
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+          
+            <div class="text12">
+
+                <div class="col-sm-6" >
+                    <h5  style="font-weight:bold">Total Present Students : &nbsp; @Model.TotalPresentStudentsCount</h5>
+
+                </div>
+                <div class="col-sm-6">
+                    <h5  style="font-weight:bold">Total Absent Students : &nbsp; @Model.TotalAbsentStudentsCount</h5>
+
+                </div>
+                <div class="col-sm-6">
+
+                    <h5  style="font-weight:bold">Total Present Students % : &nbsp; @Model.TotalPresentStudentsPersentage</h5>
+                </div>
+                <div class="col-sm-6">
+
+                    <h5  style="font-weight:bold">Total Absent Students % : &nbsp; @Model.TotalAbsentStudentsPersentage</h5>
+                </div>
+              
+            
+              
+            
+            </div>
+
+           
+        </div>
+        <br />
+        <br />
+            <br />
+            @Html.Action("DataTableScripts", "Base")
+    }
+    else
+    {
+        <div style="color:red;font-weight:bold">No Absent Students to display</div>
+        @*<div>@Model.StudentCount Students  Presented</div>*@
+    }
+}
+else
+{
+    <div style="color:red;font-weight:bold">No Absent Students to display</div>
+}
+
+
+
+<script type="text/javascript">
+
+    function submitform() {
+        $.ajax({
+            url: '/AReports/StudentAttendanceReport',
+            data: {},
+            success: function (result) {
+            }
+        })
+    };
+
+
+    //$('#btnExport').click(function () {
+    //    debugger
+    //    window.location.href = "/AReports/ExcelStudentAttendanceReportDT"
+    //    var Data = $("#tbSectionWiseDueReport").html();
+    //});
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+
+    }
+</script>
+
+

@@ -1,0 +1,158 @@
+﻿@model  List<AsteriskBrowserAL.Subscriptions>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Promotions
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Create Database</li>
+    </ul><!-- /.breadcrumb -->
+}
+<section class="content">
+
+    @if (null != TempData["CreateDBMSG"])
+    {
+        @Html.Raw(TempData["CreateDBMSG"])
+    }
+
+    @if (Model != null)
+    {
+        using (Html.BeginForm("CreateDB", "SPromotions", FormMethod.Post))
+        {
+
+            int nsno = 1;
+
+            <input type="hidden" id="SelSubscription" name="Subscriptions" />
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="table-header">
+                        Create Database
+
+                        @if (Model.Count > 0)
+                        {
+                            <div class="widget-toolbar no-border">
+                                <div class="inline action-buttons">
+                                    <button class="view-header-btn  btn btn-info btn-xs" role="button" onclick="return ValidateControls();"
+                                            type="submit" id="btnCreate">
+                                        <i class="fa fa-plus-circle bigger-180"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @if (Model.Count > 0)
+                    {
+
+                        <div class="hideScrolling">
+
+                            <table class="table tbhover table-striped table-bordered dynamic-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" id="ChkSelectAll" />
+                                        </th>
+                                        <th>
+                                            @("S.No")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Institute")
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" id="ChkBranch" value="@item.SubscriptionId" />
+                                            </td>
+
+                                            <td>
+                                                @(nsno++)
+                                            </td>
+                                            <td>
+                                                @if (null != item.DataBasePath)
+                                                {
+                                                    @item.DataBasePath
+                                                }
+
+                                            </td>
+
+                                        </tr>
+
+                                    }
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div style="margin:10px" class="alert alert-danger">
+                            <b>Data is not available</b>
+                        </div>
+                    }
+
+
+                </div>
+
+            </div>
+        }
+    }
+
+
+    @Html.Action("DataTableScripts", "Base")
+
+</section>
+
+<script>
+
+
+    function ValidateControls() {
+        debugger
+
+        var result = $('#ChkBranch:checked');
+
+        var AddItemIds = "";
+
+        $.each(result, function (i, result) {
+            AddItemIds += result.value + ","
+        });
+
+
+        if (AddItemIds == "" || AddItemIds == undefined) {
+
+            ShowGritter("Please select one or more component", Message, 'gritter-error');
+            return false;
+        }
+
+        $('#SelSubscription').val(AddItemIds);
+
+        return true;
+    }
+
+    $('#ChkSelectAll').change(function () {
+
+        if ($(this).prop('checked')) {
+            $('tbody tr td #ChkBranch').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #ChkBranch').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+</script>

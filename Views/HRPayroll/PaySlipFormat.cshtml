@@ -1,0 +1,148 @@
+﻿@model AsteriskBrowserAL.Models.SalaryItemsViewData
+@using AsteriskBrowserAL.Helpers;
+@{
+    double? Gross = Model.ListSalaryItemsEarnings.Sum(s => s.Amount);
+    double? Deduction = Model.ListSalaryItemsDeductions.Sum(s => s.Amount);
+
+    double? NetAmount = Gross - Deduction;
+}
+
+<table style="border:solid 1px black;width:100%;margin-top:5em;">
+    <tr style="width:100%;margin-top:5em;">
+        <td style="width:10%;margin-top:5em;" align="center">
+            @Html.HiddenFor(model => model.InstituteDetails.InstituteLogo)
+            @if (null != ViewBag.IsPhotoAvailable)
+            {
+                if (ViewBag.IsPhotoAvailable)
+                {
+                    <div> <img id="image1" height="120" width="120" style="margin-left:1em" class="editable img-responsive" src="@ViewBag.ImageData" /></div>
+                }
+            }
+        </td>
+        <td style="width:90%;margin-top:5em;">
+            <b style="white-space:nowrap;font-size:25px;color:#8064a2;font-family:Calibri;font-weight: bold;">Demo Campuswhiz </b><br />
+            <b style="white-space:nowrap;font-size:17px;color:#8064a2;font-family:Calibri;font-weight: bold;">Hitech City,Hyderabad </b>
+        </td>
+    </tr>
+    <tr style="width:100%">
+        <td colspan="2" align="center">
+            <br />
+            <span style="text-align: center;color:#4F6228;font-family:Calibri;font-weight: bold;font-size:25px"><u>PAYSLIP FOR THE MONTH OF @Model.MonthName.ToUpper()</u></span>
+            <br />
+            <br />
+        </td>
+    </tr>
+    <tr style="width:100%">
+        <td align="center">
+            <table style="margin-left:4em">
+                <tr style="white-space:nowrap">
+                    <td style="color:#A0522D;font-family:Calibri;font-weight: bold">ERP Code</td>
+                    <td>:</td>
+                    <td style="font-family:Calibri;font-weight: bold">@Model.ERPCode</td>
+                </tr>
+                <tr style="white-space:nowrap">
+                    <td style="color:#A0522D;font-family:Calibri;font-weight: bold">Employee Name</td>
+                    <td>:</td>
+                    <td style="font-family:Calibri;font-weight: bold">@Model.EmployeeName</td>
+                </tr>
+                <tr style="white-space:nowrap">
+                    <td style="color:#A0522D;font-family:Calibri;font-weight: bold">Designation</td>
+                    <td>:</td>
+                    <td style="font-family:Calibri;font-weight: bold">@Model.Designation</td>
+                </tr>
+                <tr style="white-space:nowrap">
+                    <td style="color:#A0522D;font-family:Calibri;font-weight: bold">Branch</td>
+                    <td>:</td>
+                    <td style="font-family:Calibri;font-weight: bold">@Model.Branch</td>
+                </tr>
+                <tr style="white-space:nowrap">
+                    <td style="color:#A0522D;font-family:Calibri;font-weight: bold">UAN Number</td>
+                    <td>:</td>
+                    <td style="font-family:Calibri;font-weight: bold">@Model.UANNumber</td>
+                </tr>
+            </table>
+        </td>
+        <td align="center">
+            <table>
+                <tr style="white-space:nowrap">
+                    <td style="color:#A0522D;font-family:Calibri;font-weight: bold">Bank Name</td>
+                    <td>:</td>
+                    <td style="font-family:Calibri;font-weight: bold">@Model.BankName</td>
+                </tr>
+                <tr style="white-space:nowrap">
+                    <td style="color:#A0522D;font-family:Calibri;font-weight: bold">A/c Number</td>
+                    <td>:</td>
+                    <td style="font-family:Calibri;font-weight: bold">@Model.AccountNumber</td>
+                </tr>
+                <tr style="white-space:nowrap">
+                    <td style="color:#A0522D;font-family:Calibri;font-weight: bold">Paid Days</td>
+                    <td>:</td>
+                    <td style="font-family:Calibri;font-weight: bold">@Model.PaidDays</td>
+                </tr>
+                <tr style="white-space:nowrap">
+                    <td style="color:#A0522D;font-family:Calibri;font-weight: bold">Arrears Days</td>
+                    <td>:</td>
+                    <td style="font-family:Calibri;font-weight: bold">@Model.ArrearsDays</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <tr style="width:100%;" align="center">
+        <td colspan="2">
+            <br />
+            <table style="border-collapse: collapse;width:90%;" align="center">
+                <thead>
+                    <tr style="border: 1px solid black">
+                        <th colspan="2" style="border: 1px solid black;font-family:Calibri;font-weight: bold">Earnings</th>
+                        <th colspan="2" style="border: 1px solid black;font-family:Calibri;font-weight: bold">Deductions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ListToDisplayinView)
+                    {
+                        <tr style="border: 1px solid black">
+                            <td style="width:25%;border: 1px solid black;font-family:Calibri;font-weight: bold" align="left">&nbsp; @item.ColumnOne </td>
+                            <td style="width:25%;border: 1px solid black;font-family:Calibri;font-weight: bold" align="right">@item.ColumnTwo &nbsp;</td>
+                            <td style="width:25%;border: 1px solid black;font-family:Calibri;font-weight: bold" align="left">&nbsp; @item.ColumnThree </td>
+                            <td style="width:25%;border: 1px solid black;font-family:Calibri;font-weight: bold" align="right">@item.ColumnFour &nbsp;</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td style="width:25%;border: 1px solid black;font-family:Calibri;font-weight: bold" align="right">Gross Salary &nbsp;</td>
+                        <td style="width:25%;border: 1px solid black;font-family:Calibri;font-weight: bold" align="right">
+                            @Utility.ConvertToStringCommas(Math.Round(Gross.Value, MidpointRounding.AwayFromZero).ToString()) &nbsp;
+                        </td>
+                        <td style="width:25%;border: 1px solid black;font-family:Calibri;font-weight: bold" align="right">Total Deductions&nbsp; </td>
+                        <td style="width:25%;border: 1px solid black;font-family:Calibri;font-weight: bold" align="right">
+                            @Utility.ConvertToStringCommas(Math.Round(Deduction.Value, MidpointRounding.AwayFromZero).ToString()) &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    <tr style="width:90%">
+        <td colspan="2">
+            <br />
+            <table style="border-collapse: collapse;font-family:Calibri;font-weight: bold;width:90%" align="center">
+                <tr>
+                    <td align="center" style="border: 1px solid black;width:50%" colspan="2">Net Salary</td>
+                    <td align="center" style="border: 1px solid black;width:25%">
+                        @Utility.ConvertToStringCommas(Math.Round(NetAmount.Value, MidpointRounding.AwayFromZero).ToString())
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+            <br />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" align="right" style="font-family:Calibri;">
+            <span style="font-weight:bold">Note: Since this is a computer-generated statement, it does not need any signature.&emsp;&emsp;&emsp;</span>
+            <br />
+            <br />
+        </td>
+    </tr>
+</table>
+

@@ -1,0 +1,317 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    ViewBag.Title = "ExamAnalysis";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Transactions
+        </li>
+        <li>
+            <i class=""></i>
+            Parent
+        </li>
+        <li class="active">Exam Analysis</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+</script>
+
+
+<section class="content">
+    <br />
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ExamResultsSubjectWise", "AReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                Subject Wise Analysis
+                            </h5>
+                            <div class="widget-toolbar no-border">
+                                <div class="inline action-buttons">
+                                    <a class="btn btn-info btn-minier P2" id="btnViewData" style="margin-bottom:8px">View Data</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">Division</label>
+                                                <div class="col-xs-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">Branch</label>
+                                                <div class="col-xs-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.BranchId" />
+                                }
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4">Class</label>
+                                            <div class="col-sm-6">
+                                                <select id="ClassNumberId" name="ClassNumberId" class="form-control"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4">Examination</label>
+                                            <div class="col-sm-6">
+                                                <select id="ExaminationId" name="ExaminationId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4">Subjects</label>
+                                            <div class="col-sm-6">
+                                                <select id="SubjectId" name="SubjectId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div id="ExamResultData"></div>
+            }
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    var status = 0;
+    var DisplayValidation = "";
+
+    $(document).ready(function () {
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral != "value") {
+            LoadClassDropdown();
+        }
+    })
+
+
+    $('#DivisionId').change(function () {
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/AReports/GetBranchesByDivisionIdMarksEntryReport',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+        LoadClassDropdown();
+    });
+
+    function LoadClassDropdown() {
+
+        var IsCentral = $('#IsCentral').val();
+
+        var Branchid = $("#BranchId").val();
+        if (Branchid > 0 || IsCentral != "value") {
+            $.ajax({
+                url: '/AReports/GetClassNumberList',
+                success: function (result) {
+                    var ClassNumberItems = $("#ClassNumberId")
+                    ClassNumberItems.children().remove();
+                    ClassNumberItems.append($("<option>").val("0").text("---Select ---"))
+                    $.each(result, function (e, record) {
+                        ClassNumberItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                    });
+
+                    $("#ClassNumberId").append(ClassNumberItems);
+                },
+                async: false
+            })
+        }
+
+    }
+
+    $('#ClassNumberId').change(function () {
+        $('#ExaminationId').empty();
+
+        var ClassNumberid = $('#ClassNumberId').val();
+
+        if (ClassNumberid < 1) {
+            $('#ExamResultData').html("");
+        }
+        else {
+            GetExaminations();
+            GetSubjects();
+            $('#ExamResultData').html("");
+        }
+    });
+
+    function GetSubjects() {
+        var ClassNumberid = $('#ClassNumberId').val();
+
+        if (ClassNumberid > 0) {
+            $.ajax({
+
+                url: '/AReports/GetSubjects',
+                data: { nClassNumber: ClassNumberid },
+                success: function (data) {
+
+                    var SubjectItems = $('#SubjectId');
+
+                    SubjectItems.children().remove();
+
+                    SubjectItems.append($("<option>").val("0").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+                    });
+
+                    $('#SubjectId').append(SubjectItems);
+                },
+                aync: false
+            });
+        }
+    }
+
+    function GetExaminations() {
+        var ClassNumberid = $('#ClassNumberId').val();
+        var BranchsId = $('#BranchId').val();
+
+        if (ClassNumberid > 0) {
+            $.ajax({
+
+                url: '/AReports/GetExaminationsByClassNumberBranchWise',
+                data: { nClassNumberId: ClassNumberid, Branchid: BranchsId },
+                success: function (data) {
+
+                    var ExaminationItems = $('#ExaminationId');
+
+                    ExaminationItems.children().remove();
+
+                    ExaminationItems.append($("<option>").val("0").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        ExaminationItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+
+                    });
+
+                    $('#ExaminationId').append(ExaminationItems);
+                },
+                aync: false
+            });
+        }
+    }
+
+    $('#btnViewData').click(function () {
+        debugger
+        GetResults();
+    });
+
+    function GetResults() {
+
+        var SubjectId = $('#SubjectId').val();
+        var ExaminationId = $('#ExaminationId').val();
+        var BranchsId = $('#BranchId').val();
+        var ClassNumberid = $('#ClassNumberId').val();
+        if (SubjectId > 0) {
+            $.ajax({
+                url: '/AReports/GetExaminationsResultsDataSubjectWise',
+                data: { ExamId: ExaminationId, SubjectId: SubjectId, nSubId: BranchsId, nClassNumber: ClassNumberid },
+                success: function (result) {
+                    $('#ExamResultData').html(result);
+                },
+                async: false
+            })
+        }
+    }
+
+    $('#SectionId').change(function () {
+
+        var SectionId = $('#SectionId').val();
+        var BranchsId = $('#BranchId').val();
+
+        if (SectionId > 0) {
+            $.ajax({
+
+                url: '/AReports/GetStudentsBySectionAndBranch',
+                data: { nSectionId: SectionId, nSubId: BranchsId },
+                success: function (data) {
+
+                    var StudentItems = $('#StudentId');
+
+                    StudentItems.children().remove();
+
+                    StudentItems.append($("<option>").val("0").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        StudentItems.append($("<option>").val(record.StudentId).text(record.Name));
+                    });
+
+                    $('#StudentId').append(StudentItems);
+                },
+                aync: false
+            });
+        }
+
+    });
+
+</script>
+

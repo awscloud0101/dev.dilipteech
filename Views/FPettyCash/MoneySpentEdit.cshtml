@@ -1,0 +1,386 @@
+﻿@model AsteriskBrowserAL.Models.MoneySpentViewModel
+@{
+    ViewBag.Title = "Money Spent Edit";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="~/script/jquery-2.0.3.js"></script>
+<script src="~/script/jquery-ui.js"></script>
+<script src="~/js/jquery-1.10.2.js"></script>
+<script src="~/js/jquery-ui.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            PettyCash
+        </li>
+        <li class="active">Money Spent</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <br />
+
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("MoneySpentEdit", "FPettyCash", new { dtDatetime = Model.TransactionDate }, FormMethod.Post))
+            {
+                <input type="hidden" id="SelHeadId" name="HeadId" value="@Model.HeadId" />
+                <input type="hidden" id="SelSubHeadId" name="SubHeadId" value="@Model.SubHeadId" />
+                <input type="hidden" id="TransAmount" name="Amount" value="@Model.Amount" />
+                <input type="hidden" name="TransactionDate" value="@Model.TransactionDate" />
+                <input type="hidden" name="HeadName" value="@Model.HeadName" />
+                <input type="hidden" name="CashInHand" value="@Model.CashInHand" />
+
+                @Html.HiddenFor(t => t.PettyCashTransactionId)
+                @Html.HiddenFor(t => t.HeadId)
+                @Html.HiddenFor(t => t.NewPaidTo)
+
+                <div class="page-header">
+                    <h1>
+                        <small style="float:right">
+
+                            @Html.ActionLink("Back to details", "MoneySpentRequest")
+
+                        </small>
+                    </h1>
+                </div>
+                <div class="widget-box">
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("PettyCashHead")</span>
+
+                    <div class="widget-header widget-header-flat widget-header-small">
+
+                        <h5 class="widget-title">
+                            @Model.HeadName
+                        </h5>
+
+
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <button class="btn btn-info btn-minier" type="submit" style="float:right;width:80px" onclick="return submitForm();">
+                                    <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                                </button>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="well">
+                                    <input type="hidden" id="cashInHand" name="cashInHand" value="@Model.CashInHand" />
+
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <h5 class="blue">Cash In Hand : </h5>
+                                                </td>
+                                                <td style="text-align:right">
+
+                                                    <h5 id="lblCashInHand"> :  @Model.CashInHand</h5>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+                                </div>
+                                <br />
+
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5">@Html.Label("Petty Cash Sub-Head")</label>
+                                        <div class="col-xs-6">
+                                            <select id="SubHeadId" name="NewSubHeadId" class="form-control"></select>
+                                            <div class="col-sm-12" style="display:none;" id="Nameval">
+                                                <label style="color:red;font-weight:bold;">Required</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6" style="pointer-events: none">
+                                        <label class="col-sm-5">@Html.Label("Date")</label>
+                                        <div class="col-xs-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" value="@Model.TransactionDate.Value.ToShortDateString()" id="TransactionDateval" name="TransactionDate" autocomplete="off" placeholder="Transaction Date" readonly="readonly" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                            <div class="col-sm-12" style="display:none;" id="lessDatesReq">
+                                                <label style="color:red;font-weight:bold;"> Please select lesss than @Model.AllowDays days</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <br />
+                                </div>
+
+
+
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5">@Html.Label("Spent Amount")</label>
+                                        <div class="col-xs-6">
+                                            @Html.TextBoxFor(model => model.NewAmount, new { autocomplete = "off", @class = "form-control txtboxNum", id = "Amount", placeholder = "Amount", @Value = Model.Amount })
+                                            <div class="col-sm-12" style="display:none;" id="spendAmount">
+                                                <label style="color:red;font-weight:bold;"> In sufficient funds</label>
+                                            </div>
+                                            <div class="col-sm-12" style="display:none;" id="spendAmountNull">
+                                                <label style="color:red;font-weight:bold;">Required</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5">@Html.Label("Paid To")</label>
+                                        <div class="col-xs-6">
+                                            @Html.TextBoxFor(model => model.PaidTo, new { autocomplete = "off", @class = "form-control textlength", @id = "PaidTo", placeholder = "Paid To", value = Model.PaidTo })
+                                            <div class="col-sm-12" style="display:none;" id="PaidToNull">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <br />
+                                </div>
+                                <br />
+                                <br />
+
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Voucher #")</label>
+                                        <div class="col-xs-6">
+                                            @Html.TextBoxFor(model => model.DisplayVoucherNo, new { @class = "form-control textlength", @id = "Voucher", @readonly = "readonly", value = Model.DisplayVoucherNo })
+                                            <div class="col-sm-12" style="display:none;" id="vocherNull">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-5">@Html.Label("Remarks")</label>
+                                        <div class="col-xs-6">
+                                            @Html.TextBoxFor(model => model.NewDescription, new { autocomplete = "off", @class = "form-control textlength", @id = "tbNarration", placeholder = "Remarks", })
+                                            <div class="col-sm-12" style="display:none;" id="NarrationNull">
+                                                <label style="color:red;font-weight:bold;"> Required </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <br />
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        if ($('#SelHeadId').val() > 0) {
+
+            var HeadId = $('#SelHeadId').val();
+
+            if (HeadId != 0) {
+
+                $.ajax({
+                    url: '/FPettyCash/GetSubHeadsByHeadIdforMoneySpent',
+                    data: { HeadId: HeadId },
+                    success: function (data) {
+
+                        var SubHeadItems = $('#SubHeadId');
+
+                        SubHeadItems.children().remove();
+
+                        SubHeadItems.append($("<option>").val("null").text("--- Select ---"));
+
+                        $.each(data, function (i, record) {
+                            SubHeadItems.append($("<option>").val(record.PettyCashSubHeadId).text(record.SubHeadName));
+                        });
+
+                        $('#SubHeadId').append(SubHeadItems);
+
+                        if ($('#SelSubHeadId').val() > 0) {
+                            $('#SubHeadId').val($('#SelSubHeadId').val());
+                        }
+                    },
+                    aync: false
+                });
+            }
+        }
+    });
+
+    function validatePettycashHead() {
+
+        var HeadName = $('#SubHeadId').val();
+        var cashInHand = parseInt($('#cashInHand').val());
+        var OldAmount = $('#TransAmount').val();
+        var spendAmount = parseInt($('#Amount').val());
+        var spendAmountnew = $('#Amount').val();
+        var paidTo = $('#PaidTo').val();
+        var Narr = $('#tbNarration').val();
+
+        cashInHand = parseInt(cashInHand) + parseInt(OldAmount);
+
+        validate = true;
+
+        //Name validation
+        if (HeadName == "null" || HeadName == " ") {
+            document.getElementById("Nameval").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("Nameval").style.display = "none";
+        }
+
+        //Checking for amount validation
+        if (spendAmountnew == null || parseInt(spendAmountnew) < 1) {
+            document.getElementById('spendAmountNull').style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById('spendAmountNull').style.display = "none";
+        }
+
+        if (cashInHand < spendAmount) {
+            document.getElementById('spendAmount').style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById('spendAmount').style.display = "none";
+            validate = true;
+        }
+
+        //paid to validation
+        if (paidTo == "") {
+            document.getElementById("PaidToNull").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("PaidToNull").style.display = "none";
+        }
+
+        //Narration validation
+        if (Narr == "") {
+            document.getElementById("NarrationNull").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("NarrationNull").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validatePettycashHead();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function LoadCashInHandBal() {
+
+        debugger
+
+        var Datetime = $('#TransactionDateval').val();
+        var HeadId = $('#SelHeadId').val();
+        alert(HeadId)
+
+        $('#imagemodal').show();
+
+        $.ajax({
+
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                $('#imagemodal').hide();
+            },
+
+            url: '/FPettyCash/GetCashinHandByHeadIdAndTransactionDate',
+            data: { nHeadId: HeadId, dtTransactionDate: Datetime },
+            success: function (data) {
+
+                debugger
+                $('#imagemodal').hide();
+                $('#lblCashInHand').html( data);
+                $('#cashInHand').val(data);
+            },
+            aync: false
+        });
+    }
+
+    $('#TransactionDateval').change(function () {
+        LoadCashInHandBal();
+    });
+
+    $('#TransactionDateval').focus(function () {
+        $('#lessDatesReq').hide();
+    });
+
+    $('#SubHeadId').focus(function () {
+        $('#Nameval').hide();
+    });
+
+    $('#PaidTo').focus(function () {
+        $('#PaidToNull').hide();
+    });
+
+    $('#Amount').focus(function () {
+        $('#spendAmountNull').hide();
+    });
+
+
+    $('#tbNarration').focus(function () {
+        $('#NarrationNull').hide();
+    });
+
+
+
+
+</script>

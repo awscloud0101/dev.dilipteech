@@ -1,0 +1,185 @@
+﻿@model AsteriskBrowserAL.Models.PettyCashReportViewModel
+@{
+    ViewBag.Title = "Funds Transfer Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Funds Transfer Edit</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("FundsTransnferEdit", "FOperations", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="SelectedBranchId" name="ToBranch" value="@Model.ToBranch" />
+                    <input type="hidden" id="SelectedDivisionId" name="DivisionId" value="@Model.DivisionId" />
+
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    @*<div class="page-header">
+                        <h1>
+                            Funds Transfer
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "FundTransfer", new { nDivisionId = Model.DivisionId, nBranchId = Model.ToBranch })
+                            </small>
+                        </h1>
+                    </div>*@
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;"> Funds Transfer Edit Details  &nbsp;&nbsp; @Model.BranchName</span>
+                  
+                            <div class="" style="float:right;margin-right:10px">
+
+
+
+                                <a id="ViewData" name="ViewData" onclick="return submitForm();">
+                                    <span class="btncustom">View Data</span>
+                                </a>
+
+
+
+                            </div>
+                        <div class="" style="float:right;margin-right:10px">
+                            <small style="float:right;font-weight:bold;" class="textheader">
+                                @Html.ActionLink("Back to details", "FundTransfer", new { nDivisionId = Model.DivisionId, nBranchId = Model.ToBranch })
+                            </small>
+
+                        </div>
+                        </div>
+                        <div class="widget-box">
+                     
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <div class="row">
+
+                                        <div class="col-xs-12">
+
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">From Date</label>
+                                                <div class="col-xs-6">
+                                                    <div id="datepicker" class="input-group date">
+                                                        <input class="form-control" type="text" id="FromDate" name="FromDate" value="@Model.FromDate.Value.ToShortDateString()" autocomplete="off" placeholder="From Date" />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">To Date</label>
+                                                <div class="col-xs-6">
+                                                    <div id="datepicker" class="input-group date">
+                                                        <input class="form-control" type="text" id="ToDate" name="ToDate" value="@Model.ToDate.Value.ToShortDateString()" autocomplete="off" placeholder="To Date  " />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        }
+                        <div id="FundTransferReportDIV"></div>
+
+                        }
+                    </div>
+                    </div>
+
+</section>
+
+
+<script>
+
+    function ONLOADDATA() {
+        submitForm();
+    }
+
+    window.onload = ONLOADDATA();
+
+    var DisplayValidation = "";
+
+
+    function submitForm() {
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        var Validation = ValidateFundsTransfer();
+
+        if (Validation == false) {
+
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+            $('#imagemodal').show();
+
+            $.ajax({
+
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    $('#imagemodal').hide();
+                },
+
+                url: '/FPettyCash/FundsTransferReportPartialView',
+                data: { DevisionId: $('#SelectedDivisionId').val(), BranchId: $('#SelectedBranchId').val(), FromDate: $('#FromDate').val(), ToDate: $('#ToDate').val() },
+
+                success: function (data) {
+                    $('#FundTransferReportDIV').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+    function ValidateFundsTransfer() {
+
+        var valid = true;
+
+        var dtFromDate = $('#FromDate').val();
+        if (dtFromDate == "") {
+            valid = false;
+            DisplayValidation += "From Date, ";
+        }
+
+        var dtToDate = $('#ToDate').val();
+        if (dtToDate == "") {
+            valid = false;
+            DisplayValidation += "To Date, ";
+        }
+
+        return valid;
+    };
+
+
+    function Editoperation(PettyCashHeadId) {
+
+    }
+
+</script>
+

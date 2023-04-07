@@ -1,0 +1,68 @@
+﻿@model AsteriskBrowserAL.StockEntry
+
+
+
+<style>
+    body{
+
+        background:white;
+    }
+
+</style>
+<div class="widget-box">
+    <div class="">
+        @*<h5 class="widget-title">
+                Budget Available
+            </h5>*@
+        <div class="" style="float:right;margin-right:10px;margin-top:10px;">
+            <button type="submit" onclick="return submitForm();" name="pay" value="Save" class="btncustom">
+                Save
+            </button>
+        </div>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="row">
+                <div class="col-sm-8">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Budget")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.Budget, new { @class = "form-control textlength", @id = "budget", @maxlength = "35", placeholder = "Budget" })
+                                </div>
+                                <span class="col-sm-2" style="color:red" id="RequiredItemsVal"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="RequisitionId" id="nRequisitionId" value="@Model.RequisitionId" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function submitForm() {
+        debugger
+        var requistionid = $('#nRequisitionId').val();
+        var Budget = $('#budget').val();
+        debugger
+        $.ajax({
+            url: '/SOperations/RequisitionApproval',
+            data: { budget: Budget, nRequisitionId: requistionid },
+            type: 'Post',
+            success: function (data) {
+            },
+            error: function () {
+                $('#imagemodal').show();
+            }
+
+        }).done(function () {
+            debugger
+            $('#myNewModal').hide();
+            location.reload();
+        });
+    }
+</script>

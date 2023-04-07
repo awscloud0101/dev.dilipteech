@@ -1,0 +1,151 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StudentAdmissionData>
+@{
+    ViewBag.Title = "Inquiry Details";
+    bool bIsCentral = false;
+    if (null != Model && Model.Count() > 0)
+    {
+        var IsDivisionSelected = Model.FirstOrDefault();
+        if (null != IsDivisionSelected)
+        {
+            bIsCentral = IsDivisionSelected.IsCentral;
+        }
+
+    }
+}
+
+
+
+
+@if (Model != null)
+{
+    if (Model.Count() > 0)
+    {
+        int nsno = 1;
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+
+        <div class="overflowscroll">
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Academic Year")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Student")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Inquiry Number")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Registration Date")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Registration Number")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Father Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Mobile Number")
+                        </th>
+
+                        <th>
+
+                            @Html.DisplayName("Branch")
+                        </th>
+
+                        @if (!bIsCentral)
+                    {
+                            <th></th>
+                        }
+
+
+
+                    </tr>
+
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @(nsno++)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DisplayAcademicYear)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FirstName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.InquiryNumber)
+                            </td>
+                            <td>
+                                @if (item.ApplicationDate.HasValue)
+                                {
+                                    @item.ApplicationDate.Value.ToString("dd - MMM - yyyy")
+
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @Html.DisplayFor(modelItem => item.DispalyApplicationNumber)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FatherName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FatherMobileNumber)
+                            </td>
+
+                            <td>
+
+                                @Html.DisplayFor(modelItem => item.Institute)
+                            </td>
+
+                            @if (item.ProvisionalAdmission == true)
+                        {
+                            if (item.IsCentral == false)
+                            {
+                                    <td>
+                                        @Html.ActionLink("Admission", "Admission", new {StudentId = @item.StudentId },new { @class = "P2"})
+                                    </td>
+
+                                }
+                            }
+
+
+
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+            </div>
+            }
+            else
+            {
+            <span style="color:red;font-weight:bold">Data not available</span>
+            }
+            }
+            else
+            {
+            <span style="color:red;font-weight:bold">Data not available</span>
+            }
+
+            @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })

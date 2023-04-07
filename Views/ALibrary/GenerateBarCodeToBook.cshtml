@@ -1,0 +1,344 @@
+﻿@model AsteriskBrowserAL.Models.ReturnBookViewModel
+
+@{
+    List<SelectListItem>
+        LibraryId = new List<SelectListItem>
+            {
+        new SelectListItem
+        {
+        Text = "Books",
+        Value="0",
+        },
+        new SelectListItem
+        {
+        Text = "Magazine",
+        Value="1",
+        },
+        new SelectListItem
+        {
+        Text = "Audio/Video",
+        Value="2",
+        }
+            };
+}
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+<br /><br />
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Generate BarCode</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+<br>
+<span style="color:red;font-weight:bold" id="ValidationMsg"> </span>
+<div class="row">
+
+    <div class="col-xs-12">
+        <div class="widget-box">
+            <div class="widget-body">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        Generate Barcode
+                    </h5>
+                    <div style="float:right">
+                        <button class="btn btn-success btn-sm" name="Generate" id="Generate">
+                            Generate
+                        </button>
+                    </div>
+                </div>
+
+                <div class="widget-main">
+                    <br /><br />
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Category Type</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("LibraryId", LibraryId, "--Select--", new { @class = "form-control col-sm-5" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br /><br />
+                    <div class="row" id="AVDiv" style="display:none">
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Acc #1</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("AVDetailsId1", null, "--Select--", new { @class = "form-control select2", @id = "AVDetailsId1", @name = "AVDetailsId1" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Acc #2</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("AVDetailsId2", null, "--Select--", new { @class = "form-control select2", @id = "AVDetailsId2", @name = "AVDetailsId2" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="BookDiv" style="display:none">
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Acc #1</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("BookDetailsId1", null, "--Select--", new { @class = "form-control select2", @id = "BookDetailsId1", @name = "BookDetailsId1" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Acc #2</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("BookDetailsId2", null, "--Select--", new { @class = "form-control select2", @id = "BookDetailsId2", @name = "BookDetailsId2" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="MaagazineDiv" style="display:none">
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Acc #1</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("MagazineDetailsId1", null, "--Select--", new { @class = "form-control select2", @id = "MagazineDetailsId1", @name = "MagazineDetailsId1" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Acc #2</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("MagazineDetailsId2", null, "--Select--", new { @class = "form-control select2", @id = "MagazineDetailsId2", @name = "MagazineDetailsId2" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br />
+                <br />
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    function ValidationData() {
+        var value = $('#LibraryId').val()
+        var Acc1 = $('#BookDetailsId1').val()
+        var Acc2 = $('#BookDetailsId2').val()
+        var MagAcc1 = $('#MagazineDetailsId1').val()
+        var MagAcc2 = $('#MagazineDetailsId2').val()
+        var AV1 = $('#AVDetailsId1').val()
+        var AV2 = $('#AVDetailsId2').val()
+        var validation = true;
+        if (value == 0) {
+            if (Acc1 > 0 && Acc2 > 0) {
+                validation = true;
+            }
+            else if (Acc1 > 0 && (Acc2 == "" || Acc2 == null || Acc2 == undefined)) {
+                document.getElementById("ValidationMsg").innerHTML = "Select Acc #2";
+                validation = false;
+            }
+            else if (Acc2 > 0 && (Acc1 == "" || Acc1 == null || Acc1 == undefined)) {
+                document.getElementById("ValidationMsg").innerHTML = "Select Acc #1";
+                validation = false;
+            }
+            else {
+                document.getElementById("ValidationMsg").innerHTML = "Select Acc #1 and Acc #2";
+                validation = false
+            }
+        }
+        else if (value == 1) {
+            if (MagAcc1 > 0 && MagAcc2 > 0) {
+                validation = true;
+            }
+            else if (MagAcc1 > 0 && (MagAcc2 == "" || MagAcc2 == null || MagAcc2 == undefined)) {
+                document.getElementById("ValidationMsg").innerHTML = "Select Acc #2";
+                validation = false;
+            }
+            else if (MagAcc2 > 0 && (MagAcc1 == "" || MagAcc1 == null || MagAcc1 == undefined)) {
+                document.getElementById("ValidationMsg").innerHTML = "Select Acc #1";
+                validation = false;
+            }
+            else {
+                document.getElementById("ValidationMsg").innerHTML = "Select Acc #1 and Acc #2";
+                validation = false;
+            }
+        }
+        else if (value == 2) {
+            if (AV1 > 0 && AV2 > 0) {
+                validation = true;
+            }
+            else if (AV1 > 0 && (AV2 == "" || AV2 == null || AV2 == undefined)) {
+                document.getElementById("ValidationMsg").innerHTML = "Select Acc #2";
+                validation = false;
+            }
+            else if (AV2 > 0 && (AV1 == "" || AV1 == null || AV1 == undefined)) {
+                document.getElementById("ValidationMsg").innerHTML = "Select Acc #1";
+                validation = false;
+            }
+            else {
+                document.getElementById("ValidationMsg").innerHTML = "Select Acc #1 and Acc #2";
+                validation = false;
+            }
+        }
+        else {
+            validation = false;
+        }
+        return validation;
+    }
+
+    $('#BookDetailsId1').change(function () {
+        document.getElementById("ValidationMsg").innerHTML = "";
+    })
+    $('#BookDetailsId2').change(function () {
+        document.getElementById("ValidationMsg").innerHTML = "";
+    })
+    $('#MagazineDetailsId1').change(function () {
+        document.getElementById("ValidationMsg").innerHTML = "";
+    })
+    $('#MagazineDetailsId2').change(function () {
+        document.getElementById("ValidationMsg").innerHTML = "";
+    })
+    $('#AVDetailsId1').change(function () {
+        document.getElementById("ValidationMsg").innerHTML = "";
+    })
+    $('#AVDetailsId2').change(function () {
+        document.getElementById("ValidationMsg").innerHTML = "";
+    })
+</script>
+
+<script>
+    $('#LibraryId').change(function () {
+        var value = $('#LibraryId').val()
+        $('#BookDetailsId2').val('')
+        $('#MagazineDetailsId2').val('')
+
+        if (value == 0) {
+            $('#MaagazineDiv').hide()
+            $('#BookDiv').show()
+            $('#AVDiv').hide()
+        }
+        else if (value == 1) {
+            $('#MaagazineDiv').show()
+            $('#BookDiv').hide()
+            $('#AVDiv').hide()
+        }
+        else if (value == 2) {
+            $('#AVDiv').show()
+            $('#BookDiv').hide()
+            $('#MaagazineDiv').hide()
+        }
+        else {
+            $('#BookDiv').hide()
+            $('#AVDiv').hide()
+            $('#MaagazineDiv').hide()
+        }
+    })
+</script>
+
+
+<script>
+    $('#Generate').click(function () {
+        var result = ValidationData();
+        if (result == true) {
+            debugger
+            var BookDetailsId1 = $('#BookDetailsId1').val();
+            var BookDetailsId2 = $('#BookDetailsId2').val();
+            var MagazineDetailsId1 = $('#MagazineDetailsId1').val();
+            var MagazineDetailsId2 = $('#MagazineDetailsId2').val();
+            var AVDetailsId1 = $('#AVDetailsId1').val();
+            var AVDetailsId2 = $('#AVDetailsId2').val();
+
+            if (BookDetailsId1 == 'undefined') {
+                BookDetailsId1 = 0;
+            }
+            if (BookDetailsId2 == 'undefined') {
+                BookDetailsId2 = 0;
+            }
+            if (MagazineDetailsId1 == 'undefined') {
+                MagazineDetailsId1 = 0;
+            }
+            if (MagazineDetailsId2 == 'undefined') {
+                MagazineDetailsId2 = 0;
+            }
+            if (AVDetailsId1 == 'undefined') {
+                AVDetailsId1 = 0;
+            }
+            if (AVDetailsId2 == 'undefined') {
+                AVDetailsId2 = 0;
+            }
+            $('#imagemodal').show();
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    $('#imagemodal').hide();
+                },
+                url: '/ALibrary/GenerateBarPartialView',
+                data: {
+                    BookDetailsId1: BookDetailsId1, BookDetailsId2: BookDetailsId2,
+                    MagazineDetailsId1: MagazineDetailsId1, MagazineDetailsId2: MagazineDetailsId2,
+                    AVDetailsId1: AVDetailsId1, AVDetailsId2: AVDetailsId2
+                },
+                success: function (data) {
+                    PrintData(data)
+                    //$('#table').html(data);
+                },
+                async: false,
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    })
+
+    //function PrintElem() {
+    //    Popup($('#table').html());
+    //}
+
+    function PrintData(data) {
+        debugger
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+        var is_chrome = Boolean(mywindow.chrome);
+
+        if (is_chrome) {
+            setTimeout(function () { // wait until all resources loaded
+                mywindow.document.close();
+                mywindow.focus();
+                mywindow.print();
+                mywindow.close();
+                window.location.href = "/ALibrary/IsBarCodeGenerated"
+            }, 1050);
+        } else {
+            mywindow.document.close();
+            mywindow.focus();
+            mywindow.print();
+            mywindow.close();
+            window.location.href = "/ALibrary/IsBarCodeGenerated"
+        }
+        return true;
+    }
+</script>

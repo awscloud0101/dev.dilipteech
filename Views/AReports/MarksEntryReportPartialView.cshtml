@@ -1,0 +1,408 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    int[] nStudentAry;
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> lstExamPapers = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+    if (null != Model && null != Model.lstExamResults && Model.lstExamResults.Count() > 0)
+    {
+        var data = Model.lstExamResults.FirstOrDefault();
+
+        if (null != data)
+        {
+            lstExamPapers = data.lstExamResultsPaperWise.ToList();
+        }
+    }
+
+    AsteriskGMSEntities _dbCentral = new AsteriskGMSEntities(AsteriskBrowserAL.Helpers.Utility.GetCentralDatabase());
+
+    string UserRole = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+
+    List<IGrouping<int, AsteriskBrowserAL.Models.ExaminationResultsData>> GroupedDataBySubId = new List<IGrouping<int, AsteriskBrowserAL.Models.ExaminationResultsData>>();
+
+    if (null != Model && null != Model.lstMarksEntryStatus && Model.lstMarksEntryStatus.Count() > 0)
+    {
+        GroupedDataBySubId = Model.lstMarksEntryStatus.GroupBy(p => p.BranchId).ToList();
+    }
+
+    int nPaperId = 0;
+    int nEntryCount = 0;
+    int nNonEntryCount = 0;
+    int nAbsentCount = 0;
+
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+
+@if (lstExamPapers.Count() > 0)
+{
+    if (null != Model && null != Model.lstExamResults && Model.lstExamResults.Count() > 0)
+    {
+        int nsno = 1;
+  
+
+        <div class="table-header">
+
+            Records Found (@Model.lstExamResults.Count)
+
+            <div style="float:right;margin-right:10px;">
+
+                <button class="btncustom" id="btnExport">
+   Download
+
+                </button>
+            </div>
+        </div>
+
+            <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                <thead>
+                    <tr>
+                        <th>
+                            S.No.
+                        </th>
+                        @if (Model.IsCentral)
+                        {
+                        <th>
+                            @Html.DisplayName("Branch Name")
+                        </th>
+                        }
+                        <th>
+                            @Html.DisplayName("Student Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Roll Number")
+                        </th>
+                        @if (bIsCoastal)
+                        {
+                        <th>
+                            @Html.DisplayName("Registration Number")
+                        </th>
+                        }
+                        <th>
+                            @Html.DisplayName("Legacy Number")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Class Name")
+                        </th>
+
+                        @if (null != lstExamPapers)
+                        {
+                            foreach (var type in lstExamPapers)
+                            {
+                        <th>
+                            @type.PaperName
+                        </th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.lstExamResults.Count(); i++)
+                    {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        @if (Model.IsCentral)
+                            {
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).BranchName
+                        </td>
+                            }
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).DisplayName
+                        </td>
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).RollNumber
+                        </td>
+                        @if (bIsCoastal)
+                            {
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).OMRNumber
+                        </td>
+                            }
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).LegacyNumber
+                        </td>
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).ClassNumberName
+                        </td>
+
+                        @if (Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Count() > 0)
+                            {
+                                for (int j = 0; j < Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Count(); j++)
+                                {
+                        <td>@Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored</td>
+                                }
+                            }
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+
+     
+
+
+        if (GroupedDataBySubId.Count() > 0)
+        {
+            foreach (var gs in GroupedDataBySubId)
+            {
+            <div class="widget-box">
+
+                <div class="table-header">
+                    @gs.FirstOrDefault().BranchName
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+
+                        @{AsteriskGMSEntities _db = new AsteriskGMSEntities(AsteriskBrowserAL.Helpers.Utility.GetDatabasebySubscriptionId(gs.Key));
+
+                                var GroupByPaper = gs.GroupBy(s => s.PaperName);
+                        }
+
+                        @foreach (var g in GroupByPaper)
+                            {
+                                var groupBySection = g.GroupBy(p => p.SectionName).ToList();
+                                var Paper = g.FirstOrDefault();
+
+                                if (null != Paper)
+                                {
+                                    nPaperId = Paper.ExaminationPaperId.HasValue ? Paper.ExaminationPaperId.Value : 0;
+                                }
+
+                        <div class="widget-box">
+
+                            <div class="widget-header widget-header-flat widget-header-small">
+                                <h5 class="widget-title">
+                                    @g.Key
+                                </h5>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <table class="table table-bordered table-striped table-hover nowrap " style="font-size:14px;">
+                                        <tr>
+                                            <th>
+                                                Section Name
+                                            </th>
+                                            <th>
+                                                Entered
+                                            </th>
+                                            <th>
+                                                Not Entered
+                                            </th>
+
+                                            <th>
+                                                Absent
+                                            </th>
+                                        </tr>
+                                        <thead></thead>
+                                        <tbody>
+                                            @foreach (var c in groupBySection)
+                                                    {
+                                                <tr>
+                                                    <td>
+                                                        @c.Key
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                                    nEntryCount = c.Where(p => AsteriskBrowserAL.Helpers.Utility.IsDouble(p.DisplayMarksScored) == true).Count();
+                                                        }
+
+
+                                                        @if (nEntryCount > 0)
+                                                                {
+                                                            <a href=@Url.Action("MarksEntryReportStatus", "AReports", new { Status = "E", PaperId = nPaperId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber })>
+                                                                @nEntryCount
+                                                            </a>
+                                                                }
+                                                                else
+                                                                {
+                                                            @nEntryCount
+                                                                }
+
+
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                                    bool bIsElective = c.Select(p => p.IsElective).FirstOrDefault();
+                                                                    int SubjectId = c.Select(p => p.SubjectId).FirstOrDefault();
+
+                                                        }
+
+                                                        @if (bIsElective)
+                                                                {
+                                                                    var Subjects = _dbCentral.Subjects.FirstOrDefault(s => s.SubjectId == SubjectId);
+
+                                                                    if (null != Subjects)
+                                                                    {
+                                                                        if (Subjects.SubjectName.Replace(" ", "").ToUpper().StartsWith("ILANGUAGE"))
+                                                                        {
+                                                                            var StudentElectives = _db.StudentElective.Where(se => se.FirstLanguage == SubjectId).ToList();
+                                                                            nStudentAry = StudentElectives.Select(s => s.StudentId.HasValue ? s.StudentId.Value : 0).ToArray();
+
+                                                                            nNonEntryCount = c.Where(n => nStudentAry.Contains(n.StudentId.Value) && !(AsteriskBrowserAL.Helpers.Utility.IsDouble(n.DisplayMarksScored) || n.DisplayMarksScored == "A")).Count();
+
+                                                                            if (nNonEntryCount > 0)
+                                                                            {
+                                                            <a href=@Url.Action("MarksEntryReportStatus", "AReports", new { Status = "NE", PaperId = nPaperId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber })>
+                                                                @nNonEntryCount
+                                                            </a>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                            @nNonEntryCount
+                                                                            }
+                                                                        }
+                                                                        else if (Subjects.SubjectName.Replace(" ", "").ToUpper().StartsWith("IILANGUAGE"))
+                                                                        {
+
+                                                                            var StudentElectives = _db.StudentElective.Where(se => se.SecondLanguage == SubjectId).ToList();
+                                                                            nStudentAry = StudentElectives.Select(s => s.StudentId.HasValue ? s.StudentId.Value : 0).ToArray();
+                                                                            nNonEntryCount = c.Where(n => nStudentAry.Contains(n.StudentId.Value) && !(AsteriskBrowserAL.Helpers.Utility.IsDouble(n.DisplayMarksScored) || n.DisplayMarksScored == "A")).Count();
+
+                                                                            if (nNonEntryCount > 0)
+                                                                            {
+                                                            <a href=@Url.Action("MarksEntryReportStatus", "AReports", new { Status = "NE", PaperId = nPaperId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber })>
+                                                                @nNonEntryCount
+                                                            </a>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                            @nNonEntryCount
+                                                                            }
+                                                                        }
+                                                                        else if (Subjects.SubjectName.Replace(" ", "").ToUpper().StartsWith("IIILANGUAGE"))
+                                                                        {
+                                                                            var StudentElectives = _db.StudentElective.Where(se => se.ThirdLanguage == SubjectId).ToList();
+                                                                            nStudentAry = StudentElectives.Select(s => s.StudentId.HasValue ? s.StudentId.Value : 0).ToArray();
+                                                                            nNonEntryCount = c.Where(n => nStudentAry.Contains(n.StudentId.Value) && !(AsteriskBrowserAL.Helpers.Utility.IsDouble(n.DisplayMarksScored) || n.DisplayMarksScored == "A")).Count();
+
+                                                                            if (nNonEntryCount > 0)
+                                                                            {
+                                                            <a href=@Url.Action("MarksEntryReportStatus", "AReports", new { Status = "NE", PaperId = nPaperId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber })>
+                                                                @nNonEntryCount
+                                                            </a>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                            @nNonEntryCount
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                            @(0)
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+
+                                                                    nNonEntryCount = c.Where(n => !(AsteriskBrowserAL.Helpers.Utility.IsDouble(n.DisplayMarksScored) || n.DisplayMarksScored == "A")).Count();
+
+                                                                    if (nNonEntryCount > 0)
+                                                                    {
+                                                            <a href=@Url.Action("MarksEntryReportStatus", "AReports", new { Status = "NE", PaperId = nPaperId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber })>
+                                                                @nNonEntryCount
+                                                            </a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                            @nNonEntryCount
+                                                                    }
+                                                                }
+
+                                                    </td>
+
+                                                    <td>
+
+                                                        @if (nAbsentCount > 0)
+                                                                {
+                                                            <a href=@Url.Action("MarksEntryReportStatus", "AReports", new { Status = "A", PaperId = nPaperId, SubscriptionId = gs.Key, ClassNumberId = Model.ClassNumber })>
+                                                                @c.Where(p => p.DisplayMarksScored == "A").Count()
+                                                            </a>
+                                                                }
+                                                                else
+                                                                {
+                                                            @nAbsentCount
+                                                                }
+
+
+                                                    </td>
+                                                </tr>
+                                                                    }
+                                        </tbody>
+
+
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                                                                    }
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+            }
+
+
+
+
+            }
+
+
+                                                                }
+                                                            }
+
+                                                            else
+                                                            {
+                                                                        <span style="color: red;"><b>No exam papers available to display</b></span>
+                                                                    }
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+<script>
+
+    function submitform() {
+        $.ajax({
+            url: '/AReports/MarksEntryReport',
+            data: {},
+            success: function (result) {
+            }
+        })
+    };
+
+
+    $('#btnExport').click(function () {
+        debugger
+        window.location.href = "/AReports/ExcelMarksEntryReportDT"
+    });
+
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+
+
+
+
+
+
+
+

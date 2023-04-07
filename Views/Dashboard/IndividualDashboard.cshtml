@@ -1,0 +1,1374 @@
+﻿@model AsteriskBrowserAL.Models.SubscriptionsData
+
+@{
+    ViewBag.Title = "Dashboard";
+    string maleCount, femaleCount;
+
+    if (Model.MaleCount != null || Model.MaleCount != "")
+    {
+        int male = Convert.ToInt32(Model.MaleCount);
+        maleCount = (male / 100).ToString();
+    }
+    if (Model.FemaleCount != null || Model.FemaleCount != "")
+    {
+        int female = Convert.ToInt32(Model.FemaleCount);
+        femaleCount = (female / 100).ToString();
+    }
+}
+
+
+
+@section BreadCrumb{
+
+
+
+    <div class="widget-header">
+        <ul class="breadcrumb">
+            <li>
+                <img src="~/Content/images/Dashboard.png" width="30px" /><strong> Dashboard</strong>
+
+            </li>
+            <li>
+                <i class=""></i>
+                Index
+            </li>
+
+
+        </ul><!-- /.breadcrumb -->
+
+        <div class="widget-toolbar no-border">
+            <ul class="nav nav-tabs" id="recent-tab" onclick="ChartData()">
+                <li class="active">
+                    <a data-toggle="tab" href="#task-tab" aria-expanded="true">UI</a>
+                </li>
+
+                <li class="">
+                    <a data-toggle="tab" href="#Notifications" aria-expanded="false">
+                        Notifications
+                        <i class="ace-icon fa fa-bell icon-animated-bell" style="color:#d30202"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+}
+
+
+
+
+<style>
+    li {
+        cursor: pointer;
+    }
+
+    #example1 {
+        border: 1px solid;
+        padding: 10px;
+        box-shadow: 5px 8px 6px #888888;
+    }
+
+    .panel-footer {
+        padding: 5px 10px;
+        background-color: #f5f5f5;
+        border-top: 1px solid #ddd;
+        border-bottom-right-radius: 3px;
+        border-bottom-left-radius: 3px;
+    }
+
+
+    .widget-main {
+        padding: 0px;
+    }
+
+    P {
+        display: list-item; /* This has to be "list-item"                                               */
+        list-style-type: disc;
+        list-style-position: inside;
+    }
+
+    .widget-header {
+        width: 100%;
+    }
+
+
+
+    .widget-box {
+        border-bottom: 2px solid #a9d9f7;
+        border-left: 2px solid #a9d9f7;
+        border-right: 2px solid #a9d9f7;
+        color: darkolivegreen;
+    }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+<div class="widget-box transparent" id="recent-box">
+
+
+
+    <div class="widget-main">
+        <div class="tab-content">
+            <div id="task-tab" class="tab-pane active">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="col-lg-3" style="margin:0px;padding:2px;">
+                            <div class="panel panel-primary1">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <img src="~/Content/images/staff.png" style="width:55px;padding:3px;background:white" class="img-circle">
+
+                                        </div>
+                                        <div class="col-xs-3"></div>
+                                        <div class="col-xs-6 text-left">
+                                            <div class="huge"></div>
+
+                                            <div><strong>Branch 1&nbsp; &nbsp;&nbsp;@Model.Raos</strong></div>
+                                            <br style="margin:3px;" />
+                                            <div> <strong>Branch 2 &nbsp;@Model.GMSClgCount </strong></div>
+                                            @*<br style="margin:3px;" />
+                                <div> <strong>Raos &nbsp;@Model.Raos</strong></div>
+                                <br style="margin:3px;" />
+                                <div> <strong>Ekashila  &nbsp;@Model.Ekashila</strong></div>*@
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="/AStudent/StudentDetails">
+                                    <div class="panel-footer panel-primary1text">
+                                        <span class="pull-left "><strong>Students Details</strong></span>
+                                        <span class="pull-right "><i class="fa fa-arrow-circle-right"></i></span>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3" style="margin:0px;padding:2px;">
+                            <div class="panel panel-primary2">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <img src="~/Content/images/user.png" style="width:50px;background:white;" class="img-circle">
+
+                                        </div>
+                                        <div class="col-xs-2"></div>
+                                        <div class="col-xs-7 text-left">
+                                            <div class="huge"></div>
+
+                                            <div><strong>Teaching&nbsp; &nbsp;&nbsp;@Model.TeachingCount</strong></div>
+                                            <br style="margin:0px;" />
+                                            <div> <strong>Non-Teaching  &nbsp;@Model.NonTeachingCount</strong></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="/HREnrollment/StaffDetails">
+                                    <div class="panel-footer">
+                                        <span class="pull-left panel-primary2text" style="color:#59985B"><strong>Staff Details</strong></span>
+                                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3" style="margin:0px;padding:2px;">
+                            <div class="panel panel-primary3">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <img src="~/Content/images/open.png" style="width:55px;background:white;" class="img-circle">
+
+                                        </div>
+                                        <div class="col-xs-2"></div>
+                                        <div class="col-xs-7 text-left">
+                                            <div class="huge"></div>
+                                            <div>
+                                                <strong>
+                                                    Today Income/Expense
+                                                </strong>
+                                                <br />
+                                                <strong style="font-size:14px;margin:0px;margin-top:10px;"> Income&nbsp; &nbsp;&nbsp;@Model.Income</strong>
+
+                                                <br style="margin:0px;" />
+                                                <div> <strong>Expense  &nbsp;@Model.Expense</strong></div>
+
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="/FReports/FeeCollectionReport/">
+                                    <div class="panel-footer">
+                                        <span class="pull-left panel-primary3text"><strong>Income/Expense</strong></span>
+                                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3" style="margin:0px;padding:2px;">
+                            <div class="panel panel-primary4">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <img src="~/Content/images/reject.png" style="width:55px;background:white;padding:10px;" class="img-circle">
+
+                                        </div>
+                                        <div class="col-xs-2"></div>
+                                        <div class="col-xs-7 text-left">
+                                            <div class="huge"></div>
+
+
+                                            <div>
+                                                <strong>
+                                                    New Admissions
+                                                </strong>
+                                                <br />
+                                                <strong style="font-size:14px;margin:0px;margin-top:10px;"> @Model.NewAdmission</strong>
+
+
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="/AReports/AdmittedStudentsReport/">
+                                    <div class="panel-footer">
+                                        <span class="pull-left panel-primary4text"><strong>New Admissions</strong></span>
+                                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+                <div class="row">
+
+                    <style>
+
+                        #donut-example, #donut-example2 {
+                            width: 300px;
+                            height: 278px;
+                        }
+
+                        .blue {
+                            color: #069;
+                        }
+
+                        .dropdown-lighter > li.active:hover > a, .dropdown-lighter > li.active > a, .dropdown-lighter > li:hover > a, .dropdown-lighter > li > a:active, .dropdown-lighter > li > a:focus {
+                            color: white;
+                        }
+
+                        .dropdown-lighter > li.active:hover > a, .dropdown-lighter > li.active > a, .dropdown-lighter > li:hover > a, .dropdown-lighter > li > a:active, .dropdown-lighter > li > a:focus {
+                            background: #069;
+                        }
+                    </style>
+                    <div>
+
+                    <div class="col-sm-9" style="margin:0px;padding:0px;">
+                        <div class="col-sm-5" style="padding:2px;">
+                            <div class="blockprogress">
+
+                                <h5 class="texthead">
+                                    <span class="fa fa-money"></span> Fee Collection
+                                </h5>
+                                <div class="widget-toolbar no-border" style="margin-top:-35px;margin-right:5px;">
+                                    <div class="inline dropdown-hover">
+                                        <button class="btn btn-minier btn-primary">
+                                            <span id="SelType"></span>
+                                            <i class="ace-icon fa fa-angle-down icon-on-right bigger-110"></i>
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-right dropdown-125 dropdown-lighter dropdown-close dropdown-caret">
+                                            <li id="activeThisYear">
+                                                <a role="button" id="ThisYear">
+                                                    <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                    This Year
+                                                </a>
+                                            </li>
+                                            <li id="activeThisMonth">
+                                                <a role="button" id="ThisMonth">
+                                                    <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                    This Month
+                                                </a>
+                                            </li>
+                                            <li id="activeLastMonth">
+                                                <a role="button" id="LastMonth">
+                                                    <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                    Last Month
+                                                </a>
+                                            </li>
+                                            <li id="activeThisWeek">
+                                                <a role="button" id="ThisWeek">
+                                                    <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                    This Week
+                                                </a>
+                                            </li>
+                                            <li id="activeLastWeek">
+                                                <a id="LastWeek">
+                                                    <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                    Last Week
+                                                </a>
+                                            </li>
+                                        </ul>
+
+                                    </div>
+
+                                </div>
+
+
+                                <hr style="margin:2px">
+
+
+
+
+
+                                <div class="widget-body">
+                                    <div class="widget-main" style="padding:10px;">
+
+
+                                        <div id="donut-example"></div>
+                                    </div><!-- /.widget-main -->
+                                </div><!-- /.widget-body -->
+
+                                <script>
+
+                                    var Data = [
+                                        { label: "Branch 1", value: 15541540 },
+                                        { label: "Branch 2", value: 16275198 },
+
+                                    ];
+                                    var total = 62;
+                                    var browsersChart = Morris.Donut({
+                                        element: 'donut-example',
+                                        data: Data,
+                                        backgroundColor: '#fff',
+                                        labelColor: '#000',
+                                        colors: [
+                                            '#00a235',
+                                            '#069',
+                                            '#67C69D',
+                                            '#95D7BB'
+                                        ]
+                                    });
+
+                                    browsersChart.options.data.forEach(function (label, i) {
+                                        var legendItem = $('<span></span>').text(label['label'] + " ( " + label['value'] + " )").prepend('<br><span>&nbsp;</span>');
+                                        legendItem.find('span')
+                                            .css('backgroundColor', browsersChart.options.colors[i])
+                                            .css('width', '20px')
+                                            .css('display', 'inline-block')
+                                            .css('margin', '5px');
+                                        $('#legend').append(legendItem)
+                                    });
+                                </script>
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-sm-7" style="padding:2px">
+                            <div class="col-sm-12 blockprogress">
+                                <h5 class="texthead" style="color:black">
+                                    <span class="fa fa-ticket"></span> Pedning Status
+                                    @*<a href="#" data-action="fullscreen" class="orange2" style="float:right;margin-right:10px;">
+                                            <i class="ace-icon fa fa-expand"></i>
+                                        </a>*@
+
+                                </h5>
+                                <hr style="margin:2px">
+
+                                <script src="~/Content/js/columngraph.js"></script>
+                                <script src="~/Content/js/columngraphA.js"></script>
+                                <style>
+                                    .chartdivcontainer {
+                                        background: #fff;
+                                    }
+
+                                    #chartdiv {
+                                        width: 100%;
+                                        height: 265px;
+                                        font-size: 12px;
+                                        background: white;
+                                        position: relative;
+                                        padding: 5px;
+                                        font-weight: bold;
+                                        margin-bottom: 10px;
+                                    }
+                                </style>
+                                <script>
+
+                                var chart = AmCharts.makeChart("chartdiv", {
+
+                                    "title": "text",
+                                    "type": "serial",
+                                    "startDuration": 2,
+                                    "dataProvider": [{
+                                        "column": "Fee Correction",
+                                        "status": @Model.NewTicketsCount,
+                                "color": "#B4A9D2"
+                                    }, {
+                                    "column": "In Active",
+                                        "status": @Model.ProcessTicketsCount    ,
+                                    "color": "#F6B958"
+                                }, {
+                                    "column": "Inquiry",
+                                        "status": @Model.SolvedTicketsCount,
+                                    "color": "#00A65A"
+                                }, @*{
+                                    "column": "Rejected",
+                                        "status": @Model.RejectedTicketsCount,
+                                    "color": "#E78074"
+                                },*@],
+                                "valueAxes": [{
+                                    "position": "left",
+                                    "axisAlpha": 0,
+                                    "gridAlpha": 0
+                                }],
+                                    "graphs": [{
+                                        "balloonText": "[[category]]: <b>[[value]]</b>",
+                                        "colorField": "color",
+
+                                        "fillAlphas": 0.85,
+                                        "lineAlpha": 0.1,
+                                        "type": "column",
+                                        "topRadius": 1,
+                                        "valueField": "status"
+                                    }],
+                                        "depth3D": 20,
+                                            "angle": 50,
+                                                "chartCursor": {
+                                    "categoryBalloonEnabled": false,
+                                        "cursorAlpha": 0,
+                                            "zoomable": false
+                                },
+                                "categoryField": "column",
+                                    "categoryAxis": {
+                                    "gridPosition": "start",
+                                        "axisAlpha": 0,
+                                            "gridAlpha": 0
+
+
+
+                                }
+                                }, 0);
+
+                                jQuery('.chart-input').off().on('input change', function () {
+                                    var property = jQuery(this).data('property');
+                                    var target = chart;
+                                    chart.startDuration = 0;
+
+                                    if (property == 'topRadius') {
+                                        target = chart.graphs[0];
+                                    }
+
+                                    target[property] = this.value;
+                                    chart.validateNow();
+                                });
+                                </script>
+                                <div class="col-sm-12">
+                                    <div id="chartdiv"></div>
+                                </div>
+                                <div class="col-sm-12" style="border:1px solid #f7f7f7;background:#fcfcfc;font-size:15px;">
+                                    <span class="glyphicon glyphicon-stop" style="color:#9585BF;"><span style="color:#9585BF;font-weight:bold;font-family:Calibri;"> Fee Correction</span>-@Model.NewTicketsCount</span> |
+                                    <span class="glyphicon glyphicon-stop" style="color:#f39c12;"><span style="color:#f39c12;font-weight:bold;font-family:Calibri;"> InActive</span>-@Model.ProcessTicketsCount</span> |
+                                    <span class="glyphicon glyphicon-stop" style="color:#00a65a;"><span style="color:#00a65a;font-weight:bold;font-family:Calibri;"> Inquiry</span>-@Model.SolvedTicketsCount</span> |
+                                    @*<span class="glyphicon glyphicon-stop" style="color:#dd4b39"><span style="color:#dd4b39;font-weight:bold;font-family:Calibri;"> Rejected</span>-@Model.RejectedTicketsCount</span>*@
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        @*<div class="col-sm-6" style="" >
+                                <div class="blockprogress">
+
+                                    <h5 class="texthead">
+                                        <span class="fa fa-money"></span> Attendance
+                                    </h5>
+                                    <div class="widget-toolbar no-border" style="margin-top:-35px;margin-right:5px;">
+                                        <div class="inline dropdown-hover">
+                                            <button class="btn btn-minier btn-primary">
+                                                <span id="SelTypeAtt"></span>
+                                                <i class="ace-icon fa fa-angle-down icon-on-right bigger-110"></i>
+                                            </button>
+
+                                            <ul class="dropdown-menu dropdown-menu-right dropdown-125 dropdown-lighter dropdown-close dropdown-caret">
+                                                <li id="activeTodayAtt">
+                                                    <a role="button" id="TodayAtt">
+                                                        <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                        Today
+                                                    </a>
+                                                </li>
+                                                <li id="activeThisWeekAtt">
+                                                    <a role="button" id="ThisWeekAtt">
+                                                        <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                        This Week
+                                                    </a>
+                                                </li>
+                                                <li id="activeThisMonthAtt">
+                                                    <a role="button" id="ThisMonthAtt">
+                                                        <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                        This Month
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+
+                                    <hr style="margin:2px">
+
+
+
+
+
+                                    <div class="widget-body">
+                                        <div class="widget-main" style="padding:10px;">
+
+
+                                            <div id="donut-example2"></div>
+                                        </div><!-- /.widget-main -->
+                                    </div><!-- /.widget-body -->
+
+                                    <script>
+
+                                        var Data = [
+                                            { label: "Branch 1", value: 15541540, labelColor: 'yellow'},
+                                            { label: "Branch 2", value: 16275198, labelColor: 'red'},
+
+                                        ];
+                                        var total = 100;
+                                        var browsersChart = Morris.Donut({
+                                            element: 'donut-example2',
+                                            data: Data,
+                                            backgroundColor: '#fff',
+                                            labelColor: '#000',
+                                            colors: [
+                                                '#94163E',
+                                                '#00B4EF',
+                                                '#67C69D',
+                                                '#95D7BB'
+                                            ],
+                                        });
+
+                                        browsersChart.options.data.forEach(function (label, i) {
+                                            var legendItem = $('<span></span>').text(label['label'] + " ( " + label['value'] + " )").prepend('<br><span>&nbsp;</span>');
+                                            legendItem.find('span')
+                                                .css('backgroundColor', browsersChart.options.colors[i])
+                                                .css('width', '20px')
+                                                .css('display', 'inline-block')
+                                                .css('margin', '5px');
+                                            $('#legend').append(legendItem)
+                                        });
+                                    </script>
+
+                                </div>
+
+
+                            </div>*@
+
+                        @*<div id="legend" class="donut-legend"></div>*@
+
+
+                    </div>
+
+
+                    <div class="col-sm-3" style="padding:2px;margin:0px;">
+                        <iframe style="overflow:hidden;border:0;margin:0;padding:0;width:100%;height:350px;" src="~/LoaderImages/clock.html"></iframe>
+
+
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+            <div id="Notifications" class="tab-pane">
+
+
+                <div class="col-sm-6 " style="padding:2px;">
+
+
+
+
+
+                    <div class="blockprogress">
+
+                        <h5 class="texthead">
+                            <span class="fa fa-bell"></span> Notifications
+                        </h5>
+                        <hr style="margin:5px;" />
+
+                        <div class="alert" style="height:400px">
+                            <div class="widget-main scrollable" style="padding:0px;margin:0px;">
+
+
+
+
+
+                                <div class="scroll-content" style="max-height: 380px;">
+                                    @if (null != Model.NotificationsData && Model.NotificationsData.Count() > 0)
+                                    {
+                                        <marquee class="alert" direction="down" onMouseOver="stop()" onMouseOut="start()" scrolldelay="180">
+                                            @foreach (var s in Model.NotificationsData)
+                                            {
+                                                <p style="list-style-type:none;line-height:20px; border-bottom: dotted #CCC 1px;border-top: dotted #CCC 1px;">
+                                                    <span class="fa fa-bell" style="background:#355B7C;color:white;padding:10px;">   </span>
+                                                    <span class="marqueetext">
+                                                        <b>@s.Date.ToString("dd - MMM - yyyy") : @s.Description</b>
+                                                    </span>
+                                                </p><br />
+
+
+
+
+
+                                                @*<marquee class="alert alert-success">@Html.Raw(item.Event.ToString())</marquee>*@
+
+                                            }
+                                        </marquee>
+                                    }
+                                    else
+                                    {
+                                        <p class="alert alert-danger" style="list-style-type:none;">
+                                            <marquee><b>Notifications are not updated</b></marquee>
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+                <div class="col-sm-6" style="padding:2px;">
+
+
+
+                    <div class=" blockprogress" id="widget-box-4">
+                        <h5 class="texthead">
+                            <span class="fa fa-birthday-cake"></span> BirthDay Notifications
+                        </h5>
+                        <hr style="margin:5px;" />
+
+                        <div class="alert" style="height:400px;">
+
+                            <div class="widget-main scrollable" style="padding:0px;margin:0px;">
+                                <div class="scroll-content" style="max-height: 300px;">
+                                    @if (null != Model.StaffBirthDayData && Model.StaffBirthDayData.Count() > 0)
+                                    {
+                                        <marquee direction="down" onMouseOver="stop()" onMouseOut="start()" class="alert" scrolldelay="150">
+                                            @foreach (var item in Model.StaffBirthDayData)
+                                            {
+                                                @*<marquee class="alert alert-info">@Html.Raw(item.StudentName.ToString())</marquee>    *@
+                                                <p style="list-style-type:none;line-height:20px; border-bottom: dotted #CCC 1px;border-top: dotted #CCC 1px;">
+                                                    <span class="fa fa-birthday-cake" style="background:#355B7C;color:white;padding:10px;">   </span>
+                                                    <span class="marqueetext" style="background:none;">
+                                                        <b> @Html.Raw(item.FirstName.ToString())  </b>
+                                                    </span>
+                                                </p>
+
+                                            }
+                                        </marquee>
+                                    }
+                                    else
+                                    {
+                                        <p class="alert alert-danger">
+                                            <marquee><b>There is no Birth Days to display</b></marquee>
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+
+            </div><!-- /.#Notifications-->
+        </div>
+    </div><!-- /.widget-main -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.progress .progress-bar').css("width",
+            function () {
+                return $(this).attr("aria-valuenow") + "%";
+            }
+        )
+    });
+</script>
+@if (null != Model)
+{
+    <input type="hidden" id="NewCount" value="@Model.NewTicketsCount" />
+    <input type="hidden" id="InProcessCount" value="@Model.ProcessTicketsCount" />
+    <input type="hidden" id="ResolvedCount" value="@Model.SolvedTicketsCount" />
+    <input type="hidden" id="RejectedCount" value="@Model.RejectedTicketsCount" />
+}
+
+@*<div class="row">
+        <div class="col-xs-12">
+            <div class="widget-header widget-header-flat widget-header-small">
+                <h5 class="widget-title"></h5><span style="color:#3c8dbc" class="pull-right" id="msg"></span>
+                <div class="widget-toolbar no-border">
+                    <div class="inline dropdown-hover">
+                    </div>
+                </div>
+            </div>
+            <div class="table-header">
+                Activities Update
+            </div>
+             form start
+            <table class="table table-striped table-bordered table-hover" id="Tab1">
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Activity")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Updated By")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Updated On")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Status")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>*@
+
+<!--[if lte IE 8]>
+     <script src="/assets/js/excanvas.min.js"></script>
+   <![endif]-->
+<script src="~/assets/js/jquery-ui.custom.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+<script src="~/assets/js/jquery.easypiechart.min.js"></script>
+<script src="~/assets/js/jquery.sparkline.min.js"></script>
+<script src="~/assets/js/jquery.flot.min.js"></script>
+<script src="~/assets/js/jquery.flot.pie.min.js"></script>
+<script src="~/assets/js/jquery.flot.resize.min.js"></script>
+<script src="~/Scripts/canvasjs.min.js"></script>
+
+<script type="text/javascript">
+
+
+
+    $('.easy-pie-chart.percentage').each(function () {
+        var $box = $(this).closest('.infobox');
+        var barColor = $(this).data('color') || (!$box.hasClass('infobox-dark') ? $box.css('color') : 'rgba(255,255,255,0.95)');
+        var trackColor = barColor == 'rgba(255,255,255,0.95)' ? 'rgba(255,255,255,0.25)' : '#E2E2E2';
+        var size = parseInt($(this).data('size')) || 50;
+        $(this).easyPieChart({
+            barColor: barColor,
+            trackColor: trackColor,
+            scaleColor: false,
+            lineCap: 'butt',
+            lineWidth: parseInt(size / 10),
+            animate: /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase()) ? false : 1000,
+            size: size
+        });
+    })
+
+    $('.sparkline').each(function () {
+        var $box = $(this).closest('.infobox');
+        var barColor = !$box.hasClass('infobox-dark') ? $box.css('color') : '#FFF';
+        $(this).sparkline('html',
+            {
+                tagValuesAttribute: 'data-values',
+                type: 'bar',
+                barColor: barColor,
+                chartRangeMin: $(this).data('min') || 0
+            });
+    });
+
+
+    //flot chart resize plugin, somehow manipulates default browser resize event to optimize it!
+    //but sometimes it brings up errors with normal resize event handlers
+    $.resize.throttleWindow = false;
+
+    var placeholder = $('#piechart-placeholder').css({ 'width': '90%', 'min-height': '150px' });
+    var data = [
+        { label: "social networks", data: 38.7, color: "#68BC31" },
+        { label: "search engines", data: 24.5, color: "#2091CF" },
+        { label: "ad campaigns", data: 8.2, color: "#AF4E96" },
+        { label: "direct traffic", data: 18.6, color: "#DA5430" },
+        { label: "other", data: 10, color: "#FEE074" }
+    ]
+    function drawPieChart(placeholder, data, position) {
+        $.plot(placeholder, data, {
+            series: {
+                pie: {
+                    show: true,
+                    tilt: 0.8,
+                    height: 30,
+                    width: 30,
+                    highlight: {
+                        opacity: 0.25
+                    },
+                    stroke: {
+                        color: '#fff',
+                        width: 2
+                    },
+                    startAngle: 2
+                }
+            },
+            legend: {
+                show: true,
+                position: position || "ne",
+                labelBoxBorderColor: null,
+                margin: [-30, 15]
+            }
+            ,
+            grid: {
+                hoverable: true,
+                clickable: true
+            }
+        })
+    }
+    drawPieChart(placeholder, data);
+
+    /**
+    we saved the drawing function and the data to redraw with different position later when switching to RTL mode dynamically
+    so that's not needed actually.
+    */
+    placeholder.data('chart', data);
+    placeholder.data('draw', drawPieChart);
+
+
+    //pie chart tooltip example
+    var $tooltip = $("<div class='tooltip top in'><div class='tooltip-inner'></div></div>").hide().appendTo('body');
+    var previousPoint = null;
+
+    placeholder.on('plothover', function (event, pos, item) {
+        if (item) {
+            if (previousPoint != item.seriesIndex) {
+                previousPoint = item.seriesIndex;
+                var tip = item.series['label'] + " : " + item.series['percent'] + '%';
+                $tooltip.show().children(0).text(tip);
+            }
+            $tooltip.css({ top: pos.pageY + 10, left: pos.pageX + 10 });
+        } else {
+            $tooltip.hide();
+            previousPoint = null;
+        }
+
+    });
+
+    /////////////////////////////////////
+    $(document).one('ajaxloadstart.page', function (e) {
+        $tooltip.remove();
+    });
+
+
+
+
+
+    var d1 = [];
+    for (var i = 0; i < Math.PI * 2; i += 0.5) {
+        d1.push([i, Math.sin(i)]);
+    }
+
+    var d2 = [];
+    for (var i = 0; i < Math.PI * 2; i += 0.5) {
+        d2.push([i, Math.cos(i)]);
+    }
+
+    var d3 = [];
+    for (var i = 0; i < Math.PI * 2; i += 0.2) {
+        d3.push([i, Math.tan(i)]);
+    }
+
+
+
+    var sales_charts = $('#sales-charts').css({ 'width': '100%', 'height': '220px' });
+    $.plot("#sales-charts", [
+        { label: "Domains", data: d1 },
+        { label: "Hosting", data: d2 },
+        { label: "Services", data: d3 }
+    ], {
+        hoverable: true,
+        shadowSize: 0,
+        series: {
+            lines: { show: true },
+            points: { show: true }
+        },
+        xaxis: {
+            tickLength: 0
+        },
+        yaxis: {
+            ticks: 10,
+            min: -2,
+            max: 2,
+            tickDecimals: 3
+        },
+        grid: {
+            backgroundColor: { colors: ["#fff", "#fff"] },
+            borderWidth: 1,
+            borderColor: '#555'
+        }
+    });
+
+
+    $('#recent-box [data-rel="tooltip"]').tooltip({ placement: tooltip_placement });
+    function tooltip_placement(context, source) {
+        var $source = $(source);
+        var $parent = $source.closest('.tab-content')
+        var off1 = $parent.offset();
+        var w1 = $parent.width();
+
+        var off2 = $source.offset();
+        //var w2 = $source.width();
+
+        if (parseInt(off2.left) < parseInt(off1.left) + parseInt(w1 / 2)) return 'right';
+        return 'left';
+    }
+
+
+    $('.dialogs,.comments').ace_scroll({
+        size: 300
+    });
+
+
+    //Android's default browser somehow is confused when tapping on label which will lead to dragging the task
+    //so disable dragging when clicking on label
+    var agent = navigator.userAgent.toLowerCase();
+    if ("ontouchstart" in document && /applewebkit/.test(agent) && /android/.test(agent))
+        $('#tasks').on('touchstart', function (e) {
+            var li = $(e.target).closest('#tasks li');
+            if (li.length == 0) return;
+            var label = li.find('label.inline').get(0);
+            if (label == e.target || $.contains(label, e.target)) e.stopImmediatePropagation();
+        });
+
+    $('#tasks').sortable({
+        opacity: 0.8,
+        revert: true,
+        forceHelperSize: true,
+        placeholder: 'draggable-placeholder',
+        forcePlaceholderSize: true,
+        tolerance: 'pointer',
+        stop: function (event, ui) {
+            //just for Chrome!!!! so that dropdowns on items don't appear below other items after being moved
+            $(ui.item).css('z-index', 'auto');
+        }
+    }
+    );
+    $('#tasks').disableSelection();
+    $('#tasks input:checkbox').removeAttr('checked').on('click', function () {
+        if (this.checked) $(this).closest('li').addClass('selected');
+        else $(this).closest('li').removeClass('selected');
+    });
+
+
+    //show the dropdowns on top or bottom depending on window height and menu position
+    $('#task-tab .dropdown-hover').on('mouseenter', function (e) {
+        var offset = $(this).offset();
+
+        var $w = $(window)
+        if (offset.top > $w.scrollTop() + $w.innerHeight() - 100)
+            $(this).addClass('dropup');
+        else $(this).removeClass('dropup');
+    });
+
+    // Donut Chart
+
+</script>
+
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script>
+
+
+
+    function RemoveActiveClass() {
+        $('#activeThisYear').removeClass("active");
+        $('#activeThisMonth').removeClass("active");
+        $('#activeLastMonth').removeClass("active");
+        $('#activeThisWeek').removeClass("active");
+        $('#activeLastWeek').removeClass("active");
+        $('#ThisYear').removeClass("blue");
+        $('#ThisMonth').removeClass("blue");
+        $('#LastMonth').removeClass("blue");
+        $('#ThisWeek').removeClass("blue");
+        $('#LastWeek').removeClass("blue");
+    }
+
+    function RemoveActiveAttClass() {
+        $('#activeTodayAtt').removeClass("active");
+        $('#activeThisMonthAtt').removeClass("active");
+        $('#activeThisWeekAtt').removeClass("active");
+        $('#TodayAtt').removeClass("blue");
+        $('#ThisMonthAtt').removeClass("blue");
+        $('#ThisWeekAtt').removeClass("blue");
+    }
+
+    window.onload = ChartData();
+
+    function ChartData() {
+        debugger
+        // GetOverViews();
+        SchoolStrengthForAdmin();
+        $('#ThisYear').addClass("blue");
+        $('#activeThisYear').addClass("active");
+        document.getElementById('SelType').innerHTML = "This Year";
+        DonutData("ThisYear");
+
+        $('#TodayAtt').addClass("blue");
+        $('#activeTodayAtt').addClass("active");
+        document.getElementById('SelTypeAtt').innerHTML = "Today";
+        AttendanceDonutData("Today");
+
+
+
+        //google.load("visualization", "1", { packages: ["corechart"] });
+        //google.setOnLoadCallback(drawChart);
+
+
+    }
+
+
+    function SchoolStrengthForAdmin() {
+        $.getJSON("/Dashboard/SchoolStrengthChart/", function (data) {
+            var ChartData = []
+            for (var i = 0; i <= data.length - 1; i++) {
+
+                ChartData.push({
+                    y: parseInt(data[i].value),
+                    label: data[i].Label,
+                    indexLabel: data[i].LabelHover
+                });
+            }
+
+
+            var chart = new CanvasJS.Chart("SchoolStrength", {
+                title: {
+                    text: "SCHOOL STRENGTH"
+                },
+                width: 475,
+                legend: {
+                    maxWidth: 350,
+                    itemWidth: 120
+                },
+                data: [{
+                    type: "pie",
+                    showInLegend: true,
+                    legendText: "{indexLabel}",
+                    dataPoints: ChartData
+                }]
+            });
+            chart.render();
+        });
+    }
+
+    function GetOverViews() {
+        $.ajax({
+            url: '/Dashboard/GetOverViewsForChairmanDashboard',
+            success: function (Data) {
+
+                document.getElementById("ng").innerHTML = "<span style='font-weight:bold'>Teaching     : </span>" + Data.Teaching;
+                document.getElementById("NonTeaching").innerHTML = "<span style='font-weight:bold'>Non-Teaching : </span>" + Data.NonTeaching;
+                document.getElementById("MaleStudents").innerHTML = " " + Data.MaleStudents;
+                document.getElementById("FemaleStudents").innerHTML = " " + Data.FemaleStudents;
+
+            },
+            async: false
+        });
+    }
+
+    $('#ThisYear').click(function () {
+        debugger
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeThisYear').addClass("active");
+        document.getElementById('SelType').innerHTML = "This Year";
+        DonutData("ThisYear");
+    });
+
+    $('#ThisMonth').click(function () {
+        debugger
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeThisMonth').addClass("active");
+        document.getElementById('SelType').innerHTML = "This Month";
+        DonutData("ThisMonth");
+    });
+
+    $('#LastMonth').click(function () {
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeLastMonth').addClass("active");
+        document.getElementById('SelType').innerHTML = "Last Month";
+        DonutData("LastMonth");
+    });
+
+    $('#ThisWeek').click(function () {
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeThisWeek').addClass("active");
+        document.getElementById('SelType').innerHTML = "This Week";
+        DonutData("ThisWeek");
+    });
+
+    $('#LastWeek').click(function () {
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeLastWeek').addClass("active");
+        document.getElementById('SelType').innerHTML = "Last Week";
+        DonutData("LastWeek");
+    });
+
+
+    $('#TodayAtt').click(function () {
+        RemoveActiveAttClass()
+        $(this).addClass("blue");
+        $('#activeTodayAtt').addClass("active");
+        document.getElementById('SelTypeAtt').innerHTML = "Today";
+        AttendanceDonutData("Today");
+    })
+
+    $('#ThisWeekAtt').click(function () {
+        RemoveActiveAttClass()
+        $(this).addClass("blue");
+        $('#activeThisWeekAtt').addClass("active");
+        document.getElementById('SelTypeAtt').innerHTML = "This Week";
+        AttendanceDonutData("ThisWeek");
+    })
+
+    $('#ThisMonthAtt').click(function () {
+        RemoveActiveAttClass()
+        $(this).addClass("blue");
+        $('#activeThisMonthAtt').addClass("active");
+        document.getElementById('SelTypeAtt').innerHTML = "This Month";
+        AttendanceDonutData("ThisMonth");
+    })
+
+    function AttendanceDonutData(type) {
+        debugger
+        var Color = ['red', '#1424b8', '#0aa623', '#940f3f', '#148585', '#098215', '#b86c14', '#b83214']
+        var attendancecolor = ['#900C3F', '#08B5F1']
+        $.ajax({
+            url: '/Dashboard/GetAttendancePercentage',
+            data: { Type: type },
+            success: function (Data) {
+
+                var Attendance = [];
+
+                $.each(Data, function (i, record) {
+
+                    Attendance.push({
+                        label: record.Institute + " %",
+                        value: parseInt(record.AttendancePercentage)
+                    })
+                });
+                $('#AttentancePercentageId').html('')
+                var AttentancePercentageId = Morris.Donut({
+                    element: 'AttentancePercentageId',
+                    resize: true,
+                    data: Attendance,
+                    colors: attendancecolor,
+
+                });
+
+            },
+            async: false
+        });
+    }
+
+
+
+
+    function DonutData(type) {
+        debugger
+
+        var Color = ['#294d6b', '#0aa623', '#940f3f', '#148585', '#098215', '#b86c14', '#b83214']
+
+        $.ajax({
+            url: '/Dashboard/GetFeeCollectionDeatils',
+            data: { Type: type },
+            success: function (Data) {
+
+                var Collection = [];
+
+                $.each(Data, function (i, record) {
+
+                    Collection.push({
+                        label: record.Institute,
+                        value: parseInt(record.DebitAmount)
+                    })
+
+                });
+
+
+                $('#donut-example').html('')
+                var TotalFeeCollectionBranchWise = Morris.Donut({
+                    element: 'donut-example',
+                    resize: true,
+
+                    colors: Color,
+                    data: Collection,
+                });
+
+            },
+            async: false
+
+        });
+    };
+
+    //function drawChart() {
+
+    //    $.ajax({
+    //        url: '/Dashboard/GetFeepaymentsDataInstallmentsWise',
+    //        data : {Type : 'ThisYear'},
+    //        dataType: "json",
+    //        success: function (jsonData) {
+    //            var data = new google.visualization.DataTable();
+    //            // assumes "word" is a string and "count" is a number
+    //            data.addColumn('string', 'word');
+    //            data.addColumn('number', 'count');
+
+    //            for (var i = 0; i < jsonData.length; i++) {
+    //                data.addRow([jsonData[i].ParticularName, jsonData[i].Amount]);
+    //            }
+
+    //            var options = {
+    //                //title: 'Certificate details',
+    //                is3D: true,
+    //                legend: { position: 'none' },
+    //                height: 200,
+    //                width:200
+    //            };
+    //            var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+    //            chart.draw(data, options);
+    //        },
+    //        async : false
+    //    });
+    //}
+
+
+
+
+</script>
+
+<script type="text/javascript">
+
+
+
+    jQuery(function ($) {
+
+        $('.scrollable').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll({
+                size: $this.attr('data-size') || 300,
+
+                //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+            });
+        });
+        $('.scrollable-horizontal').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll(
+                {
+                    horizontal: true,
+                    styleClass: 'scroll-bottom',//show the scrollbars on top(default is bottom)
+                    size: $this.attr('data-size') || 500,
+                    mouseWheelLock: true
+                }
+            ).css({ 'padding-top': 12 });
+        });
+
+        $(window).on('resize.scroll_reset', function () {
+            $('.scrollable-horizontal').ace_scroll('reset');
+        });
+
+
+        $('#id-checkbox-vertical').prop('checked', false).on('click', function () {
+            $('#widget-toolbox-1').toggleClass('toolbox-vertical')
+                .find('.btn-group').toggleClass('btn-group-vertical')
+                .filter(':first').toggleClass('hidden')
+                .parent().toggleClass('btn-toolbar')
+        });
+
+    })
+
+</script>

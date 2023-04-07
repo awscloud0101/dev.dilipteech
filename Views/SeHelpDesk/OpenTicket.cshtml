@@ -1,0 +1,135 @@
+﻿@model AsteriskBrowserAL.Models.HdTicketsInfo
+
+@{
+    ViewBag.Title = "Open Ticket";
+
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Master
+        </li>
+        <li>
+            <i class=""></i>
+            Help Desk
+        </li>
+        <li class="active">Open Ticket</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+            <h3>@Html.ActionLink("new Ticket", "NewTicket")</h3>
+        </div>
+    </div>
+    <br />
+    <div class="box">
+        <div class="box-header">
+        </div>
+        <div class="box-body">
+            <div class="row">
+                    <div class="col-sm-6">
+                        <label class="col-sm-3  control-label no-padding-right">@Html.Label("Staus")</label>
+                        <div class="col-sm-6">
+                            <select id="HDStatusId" name="HDStatusId" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Priority")</label>
+                        <div class="col-sm-6">
+                            <select id="PriorityId" name="HDStatusId" class="form-control"></select>
+                        </div>
+
+                    </div>
+            </div>
+        </div>
+    </div>
+    <div id="SearchDiv">
+        @Html.Partial("OpenTicketPartial", Model)
+    </div>
+    <input type="hidden" id="HDStatusIdSel" value="@Model.HDStatusId" />
+    <input type="hidden" id="PriorityIdSel" value="@Model.PriorityId" />
+</section>
+
+
+<script>
+
+    function OnloadData() {
+        LoadSatus()
+        LosadPriority()
+    }
+
+
+    function LoadSatus() {
+        $.ajax({
+            url: "/MnHelpDesk/LoadSatus",
+            success: function (data) {
+                var StatusItems = $('#HDStatusId')
+                StatusItems.children().remove();
+                StatusItems.append($("<option>").val("null").text("--Select--"))
+                $.each(data, function (i, record) {
+                    StatusItems.append($("<option>").val(record.HDStatusId).text(record.HDStatusName));
+                });
+                $('#HDStatusId').append(StatusItems);
+                var HDStatusId = $("#HDStatusIdSel").val()
+
+                if (HDStatusId > 0) {
+                    document.getElementById("HDStatusId").value = HDStatusId
+                }
+
+            }
+
+        });
+    }
+
+
+
+    function LosadPriority() {
+        $.ajax({
+            url: "/MnHelpDesk/LoadPriorities",
+            success: function (data) {
+                var PriorityItems = $('#PriorityId')
+                PriorityItems.children().remove();
+                PriorityItems.append($("<option>").val("null").text("--Select--"))
+                $.each(data, function (i, record) {
+                    PriorityItems.append($("<option>").val(record.HDPriorityId).text(record.Priority));
+                });
+                $('#PriorityId').append(PriorityItems);
+                var SelPriorityId = $("#PriorityIdSel").val()
+                if (SelPriorityId > 0) {
+                    document.getElementById("PriorityId").value = SelPriorityId
+                }
+
+            }
+
+        });
+    }
+
+    $("#HDStatusId").change(function () {
+        getOpenTicketData()
+    })
+    $("#PriorityId").change(function () {
+        getOpenTicketData()
+    })
+
+    function getOpenTicketData() {
+        var Priority = $("#PriorityId").val();
+        var Status = $("#HDStatusId").val();
+        $.ajax({
+            url: '/MnHelpDesk/GetOpenTickets',
+            data: { Priority: Priority, Status: Status },
+            success: function (data) {
+                $("#SearchDiv").html(data)
+            }
+        })
+
+    }
+
+    window.onload = OnloadData();
+
+</script>

@@ -1,0 +1,99 @@
+﻿@model AsteriskBrowserAL.Models.StaffAdoptedStudentDataModel
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-database"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Teacher Adopted Student</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <br />
+            @using (Html.BeginForm("StaffAdoptedStudent", "AStudent", FormMethod.Post))
+            {
+                    <!-- form start -->
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(true)
+                <span id="SaveVal" style="color:green;font-weight:bold"></span>
+
+                <span id="ErrorId" style="color:red;font-weight:bold"></span>
+    <div class="widget-box">
+
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">
+            Teacher Adopted Student</h5>
+
+        </div>
+            <div class="widget-main">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 ">Class</label>
+                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                @Html.DropDownListFor(model => model.IstClassNumbers, new SelectList(Model.IstClassNumbers, "ClassNumber", "ClassNumberDisplay"), "--- Select Class ---", new { @class = "form-control", @id = "ClassNumber" })
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 ">Staff</label>
+                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                @Html.DropDownListFor(model => model.IstStaff, new SelectList(Model.IstStaff, "StaffId", "FirstName"), "--- Select Staff ---", new { @class = "form-control", @id = "StaffId" })
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+  
+
+       </div>
+  
+                <div id="UnAssingStudentList">
+                </div>
+            }
+
+        </div>
+    </div>
+</section>
+
+<script>
+    $('#ClassNumber').change(function () {
+        var ClassNumberId = $('#ClassNumber').val();
+        if (ClassNumberId > 0) {
+            GetClassUnAssignStudentList();
+        }
+       
+        else {
+            $("#UnAssingStudentList").html("")
+        }
+    })
+
+    function GetClassUnAssignStudentList() {
+        var ClassNumberId =$('#ClassNumber').val();
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/AStudent/GetClassWiseStudentList',
+                data: { nClassNumber: ClassNumberId },
+                success: function (result) {
+                    $('#imagemodal').hide();
+                    $("#UnAssingStudentList").html(result)
+                }
+            })        
+    }
+
+</script>
+

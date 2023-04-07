@@ -1,0 +1,242 @@
+﻿
+@model AsteriskBrowserAL.Models.TeacherAssignmentUploadData
+
+@{
+    ViewBag.Title = "Teacher Assignment";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Individual Assignment Upload</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm("TeacherAssignmentUpload", "AExamination", FormMethod.Post))
+    {
+        @Html.ValidationMessage("TeacherAssignment")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Teacher Assignment Upload
+                        </h5>
+
+                    </div>
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+
+
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Subject</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.SubjectId, new SelectList(Model.lstsubjects, "SubjectId", "Name"), "-- Select --", new { @class = "form-control", id = "SubjectId" })
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Chapters</label>
+                                                <div class="col-sm-6">
+                                                    <select id="Chapters" name="Chapters" class="form-control"></select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                }
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+
+
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Assignment</label>
+                                            <div class="col-sm-6">
+                                                <select id="AssignmentId" name="AssignmentId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div id="SearchData" class="row">
+        </div>
+
+
+        if (null != Model)
+        {
+
+
+
+           
+           
+            <input style="display:none" id="SelSubscriptionId" value="@Model.SubscriptionId" />
+        }
+        else
+        {
+
+
+                     
+            
+            <input style="display:none" id="SelSubscriptionId" value="0" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+    var Chapters = $('#Chapters');
+    var AssignmentId = $('#AssignmentId');
+
+    $(document).ready(function () {
+             
+       
+        var SelSubjectId = $('#SubjectId').val();
+       
+        if (SelSubjectId > 0) {
+            GetChapters();
+        }
+    });
+    $('#SubjectId').change(function () {
+        
+        $("#SearchData").html("");
+        document.getElementById('Chapters').value = "0";
+        document.getElementById('AssignmentId').value = "0";
+        var SubjectId = $('#SubjectId').val();
+        
+        if (SubjectId > 0) {
+            GetChapters();
+        }
+       
+    });
+    function GetChapters() {
+        
+        var SubjectId = $('#SubjectId').val();
+        var BranchId = $('#SelSubscriptionId').val();
+        $.ajax({
+            url: '/AExamination/GetContentIndex',
+            data: { BranchId: BranchId, SubjectId: SubjectId },
+            success: function (data) {
+
+                Chapters.children().remove();
+
+                Chapters.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+
+                    Chapters.append($("<option>").val(record.ContentIndexId).text(record.ContentName));
+                });
+
+                $('#Chapters').append(Chapters);
+            },
+            aync: false
+        });
+    }
+    $('#Chapters').change(function () {
+        $("#SearchData").html("");
+        document.getElementById('AssignmentId').value = "0";
+        var SubjectId = $('#SubjectId').val();
+        var ContentIndexId = $('#Chapters').val();
+
+        if (SubjectId > 0 && ContentIndexId > 0) {
+            GetAssignmentsData();
+        }
+    });
+    
+    function GetAssignmentsData() {
+        var ContextId = $('#Chapters').val();
+        
+        $.ajax({
+            url: '/AExamination/GetAssignments',
+            data: { ContextId: ContextId },
+            success: function (data) {
+
+                AssignmentId.children().remove();
+
+                AssignmentId.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+
+                    AssignmentId.append($("<option>").val(record.AssignmentUploadId).text(record.AssignmentName ));
+                });
+
+                $('#AssignmentId').append(AssignmentId);
+            },
+            aync: false
+        });
+    }
+    $('#AssignmentId').change(function () {
+        $("#SearchData").html("");
+
+        var SubjectId = $('#SubjectId').val();
+        var ContentIndexId = $('#Chapters').val();
+        var AssignmentId = $('#AssignmentId').val();
+
+        if (SubjectId > 0 && ContentIndexId > 0 && AssignmentId > 0) {
+            GetIndividualAssignmentReport();
+        }
+    });
+   
+
+    
+
+
+    function GetIndividualAssignmentReport() {
+        $("#SearchData").html("");
+      
+        
+        var AssignmentUploadId = $('#AssignmentId').val();
+        $('#imagemodal').show();
+        if (AssignmentUploadId > 0) {
+            $.ajax({
+                url: '/AExamination/GetStudentAssignmentURLByTopic',
+                data: { AssignmentUploadId: AssignmentUploadId },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchData").html(Data);
+                }
+            });
+        }
+    }
+
+</script>
+
+
+
+
+
+

@@ -1,0 +1,115 @@
+﻿@{
+    DateTime TodayDate = DateTime.Today;
+
+    List<SelectListItem>
+    LeaveState = new List<SelectListItem>();
+
+    LeaveState.Add(new SelectListItem { Text = "--Select--", Value = "-1" });
+    LeaveState.Add(new SelectListItem { Text = "Pending", Value = "0" });
+    LeaveState.Add(new SelectListItem { Text = "Accepted", Value = "1" });
+    LeaveState.Add(new SelectListItem { Text = "Rejected", Value = "2" });
+
+}
+                             @section BreadCrumb{
+
+                             <ul class="breadcrumb">
+                                 <li>
+                                     <i class="menu-icon fa fa-group"></i>
+                                     HR
+                                 </li>
+                                 <li>
+                                     <i class=""></i>
+                                     LeaveManagement
+                                 </li>
+                                 <li class="active">Leave Approval</li>
+                             </ul><!-- /.breadcrumb -->
+                             }
+
+<section class="content">
+
+    <div class="row">
+
+        <div class="col-xs-12">
+
+
+            <div class="table-header">
+                <span style="font-family:calibri;">Staff Leave Approval</span>
+
+
+            </div>
+            <div class="widget-box">
+           
+                <div class="widget-body">
+
+                    <div class="widget-main">
+                        <div class="row">
+
+                            <div class="col-xs-12">
+
+
+
+                                <div class="col-sm-6">
+
+                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Action")</label>
+
+                                    <div class="col-sm-6">
+
+                                        @Html.DropDownList("LeaveState", new SelectList(LeaveState, "Value", "Text", -1), new { @class = "form-control", id = "LeaveState" })
+
+
+                                    </div>
+
+
+
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+
+                        </div>
+
+                
+
+
+
+
+
+                    </div>
+
+                </div>
+            </div>
+            <div id="PartialView">
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script>
+    $('#LeaveState').change(function () {
+        var drpVal = $('#LeaveState').val();
+        if (drpVal !=-1 )
+        {
+            $.ajax({
+                url: '/HRLeaveManagement/GetLeaveListStatusWise',
+                data: { StatusId: drpVal },
+                success: function (data) {
+                    $('#PartialView').html(data);
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    });
+    
+</script>
+

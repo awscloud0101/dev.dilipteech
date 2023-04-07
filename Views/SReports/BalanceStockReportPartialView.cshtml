@@ -1,0 +1,240 @@
+﻿@model AsteriskBrowserAL.Models.BalanceStockData
+@{
+    List<IGrouping<string, AsteriskBrowserAL.Models.BalanceStockData>> GroupedData = new List<IGrouping<string, AsteriskBrowserAL.Models.BalanceStockData>>();
+    int sno = 1;
+
+    if (null != Model)
+    {
+        if (null != Model.lstStock && Model.lstStock.Count() > 0)
+        {
+            GroupedData = Model.lstStock.GroupBy(p => p.BranchName).ToList();
+        }
+    }
+}
+
+
+<div class="row">
+    <div class="col-xs-12">
+
+        @if (null != Model)
+        {
+            if (null != Model.lstStock && Model.lstStock.Count() > 0)
+            {
+
+                <div class="hr hr-18 dotted hr-double"></div>
+
+                <div class="table-header">
+                    Records Found (@Model.lstStock.Count)
+
+                    <div style="float:right">
+                        <button onclick="PrintElem('#mydiv')" class="btn btn-info btn-xs">
+
+                            <i class="ace-icon fa fa-print bigger-180"></i>
+
+                        </button>
+                    </div>
+
+                </div>
+        <!-- /.box-header -->
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <tbody>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Item Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Transferred Qty")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Balance Quantity")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Transfer Date")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Stock Transport Order")
+                            </th>
+
+                        </tr>
+
+                        @foreach (var item in Model.lstStock)
+                        {
+                            <tr>
+                                <td>
+                                    @(sno++)
+                                </td>
+                                <td>
+                                    @item.BranchName
+                                </td>
+                                <td>
+                                    @item.ItemName
+                                </td>
+                                <td>
+                                    @item.TransferredQuantity
+                                </td>
+                                <td>
+                                    @item.BalanceQuantity
+                                </td>
+                                <td>
+                                    @if (item.TransferDate.HasValue)
+                        {
+                                        @item.TransferDate.Value.ToString("dd-MMM-yyyy")
+                                    }
+                                </td>
+                                <td>
+                                    @item.DisplayDCNumber
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+
+
+            }
+            else
+            {
+                <div class="hr hr-18 dotted hr-double"></div>
+                <span style="color:red">No Records Found</span>
+            }
+        }
+
+
+
+    </div>
+</div>
+@Html.Action("DataTableScripts", "Base")
+
+<script type="text/javascript">
+    function PrintElem(elem) {
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+<body>
+    <div id="mydiv" style="display:none">
+
+        @if (null != Model)
+        {
+            if (null != Model.lstStock && Model.lstStock.Count() > 0)
+            {
+                int nSno = 1;
+                <div class="hr hr-18 dotted hr-double"></div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <img class=" col-xs-11" id="avatar" width="50" height="43" src="@Model.InstituteDetails.InstituteLogo" style="margin-bottom:-1.5em;" />
+                        <b style="font-weight:bold; margin-left:0.3em; font-size:20px; font-family:'Segoe UI'">@Model.InstituteDetails.InstituteName</b>
+                    </div>
+                    <div style="margin-left:3.7em; font-family:'Segoe UI'"><b>@Model.InstituteDetails.InstituteAddress</b></div>
+                    <br />
+
+                    <hr style="width:100%; margin-bottom:-0.5em" />
+                    <hr style="width:100%;" />
+                    <div align="center" style="font:12%; font-family:'Segoe UI'"><b>Pending Books Report (@((Model.FromDate.HasValue && Model.ToDate.HasValue) ? (Model.FromDate.Value.ToString("dd-MMM-yyyy") + " - " + Model.ToDate.Value.ToString("dd-MMM-yyyy")) : "")) </b></div>
+                    <hr style="width:100%;" />
+
+                    @foreach (var g in GroupedData)
+                    {
+                        <hr style="width:100%; margin-top:-0.5em" />
+
+                        <div align="left" style="font-weight:bold; margin-left:0.4em; font-family:'Segoe UI'; font-size:14px;"><b>@g.Key</b></div>
+                        <hr style="width:100%;" />
+
+                        <div class="col-xs-12 box-body table-responsive">
+                            <table class="table table-hover" rules="rows" cellpadding="5" style="width:675px; font-size:12px;">
+
+                                <tbody>
+                                    <tr style="font-size:13px; font-family:'Segoe UI'; font-weight:bold; text-align:left;">
+
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Branch")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Item Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Transferred Qty")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Balance Quantity")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Transfer Date")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Delivery Challan No")
+                                        </th>
+
+
+                                    </tr>
+                                    @foreach (var item in g)
+                                    {
+                                        <tr style="font-family:'Segoe UI';">
+                                            <td>
+                                                @(nSno++)
+                                            </td>
+                                            <td>
+                                                @item.BranchName
+                                            </td>
+                                            <td>
+                                                @item.ItemName
+                                            </td>
+                                            <td>
+                                                @item.TransferredQuantity
+                                            </td>
+                                            <td>
+                                                @item.BalanceQuantity
+                                            </td>
+                                            <td>
+                                                @if (item.TransferDate.HasValue)
+                                                {
+                                                    @item.TransferDate.Value.ToString("dd-MMM-yyyy")
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.DisplayDCNumber
+                                            </td>
+
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    <hr style="width:100%;" />
+
+                </div>
+            }
+        }
+
+
+    </div>
+</body>
+
+
+
+

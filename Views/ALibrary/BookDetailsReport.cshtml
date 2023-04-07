@@ -1,0 +1,70 @@
+﻿@model IEnumerable<AsteriskBrowserAL.BookCategory>
+@{
+    ViewBag.Title = "BookDetailsReport";
+}
+
+<br />
+<br />
+
+<div class="widget-box">
+    <div class="widget-header">
+        <h5 class="widget-title">
+            Books Report
+        </h5>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="row">
+                <div class="col-sm-6">
+                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Book Category</label>
+                    <div class="col-sm-6">
+                        <select id="BookCategoryId" name="nBookCategoryId" class="form-control"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+</div>
+
+<div id="BookDetails">
+
+</div>
+
+<script>
+    function onloadData() {
+        GetBookCategory();
+    }
+
+    function GetBookCategory() {
+        $.ajax({
+            url: '/ALibrary/GetBookCategoryDropDown',
+            success: function (Data) {
+                var BookCategory = $('#BookCategoryId')
+                BookCategory.children().remove();
+                BookCategory.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    BookCategory.append($("<option>").val(record.BookCategoryId).text(record.BookCategoryName));
+                    debugger
+                });
+            }
+        })
+    }
+    $("#BookCategoryId").change(function () {
+        debugger
+        GetBookCategoryView();
+    })
+    function GetBookCategoryView() {
+        debugger
+        var BookCategoryId = $('#BookCategoryId').val()
+        $.ajax({
+            url: '/ALibrary/BookOverallReaport',
+            data: { nBookCategoryId: BookCategoryId },
+            success: function (Data) {
+                $("#BookDetails").html(Data)
+                
+            }
+        })
+    }
+    window.onload = onloadData();
+</script>

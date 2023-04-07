@@ -1,0 +1,85 @@
+﻿@model IEnumerable<AsteriskBrowserAL.InventorySubCategoryItemType>
+
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+    <div class="hr hr-18 dotted hr-double"></div>
+    <div class="table-header">
+        Records Found (@Model.Count())
+    </div>
+    <table class="table tbhover table-striped table-bordered dynamic-table">
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Code")
+                </th>
+                <th>
+                    @Html.DisplayName("Item Group")
+                </th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @(nsno++)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemTypeName)
+                    </td>
+
+                    <td>
+                        <div class="hidden-sm hidden-xs action-buttons">
+                            <a class="green P2" href="@Url.Action("ItemGroupE", "SMasterData", new { id = item.InventorySubCategoryItemTypeId })">
+                                <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                            </a>
+                            <a class="red P2" onclick="btnConfirm(@item.InventorySubCategoryItemTypeId )">
+                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+else
+{
+        <span style="color: red;"><b>Data not available</b></span>
+        }
+@Html.Action("DataTableScripts", "Base")
+
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SMasterData/ValidationForItemGroupD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SMasterData/ItemGroupD?id=' + Value;
+                    var title = "Item Group";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+

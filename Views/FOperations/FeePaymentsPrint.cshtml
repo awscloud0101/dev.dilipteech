@@ -1,0 +1,248 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.FeepaymentPrintData>
+@{
+    ViewBag.Title = "Fee Payments Print";
+    int nSnum = 1;
+}
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 13px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+@Html.Action("DatePickerScripts","Base")
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            FOperations
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Re-Print</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+   
+    <br />
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("FeePaymentsPrint", "TFinance", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("FeePayments Print")</span>
+    <div class="box">
+        <div class="page-header">
+            <h1>
+                Fee Payments
+                <small style="float:right;">
+                    @Html.ActionLink("Back to details", "FeePayments")
+                </small>
+            </h1>
+        </div>
+        </div>
+    <div class="widget-box">
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">
+                Fee Payments Print
+            </h5>
+
+            <div class="widget-toolbar no-border">
+                <div class="inline action-buttons">
+                </div>
+            </div>
+        </div>
+        <!-- /.box-header -->
+
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group">
+
+                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Receipt")</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="ReceiptNo" id="ReceiptNo" class="form-control" />
+                            </div>
+
+                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Student Name")</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="StudentId" id="StudentId" class="form-control" />
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Date Range</label>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control pull-right" id="daterange" name="daterange" autocomplete="off" />
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+            <div id="Data" style="display:none">
+                <div id="SearchData" class="row">
+                </div>
+            </div>
+
+            }
+    </div>
+                        </div>
+</section>
+
+
+    <script type="text/javascript">
+
+        var StudentId = "";
+        var ReceiptNum = "";
+
+        //$('#ReceiptNo').keyup(function () {
+
+        //    alert($(this).val())
+
+        //    StudentId = "";
+        //    document.getElementById("StudentId").value = "";
+        //    document.getElementById("daterange").value = "";
+
+        //    if ($(this).val() == "") {
+        //        document.getElementById("Data").style.display = "none";
+        //    }
+        //    else {
+        //        GetPayments();
+        //    }
+        //});
+
+
+        $("#ReceiptNo").autocomplete(
+         {
+             source: function (request, response) {
+
+
+                 StudentId = "";
+                 document.getElementById("StudentId").value = "";
+                 document.getElementById("daterange").value = "";
+                 document.getElementById("Data").style.display = "none";
+
+                 if (request.term.length < 3) {
+                     return;
+                 }
+                 $('#imagemodal').show();
+
+                 $.ajax({
+
+                     error: function (jqXHR, textStatus, errorThrown) {
+                         alert(errorThrown);
+                         $('#imagemodal').hide();
+                     },
+
+                     url: "/FOperations/GetReceiptNumbers",
+                     type: "POST",
+                     dataType: "json",
+                     data: { strVal: request.term },
+                     success: function (json) {
+                         response($.map(json, function (data, id) {
+                             return {
+                                 label: data.ReceiptNo, //+ " (" + data.NewTemplateNo + ")",
+                                 value: data.ReceiptNo,
+                                 id: data.ReceiptNo,
+                             };
+                         }));
+                         $('#imagemodal').hide();
+                     },
+                 });
+             },
+             minLength: 3,
+             select: function SelectEvent(event, ui) {
+                 ReceiptNum = ui.item.value;
+                 GetPayments();
+             }
+         });
+
+        $("#daterange").change(function () {
+            document.getElementById("ReceiptNo").value = "";
+            GetPayments();
+        });
+
+        $("#StudentId").autocomplete({
+            source: function (request, response) {
+
+                document.getElementById("ReceiptNo").value = "";
+
+
+                $('#imagemodal').show();
+                $.ajax({
+                    url: "/FOperations/GetStudentsForFeePaymnetsRePrint",
+                    data: { StudentName: request.term },
+
+                    success: function (json) {
+                        response($.map(json, function (data, id) {
+
+                            return {
+                                label: data.FirstName,
+                                value: data.FirstName,
+                                StudentId: data.StudentId,
+                            };
+                        }));
+                    },
+                }).done(function () {
+                    $('#imagemodal').hide();
+                });
+            },
+            minLength: 1,
+            select: function SelectEvent(event, ui) {
+
+                StudentId = ui.item.StudentId;
+                GetPayments()
+            }
+        });
+
+        function GetPayments() {
+
+            $.ajax({
+                url: '/FOperations/GetFeePaymentsDataForRePrint',
+                data: { ReceiptNo: ReceiptNum, StudentId: StudentId, DateRange: $('#daterange').val() },
+                success: function (Data) {
+                    document.getElementById("Data").style.display = "inline";
+                    $('#SearchData').html(Data);
+                }
+            });
+        }
+
+    </script>
+
+
+
+
+

@@ -1,0 +1,194 @@
+﻿@model AsteriskBrowserAL.ClassTimingsDurations
+
+@{
+    ViewBag.Title = "Create Class Timings Durations";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            TimeTable
+        </li>
+        <li class="active">Class Timings Durations</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<section class="content">
+    @if (null != Model)
+    {
+        @*<div class="row">
+            <div class=col-xs-12>
+                <h3>@Html.ActionLink("<< Class Timings Durations", "ClassTimingsDurations", new { ClassNumber = Model.BatchId })</h3>
+            </div>
+        </div>*@
+    }
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ClassTimingsDurationsC", "ATimetable", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                @Html.HiddenFor(model => model.ClassTimingsDurationsId)
+                @Html.HiddenFor(model=>Model.BatchId)
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("ClassTimingsDurations")</span>
+                <span style="color: red;" id="Validation"></span>
+                <div class="page-header">
+                    <br />
+                    <h1>
+                        Class Timings Durations
+
+                        <small style="float:right;">
+                            @Html.ActionLink("Back to details", "ClassTimingsDurations")
+                        </small>
+                    </h1>
+                </div>
+    <div class="box-body">
+
+     
+        <div class="row">
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Start Date")</label>
+                <div class="col-sm-3">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div id="datepicker" class="input-group date" data-date-format="MM/dd/yyyy">
+                                @if (Model.StartDate.HasValue)
+                                {
+                                    <input class="form-control" type="text" name="StartDate" id="StartDate" value="@Model.StartDate.Value.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+                                }
+                                else
+                                {
+                                    <input class="form-control" type="text" name="StartDate" id="StartDate" autocomplete="off" placeholder="Select Date" />
+                                }
+                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("End Date")</label>
+                <div class="col-sm-3">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div id="datepicker" class="input-group date" data-date-format="MM/dd/yyyy">
+                                @if (Model.EndDate.HasValue)
+                                {
+                                    <input class="form-control" type="text" id="EndDate" name="EndDate" value="@Model.EndDate.Value.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+                                }
+                                else
+                                {
+                                    <input class="form-control" type="text" id="EndDate" name="EndDate" autocomplete="off" placeholder="Select Date" />
+                                }
+                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        </div>
+
+              
+           <div class="box">
+        <span style="color:red;font-weight:bold;">@Html.ValidationMessage("ClassTimingsDurations")</span>
+        <div class="hr hr-18 dotted hr-double"></div>
+        <div class="box-header">
+            @*<h3 class="box-title">Dispute Type</h3>*@
+            <div class="col-md-offset-3 col-md-9">
+                <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                    Save
+                    <i class="ace-icon fa fa-check bigger-50"></i>
+
+                </button>
+
+                &nbsp; &nbsp; &nbsp;
+                <button class="btn btn-sm" type="reset">
+                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                    Reset
+                </button>
+            </div>
+        </div><!-- /.box-header -->
+        <!-- form start -->
+        @*<div class="box-body">
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Name")</label>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control textlength", @id = "Name",@maxlength ="40", placeholder = "Dispute Type Name" })
+                    </div>
+
+                    <span class="col-sm-3" style="color:red;font-weight:bold;" id="Validation"></span>
+
+                </div>
+            </div>*@
+    </div>
+            }
+                </div>
+                </div>
+</section>
+
+
+
+
+<script type="text/javascript">
+
+    $('#StartDate').focus(function () {
+        document.getElementById("Validation").innerHTML = "";
+    })
+
+    $('#EndDate').focus(function () {
+        document.getElementById("Validation").innerHTML = "";
+    })
+
+    function submitForm() {
+
+        var StartDate = document.getElementById("StartDate").value;
+        var EndDate = document.getElementById("EndDate").value;
+
+        if(StartDate == "" && EndDate == "")
+        {
+            document.getElementById("Validation").innerHTML = "Please select both Start Date and End Date";
+            return false;
+        }
+        else if(StartDate == "")
+        {
+            document.getElementById("Validation").innerHTML = "Please select Start Date";
+            return false;
+        }
+        else if (EndDate == "") {
+            document.getElementById("Validation").innerHTML = "Please select End Date";
+            return false;
+        }
+        else if( Date.parse(StartDate) > Date.parse(EndDate) )
+        {
+            document.getElementById("Validation").innerHTML = "Start date should be less than End Date";
+            return false;
+        }
+
+    };
+
+
+
+</script>
+

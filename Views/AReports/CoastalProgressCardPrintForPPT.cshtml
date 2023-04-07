@@ -1,0 +1,528 @@
+﻿@model List<AsteriskBrowserAL.Models.CoastalProgressCard>
+@using AsteriskBrowserAL.Helpers
+@{
+    int n = 0;
+    int nCount = 0;
+    double MaxMarks = Model.FirstOrDefault().StudentMarks.FirstOrDefault().MaxMarks;
+    if (null != Model)
+    {
+        var data = Model.Select(s => s.StudentMarks).ToList();
+        n = data.Count();
+    }
+
+    string strDescriptor = "";
+
+    List<ScholasticsGrading> lstScholasticDescriptors = new List<ScholasticsGrading>();
+
+    lstScholasticDescriptors.Add(new ScholasticsGrading { ScholasticsGradingId = 1, ScholasticsMinMarks = 100, ScholasticsMaxMarks = 100, ScholasticsGrade = "Out Standing" });
+    lstScholasticDescriptors.Add(new ScholasticsGrading { ScholasticsGradingId = 2, ScholasticsMinMarks = 90, ScholasticsMaxMarks = 99.9, ScholasticsGrade = "Excellent" });
+    lstScholasticDescriptors.Add(new ScholasticsGrading { ScholasticsGradingId = 3, ScholasticsMinMarks = 80, ScholasticsMaxMarks = 89.9, ScholasticsGrade = "Very Good" });
+    lstScholasticDescriptors.Add(new ScholasticsGrading { ScholasticsGradingId = 4, ScholasticsMinMarks = 60, ScholasticsMaxMarks = 79.9, ScholasticsGrade = "Good" });
+    lstScholasticDescriptors.Add(new ScholasticsGrading { ScholasticsGradingId = 5, ScholasticsMinMarks = 40, ScholasticsMaxMarks = 59.9, ScholasticsGrade = "Satisfactory" });
+    lstScholasticDescriptors.Add(new ScholasticsGrading { ScholasticsGradingId = 6, ScholasticsMinMarks = 0, ScholasticsMaxMarks = 39.9, ScholasticsGrade = "Needs to work on" });
+
+    double marks = 0;
+    string Grade = "";
+    int GradePoint = 0;
+    double TotalTestMarks = 0;
+    double TwoPapersMarks = 0;
+    double TotalPaper1Marks = 0;
+    double TotalPaper2Marks = 0;
+
+    int nSubjectCount = 0;
+    double AvgGradePoint = 0;
+    double TotalGradePoint = 0;
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Approve Bank Deposit</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<input type="hidden" id="ExamId" value="@Model.FirstOrDefault().ExamId" />
+<input type="hidden" id="DivisionId" value="@Model.FirstOrDefault().DivisionId" />
+<input type="hidden" id="BranchId" value="@Model.FirstOrDefault().BranchId" />
+<input type="hidden" id="ClassNumber" value="@Model.FirstOrDefault().ClassNumber" />
+
+<html>
+<head>
+    <title>Test</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+        table, td, th {
+            border: 1px solid black;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div id="mydiv" style="display:none">
+
+
+        @if (null != Model)
+        {
+            foreach (var p in Model)
+            {
+                nCount++;
+                @*<div class="col-xs-12" style="border:groove">
+                    <img class="col-xs-11" id="avatar" width="100" height="110" style="float:left;text-decoration:none" src="@p.InstituteDet.InstituteLogo" />
+                    <b style="font-weight:bold; font-size:30px; font-family:'Segoe UI'"> &nbsp; &nbsp;Gowtham Model Schools - @p.InstituteDet.InstituteName</b>
+                    <br />
+                    <br />
+                    <br />
+                    <div style="background-color:#C0C0C0">
+                        <div align="center" style="font:25px; font-size:25px; font-family:'Segoe UI'"><b> @p.Exam</b></div>
+                    </div>
+
+                </div>*@
+                <div>
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    @if (null != p.InstituteDet.InstituteLogo)
+                    {
+                        <div align="center">
+
+                            <img width="120" height="80" src="@p.InstituteDet.InstituteLogo" />
+
+                        </div>
+                    }
+                    <br />
+                    <br />
+                    <div style="background-color:#C0C0C0">
+                        <div align="center" style="font:28px;font-size:28px;font-family:'Segoe UI';"><b> @p.InstituteDet.InstituteName.ToUpper()</b></div>
+                    </div>
+                    <div style="background-color:#C0C0C0">
+                        <div align="center" style="font:28px;font-size:28px;font-family:'Segoe UI';"><b> @p.InstituteDet.InstituteAddress.ToUpper()</b></div>
+                    </div>
+
+                    <div style="background-color:#C0C0C0">
+                        <div align="center" style="font:28px;font-size:28px;font-family:'Segoe UI';"><b> @p.ExamCode.ToUpper()</b></div>
+                    </div>
+                    <br />
+                    @*Stdent Details*@
+                    <table style="width:1000px;font-family:'Segoe UI'">
+                        <tr>
+                            <td style="font-size:20px;width:55%">
+                                <b style="font-size:22px"> Name : </b>@p.StudentName
+                            </td>
+                            <td style="width:50%;font-size:20px">
+                                <b style="font-size:22px"> Father Name : </b>
+                                @p.FatherName
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="width:1000px;font-family:'Segoe UI'">
+                        <tr>
+                            <td style="width:55%;font-size:20px">
+                                <b style="font-size:22px"> Admission No : </b>@p.AdmissionNo
+                            </td>
+
+                            <td style="width:50%;font-size:20px">
+                                <b style="font-size:22px"> Class : </b>@p.Class
+                            </td>
+                        </tr>
+                    </table>
+
+                    <br />
+                    <br />
+
+                    <table style="font:14;font-family:'Segoe UI'">
+                        <tr>
+                            <td style="vertical-align:top">
+                                <table style="border:1px solid black;width:550px;height:auto;" rules="all">
+                                    <tbody>
+                                        <tr style="border:1px solid black">
+                                            <th rowspan="2" style="font-size:20px;background-color:#C0C0C0">
+                                                Subject
+                                            </th>
+                                            <th colspan="3" style="font-size:20px;background-color:#C0C0C0">
+                                                @p.ExamCode
+                                            </th>
+                                        </tr>
+                                        <tr style="border:1px solid black;text-align:center">
+                                            <th style="font-size:20px;background-color:#C0C0C0">
+                                                Max<br /> Marks
+                                            </th>
+                                            <th style="font-size:20px;background-color:#C0C0C0">
+                                                Achieved<br /> Marks
+                                            </th>
+                                            <th style="font-size:20px;background-color:#C0C0C0">
+                                                Grade
+                                            </th>
+                                            <th style="font-size:20px;background-color:#C0C0C0">
+                                                Grade Point
+                                            </th>
+                                        </tr>
+                                        @foreach (var m in p.StudentMarks.Where(s => s.IsScholastic == true).OrderBy(s => s.OrderId))
+                                        {
+                                            if(@m.MaxMarks == 100)
+                                            {
+                                                Utility.GetGradeAndGradePointForCoastal1stTo5th(ref Grade, ref GradePoint, m.MarksScored);
+                                            }
+                                            else
+                                            {
+                                                Utility.GetGradeAndGradePointFor50Marks(ref Grade, ref GradePoint, m.MarksScored);
+                                            }
+                                            <tr style="text-align:center;">
+
+                                                <td style="font-size:20px;text-align:left">
+
+                                                    &nbsp; @m.Subject
+                                                </td>
+                                                <td style="font-size:20px">
+                                                    @m.MaxMarks
+                                                </td>
+                                                <td style="font-size:20px">
+                                                    @if (m.IsAbscent == true)
+                                                    {
+                                                        <p> A</p>
+                                                    }
+                                                    else
+                                                    {
+                                                        @m.DisplayMarksScored
+                                                    }
+                                                </td>
+
+                                                <td style="text-align:center">
+                                                    @Grade
+                                                </td>
+                                                <td style="text-align:center">
+                                                    @if (GradePoint == 0)
+                                                    {
+                                                        @("-")
+                                                    }
+                                                    else
+                                                    {
+                                                        @GradePoint
+                                                        TotalGradePoint += GradePoint;
+                                                    }
+
+                                                </td>
+                                                @*<td>
+            @{
+                if (!m.IsAbscent && m.DisplayMarksScored != "")
+                {
+                    marks = Math.Round(Convert.ToDouble((m.MarksScored / m.MaxMarks) * 100), 1);
+                    var descriptor = lstScholasticDescriptors.FirstOrDefault(d => marks >= d.ScholasticsMinMarks && marks <= d.ScholasticsMaxMarks);
+
+                    if (null != descriptor)
+                    {
+                        @descriptor.ScholasticsGrade
+                    }
+                }
+            }
+
+        </td>*@
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </td>
+                            @*<td style="vertical-align:top">
+                                <table style="border:1px solid black;width:450px;height:auto" rules="all">
+                                    <tbody>
+                                        <tr style="border:1px solid black">
+                                            <th style="font-size:20px;background-color:#C0C0C0">
+                                                Psychomotor Skills
+                                            </th>
+                                            <th colspan="3" style="font-size:20px;background-color:#C0C0C0">
+                                                Descriptors
+                                            </th>
+                                        </tr>
+                                        @foreach (var cr in p.StudentMarks.Where(s => s.IsScholastic == false).OrderBy(s => s.OrderId))
+                                        {
+                                            <tr style="text-align:center;">
+
+                                                <td style="font-size:20px;text-align:left">
+
+                                                    &nbsp; @cr.Subject
+                                                </td>
+                                                <td style="font-size:14px">
+                                                    @{
+                                                        Utility.GetCoastalPPTDescriptors(ref strDescriptor, cr.MarksScored);
+                                                    }
+
+                                                    @strDescriptor
+                                                </td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </td>*@
+                        </tr>
+                    </table>
+
+                    <br />
+
+                    @*<table>
+                        <tr>
+                            <td>
+                                <table style="border:1px solid black;font-family:'Segoe UI';width:1000px" rules="all">
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-size:20px;background-color:#C0C0C0;">
+                                                <b style="font-size:20px;">Attendance</b>
+                                            </td>
+
+                                            <td style="font-size:20px" align="center">
+                                                June
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                July
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                Aug
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                Sep
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                Oct
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                Nov
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                Dec
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                Jan
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                Feb
+                                            </td>
+
+                                            <td style="font-size:20px" align="center">
+                                                Mar
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                Apr
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color:#C0C0C0;">
+                                                <b style="font-size:20px">Working Days</b>
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJuneWorkingDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJulyWorkingDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJAugWorkingDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJSepWorkingDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nOctWorkingDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nNovWorkingDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nDecWorkingDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJanWorkingDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nFebWorkingDays
+                                            </td>
+
+                                            <td style="font-size:20px" align="center">
+                                                @p.nMarWorkingDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nAprilWorkingDays
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+
+                                            <td style="background-color:#C0C0C0;">
+                                                <b style="font-size:20px">Days present</b>
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJunePresentDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJulyPresentDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJAugPresentDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJSepPresentDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nOctPresentDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nNovPresentDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nDecPresentDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nJanPresentDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nFebPresentDays
+                                            </td>
+
+                                            <td style="font-size:20px" align="center">
+                                                @p.nMarPresentDays
+                                            </td>
+                                            <td style="font-size:20px" align="center">
+                                                @p.nAprilPresentDays
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                            </td>
+                        </tr>
+
+                        <tr>
+
+                            <td>
+                                <br />
+                                <table style="border:1px solid black;width:1000px;font-family:'Segoe UI';height:150px">
+                                    <tbody>
+                                        <tr style="background-color:#C0C0C0">
+
+                                            <td style="font-size:20px;height:20px;font-weight:bold">
+                                                Teacher Remarks
+                                            </td>
+                                        </tr>
+                                        <tr style="margin-top:1em">
+                                            @p.TeacherAssessment
+                                            <td style="font-size:30px"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
+                        </tr>
+                    </table>*@
+                </div>
+                <br />
+                <br />
+                <br />
+                <br />
+                <table style="width:1000px;font-family:'Segoe UI'">
+                    <tr>
+                        <td style="width:55%;font-size:20px">
+                            <b style="font-size:22px"> Class Teacher </b>
+                        </td>
+
+                        <td style="width:50%;font-size:20px">
+                            <b style="font-size:22px"> Parent </b>
+                        </td>
+                        <td style="width:50%;font-size:20px">
+                            <b style="font-size:22px"> Principal </b>
+                        </td>
+                    </tr>
+                </table>
+                @*<table style="width:1500px">
+                    <tbody>
+                        <tr>
+
+                            <td style="font-size:20px;height:50px;text-align:center">
+                                <b style="font-size:20px"> Principal</b>
+                            </td>
+                            <td style="font-size:20px;height:50px;text-align:center">
+                                <b style="font-size:20px"> Class Teacher</b>
+
+
+                            </td>
+                            <td style="font-size:20px;height:50px;text-align:center">
+                                <b style="font-size:20px"> Parent</b>
+
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>*@
+                if (nCount != n)
+                {
+                    <div style="page-break-after:always">
+                    </div>
+                }
+                else
+                {
+                    nCount = 0;
+                }
+
+
+            }
+        }
+    </div>
+
+</body>
+</html>
+
+<script>
+
+    function onloadData() {
+        PrintElem('#mydiv');
+    }
+    window.onload = onloadData();
+
+    function PrintElem(elem) {
+        var BranchId = $("#BranchId").val();
+        var DivisionId = $("#DivisionId").val()
+        var ClassNumber = $("#ClassNumber").val();
+        var ExamId = $("#ExamId").val();
+        Popup($(elem).html());
+
+        window.location.href = "/AReports/CostalProgressCardReport?Emd=" + ExamId + "&IdB=" + BranchId + "&IdDn=" + DivisionId + "&ClNb=" + ClassNumber
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=400,width=300,size=landscape');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+
+</script>
+

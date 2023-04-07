@@ -1,0 +1,145 @@
+﻿@{
+    ViewBag.Title = "Disputed stock details";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Disputed Stock details</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<br />
+
+
+<style>
+    tr {
+        display: table-row;
+        vertical-align: inherit;
+        border-color: inherit;
+    }
+
+    .selected {
+        background-color: #ccc;
+    }
+</style>
+
+
+<section class="content">
+    <form id="myForm" method="post">
+
+        @*@if (null != TempData["Status"])
+        {
+            <span style="color:forestgreen">@Html.Raw(TempData["Status"])</span>
+        }*@
+
+        <div class="row">
+            <div class="col-xs-12">
+                @using (Html.BeginForm("DisputedStockDetails", "SOperations", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-xs-12">
+
+                            <div class="widget-box">
+
+                                <div class="widget-header widget-header-flat widget-header-small">
+                                    <h5 class="widget-title">
+                                        Disputed Stock Details
+                                    </h5>
+
+                                    <div class="widget-toolbar no-border">
+                                        <div class="inline action-buttons">
+                                            <a href="/SOperations/RaiseDispute" class="blue btn btn-info btn-minier">Raise Dispute</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <div class="col-sm-6">
+
+                                                    <input type="radio" name="rbReceivedType" checked="checked" value="Kit"><span style="margin-right:2em;">Kit Items</span>
+                                                    <input type="radio" name="rbReceivedType" value="Item" />Items
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+                <div class="hr hr-18 dotted hr-double"></div>
+                <div id="Items"></div>
+
+            </div>
+        </div>
+    </form>
+
+</section>
+
+<script>
+    var rbReceivedType = "";
+
+    $(document).ready(function () {
+        GetDataOnrbClick();
+    });
+
+    $('input[name="rbReceivedType"]').click(function radioButton() {
+        rbReceivedType = $(this).val();
+        GetDataOnrbClick();
+    });
+
+    function GetDataOnrbClick() {
+        rbReceivedType = $('input[name=rbReceivedType]:checked', '#myForm').val();
+
+        $('#Items').html("");
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            },
+
+            url: '/SOperations/GetDisputedStock',
+            data: { Type: rbReceivedType },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (Data) {
+                $('#imagemodal').hide()
+                $('#Items').html(Data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide()
+        });
+    }
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

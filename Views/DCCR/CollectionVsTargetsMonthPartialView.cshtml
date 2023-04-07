@@ -1,0 +1,141 @@
+﻿
+@model IEnumerable<AsteriskBrowserAL.Models.CollectionVsTargetsViewModel>
+@{
+}
+
+
+<section>
+
+    @if (null != Model && Model.Count() > 0)
+    {
+
+   
+
+        int nsno = 1;
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+        </div>
+
+        if (Model.ElementAt(0).lstTargetData != null)
+        {
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Collections Rs.Lacks")
+                        </th>
+
+                        @foreach (var strName in Model.ElementAt(0).lstTargetData.Distinct().Select(T => T.Name).ToList())
+                        {
+                            <th>
+                                @Html.DisplayName(strName)
+                            </th>
+                        }
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @(nsno++)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DisplayYearName)
+                            </td>
+
+                            @foreach (var Item in item.lstTargetData)
+                            {
+                                <td>
+                                    @Html.DisplayFor(modelItem => Item.Value)
+                                </td>
+                            }
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+        }
+        else
+        {  <span style="color:red;font-weight:bold;">Data is not available</span>
+        }
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold;">Data is not available</span>
+    }
+
+</section>
+
+@Html.Action("DataTableScripts", "Base")
+
+<section>
+
+    @if (Model != null)
+    {
+        <div id="curve_chart" style="height: 500px;width:1000px"></div>
+    }
+
+</section>
+
+<script type="text/javascript">
+
+    window.onload = LoadChartData();
+
+    function drawChart(dataArray) {
+
+        var data = google.visualization.arrayToDataTable(dataArray);
+
+        var options = {
+
+            hAxis: {
+                title: 'Day'
+            },
+            vAxis: {
+                title: 'Collection In Lacks'
+            },
+
+            title: 'Collection Vs Target Month Wise',
+            //curveType: 'function',
+            legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+    }
+
+    function LoadChartData() {
+
+        debugger
+
+        $.ajax({
+            url: '/DCCR/GetChartData',
+            type: 'get',
+            dataType: 'json',
+            data: {},
+            success: function (chartsdata) {
+
+                debugger
+                drawChart(chartsdata);
+            },
+            error: function () {
+                alert("Error loading data! Please try again.");
+            }
+        });
+    }
+
+</script>
+

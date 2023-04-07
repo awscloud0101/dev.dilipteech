@@ -1,0 +1,301 @@
+﻿@model AsteriskBrowserAL.Models.StudentDetailsData
+@{
+    int Sno = 1;
+}
+<section>
+
+    @if ((null != Model))
+    {
+        if (null != Model.lstStudentsData)
+        {
+            if (Model.lstStudentsData.Count() > 0)
+            {
+                <span id="Validation" style="color:red;font-weight:bold"></span>
+                <div class="hr hr-18 dotted hr-double"></div>
+
+                <div class="table-header">
+                    Records Found (@Model.lstStudentsData.Count)
+                    <div style="float:right;">
+                        <button type="submit" class="btn btn-info btn-xs" name="button" id="Save" value="Save">
+                            <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                        </button>
+                    </div>
+                </div>
+
+                    <input type="hidden" id="selbuttonVal" />
+
+
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Admission No")
+                                </th>
+                                <th>
+                                    <input type="checkbox" id="Selectall" class="checkbox" />
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @for (int i = 0; i < Model.lstStudentsData.Count(); i++)
+                        {
+                                <tr>
+
+                                    <td>
+                                        @Sno
+                                    </td>
+                                    <td>
+                                        @Model.lstStudentsData.ElementAt(i).StudentName
+                                    </td>
+                                    <td>
+                                        @Model.lstStudentsData.ElementAt(i).AdmissionNo
+                                        @Html.Hidden("StudentList[" + (@i + 10) + "].AdmissionNo", Model.lstStudentsData.ElementAt(i).AdmissionNo)
+                                    </td>
+                                    <td>
+                                        @Html.Hidden("SelStudentId", Model.lstStudentsData.ElementAt(i).StudentId)
+                                        @Html.Hidden("StudentList.Index", (@i + 10))
+                                        @Html.Hidden("StudentList[" + (@i + 10) + "].StudentId", Model.lstStudentsData.ElementAt(i).StudentId)
+                                        @Html.Hidden("StudentList[" + (@i + 10) + "].SubscriptionId", Model.lstStudentsData.ElementAt(i).SubscriptionId)
+                                        @Html.CheckBox("StudentList[" + (@i + 10) + "].IsChecked", Model.lstStudentsData.ElementAt(i).IsChecked, new { @id = "Check", @name = "Check", @class = "checkbox" })
+                                    </td>
+                                </tr>
+                                Sno++;
+                            }
+                        </tbody>
+                    </table>
+            }
+            else
+            {
+                <span style="color: red;"><b>Data not available</b></span>
+            }
+        }
+
+
+    }
+</section>
+@*<div id="dialogRemarks" title="Remarks" style="display:none"> <p>Remarks<input type="text" name="Remarks" id="remarks" class="form-control" /></p> </div>*@
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+    function CheckRemarks(result) {
+
+        var val = true;
+
+        $.each(result, function (i, result) {
+
+            $("#AttendanceTable tr").each(function (index) {
+                if (index != 0) {
+
+                    var SelStatus = $(this).find("#SelStatus").val();
+
+                    if (SelStatus == "True") {
+
+                        var StudentId = $(this).find("#SelStudentId").val();
+
+                        if (StudentId == result.value) {
+
+                            var SelRemarks = $(this).find("#Remarks").val();
+
+                            if (SelRemarks == "") {
+
+                                document.getElementById("Validation").innerHTML = "Enter remarks for selected student(s)";
+                                val = false;
+                                return false;
+                            }
+                        }
+                    }
+                }
+            });
+
+            if (val == false) {
+                return false;
+            }
+
+        })
+
+        return val;
+    }
+
+
+
+    $("#A").click(function () {
+
+
+        var Ids = " ";
+        var result = $('#Check:checked');
+
+        var val = CheckRemarks(result);
+
+        if (val == false)
+            return;
+
+        $.each(result, function (i, result) {
+            Ids += result.value + ":A" + ",";
+
+        });
+        if (Ids != "") {
+            UpdateStatus("A")
+        }
+    });
+
+    $("#L").click(function () {
+        var Ids = " ";
+        var result = $('#Check:checked');
+
+        var val = CheckRemarks(result);
+
+        if (val == false)
+            return;
+
+        $.each(result, function (i, result) {
+            Ids += result.value + ":L" + ",";
+        });
+        if (Ids != "") {
+            UpdateStatus("L")
+        }
+    })
+
+    $("#P").click(function () {
+        var Ids = " ";
+        var result = $('#Check:checked');
+
+        //var val = CheckRemarks(result);
+
+        //if (val == false)
+        //    return;
+
+        $.each(result, function (i, result) {
+            Ids += result.value + ":P" + ",";
+        });
+        if (Ids != "") {
+            UpdateStatus("P")
+        }
+    });
+
+    $('#Remarks').focus(function () {
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    function UpdateStatus(Type) {
+
+        $("#selbuttonVal").val(Type)
+
+        var dateval = $("#SelectDate").val();
+        var SectionId = $("#SectionId").val();
+
+        var PreviousStrings = $("#SelStudent").val()
+        var strArray = new Array();
+        var stringStudents = new Array();
+        var ButtonVal = $("#selbuttonVal").val()
+
+        if (PreviousStrings != "") {
+            strArray = PreviousStrings.split(',')
+        }
+
+        var Ids = " ";
+        var arryRemov = new Array();
+
+        var result = $('#Check:checked');
+
+        $.each(result, function (i, result) {
+
+            var Remarks = "";
+
+            $("#AttendanceTable tr").each(function (index) {
+
+                if (index != 0) {
+
+                    var SelStatus = $(this).find("#SelStatus").val();
+
+                    if (SelStatus == "True") {
+
+                        var StudentId = $(this).find("#SelStudentId").val();
+
+                        if (StudentId == result.value) {
+                            var SelRemarks = $(this).find("#Remarks").val();
+
+                            if (SelRemarks != "undefined") {
+                                Remarks = SelRemarks;
+                            }
+                        }
+                    }
+                }
+
+            });
+
+            Ids += result.value + ":" + ButtonVal + ":" + Remarks + ",";
+            if (strArray.length > 0) {
+                $.each(strArray, function (i, e) {
+                    var strResult = e
+                    var strCheckStr = result.value + ":";
+                    if (strResult.includes(strCheckStr) == true) {
+                        arryRemov.push(e)
+                    }
+                });
+            }
+
+
+        });
+
+        if (arryRemov.length > 0) {
+            $.each(arryRemov, function (i, c) {
+                var index = strArray.indexOf(c);
+                strArray.splice(index, 1);
+
+            });
+        }
+        var finalpreviousstr = ""
+        if (strArray.length > 0) {
+            $.each(strArray, function (i, c) {
+                finalpreviousstr += c + ",";
+            });
+        }
+        document.getElementById("SelStudent").value = finalpreviousstr + Ids
+
+        var IsFreeze = $('#IsFreeze').val();
+
+        if (IsFreeze == "value")
+            IsFreeze = true;
+        else
+            IsFreeze = false;
+
+        var SelStudents = $("#SelStudent").val()
+        var Attendance = $("input[name=Attendance]:checked").val()
+        $.ajax({
+            url: "/AFrontOffice/UpdateStudentAttendance",
+            data: { strStudents: SelStudents, SectionId: SectionId, Date: dateval, IsFreeze: IsFreeze, Attendance: Attendance },
+            success: function (Data) {
+                $("#SearchViewDiv").html(Data);
+
+                document.getElementById("Validation").value = "";
+            },
+            async: false
+        })
+    }
+
+    var Attendance = $("input[name=Attendance]:checked").val()
+</script>

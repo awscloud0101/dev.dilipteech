@@ -1,0 +1,53 @@
+﻿@{
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+@{
+    ViewBag.Title = "ParentCalendar";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+<div id='calendar'>  </div>
+
+<style>
+    .modal-backdrop {
+        z-index: -1;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Events/GetEventsForParents',
+            contentType: "application/json",
+            dataType: "json",
+            aync: false,
+            success: function (data) {
+                debugger
+                $.each(data, function (i) {
+                    calendar.fullCalendar('renderEvent', {
+                        title: data[i].Subject,
+                        start: data[i].Time,
+                        allDay: true,
+                        color:data[i].color,
+                        id: data[i].EventId
+                    }, true);
+                });
+            },
+            aync: false
+        });
+        var calendar = $('#calendar').fullCalendar({
+            editable: true,
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: ''
+            },
+            eventClick: function (event) {
+                debugger
+                window.location = "/Events/EventSlots?EventId=" + event.id
+            },
+        });
+    });
+</script>
+

@@ -1,0 +1,236 @@
+﻿@model AsteriskBrowserAL.Models.ApproveBankDepositViewModel
+@{
+    ViewBag.Title = "Request Bank Deposit";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+           Operations
+        </li>
+        <li class="active">Bank Deposit Request</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+       
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+   
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("BankDepositRequest", "FOperations", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(model => model.FirstInserted)
+                @Html.HiddenFor(model => model.Lastupdated)
+                @Html.HiddenFor(model => model.DepositDate)
+                @Html.HiddenFor(model => model.BankDepositId)
+                @Html.HiddenFor(model => model.OldCashAmount)
+                @Html.HiddenFor(model => model.OldChequeAmount)
+
+
+    <div class="page-header">
+        <br />
+        <h1>
+            <small style="float:right;">
+                @Html.ActionLink("<< Bank Deposit Details", "BankDeposit", new { dtFromdate = Model.FirstInserted, dtToDate = Model.Lastupdated })
+            </small>
+        </h1>
+    </div><!-- /.page-header -->
+
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <span style="color:red;font-weight:bold;">@Html.ValidationMessage("BankDeposit")</span>
+                        <span style="color:red;font-weight:bold" id="Validation"></span>
+                        <br />
+                        <h5 class="widget-title">
+                            Bank Deposit Request
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <p>
+
+                            </p>
+                            <div class="inline action-buttons">
+
+                                <div style="float:right;">
+                                    <button class="btn btn-info btn-xs" type="submit" style="width:80px;" onclick="return submitForm();">
+                                        Request
+                                    </button>
+                                </div>
+                                @*<button class="fa fa-plus-circle bigger-150 pull-right" id="Save" style="color:#a82682 ;" type="button" onclick="RedirectToNew()"></button>*@
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- form start -->
+
+                    <div class="widget-body">
+
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Deposit Date</label>
+                                    <div class="col-xs-3">
+                                        <div id="datepicker" class="input-group date">
+                                            <input class="form-control" type="text" value="@Model.DepositDate.ToShortDateString()" id="DepositDateVal" disabled="disabled" name="DepositDate" autocomplete="off" placeholder="Deposit Date" />
+                                            <span disabled="disabled" class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="widget-body table-responsive">
+                                    <div class="widget-main">
+                                        <div class="row">
+                                            <div id="Summary">
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <br />
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Cash Amount</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.CashAmount, new { @class = "form-control textlength txtboxNum", @id = "txtCashAmount", placeholder = "Cash Amount" })
+                                    </div>
+                                </div>
+
+                                <br />
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Cheque Amount</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.ChequeAmount, new { @class = "form-control textlength txtboxNum", @id = "txtChequeAmount", placeholder = "Cheque Amount" })
+                                    </div>
+                                </div>
+
+                                <br />
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Remarks</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.Remarks, new { @class = "form-control textlength", @id = "Remarks", placeholder = "Remarks" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                      
+
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+
+    function ONLOADDATA() {
+        PopulateBankDepositData();
+    }
+
+    window.onload = ONLOADDATA();
+
+    function submitForm() {
+
+        var ChequeAmount = $('#txtChequeAmount').val();
+        var CashAmount = $('#txtCashAmount').val();
+        var Remarks = $('#Remarks').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (CashAmount < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Cash Amount";
+            isValid = false;
+        }
+
+        if (ChequeAmount < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Cheque Amount";
+            isValid = false;
+        }
+
+        if (Remarks == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Remarks";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return false;
+        }
+
+        return isValid;
+    }
+
+    function PopulateBankDepositData() {
+        var InquiryDate = $('#DepositDateVal').val();
+
+        if (InquiryDate != "") {
+            $.ajax({
+                url: '/FOperations/GetBankDepositSummary',
+                data: { dtStartDate: InquiryDate },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#Summary').html(data);
+                },
+                aync: false
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+
+
+</script>
+
+
+
+
+
+
+
+
+

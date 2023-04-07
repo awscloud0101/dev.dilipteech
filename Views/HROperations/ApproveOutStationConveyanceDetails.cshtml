@@ -1,0 +1,678 @@
+﻿@model AsteriskBrowserAL.Models.ConveyanceViewModel
+@{
+    ViewBag.Title = "OutStationConveyance";
+    int nsno = 1;
+    int nSno1 = 1;
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Approve Conveyance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<style>
+    .required:first-letter {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+
+<section class="content">
+    <br />
+
+    <div class="row">
+        <div class=col-xs-8>
+            <h3>@Html.ActionLink("<< Out Station Conveyance", "ApproveConveyance", new { })</h3>
+        </div>
+    </div>
+    @using (Html.BeginForm())
+    {
+        if (null != Model)
+        {
+            if (Model.ListConveyance.Count() > 0)
+            {
+                @Html.ValidationMessage("Message")
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div class="box-header">
+                                <h3 class="box-title">Applied Conveyances</h3>
+                            
+                                <button class="btn btn-primary pull-right" style="margin-left:3px;"  onclick="return Export();">Export Approve</button>
+                                <button class="btn btn-primary pull-right" style="margin-left:3px;" onclick="return PendingExport();">Export Pending</button>                         
+                                <button class="btn btn-primary pull-right">Approve</button>
+                                   
+                            </div>
+
+                            <div class="box-body">
+                                <div style="overflow:auto;height:440px;">
+                                    <div class="hideScrolling">
+                                        <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;">
+
+                                            <tbody>
+                                                <tr>
+                                                    <th>
+                                                       S.No.
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Date")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("From Branch")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("To Branch")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Branches Visited")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Reporting Manager")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Purpose")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Travel Mode")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Travel Fare")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Food Expense")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Lodging Fare")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Select")
+                                                        <input type="checkbox" id="checkAll" />
+                                                    </th>
+                                                    <th>
+                                                        Status
+                                                    </th>
+                                                </tr>
+
+                                                @foreach (var item in Model.ListConveyance)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @(nsno++)
+                                                        </td>
+                                                        @if (item.Date.HasValue)
+                                                        {
+                                                            <td>
+                                                                @item.Date.Value.ToString("dd-MMM-yyyy")
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td></td>
+                                                        }
+                                                        <td>
+                                                            @item.DisplayFromBranch
+                                                        </td>
+                                                        <td>
+                                                            @item.DisplayToBranch
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.BranchesVisited)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.ReportingManagerName)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.PurposeOfVisiting)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.DisplayModeOfTravelling)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.TravelFare)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.FoodExpense)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.LodgingFare)
+                                                        </td>
+                                                        <td>
+                                                            @if (item.Status == "Approved")
+                                                            {
+                                                                <input type="checkbox" disabled />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="case" name="lstMeetingConveyanceId" value="@item.MeetingConveyanceId" />
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @item.Status
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        }
+        else
+        {
+            <label style="color:red;">Data is not available</label>
+        }
+    }
+
+</section>
+
+@*</section>*@
+
+<div style="display:none;">
+    <table id="ConveyanceTableId">
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th colspan="8" rowspan="2">OUT STATION CONVEYANCE FOR THE MONTH OF AUGUST'16</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th align="left">Name </th>
+                            <td colspan="6">: @Model.EmployeeName</td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th align="left">Designation </th>
+                            <td colspan="6">: @Model.DesignationName</td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th align="left">Contact No </th>
+                            <td colspan="6" align="left">: @Model.ContactNumber</td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th align="left">BANK A/C DETAILS </th>
+                            <td colspan="6" align="left">: @Model.AccountNumber</td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th align="left">IFSC Code </th>
+                            <td colspan="6" align="left">: @Model.IFSCCode </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th colspan="8" rowspan="2"></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td>
+                <table border="1">
+                    <tbody>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Date")
+                            </th>
+                            <th>
+                                @Html.DisplayName("From Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("To Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branches Visited")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Purpose")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Travel Mode")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Travel Fare")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Food Expense")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Lodging Fare")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Total Amount")
+                            </th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+
+                        @foreach (var item in Model.ListConveyance)
+                        {
+                            if(item.Status=="Approved")
+                            { 
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                @if (item.Date.HasValue)
+                                {
+                                    <td>
+                                        @item.Date.Value.ToString("dd-MMM-yyyy")
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
+                                <td>
+                                    @item.DisplayFromBranch
+                                </td>
+                                <td>
+                                    @item.DisplayToBranch
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BranchesVisited)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PurposeOfVisiting)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DisplayModeOfTravelling)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TravelFare)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FoodExpense)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LodgingFare)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Amount)
+                                </td>
+                                <td>
+                                    @item.Status
+                                </td>
+                            </tr>
+                        }
+                        }
+                    </tbody>
+                </table>
+
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th colspan="8" rowspan="2"></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th colspan="5" align="left">Employee Signature</th>
+                            <th colspan="2" align="left">Authorized By</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th colspan="8" rowspan="2"></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th colspan="5"></th>
+                            <th colspan="2" align="left">Name and Signature</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+<div style="display:none;">
+    <table id="ConveyanceTableId2">
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th colspan="8" rowspan="2">OUT STATION CONVEYANCE FOR THE MONTH OF AUGUST'16</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th align="left">Name </th>
+                            <td colspan="6">: @Model.EmployeeName</td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th align="left">Designation </th>
+                            <td colspan="6">: @Model.DesignationName</td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th align="left">Contact No </th>
+                            <td colspan="6" align="left">: @Model.ContactNumber</td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th align="left">BANK A/C DETAILS </th>
+                            <td colspan="6" align="left">: @Model.AccountNumber</td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th align="left">IFSC Code </th>
+                            <td colspan="6" align="left">: @Model.IFSCCode </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th colspan="8" rowspan="2"></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td>
+                <table border="1">
+                    <tbody>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Date")
+                            </th>
+                            <th>
+                                @Html.DisplayName("From Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("To Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branches Visited")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Purpose")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Travel Mode")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Travel Fare")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Food Expense")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Lodging Fare")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Total Amount")
+                            </th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+
+                        @foreach (var item in Model.ListConveyance)
+                        {
+                            if (item.Status == "Pending")
+                            {
+                                <tr>
+                                    <td>
+                                        @(nsno++)
+                                    </td>
+                                    @if (item.Date.HasValue)
+                                    {
+                                        <td>
+                                            @item.Date.Value.ToString("dd-MMM-yyyy")
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+                                    <td>
+                                        @item.DisplayFromBranch
+                                    </td>
+                                    <td>
+                                        @item.DisplayToBranch
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.BranchesVisited)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.PurposeOfVisiting)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DisplayModeOfTravelling)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.TravelFare)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.FoodExpense)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.LodgingFare)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Amount)
+                                    </td>
+                                    <td>
+                                        @item.Status
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th colspan="8" rowspan="2"></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th colspan="5" align="left">Employee Signature</th>
+                            <th colspan="2" align="left">Authorized By</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th colspan="8" rowspan="2"></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th colspan="5"></th>
+                            <th colspan="2" align="left">Name and Signature</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+<script>
+
+    $('#checkAll').click(function () {
+        if ($(this).is(':checked')) {
+            var res = document.getElementsByClassName("case");
+            for (var i = 0; i < res.length; i++) {
+                var val = res[i];
+                val.checked = true;
+            }
+        }
+        else {
+            var res = document.getElementsByClassName("case");
+            for (var i = 0; i < res.length; i++) {
+                var val = res[i];
+                val.checked = false;
+            }
+        }
+    });
+
+
+    function Export() {
+        debugger
+        ExportDataToExcel('ConveyanceTableId');
+        return false;
+    }
+
+    function PendingExport() {
+        debugger
+        ExportDataToExcel('ConveyanceTableId2');
+        return false;
+    }
+
+    function ExportDataToExcel(tableid) {
+
+
+        var filename = "Out Station Conveyance";
+        //creating a temporary HTML link element (they support setting file names)
+        var a = document.createElement('a');
+        //getting data from our div that contains the HTML table
+        var data_type = 'data:application/vnd.ms-excel';
+        var table_div = document.getElementById(tableid);
+        var table_html = table_div.outerHTML.replace(/ /g, '%20');
+        a.href = data_type + ', ' + table_html;
+        //setting the file name
+        a.orientation
+        a.download = filename + '.xls';
+        //triggering the function
+        a.click();
+        //just in case, prevent default behaviour
+        //e.preventDefault();
+
+        return false;
+    }
+
+</script>
+

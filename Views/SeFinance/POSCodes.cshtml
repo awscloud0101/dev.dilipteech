@@ -1,0 +1,186 @@
+﻿@model List<AsteriskBrowserAL.Models.SwipePaymentData>
+@{
+    ViewBag.Title = "POS Codes";
+    int sno = 1;
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">POS Codes</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-6>
+
+        </div>
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            <br />
+            @using (Html.BeginForm("POSCodes", "SeFinance", FormMethod.Post))
+            {
+
+                if (null != TempData["Message"])
+                {
+                    <span id="Validation1" style="color:green;font-weight:bold;">@Html.Raw(TempData["Message"])</span>
+                }
+                else
+                {
+                    <span id="Validation" style="color:red;font-weight:bold;"></span>
+                }
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="table-header">
+                                Bank Accounts
+                                <div style="float:right;">
+                                    <button type="submit" name="Save" class="btn btn-info btn-xs P2" onclick="return submitForm()">
+                                        <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <table class="table tbhover table-striped table-bordered dynamic-table" id="tbPOSCodes">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                               S.No.
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Branch")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("POS Code")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("IMEI")
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @for (int i = 0; i < Model.Count(); i++)
+                                        {
+                                            <tr>
+                                                @Html.Hidden("lstPOSCodes.Index", (@i))
+                                                @Html.Hidden("lstPOSCodes[" + (@i) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                                @Html.Hidden("lstPOSCodes[" + (@i) + "].BranchName", Model.ElementAt(i).BranchName)
+                                                @Html.Hidden("lstPOSCodes[" + (@i) + "].POSCodeId", Model.ElementAt(i).POSCodeId)
+                                                <td>
+                                                    @(sno++)
+                                                </td>
+                                                <td>
+                                                    @Model.ElementAt(i).BranchName
+                                                    <input type="hidden" id="Branchname" value="@Model.ElementAt(i).BranchName" />
+                                                </td>
+                                                <td>
+                                                    @Html.TextBox("lstPOSCodes[" + (@i) + "].MerchantStorePosCode", Model.ElementAt(i).MerchantStorePosCode, new { @class = "form-control textlength ", @min = "0", @style = "width:220px", @id = "POSCode" })
+                                                </td>
+
+                                                <td>
+                                                    @Html.TextBox("lstPOSCodes[" + (@i) + "].IMEI", Model.ElementAt(i).IMEI, new { @class = "form-control textlength ", @min = "0", @style = "width:220px", @id = "IMEI" })
+                                                </td>
+
+
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+
+<script type="text/javascript">
+
+    $(document).ready(function () { $("#Validation").html("") });
+
+    function ValidateData() {
+        var POSCode = 0;
+        var IMEI = 0;
+        var isvalid = true;
+
+        $('#tbPOSCodes tr').each(function (index) {
+            debugger
+            if (index > 0) {
+                debugger
+
+                POSCode = $(this).find('#POSCode').val();
+                IMEI = $(this).find('#IMEI').val();
+
+                if (POSCode != "" || IMEI != "")
+                {
+                    $('#tbPOSCodes tr').each(function (index1) {
+                        debugger
+                        if (index1 > 0) {
+                            if (index1 != index) {
+                                var POSCode1 = $(this).find('#POSCode').val();
+                                var IMEI1 = $(this).find('#IMEI').val();
+
+                                if (POSCode == POSCode1 || IMEI == IMEI1) {
+                                    $("#Validation").html("POS Code / IMEI should be unique");
+                                    isvalid = false;
+                                    return isvalid;
+                                }
+                            }
+                        }
+                    })
+                }
+            }
+        })
+
+        return isvalid;
+    }
+
+    function submitForm() {
+
+        var IsValid = ValidateData();
+
+        if (IsValid == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+</script>
+

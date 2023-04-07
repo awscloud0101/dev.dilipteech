@@ -1,0 +1,218 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    ViewBag.Title = "ExaminationPapers";
+}
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Examination Papers</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<!-- /section:basics/content.breadcrumbs -->
+@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>*@
+
+<section class="content">
+  
+
+    @using (Html.BeginForm("ExaminationPapers", "AExamination", FormMethod.Post))
+    {
+        @Html.ValidationMessage("ExaminationPapers")
+        <span style="color:red;" id="EPCombos"></span>
+        <div class="table-header">
+
+                Exam Papers
+        
+    
+                <div style="float:right;margin-right:10px">
+                    <a class="btncustom P2" id="NewPaper" name="New">
+                    Add</a>
+                </div>
+         
+
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+            
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.lstClassNumbers, "ClassNumber", "ClassNumberDisplay"), "-- Select --", new { @class = "form-control", @id = "ClassNumber" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Term")</label>
+
+                                        <div class="col-sm-6">
+
+                                            @Html.DropDownListFor(model => model.TermNumber, new SelectList(Model.lstTerms, "TermNumber", "TermName"), "-- Select --", new { @class = "form-control", id = "TermNumber" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+                         
+                        </div>
+                    </div>
+                    <div id="Data" style="display:none" class="col-sm-12">
+                        <div id="SearchData" class="row">
+                        </div>
+
+                    </div>
+
+                    if (null != Model)
+                    {
+                    <input style="display:none" id="SelClass" value="@Model.ClassNumber" />
+                    <input style="display:none" id="SelTerm" value="@Model.TermNumber" />
+                    }
+                    else
+                    {
+
+                    <input style="display:none" id="SelClass" value="0" />
+                    <input style="display:none" id="SelTerm" value="0" />
+                    }
+
+
+                    }
+</section>
+
+<script>
+
+    $('#ClassNumber').change(function () {
+        var ClassNumberId = $('#ClassNumber').val();
+        if (ClassNumberId > 0) {
+            GetData();
+        }
+         
+    });
+
+    $('#TermNumber').change(function () {
+        var TermNumberId = $('#TermNumber').val();
+        var ClassNumberId = $('#ClassNumber').val();
+        if (TermNumberId > 0 && ClassNumberId > 0) {
+            GetData();
+        }
+              
+    });
+
+    function GetData() {
+        document.getElementById("EPCombos").innerHTML = "";
+        var ClassNumber = $('#ClassNumber').val();
+        var TermNumber = $('#TermNumber').val();
+        if (ClassNumber > 0 && TermNumber > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+
+                url: '/AExamination/GetExamPapersData',
+                data: { ClassNumber: ClassNumber, TermNumber: TermNumber },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    document.getElementById("Data").style.display = "inline";
+                    $("#SearchData").html(Data);
+                   
+                }
+            });
+        }
+        else {
+            document.getElementById("Data").style.display = "none";
+            $("#SearchData").html("");
+        }
+
+    };
+
+    $(document).ready(function () {
+        var SelClass = $('#SelClass').val();
+        var SelTerm = $('#SelTerm').val();
+
+        if (SelClass > 0 && SelTerm > 0) {
+            GetData();
+        }
+    });
+
+    $('#NewPaper').click(function () {
+        return submitForm();
+    });
+
+    function submitForm() {
+        var validatestatus = ValidateEP();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function ValidateEP() {
+        var ClassNumber = $('#ClassNumber').val();
+        var TermNumber = $('#TermNumber').val();
+        if (ClassNumber == "" && TermNumber == "") {
+            validate = false;
+            document.getElementById("EPCombos").innerHTML = "Please select both Class and Term";
+        }
+        else if (ClassNumber == "") {
+            validate = false;
+            document.getElementById("EPCombos").innerHTML = "Please select the Class";
+        }
+        else if (TermNumber == "") {
+            validate = false;
+            document.getElementById("EPCombos").innerHTML = "Please select the Term";
+        }
+        else {
+
+                $.ajax({
+
+                    url: '/AExamination/CheckSchedulesByClass',
+                    data: { ClassNumber: ClassNumber, TermNumber: TermNumber },
+                    success: function (Data) {
+
+                        if (Data == true)
+                        {
+                            window.location.href = '/AExamination/ExaminationPapersC?ClassNumber=' + ClassNumber + '&TermNumber=' + TermNumber;
+                        }
+                        else
+                        {
+                            validate = false;
+                            document.getElementById("EPCombos").innerHTML = "No exam schedules found for the selected class. Click on <a href = '/AExamination/ExamSchedules'>Exam Schedules</a> to create";
+                        }
+                    },
+                    async : false
+                });
+
+        }
+
+        return validate;
+
+    }
+
+</script>
+
+
+

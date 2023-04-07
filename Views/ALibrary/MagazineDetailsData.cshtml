@@ -1,0 +1,164 @@
+﻿@model AsteriskBrowserAL.Models.BookDetailsData
+@{
+    ViewBag.Title = "MagazineDetails";
+}
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Manage Magazine</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+<section class="content">
+    <div class="row">
+    </div>
+    <br />
+    <div>
+        @if (null != @TempData["Success"])
+        {
+            <span style="color:green">@TempData["Success"].ToString()</span>
+        }
+    </div>
+    <div>
+        @if (null != @TempData["UpdateMsg"])
+        {
+            <span style="color:green"  id="UpdateMsg" > @TempData["UpdateMsg"].ToString()</span>
+        }
+    </div>
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <span style="color: red;">@Html.ValidationMessage("Manage Books")</span>
+    <div class="row">
+        <div class="col-xs-12">
+              <span id="managemsg" style="color: red;display:none">Please select Manage Magazine</span>
+    <div class="widget-box">
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">Manage Magazine</h5>
+            <div style="float:right">
+                <a  class="view-header-btn btn btn-info btn-xs" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+            </div>
+        </div>
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label no-padding-right" for="form-field-1">  Magazine category</label>
+                        <div class="col-sm-3">
+                            @*@Html.DropDownListFor(model => model.MagazineCategoryId, new SelectList(Model.MagazineCategoryList, "BookCategoryId", "BookCategoryName"), "--Select--", new { @class = "form-control", onchange = "GetData()" })*@
+                                    @Html.DropDownList("BookCategoryId", null, "--- Select ---", new { @class = "form-control", onchange = "GetData()" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="display_box" style="display:none;">
+                <div class="table-header">
+                    Manage Books
+                </div>
+                <div style="overflow:auto">
+                    <table class="table table-bordered table-striped table-hover nowrap">
+                        <tbody id="tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="display_error" style="display:none;">
+                <span style="color:red;font-weight:bold">No data to display. Please click on 'New' to create</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+    <div id="MangeBook"></div>
+</section>
+
+
+<script>
+    $('#New').click(function () {
+        debugger
+        var value = $('#BookCategoryId').val();
+        
+        if (value != null && value != "") {
+            window.location.href = "/ALibrary/MagazineDetailsDataC?MagazineCategoryId=" + value;
+        }
+        else {
+            
+            $('#managemsg').show();
+        }
+    })
+    $('#BookCategoryId').focus(function () {
+
+        $('#managemsg').hide();
+    });
+
+    function GetData() {
+        debugger
+        var MagazineCategoryId = $('#BookCategoryId').val();
+        debugger
+        if (MagazineCategoryId > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+
+                url: '/ALibrary/MagazineBooksDisplayData',
+                data: { MagazineCategoryId: MagazineCategoryId },
+                success: function (Data) {
+                    GetMangeBooks();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            document.getElementById("display_box").style.display = "none";
+
+        }
+        $("#BookCategoryId").change(function () {
+            debugger
+            $('#UpdateMsg').hide();
+            GetMangeBooks();
+        })
+        function GetMangeBooks() {
+            debugger
+            var MagazineCategoryId = $('#BookCategoryId').val()
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/MagazineDetailsDataPartialView',
+                data: { MagazineCategoryId: MagazineCategoryId },
+                success: function (Data) {
+                    $("#MangeBook").html(Data)
+
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+
+        function errorFunc() {
+            document.getElementById("display_box").style.display = "none";
+        }
+
+    };
+
+    window.onload = GetData;
+
+</script>

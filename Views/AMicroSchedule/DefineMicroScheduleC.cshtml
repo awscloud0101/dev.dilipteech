@@ -1,0 +1,298 @@
+﻿@model AsteriskBrowserAL.Models.MicroScheduleData
+
+@{
+    ViewBag.Title = "Create Syllabus";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Micro Schedule
+        </li>
+        <li class="active">Define Micro Plan</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<section class="content">
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <span style="color:red;" id="Validation"></span>
+    @using (Html.BeginForm("DefineMicroScheduleC", "AMicroSchedule", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+        <input type="hidden" name="Exam" id="Exam" />
+                @Html.HiddenFor(model => model.SubscriptionId)
+                @Html.HiddenFor(model => model.ClassNumber)
+                @Html.HiddenFor(model => model.ExamId)
+                @Html.HiddenFor(model => model.SubjectId)
+
+                <input type="hidden" id="SelSubId" value="@Model.SubscriptionId" />
+                <input type="hidden" id="SelClass" value="@Model.ClassNumber" />
+                <input type="hidden" id="SelExamId" name="ExamId" value="@Model.ExamId" />
+                <input type="hidden" id="SelSubject" value="@Model.SubjectId" />
+
+
+                <div class="table-header">
+
+                    Micro Plan
+                    <small style="float:right;font-weight:bold;" class="textheader">
+                        @Html.ActionLink("Back to details", "DefineMicroSchedule", new { ClassNumber = Model.ClassNumber, Branch = Model.SubscriptionId, Exam = Model.ExamId, Subject = Model.SubjectId })
+                    </small>
+
+                </div><!-- /.page-header -->
+
+                <!-- form start -->
+        <div class="widget-box row" style="padding:10px;">
+            <form class="form-horizontal" role="form">
+
+
+
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Topic Name")</label>
+
+                        <div class="col-sm-8">
+                            @Html.TextAreaFor(model => model.Topic, 10, 15, new { @class = "form-control textlength", placeholder = "Topic Name", @id = "TopicName" })
+                            <span class="" style="color:red;font-weight:bold;" id="ESTopicname">
+                            </span>
+                        </div>
+
+                        
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                        <input class="form-control" type="text" name="StartDate" id="Date" autocomplete="off" placeholder="Select Start Date" />
+                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+                                    <span class="" id="ESDate" style="color:red;font-weight:bold;">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+                <div class=" col-md-9">
+                    <div class="hr hr-18 dotted hr-double"></div>
+                    <button class="btn btn-success btn-sm" name="Save" onclick="return submitForm();" type="submit">
+                        <i class="ace-icon fa fa-check bigger-50"></i>
+                        Save
+                    </button>
+
+                    &nbsp; &nbsp; &nbsp;
+                    <button class="btn btn-sm" type="reset">
+                        <i class="ace-icon fa fa-undo bigger-50"></i>
+                        Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    }
+        </div>
+
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    function submitForm() {
+        var validatestatus = validateSyllabus();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+   
+    function validateSyllabus() {
+
+        var validate = true;
+
+        var TopicName = document.getElementById("TopicName").value;
+       
+        var Date = document.getElementById("Date").value;
+        //alert(StartDate);       
+
+       
+        if (TopicName == "") {
+            document.getElementById("ESTopicname").innerHTML = "Please enter Topic Name";
+            validate = false;
+        }
+
+     
+
+        if (Date == "") {
+            document.getElementById("ESDate").innerHTML = "Please select Date";
+            validate = false;
+        }       
+
+        if (validate == true) {
+            var status = IsMicroScheduleExisted(validate);
+            validate = status;
+        }
+
+        return validate;
+    };
+
+    function IsMicroScheduleExisted(validate) {
+
+        var ClassNumber = $('#SelClass').val()
+        var SubId = $('#SelSubId').val()
+        var SubjectId = $('#SelSubject').val()
+        var ExamId = $('#SelExamId').val()
+        $.ajax({
+
+            url: '/AMicroSchedule/IsSyllabusExisted',
+            data: { type: "New", id: 0, Topic: $('#TopicName').val(), ClassNumber: ClassNumber, SubId: SubId, SubjectId: SubjectId, ExamId: ExamId },
+            success: function (Data) {
+
+                if (Data != "") {
+                    validate = false;
+                    document.getElementById("Validation").innerHTML = Data;
+                }
+            },
+            async: false
+        });
+
+        return validate;
+    }
+
+
+    $('#ExamName').focus(function () {
+        document.getElementById("ESExamName").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    $('#ExamCode').focus(function () {
+        document.getElementById("ESExamCode").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    $('#StartDate').change(function () {
+        document.getElementById("ESStartDate").innerHTML = "";
+    });
+    //$('#ClassId').change(function () {
+    //    document.getElementById("ESClassId").innerHTML = "";
+    //});
+
+    $('#EndDate').change(function () {
+        document.getElementById("ESEndDate").innerHTML = "";
+    });
+
+    $('#CCEExamId').focus(function () {
+        document.getElementById("ESCCEExam").innerHTML = "";
+    });
+
+    $('#CCEExamId').change(function () {
+        debugger
+
+        var CCEExamName = $("#CCEExamId option:selected").text();
+
+        var CCE = $('#CCEExamId').val();
+
+        $('#ExamName').val("");
+        $('#Exam').val("");
+
+
+        if(CCE > 0)
+        {
+
+            if ($("#IsCT").prop("checked")) {
+
+                var NoOfCTs = $('#NoOfCTs').val();
+
+                $('#ExamName').val(CCEExamName + " - " + "CT" + (parseInt(NoOfCTs, 10)+1))
+                $('#Exam').val(CCEExamName + " - " + "CT" + (parseInt(NoOfCTs, 10) +1))
+            }
+            else {
+                var NoOfUTs = $('#NoOfUTs').val();
+
+                $('#ExamName').val(CCEExamName + " - " + "UT" + (parseInt(NoOfUTs, 10)+1) )
+                $('#Exam').val(CCEExamName + " - " + "UT" + (parseInt(NoOfUTs, 10)+1) )
+            }
+        }
+        else
+        {
+            $("#IsCT").prop("checked", true);
+            OnClick();
+        }
+    });
+
+
+    $('#IsUT').click(function () {
+
+        $('#ExamName').val("");
+        $('#Exam').val("");
+
+        var CCEExamName = $("#CCEExamId option:selected").text();
+
+        if (CCEExamName != "--- Select ---") {
+            document.getElementById("ESExamName").innerHTML = "";
+            var NoOfUTs = $('#NoOfUTs').val();
+            $('#ExamName').val(CCEExamName + " - " + "UT" + (parseInt(NoOfUTs, 10)+1) )
+            $('#Exam').val(CCEExamName + " - " + "UT" + (parseInt(NoOfUTs, 10)+1) )
+        }
+
+    });
+
+    $('#IsCT').click(function () {
+
+        OnClick();
+
+    });
+
+    function OnClick() {
+
+        $('#ExamName').val("");
+        $('#Exam').val("");
+
+        var CCEExamName = $("#CCEExamId option:selected").text();
+
+        if (CCEExamName != "--- Select ---") {
+            document.getElementById("ESExamName").innerHTML = "";
+            var NoOfCTs = $('#NoOfCTs').val();
+
+            $('#ExamName').val(CCEExamName + " - " + "CT" + (parseInt(NoOfCTs, 10)+1) )
+            $('#Exam').val(CCEExamName + " - " + "CT" + (parseInt(NoOfCTs, 10)+1) )
+        }
+    }
+
+</script>
+

@@ -1,0 +1,309 @@
+﻿@model AsteriskBrowserAL.Models.BalanceStockData
+
+@{
+    ViewBag.Title = "Pending Stock Transfer";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Pending Stock Transfer</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<br />
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+<section class="content">
+    <form id="myForm" method="post">
+        <div class="row">
+            <div class="col-xs-12">
+                @using (Html.BeginForm("BalanceStock", "SOperations", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="col-xs-12">
+                            @if (null != Model)
+                            {
+                                if (Model.IsSaved)
+                                {
+                                    <input type="hidden" id="Status" value="true" />
+                                    <input type="hidden" id="DCNumber" value="@Model.DCNumber" />
+                                    <input type="hidden" id="SubId" value="@Model.SubscriptionId" />
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="Status" value="false" />
+                                }
+                                <div class="widget-box">
+                                    <div class="widget-header widget-header-flat widget-header-small">
+                                        <h5 class="widget-title">
+                                            Pending Stock Transfer
+                                        </h5>
+                                    </div>
+
+                                    <div class="widget-body">
+                                        <div class="widget-main">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-xs-6">
+                                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                                        <div class="col-sm-6">
+                                                            @if (null != Model.lstDivision)
+                                                            {
+                                                                @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                            }
+                                                            else
+                                                            {
+                                                                <select id="DivisionId" style="width:200px;" class="form-control"></select>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-6">
+                                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                                        <div class="col-sm-6">
+                                                            <select id="Branch" style="width:200px;" name="SubscriptionId" class="form-control"></select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            }
+                        </div>
+                    </div>
+
+                }
+                <div id="Items"></div>
+            </div>
+
+
+
+        </div>
+    </form>
+
+</section>
+
+<script>
+    var nCount = 0;
+    var SelRowIndex = 0;
+    var Content = "";
+
+    $(document).ready(function () {
+        if ($('#Status').val() == "true") {
+            Content = "Stock transferred";
+            dialogForChallan();
+        }
+    });
+
+    $('#DivisionId').change(function () {
+        $('#Items').html("");
+        $('#Branch').html("");
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (data) {
+
+                    $('#Branch').children().remove();
+
+                    $('#Branch').append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        $('#Branch').append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                },
+                aync: false
+            });
+        }
+        else {
+            $('#Branch').append("");
+        }
+    });
+
+    $('#Branch').change(function () {
+        $('#Items').html("");
+        GetData();
+    });
+
+    function GetData() {
+
+        var SubscriptionId = $('#Branch').val();
+
+        if (SubscriptionId > 0) {
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+                url: '/SOperations/PopulateBalanceItems',
+                data: { SubscriptionId: SubscriptionId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $('#imagemodal').hide()
+                    $('#Items').html(Data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+        }
+        else {
+            $('#Items').html("");
+        }
+    }
+
+    $(document).on('focusout', 'td', function (e) {
+        nCount += 1;
+        if (nCount == 1) {
+            var ItemId = $(this).closest('tr').find('#ItemId').val();
+
+            var Quantity = $(this).closest('tr').find('#Quantity').val();
+            SelRowIndex = $(this).closest('tr').index();
+
+            if (parseInt(Quantity, 10) > 0) {
+                var ExistedQty = $(this).closest('tr').find('#ExistedQty').val();
+
+                if (parseInt(Quantity, 10) > parseInt(ExistedQty, 10)) {
+
+                    Content = "Entered quantity exceeds existed quantity"
+                    dialogForNotExists();
+                }
+            }
+            else {
+                nCount = 0;
+            }
+        }
+        else {
+            e.stopImmediatePropagation();
+            nCount = 0;
+            e.preventDefault();
+        }
+
+    });
+
+    function dialogForNotExists() {
+
+        $('#dValidation').html(" <i class='ace-icon fa fa-hand-o-right blue bigger-120'></i>&nbsp; " + Content);
+
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            draggable: false,
+            width: '320',
+            modal: true,
+            title: 'Balance Stock',
+            title_html: true,
+            buttons: [{
+                html: "OK",
+                "class": "btn btn-info btn-minier",
+                click: function () {
+                    nCount = 0;
+                    $(this).dialog("close");
+                    $('#mytab1 tbody').find('tr:eq(' + SelRowIndex + ')').find('td:eq(7) input').val("0");
+                }
+            },
+            ]
+        });
+
+        return false;
+    }
+
+    function dialogForChallan() {
+
+
+        $('#dValidation').html(" <i class='ace-icon fa fa-hand-o-right blue bigger-120'></i>&nbsp; " + Content);
+
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            draggable: false,
+            width: '320',
+            modal: true,
+            title: 'Balance Stock',
+            title_html: true,
+            buttons: [
+                {
+                    html: "OK",
+                    "class": "btn btn-info btn-minier",
+                    click: function () {
+
+
+                        $(this).dialog("close");
+                        var DCNo = $('#DCNumber').val();
+
+                        if (DCNo > 0) {
+                            window.location.href = '/SMasterData/DeliveryChallan?DCNum=' + DCNo + '&SubId=' + $('#SubId').val() + '&Type=' + "bal";
+                        }
+                    }
+                }
+            ]
+        });
+
+        return false;
+    }
+
+    function SubmitForm() {
+        debugger
+        var valid = true;
+
+        var Quantity = 0;
+
+        // Get table object
+        var myTable = document.getElementById("mytab1");
+
+        for (var r = 1, n = myTable.rows.length; r < n; r++) {
+            var dValue = myTable.rows[r].cells[7].children[0].value;
+            Quantity += parseInt(dValue, 10);
+        }
+
+        if (Quantity == 0) {
+            Content = "Enter quantity";
+            OpenDialog(Content, "", "Balance Stock");
+
+            valid = false;
+        }
+
+        return valid;
+    }
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

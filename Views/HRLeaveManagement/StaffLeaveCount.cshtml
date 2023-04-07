@@ -1,0 +1,227 @@
+﻿<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Hr
+        </li>
+        <li>
+            <i class=""></i>
+            Leave Management
+        </li>
+        <li class="active"> Staff Leave Count</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+
+
+<section>
+    <div class="hr hr-18 dotted hr-double"></div>
+
+
+
+    @if (null != Model)
+    {
+   
+
+  
+    <div class="table-header">
+        Staff Leave Count
+        <div style="float:right">
+            <input class="btn btn-sm btn-info" style="width:80px;" type="button" name="Save" value="Save" id="Save" onclick="validateischecked()" />
+            @*<button class="btn btn-info btn-xs" id="btnExport">
+                <i class="ace-icon fa fa-share bigger-180"></i>
+            </button>*@
+        </div>
+    </div>
+
+
+    <div style="overflow:auto; height:500px;">
+        <table class="table table-hover table-striped table-bordered nowrap" style="font-size:14px;" id="tbSalaryData">
+            <thead>
+                <tr>                   
+                    @if(1==1)
+                    {
+                    Int32 snoo = 0;
+                    foreach (System.Data.DataColumn col in Model.Columns)
+                    {
+                    if (snoo != 1 && snoo != 4 && snoo != 6 && snoo != 8 && snoo != 10)
+                    {
+                    <th>@col.Caption </th>
+                    }
+                    snoo +=1;
+                    }
+                    }
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (System.Data.DataRow row in Model.Rows)
+                {
+                Int32 sno = 0;
+                Int32 Rowsno = 1;
+                Int32 LeaveListCount = 1;
+
+                <tr>
+
+
+                    @foreach (var cell in row.ItemArray)
+                    {
+                   
+                    if(sno == 0 || sno == 2 || sno == 3)
+                    {
+                    <td>
+                        @cell.ToString()
+                    </td>
+                    }
+                    else if (sno != 1 && sno != 4 && sno != 6 && sno != 8 && sno != 10 && sno != 12 && sno != 14 && sno != 16 && sno != 18)
+                    {
+                    if(LeaveListCount==1)
+                    {
+                    <td>
+                        <input type="text" class="number txtcountchange" id="txt_@row["SNo"].ToString()_@row["staffid"].ToString()_@row["1"].ToString()" value="@cell.ToString()" maxlength="2"/>
+                    </td>
+                    }
+                    else if(LeaveListCount==2)
+                    {
+                    <td>
+                        <input type="text" class="number txtcountchange" id="txt_@row["SNo"].ToString()_@row["staffid"].ToString()_@row["2"].ToString()" value="@cell.ToString()" maxlength="2"/>
+                    </td>
+                    }
+                    else if(LeaveListCount==3)
+                    {
+                    <td>
+                        <input type="text" class="number txtcountchange" id="txt_@row["SNo"].ToString()_@row["staffid"].ToString()_@row["3"].ToString()" value="@cell.ToString()" maxlength="2"/>
+                    </td>
+                    }
+                    else if(LeaveListCount==4)
+                    {
+                    <td>
+                        <input type="text" class="number txtcountchange" id="txt_@row["SNo"].ToString()_@row["staffid"].ToString()_@row["4"].ToString()" value="@cell.ToString()" maxlength="2"/>
+                    </td>
+                    }
+                    else if(LeaveListCount==5)
+                    {
+                    <td>
+                        <input type="text" class="number txtcountchange" id="txt_@row["SNo"].ToString()_@row["staffid"].ToString()_@row["5"].ToString()" value="@cell.ToString()" maxlength="2"/>
+                    </td>
+                    }
+                    LeaveListCount+=1;
+
+                    }                   
+                    else
+                    {
+
+                    }
+                    sno += 1;
+                   
+                    }
+                </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+    }
+    else
+    {
+    <span style="color: red;"><b>Data not available</b></span>
+    }
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+    <div style="display:none">
+        <input type="hidden" id="hd_onchangelist" value=""/>
+    </div>
+</section>
+<script>   
+    function validateischecked() {
+       debugger
+        var stringofChangedList = $('#hd_onchangelist').val();
+
+        var splitarray = [];
+        splitarray = stringofChangedList.split(',');
+        var PostString = '';
+        for(var i=0;i<=splitarray.length-1;i++)
+        {
+            var splitofsplitarray = [];
+            splitofsplitarray = splitarray[i].split('_');
+            PostString += splitofsplitarray[2] + '_' + splitofsplitarray[3] + '_' + document.getElementById(splitarray[i]).value+',';
+            
+        }
+
+
+        if (PostString != '')
+        {
+            $('#imagemodal').show();
+                $.ajax({
+                    url: '/HRLeaveManagement/StaffLeaveCountSave',
+                    data: { ListofChanges: PostString },
+                    async:false,
+                    beforeSend: function () {
+                        $('#imagemodal').show();
+                    },
+                    success: function (data) {
+                        window.location.href = '@Url.Action("StaffLeaveCount", "HRLeaveManagement", new { res=true })';
+                        $('#imagemodal').hide();
+                    },
+                    error: function () {
+                        $('#imagemodal').hide();
+                        alert('Cannot Reach to Server at the moment..');
+                    }
+                })
+        }
+        $('#imagemodal').hide();
+
+    }
+
+
+
+
+    $(".number").keydown(function (e) {
+
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            return;
+        }
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+
+    $(document)
+    .ajaxStart(function () {
+
+        var $loading = $('#imagemodal');
+        $loading.show();
+    })
+    .ajaxStop(function () {
+        var $loading = $('#imagemodal');
+        $loading.hide();
+    });
+
+    $(".txtcountchange").change(function (e) {
+       debugger
+        var ID = $(this).attr("id");
+
+        var hd_onchangelist = $('#hd_onchangelist').val();
+        if (hd_onchangelist != '') {
+            hd_onchangelist = hd_onchangelist + ','+ID;
+        }
+        else {
+            hd_onchangelist = ID;
+        }
+        $('#hd_onchangelist').val(hd_onchangelist);
+       
+
+    });
+
+</script>

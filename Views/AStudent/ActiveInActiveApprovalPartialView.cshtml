@@ -1,0 +1,169 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentStatusViewModel>
+@{
+    int sno = 1;
+}
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+
+@if (null != Model && Model.Count() > 0)
+{
+    <div class="table-header">
+
+       Records Found
+
+    
+    </div>
+
+
+ <div class="overflowscroll" style="height:300px">
+        <table class="table tbhover table-striped table-bordered dynamic-table" id="mytab1">
+            <thead>
+                <tr>
+                    <th>
+                        S.No.
+                    </th>
+                    <th>
+                        <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Branch Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Admission Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Legacy Number")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Section")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Request Sent Date")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Request Reason")
+                    </th>
+                    @*<th>
+                            @Html.DisplayName("Request Approv Date")
+                        </th>*@
+                    <th>
+                        @Html.DisplayName("Request Status")
+                    </th>
+
+                </tr>
+
+            </thead>
+            <tbody>
+
+                @for (int i = 0; i < Model.Count(); i++)
+            {
+            <tr>
+                @Html.Hidden("StudentActiveList.Index", (@i))
+                @Html.Hidden("StudentActiveList[" + (@i) + "].StudentStatusId", Model.ElementAt(i).StudentStatusId)
+                @Html.Hidden("StudentActiveList[" + (@i) + "].StudentId", Model.ElementAt(i).StudentId)
+                @Html.Hidden("StudentActiveList[" + (@i) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                <td>
+                    @(sno++)
+                </td>
+                <td>
+                    @{
+                            string StudentDet = Model.ElementAt(i).SubscriptionId + "-" + Model.ElementAt(i).StudentStatusId;
+
+                    }
+                    @Html.CheckBox("StudentActiveList[" + (@i) + "].IsChecked", Model.ElementAt(i).IsChecked, new { @value = StudentDet, @id = "Check" })
+                </td>
+
+
+                <td>
+                    @Model.ElementAt(i).BranchName
+                </td>
+                <td>
+                    @Model.ElementAt(i).StudentName
+                </td>
+                <td>
+                    @Model.ElementAt(i).AdmissionNumber
+                </td>
+                <td>
+                    @Model.ElementAt(i).LegacyNumber
+                </td>
+
+
+                <td>
+                    @Model.ElementAt(i).Section
+                </td>
+                <td>
+                    @Model.ElementAt(i).RequestSentDate.Value.ToString("dd - MMM - yyyy")
+                </td>
+                <td>
+                    @Model.ElementAt(i).RequestReason
+                </td>
+                @*<td>
+                        @Model.ElementAt(i).ApproveDate.Value.ToString("dd - MMM - yyyy")
+                    </td>*@
+                <td>
+                    @if (Model.ElementAt(i).RequestStatus == 1)
+                        {
+                        <span class="label label-danger">In-Active</span>
+                        }
+                    @if (Model.ElementAt(i).RequestStatus == 2)
+                        {
+                        <span class="label label-success">Active</span>
+                        }
+                </td>
+
+
+            </tr>
+
+                            }
+
+
+            </tbody>
+        </table>
+
+    </div>
+                        }
+                        else
+                        {
+                            <span style="color:red;font-weight:bold"> Data not available</span>
+                        }
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<script>
+
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+
+</script>

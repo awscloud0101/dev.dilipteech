@@ -1,0 +1,186 @@
+﻿@model AsteriskBrowserAL.Models.ClassTimingsDurationsData
+@{
+    ViewBag.Title = "ClassTimingsDurations";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            TimeTable
+        </li>
+        <li class="active">Class Timings Durations</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+    @if (null != Model)
+    {
+        <div class="row">
+            <div class=col-xs-12>
+                @*<h3>@Html.ActionLink("New", "ClassTimingsC")</h3>*@
+               
+
+            </div>
+        </div>
+        <br />
+        using (Html.BeginForm("ClassTimingsDurations", "ATimetable", FormMethod.Post))
+        {
+            <span style="color:red;font-weight:bold" id="CTDCombo"></span>
+            <span style="color:red;font-weight:bold" id="Validation"></span>
+            @*<div class="widget-box">
+
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">*@
+    <div class="widget-box">
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">
+                Class Timings Durations
+            </h5>
+            @*<div class="widget-toolbar no-border">
+
+                <div class="inline dropdown-hover">*@
+                    <div class="widget-toolbar no-border">
+                        <div class="inline action-buttons">
+                            <a style=" color:#811761;"><i class="fa fa-plus-circle bigger-200" onclick="return submitForm()" type="submit"></i></a>
+                            
+                            @*<a href="@Url.Action("ClassTimingsDurationsC", "ATimetable")" style="color:#811761;"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+                            @*<a class="view-header-btn" href="@Url.Action("ClassTimingsDurationsC", "ATimetable")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+                        </div>
+                    </div>
+                @*</div>
+            </div>*@
+        </div>
+        <div class="widget-body">
+            <div class="widget-main">
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("Class Timings")</span>
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                <div class="col-sm-6">
+
+                                    @if (null != Model.lstBatch)
+                                            {
+                                        @Html.DropDownListFor(model => model.ClassNumber, new SelectList(Model.lstBatch, "ClassNumber", "ClassNumberDisplay"), "--- Select Class ---", new { @class = "form-control", @id = "ClassNumber" })
+                                            }
+                                            else
+                                            {
+                                        <select id="ClassNumber">
+                                            <option>
+                                                --- Select Class ---
+                                            </option>
+                                        </select>
+                                            }
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+            
+    </div>
+
+        <div id="Data" style="display:none">
+            <div id="SearchData" class="row"></div>
+        </div>
+        }
+
+        }
+
+</section>
+
+
+
+<script>
+
+    $(document).ready(function () {
+
+        var ClassNumber= $('#ClassNumber').val();
+
+        if (ClassNumber > 0)
+        {
+            GetData();
+        }
+        else {
+            document.getElementById("Data").style.display = "none";
+        }
+
+    });
+
+
+    function submitForm() {
+
+        var ClassNumber = $('#ClassNumber').val();
+
+        if (ClassNumber == "" ) {
+            document.getElementById("CTDCombo").innerHTML = "Please select the Class";
+            return false;
+        }
+        else {
+            window.location.href = '/ATimetable/ClassTimingsDurationsC?ClassNumber=' + ClassNumber + '';
+        }
+    };
+
+
+    $('#ClassNumber').change(function () {
+
+        document.getElementById("CTDCombo").innerHTML = "";
+
+        var BatchId = $(this).val();
+        if (BatchId > 0) {
+            GetData();
+        }
+        else {
+            document.getElementById("Data").style.display = "none";
+        }
+
+    })
+
+    function GetData()
+    {
+        $.ajax({
+            url: '/ATimetable/GetClassTimingsDurationsByBatchId',
+            data: { ClassNumber: $('#ClassNumber').val() },
+            success: function (data) {
+                document.getElementById('Data').style.display = "inline"
+                $('#SearchData').html(data);
+            }
+        });
+    }
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/ATimetable/ValidationForClassTimingsDurationsD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/ATimetable/ClassTimingsDurationsD?id=' + Value;
+                    var title = " Class Timings Durations";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+

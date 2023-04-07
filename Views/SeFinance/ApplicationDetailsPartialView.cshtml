@@ -1,0 +1,101 @@
+﻿@model List<AsteriskBrowserAL.Models.PROApplicationStatusViewModel>
+@{
+    ViewBag.Title = "Appliction Range Report";
+    int sno = 1;
+    string color = string.Empty;
+    string BranchName = string.Empty;
+}
+
+<style>
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+    hideScrolling:hover {
+        overflow: auto;
+    }
+</style>
+
+
+
+
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="table-header">
+                Records Found (@Model.Count())
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class=" overflowscroll">
+
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                        S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Registration Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Issued Date")
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+
+                    color = "";
+                    if (item.AdmissionNumber != null && item.ProvisionalAdmission == true)
+                    {
+                        color = "#0080004a";
+                    }
+                    if (item.AdmissionNumber == null && item.ProvisionalAdmission == true)
+                    {
+                        color = "#fffbd3";
+                    }
+                    if (item.ApplicationStatus == false)
+                    {
+                        color = "#ffbcbc";
+                    }
+
+                        <tr style="background-color:@color;">
+                            <td>
+                                @(sno++)
+                            </td>
+                            <td>
+                                @item.ApplicationNumber
+                            </td>
+                            <td>
+                                @if (item.ApplicationStatus == false)
+                            {
+                            }
+                            else
+                            {
+                            @item.ApplicationDate.ToString("dd-MMM-yyyy")
+                            }
+                            </td>
+                        </tr>
+
+                        }
+            </tbody>
+        </table>
+
+    </div>
+
+}
+else
+{
+    @*<div class="hr hr-18 dotted hr-double"></div>*@
+                <span style="color:red;font-weight:bold">Data not available </span>
+}
+@Html.Action("DataTableScripts", "Base")

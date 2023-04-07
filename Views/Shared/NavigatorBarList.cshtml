@@ -1,0 +1,142 @@
+﻿@using AsteriskBrowserAL.Helpers
+
+@{ 
+    List<AsteriskBrowserAL.Models.LayoutLOV> UserLayout = new List<AsteriskBrowserAL.Models.LayoutLOV>();
+
+    UserLayout = Utility.LayoutLinks();
+    string Controllers = string.Empty;
+    if (null != UserLayout && UserLayout.Count() > 0)
+    {
+        var GroupData = UserLayout.GroupBy(s => s.ModuleId);
+
+
+        foreach (var g in GroupData)
+        {
+            var pageGroup = g.GroupBy(p => p.PageURL).ToList();
+            foreach (var p in pageGroup)
+            {
+                if (!string.IsNullOrEmpty(p.Key))
+                {
+                    Controllers += p.Key + ",";
+
+
+                }
+
+            }
+        }
+    }
+
+}
+
+
+
+<ul class="nav nav-list">
+
+    @if (null != UserLayout && UserLayout.Count() > 0)
+    {
+        int Count = UserLayout.Where(u => u.PermissionType == 1 || u.PermissionType == 2).Count();
+        if (Count > 0)
+        {
+            var ModuleGroupData = UserLayout.GroupBy(s => s.ModuleId).ToList();
+            if (ModuleGroupData.Count() > 0)
+            {
+                foreach (var s in ModuleGroupData)
+                {
+
+                    if (s.FirstOrDefault().ModuleName != "Dashboard")
+                    {
+                        Controllers = string.Empty;
+                        int CountPage = s.Where(u => u.PermissionType == 1 || u.PermissionType == 2).Count();
+                        var pageGroup = s.GroupBy(p => p.PageURL);
+
+                        foreach (var p in pageGroup)
+                        {
+                            if (!string.IsNullOrEmpty(p.Key))
+                            {
+                                Controllers += p.Key + ",";
+                            }
+                        }
+
+
+                        <li class="">
+                            <a href="#" class="dropdown-toggle">
+
+                                <i class="menu-icon @s.FirstOrDefault().ModuleIcon"></i>
+
+                                <span class="menu-text">
+                                    @s.FirstOrDefault().ModuleName
+                                </span>
+
+                                <b class="arrow fa fa-angle-down"></b>
+                            </a>
+
+                            <b class="arrow"></b>
+
+
+                            @{
+                                var PageGroupData = s.GroupBy(p => p.PageId).ToList();
+                            }
+                            @if (null != PageGroupData && PageGroupData.Count() > 0)
+                            {
+                                foreach (var p in PageGroupData)
+                                {
+                                    int pageCount = p.Where(u => u.PermissionType == 1 || u.PermissionType == 2).Count();
+                                    if (pageCount > 0)
+                                    {
+
+                                        <ul class="submenu">
+                                            <li class="" id=@p.FirstOrDefault().PageURL>
+
+                                                <a href="#" class="dropdown-toggle">
+                                                    <i class="menu-icon @p.FirstOrDefault().PageIcon"></i>
+
+                                                    @p.FirstOrDefault().PageName
+                                                    <b class="arrow fa fa-angle-down"></b>
+                                                </a>
+
+                                                <ul class="submenu">
+                                                    @foreach (var Sp in p)
+                                                    {
+
+                                                        if (Sp.PermissionType != 0)
+                                                        {
+
+                                                            <li class="@Html.ActivePage(p.FirstOrDefault().PageURL, Sp.SubpageURL)">
+                                                                <a href='/@p.FirstOrDefault().PageURL/@Sp.SubpageURL/'>
+                                                                    <i class="menu-icon fa fa-caret-right"></i>
+                                                                    @Sp.SubpageName
+                                                                </a>
+
+                                                                <b class="arrow"></b>
+                                                            </li>
+                                                        }
+                                                    }
+
+                                                </ul>
+                                            </li>
+
+
+
+                                        </ul>
+                                    }
+                                }
+                            }
+                        </li>
+
+                                                }
+
+
+                                            }
+                                        }
+                                    }
+
+
+
+                                }
+
+</ul>
+
+
+
+
+

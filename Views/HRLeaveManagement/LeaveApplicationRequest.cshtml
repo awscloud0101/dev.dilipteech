@@ -1,0 +1,168 @@
+﻿@model AsteriskBrowserAL.Models.LeaveApplicationViewData
+@{
+    ViewBag.Title = "Leave Application";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            LeaveManagement
+        </li>
+        <li class="active">Leave Application</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<input type="hidden" value="@Model.StaffId" id="LoggedStaffId" />
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <span id="error" style="color: red;"></span>
+           
+                <div class="widget-box">
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Leave Application</span>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5 control-label no-padding-right"><span style="color:red">* </span> @Html.Label("Leave For")</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownList("PayslipFor", null, "--- Select ---", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" id="HideThis">
+                                        <label class="col-sm-5 control-label no-padding-right"><span style="color:red">* </span>  @Html.Label("Employee")</label>
+                                        <div class="col-sm-6">
+                                            <select id="StaffId" name="StaffId" class="form-control select2"></select>
+                                            @*<select id="DivisionId" name="DivisionId" class="form-control"></select>*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                                @*<div class="form-group" id="HideThis1">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5 control-label no-padding-right"><span style="color:red">* </span> @Html.Label("Branch")</label>
+                                        <div class="col-sm-6">
+                                            <select id="BranchId" name="BranchId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5 control-label no-padding-right">@Html.Label("Payroll Month")</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.MonthYear, new SelectList(Model.ListMonths, "MonthValue", "MonthName"), "--- Select ---", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <br /><br />
+                                <div class="form-group" id="dvStaffId">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-5 control-label no-padding-right"><span style="color:red">* </span> @Html.Label("Employee")</label>
+                                        <div class="col-sm-6">
+                                            <select id="StaffId" name="StaffId" class="form-control select2"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+           
+            <div id="PartialView"></div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $('#PayslipFor').change(function () {
+        debugger
+        $('#PartialView').html("");
+        var PayslipFor = $('#PayslipFor').val()
+        if (PayslipFor == 1 || PayslipFor == "1") {
+            $('#HideThis').hide()
+
+            var StaffId = $('#LoggedStaffId').val()
+            LoadPartial(StaffId)
+           
+        }
+        else if (PayslipFor == "2" || PayslipFor == 2) {
+            $('#HideThis').show()
+
+            $.ajax({
+                url: '/HRLeaveManagement/GetEmployeesBySubscriptionId',
+                success: function (data) {
+                    var DivisionItems = $('#StaffId');
+                    $('#StaffId').append($("<option>").val("").text("--- Select ---"));
+                    $.each(data, function (i, record) {
+                        DivisionItems.append($("<option>").val(record.StaffId).text(record.FirstName));
+                    });
+                    $('#StaffId').append(DivisionItems);
+                },
+                aync: false
+            });
+        }
+        else {
+            $('#HideThis').show()
+        }
+    })
+
+    $('#StaffId').change(function () {
+        $('#imagemodal').show();
+         $('#PartialView').html("");
+        var StaffId = $('#StaffId').val()
+
+        if (StaffId != "") {
+            LoadPartial(StaffId)
+        }
+        else {
+            document.getElementById('error').innerHTML = 'Select all fields';
+        }
+
+    })
+ 
+    function LoadPartial(StaffId) {
+        debugger
+        $.ajax({
+            url: '/HRLeaveManagement/GetLeaveApplication',
+            data: { StaffId: StaffId },
+            success: function (data) {
+                $('#PartialView').html(data);
+                $('#imagemodal').hide();
+            },
+            aync: false
+        });
+    }
+
+    window.onload = onLoad();
+
+    function onLoad() {
+        debugger
+        //var IsHr = $('#IsHr').val()
+        //var StaffId = $('#LoggedStaffId').val()
+        //if (IsHr == "") {
+        //    LoadPartial(StaffId)
+        //}
+
+    }
+</script>
+

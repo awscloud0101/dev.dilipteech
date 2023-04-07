@@ -1,0 +1,99 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentDetailsData>
+<div class="hr hr-18 dotted hr-double"></div>
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+    <div class="row">
+        <div class="col-xs-12">
+                <div class="table-header">
+                        Send SMS
+                            <div style="float:right" class="inline action-buttons">
+                                <button type="submit" class="btn btn-info btn-minier P2" id="SendMessage" name="SendMessage">Send Message</button>
+
+                            </div>
+
+                        </div>
+                    <!-- form start -->
+
+                        <div style="overflow:auto;height:400px;">
+                                <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                               S.No.
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Student Name")
+                                            </th>
+                                            <th>
+                                                <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.Count(); i++)
+                            {
+                                            <tr>
+                                                <td>
+                                                    @Html.Hidden("lstStudents.Index", (@i + 10))
+                                                    @Html.Hidden("lstStudents[" + (@i + 10) + "].DisplayName", Model.ElementAt(i).DisplayName)
+                                                    @(nsno++)
+                                                </td>
+                                                <td>
+                                                    @Html.Hidden("lstStudents[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                                                    @Model.ElementAt(i).DisplayName
+                                                </td>
+                                                <td>
+                                                    @Html.CheckBox("lstStudents[" + (@i + 10) + "].IsChecked", Model.ElementAt(i).IsChecked, new { id = "Check" })
+                                                </td>
+                                            </tr>
+                            }
+                                    </tbody>
+                                </table>
+                        </div>
+                </div>
+            </div>
+            }
+            else
+            {
+            <span style="color: red;"><b>Data not available</b></span>
+            }
+
+          @Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+        <script>
+    $('#Selectall').change(function () {
+        document.getElementById("Alert").innerHTML = "";
+
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $('#SendMessage').click(function () {
+        var nCount = 0;
+        $('tbody tr td #Check').each(function () {
+            if ($(this).is(':checked')) {
+                nCount += 1;
+            }
+        });
+
+        if (nCount == 0) {
+            document.getElementById("Alert").innerHTML = "Please select student(s)";
+            return false;
+        }
+    });
+
+
+    $('#Check').click(function () {
+        document.getElementById("Alert").innerHTML = "";
+    })
+</script>
+
+
+

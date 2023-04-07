@@ -1,0 +1,122 @@
+﻿@model List<AsteriskBrowserAL.Models.HealthEntryFormModel>
+@{
+    ViewBag.Title = "Health Entry Form";
+    int nsno = 1;
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+
+@if (Model != null && Model.Count() > 0)
+{
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="table-header">
+                Records Found (@Model.Count())
+                <div style="float:right;margin-right:10px;">
+                    <button type="submit" name="Save" class="btncustom P2" style="margin-top:2px">
+                       Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    <input type="hidden" id="nClassNumber" name="nClassNumber" value="@ViewBag.SectionId" />
+    <input type="hidden" id="TermNumber" name="TermNumber" value="@ViewBag.TermNumberId " />
+    @*<input type="hidden" value="@Model.FirstOrDefault().ExamId"  />*@
+    <div>
+
+        <table id="example" class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Roll Number")
+                    </th>
+                    @if (bIsCoastal)
+                    {
+                        <th>
+                            @Html.DisplayName("Registration Number")
+                        </th>
+                    }
+                    <th>
+                        @Html.DisplayName("Height (cm)")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Height Remarks")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Weight (kg)")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Weight Remarks")
+                    </th>
+
+
+                </tr>
+            </thead>
+           <tbody>
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+                    <tr>
+
+                        <td>
+                            @(nsno++)
+                            @Html.Hidden("HealthEntryList.Index", (@i))
+                            @Html.Hidden("HealthEntryList[" + (@i) + "].StudentId", Model.ElementAt(i).StudentId)
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).StudentName
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).RollNumber
+                        </td>
+                        @if (bIsCoastal)
+                        {
+                            <td>
+                                @Model.ElementAt(i).OMRNumber
+                            </td>
+                        }
+                        <td>
+                            @Html.TextBox("HealthEntryList[" + (@i) + "].Height", Model.ElementAt(i).Height, new { @class = "form-control ", onkeypress = "return isNumberKey(event)", @style = "width:140px", @maxlength = "5" })
+                        </td>
+                        <td>
+                            @Html.TextBox("HealthEntryList[" + (@i) + "].HeightRemarks", Model.ElementAt(i).HeightRemarks, new { @class = "form-control", @style = "width:140px", @maxlength = "10" })
+                        </td>
+                        <td>
+                            @Html.TextBox("HealthEntryList[" + (@i) + "].Weight", Model.ElementAt(i).Weight, new { @class = "form-control", onkeypress = "return isNumberKey(event)", @style = "width:140px", @maxlength = "5" })
+                        </td>
+                        <td>
+                            @Html.TextBox("HealthEntryList[" + (@i) + "].WeightRemarks", Model.ElementAt(i).WeightRemarks, new { @class = "form-control", @style = "width:140px", @maxlength = "10" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+<script>
+
+
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode
+
+            if (charCode == 46 || charCode == 65)
+                return true;
+
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+
+            return true;
+        }
+</script>
+
+

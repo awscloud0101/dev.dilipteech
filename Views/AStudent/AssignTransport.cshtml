@@ -1,0 +1,374 @@
+﻿@model List<AsteriskBrowserAL.Models.PlayersData>
+@{
+
+    ViewBag.Title = "Assign Transport";
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Accademics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Assign Transport</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("AssignTransport", "AStudent", FormMethod.Post))
+            {
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                <span style="color:green;font-weight:bold" id="SaveVal"></span>
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Assign Transport</span>
+
+
+                </div>
+
+                <div class="widget-box">
+     
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Class")</label>
+                                        <div class="col-sm-6">
+                                            <select id="ClassId" name="ClassId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Plan")</label>
+                                        <div class="col-sm-6">
+                                            <select id="PlanId" name="PlanId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+                <div id="SearchDiv">
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+
+    function onloadData() {
+        LoadClassDropdown();
+
+    }
+    window.onload = onloadData();
+    function LoadClassDropdown() {
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            data: { SelClassNumber: 0 },
+            success: function (result) {
+                Section = $("#ClassId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(Section)
+
+            },
+            async: false
+        })
+    }
+    $("#ClassId").change(function () {
+        $("#SearchDiv").html("")
+        LoadTransportPlans()
+    })
+    function LoadTransportPlans() {
+        var ClassId = $("#ClassId").val();
+        if (ClassId > 0) {
+            $.ajax({
+                url: '/AStudent/GetTransportPlans',
+                success: function (Data) {
+                    var TransportPalns = $('#PlanId')
+                    TransportPalns.children().remove();
+                    TransportPalns.append($("<option>").val("").text("--Select--"))
+                    $.each(Data, function (i, record) {
+                        TransportPalns.append($("<option>").val(record.TransportPlanId).text(record.PlanName));
+                    });
+                    $('#PlanId').append(TransportPalns);
+                }
+            })
+        }
+        else {
+            $("#SearchDiv").html("")
+            $('#PlanId').html("")
+
+        }
+
+    }
+
+    $("#PlanId").change(function () {
+        var ClassId = $("#ClassId").val()
+        var PlanId = $("#PlanId").val()
+        if (ClassId > 0 && PlanId > 0) {
+            $("#imagemodal").show();
+            $.ajax({
+                url: '/AStudent/GetStudentsWithTransport',
+                data: { ClassId: ClassId, PlanId: PlanId },
+                success: function (Data) {
+                    $("#imagemodal").hide();
+                    $("#SearchDiv").html(Data);
+                    LoadAssignedStudents();
+                }
+            })
+        }
+        else {
+            $("#SearchDiv").html("")
+        }
+    })
+
+</script>
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+    function SaveStudent() {
+        debugger
+        var Ids = " ";
+        var result = $('#Check:checked');
+
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+
+        });
+        if (Ids != " ") {
+            document.getElementById("Message").innerHTML = ""
+            document.getElementById("MessageData").innerHTML = ""
+            SaveData(Ids)
+        }
+        else {
+            document.getElementById("Message").innerHTML = ""
+            document.getElementById("MessageData").innerHTML = "Please select any Student"
+        }
+    }
+
+    function SaveStudentRoutePoint() {
+        debugger
+        var Ids = " ";
+        var result = $('#CheckR:checked');
+
+        debugger
+        $.each(result, function (i, result) {
+            if (result.value != "on") {
+                Ids += result.value + ",";
+            }
+
+        });
+
+        if (Ids != " ") {
+            var TransportRoutePoint = $("#RoutePointId").val();
+            document.getElementById("MessageData").innerHTML = ""
+            document.getElementById("Message").innerHTML = ""
+            if (TransportRoutePoint != "") {
+                SaveRoutePointStudentsData(Ids)
+            } else {
+                document.getElementById("Message").innerHTML = "Please select Vehicle Route Point"
+            }
+        }
+        else {
+            document.getElementById("MessageData").innerHTML = ""
+            document.getElementById("Message").innerHTML = "Please select any Student"
+        }
+    }
+
+
+
+    function SaveRoutePointStudentsData(Data) {
+
+        debugger
+        var PlanId = $("#PlanId").val();
+        var ClassId = $("#ClassId").val();
+        var TransportRoutePoint = $("#RoutePointId").val();
+        $("#imagemodal").show();
+        $.ajax({
+            url: "/AStudent/SaveTransportRoutePointStudents",
+            data: { PlanId: PlanId, StudentsIds: Data, ClassId: ClassId, nVehicleroutePointId: TransportRoutePoint },
+            success: function (Data) {
+                $("#imagemodal").hide();
+                $("#AssignStudentListData").html(Data)
+                document.getElementById("SaveVal").innerHTML = "Data saved";
+            }
+        })
+
+    }
+
+
+    function SaveData(Data) {
+        debugger
+        var PlanId = $("#PlanId").val();
+        var ClassId = $("#ClassId").val();
+        $("#imagemodal").show();
+        $.ajax({
+            url: "/AStudent/SaveTransportStudents",
+            data: { PlanId: PlanId, StudentsIds: Data, ClassId: ClassId },
+            success: function (Data) {
+                $("#imagemodal").hide();
+                $("#SearchDiv").html(Data);
+                document.getElementById("SaveVal").innerHTML = "Data saved"
+                LoadAssignedStudents();
+            }
+        })
+
+    }
+
+
+    function RemoveVal() {
+        document.getElementById("SaveVal").innerHTML = ""
+
+    }
+
+    function AssingRoutePoint() {
+        document.getElementById("SaveVal").innerHTML = ""
+    }
+
+    //Student And Program Search
+    $('#SearchOne').keyup(function () {
+        searchTable($(this).val(), 'PlayerTable');
+    });
+
+    $('#SearchTwo').keyup(function () {
+        searchTable($(this).val(), 'TableTwo');
+    });
+
+    function searchTable(inputVal) {
+        var i = 1;
+        var table = document.getElementById(TableId);
+
+        tablerow = "";
+        table.find('tr').each(function (index, row) {
+            var allCells = $(row).find('td');
+
+            if (allCells.length != 0) {
+                var found = false;
+                allCells.each(function (index, td) {
+                    var regExp = new RegExp(inputVal, 'i');
+                    if (regExp.test($(td).text())) {
+                        found = true;
+                        return false;
+                    }
+                });
+                if (found == true) {
+                    $(row).show();
+                    //$(row).find("td:first").html(parseInt(i));
+                    //i = i + 1;
+
+                    var rowcells = $(row).find('td');
+
+                    tablerow += "<tr style='font-family:'''Segoe UI''';'>";
+
+                    rowcells.each(function (index, td) {
+                        tablerow += "<td>" + $(td).text() + "</td>"
+                    });
+                    tablerow += "</tr>"
+                }
+                else $(row).hide(row);
+            }
+        });
+
+    }
+
+    function searchTable(inputVal, TableId) {
+        var i = 1;
+        var table = $('#' + TableId);
+
+        table.find('tr').each(function (index, row) {
+            var allCells = $(row).find('td');
+
+            if (allCells.length != 0) {
+                var found = false;
+                allCells.each(function (index, td) {
+                    var regExp = new RegExp(inputVal, 'i');
+                    if (regExp.test($(td).text())) {
+                        found = true;
+                        return false;
+                    }
+                });
+                if (found == true) {
+                    $(row).show();
+                    //$(row).find("td:first").html(parseInt(i));
+                    //i = i + 1;
+                }
+                else $(row).hide(row);
+            }
+        });
+    }
+
+    $('#RoutePointId').change(function () {
+        LoadAssignedStudents();
+    })
+
+    function LoadAssignedStudents() {
+        var transporPlan = $('#PlanId').val()
+        var RoutepointId = $('#RoutePointId').val();
+        var ClassId = $("#ClassId").val();
+        if (transporPlan > 0 && RoutepointId >= 0 && ClassId > 0) {
+            GetAssignStudentsListData();
+        }
+        else {
+            $('#AssignStudentListData').html("")
+        }
+    }
+
+    function GetAssignStudentsListData() {
+        var transporPlan = $('#PlanId').val()
+        var RoutepointId = $('#RoutePointId').val()
+        var ClassId = $("#ClassId").val();
+        if (transporPlan > 0 && RoutepointId >= 0 && ClassId > 0) {
+            $("#imagemodal").show();
+            $.ajax({
+                url: '/AStudent/GetAssignRoutePointStudentListData',
+                data: { nTransportPlanId: transporPlan, nRoutepointId: RoutepointId, ClassId: ClassId },
+
+                success: function (Data) {
+                    $("#imagemodal").hide();
+                    $("#AssignStudentListData").html(Data)
+                    document.getElementById('SaveTransportRoutePoint').style.display = "inline";
+
+                }
+            })
+
+        }
+        else {
+            $("#AssignStudentListData").html("")
+
+        }
+    }
+
+
+
+</script>

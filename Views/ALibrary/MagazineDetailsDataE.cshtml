@@ -1,0 +1,562 @@
+﻿@model AsteriskBrowserAL.Models.BookDetailsData
+@{
+    ViewBag.Title = "MagazineDetailsDataE";
+}
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Manage Magazine</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+<section class="content">
+    <br />
+    <span style="color: red;font-weight:bold" id="valManageMagazine">@Html.ValidationMessage("ManageMagazine")</span>
+    <h3>
+        <small style="float:right;">
+            @Html.ActionLink("Back To Details", "ManageMagazine", new { MagazineCategoryId = Model.MagazineCategoryId })
+        </small>
+    </h3>
+    <br />
+    @if (null != TempData["Msg"])
+    {
+        <div>
+            <span style="color:red" id="Msg">@TempData["Msg"].ToString()</span>
+        </div>
+    }
+    <span id="VDateValidation" style="color:red;font-weight:bold;display:none">Start Date Should be greater than Renewal Date</span>
+    @*<span id="CountV" style="font-weight:bold;color:red;display:none">*Number Of Copies should greater than Previous Number</span>*@
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("MagazineDetailsDataE", "ALibrary", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">Magazine Details</h5>
+                        <div class="widget-toolbar no-border">
+                            @*<div class="inline action-buttons">
+                                    <button class="btn btn-info btn-xs" name="Save" value="Save" type="submit" onclick="return MagazineValidation()">
+                                        <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                                    </button>
+                                </div>*@
+                        </div>
+                    </div>
+                    <!-- form start -->
+                    <br />
+                    @Html.HiddenFor(model => model.Id)
+                    <div class="box-body">
+                        @*<div class="form-group">
+                            <label class="col-lg-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>@Html.Label("Rack ID")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.RackId, new
+                           {
+                               @class = "form-control txtboxNum col-sm-5 ",
+                               @id = "RackId", @onkeydown = "return SpacesNotAllowed(event)",@maxLength = "3"
+                           })
+
+                              
+
+                            </div>
+                            <div>
+                                <span id="VRackId" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>*@
+                        @Html.HiddenFor(model => model.MasterMagazineDetailsId, new { @name = "MasterMagazineDetailsId" })
+                        @Html.HiddenFor(model => model.MagazineCategoryId, new { @name = "MagazineCategoryId" })
+
+
+                        @*<div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>@Html.Label("Magazine Category")</label>
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.MagazineCategoryId, new SelectList(Model.MagazineCategoryList, "BookCategoryId", "BookCategoryName",Model.MagazineCategoryId), "--Select--", new { @class = "form-control", })
+                                </div>
+                                <div>
+                                    <span id="VMagazineCategoryId" style="font-weight:bold;color:red;display:none">* Required</span>
+                                </div>
+                            </div>*@
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>@Html.Label("Magazine Name")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.MagazineName, new
+                           {
+                               @class = "form-control col-sm-5 ",
+                               @id = "MagazineName", @*@onclick = "nospaces(this)",*@@maxLenght = "30"
+                           })
+                            </div>
+                            <div>
+                                <span id="VMagazineName" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>@Html.Label("Date") &nbsp;&nbsp;</label>
+                                <div class="col-sm-3">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div id="datepicker" class="input-group date">
+                                                @Html.TextBoxFor(model => model.Date, new { @class = "form-control col-sm-6", @id = "Date", @readonly = "true", @value = "@Model.Date.Value.ToShortDateString()" })
+                                                <span class="input-group-addon "><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span id="VDate" style="font-weight:bold;color:red;display:none">* Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Periodicity")</label>
+                            <div class="col-sm-3">
+                                @Html.DropDownListFor(model => model.PeriodicityName, new SelectList(Model.PeriodicityList, "PeriodicityId", "Name", Model.PeriodicityId), "--Select--", new { @class = "form-control", })
+                            </div>
+                            <div>
+                                <span id="VPeriodicity" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>@Html.Label("Edition")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Edition, new
+                           {
+                               @class = "form-control col-sm-5 ",
+                               @id = "Edition", @onclick = "nospaces(this)",@onkeydown = "return SpacesNotAllowed(event)",@maxLength = "20"
+                           })
+                            </div>
+                            <div>
+                                <span id="VEdition" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>*@
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>@Html.Label("Number Of Copies")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.NumberOfCopies, new
+                           { @class = "form-control txtboxNum col-sm-5 ", @id = "NumberOfCopies" ,
+                             onblur = " return TotalPriceCal(this)", onkeypress = "return isNumberKey(event)", @maxlength = "4"})
+                            </div>
+                            <div>
+                                <span id="VNumberOfCopies" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>@Html.Label("Individual Price")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Price, new
+                           {
+                               @class = "form-control txtboxNum col-sm-5 ",
+                               onblur = " return TotalPriceCal(this)", onkeypress = "return isNumberKey(event)",
+                               @id = "Price",
+                               @maxlength = "4" })
+                            </div>
+                            <div>
+                                <span id="VPrice" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Total Magazines Price")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.TotalMagazinePrice, new { @class = "form-control col-sm-5", disabled = "disabled", @id = "TotalMagazinePrice" })
+                            </div> 
+
+                            <div class="col-sm-3" style="display:none;" id="MBPrice">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Payment Details")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.PaymentDetails, new { @class = "form-control col-sm-5 ", name = "PaymentDetails", @id = "PaymentDetails", })
+                            </div>
+                            <div>
+                                <span id="VPaymentDetails" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Publication")</label>
+                            <div class="col-sm-3">
+                                @Html.DropDownListFor(model => model.PublicationId, new SelectList(Model.PublicationList, "PublicationId", "PublicationName", Model.PublicationId), "--Select--", new { @class = "form-control", })
+                            </div>
+                            <div>
+                                <span id="VPublisher" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Number Of Pages")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.NumberOfPages, new
+                           {
+                               @class = "form-control col-sm-5 ",
+                               @id = "NumberOfPages",
+                               @maxlength = "30", @onclick = "nospaces(this)",@onkeydown = "return SpacesNotAllowed(event)" })
+                            </div>
+                            <div>
+                                <span id="VNumberOfPages" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>*@
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("RenewalDate")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div id="datepicker" class="input-group date">
+                                            @if (Model.RenewalDate.HasValue)
+                                            {
+                                                <input type="text" value="@Model.RenewalDate.Value.ToShortDateString()" class="form-control col-sm-5 " id="RenewalDate" maxlength="30" name="RenewalDate" />
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(model => model.RenewalDate, new { @class = "form-control col-sm-5 ", @id = "RenewalDate", @maxlength = "30", })
+                                            }
+                                            <span class="input-group-addon "><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div>
+                                <span id="VRenewalDate" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Issue Start Date")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div id="datepicker" class="input-group date">
+                                            @if (Model.IssueStartDate.HasValue)
+                                            {
+                                                <input type="text" value="@Model.IssueStartDate.Value.ToShortDateString()" class="form-control col-sm-5 " id="IssueStartDate" maxlength="30" name="IssueStartDate" />
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(model => model.IssueStartDate, new { @class = "form-control col-sm-5 ", @id = "IssueStartDate", @maxlength = "30" })
+                                            }
+                                            <span class="input-group-addon "><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <span id="VIssueStartDate" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Issue End Date")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div id="datepicker" class="input-group date">
+                                            @if (Model.IssueEndDate.HasValue)
+                                            {
+                                                <input type="text" value="@Model.IssueEndDate.Value.ToShortDateString()" class="form-control col-sm-5 " id="IssueEndDate" maxlength="30" name="IssueEndDate" />
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(model => model.IssueEndDate, new { @class = "form-control col-sm-5 ", @id = "IssueEndDate", @maxlength = "30", })
+                                            }
+                                            <span class="input-group-addon "><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <span id="VIssueEndDate" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Remarks")</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Remarks, new
+                           {
+                               @class = "form-control col-sm-5 ",
+                               @id = "Remarks",
+                               @maxlength = "30", @*@onclick = "nospaces(this)",*@ @*@onkeydown = "return SpacesNotAllowed(event)"*@ })
+                            </div>
+                            <div>
+                                <span id="VRemarks" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button class="btn btn-success btn-sm" onclick="return MagazineValidation();" type="submit">
+                                    <i class="ace-icon fa fa-check bigger-50"></i>
+                                    Save
+                                </button>
+
+                                &nbsp; &nbsp; &nbsp;
+                                <button class="btn btn-sm" type="reset" onclick="return resetManageBooks();">
+                                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                        @*end*@
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+    window.onload = function TotalAmount() {
+        debugger
+        var NoOfCopies = $('#NumberOfCopies').val()
+        var Amount = $('#Price').val()
+        var TotalAmount = NoOfCopies * Amount;
+
+        if (TotalAmount > 0) {
+            $('#TotalMagazinePrice').val(TotalAmount);
+        }
+    }
+    $("#RackId").keypress(function (e) {
+        debugger
+        var RackId = $('#RackId').val();
+
+        if (e.which == 32) {
+            if (RackId.length == "") {
+                return false;
+            }
+        }
+
+    });
+    $("#MagazineName").keypress(function (e) {
+        debugger
+        var MagazineName = $('#MagazineName').val();
+
+        if (e.which == 32) {
+            if (MagazineName.length == "") {
+                return false;
+            }
+        }
+
+    });
+    $("#Edition").keypress(function (e) {
+        debugger
+        var Edition = $('#Edition').val();
+
+        if (e.which == 32) {
+            if (Edition.length == "") {
+                return false;
+            }
+        }
+
+    });
+    $("#NumberOfCopies").keypress(function (e) {
+        debugger
+        var NumberOfCopies = $('#NumberOfCopies').val();
+
+        if (e.which == 32) {
+            if (NumberOfCopies.length == "") {
+                return false;
+            }
+        }
+
+    });
+    $("#Price").keypress(function (e) {
+        debugger
+        var Price = $('#Price').val();
+
+        if (e.which == 32) {
+            if (Price.length == "") {
+                return false;
+            }
+        }
+
+    });
+    $("#Publisher").keypress(function (e) {
+        debugger
+        var Publisher = $('#Publisher').val();
+
+        if (e.which == 32) {
+            if (Publisher.length == "") {
+                return false;
+            }
+        }
+
+    });
+    //function nospaces() {
+    //    debugger
+    //    $('#MagazineName').on('keypress', function (e) {
+    //        if (e.which == 32)
+    //            return false;
+    //    });
+    //    $('#Edition').on('keypress', function (e) {
+    //        if (e.which == 32)
+    //            return false;
+    //    });
+    //    $('#NumberOfCopies').on('keypress', function (e) {
+    //        if (e.which == 32)
+    //            return false;
+    //    });
+    //    $('#Price').on('keypress', function (e) {
+    //        if (e.which == 32)
+    //            return false;
+    //    });
+    //    $('#Publisher').on('keypress', function (e) {
+    //        debugger
+    //        if (e.which == 32)
+    //            return false;
+    //    });
+    //}
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+    function MagazineValidation() {
+        debugger
+        var Validation = true;
+        var RackNo = $('#RackId').val();
+        //var CategoryId = $('#MagazineCategoryId').val();
+        var name = $('#MagazineName').val();
+        var date = $('#Date').val();
+        var Edition = $('#Edition').val();
+        var NoOfCopies = $('#NumberOfCopies').val();
+        var Price = $('#Price').val();
+        var RenewalDate = $('#RenewalDate').val()
+        var IssueStartDate = $('#IssueStartDate').val()
+        // var recievedBy = $('#ReceivedBy').val();
+
+        if (IssueStartDate > RenewalDate) {
+            $('#VDateValidation').show();
+            Validation = false;
+        }
+        //if (RackNo == "" || RackNo == null || RackNo == undefined) {
+        //    $('#VRackId').show();
+        //    Validation = false;
+        //}
+        //if (CategoryId == "" || CategoryId == null || CategoryId == undefined) {
+        //    $('#VMagazineCategoryId').show();
+        //    Validation = false;
+        //}
+        if (name == "" || name == null || name == undefined) {
+            $('#VMagazineName').show();
+            Validation = false;
+        }
+        if (date == "" || date == null || date == undefined) {
+            $('#VDate').show();
+            Validation = false;
+        }
+        //if (Edition == "" || Edition == null || Edition == undefined) {
+        //    $('#VEdition').show();
+        //    Validation = false;
+        //}
+        if (NoOfCopies == "" || NoOfCopies == null || NoOfCopies == undefined) {
+            $('#VNumberOfCopies').show();
+            //$("#CountV").hide();
+            Validation = false;
+        }
+
+        @*if (@Model.NumberOfCopies > NoOfCopies)
+        {
+            $("#CountV").show();
+            $('#VNumberOfCopies').hide();
+            Validation =false;
+        }*@
+        if (Price == "" || Price == null || Price == undefined) {
+            $('#VPrice').show();
+            Validation = false;
+        }
+        //if (recievedBy == "" || recievedBy == null || recievedBy == undefined) {
+        //    $('#VReceivedBy').show();
+        //    Validation = false;
+        //}
+        return Validation;
+    };
+    $('#RackId').click(function () {
+        $('#VRackId').hide();
+        $('#Success').hide();
+    })
+    //$('#MagazineCategoryId').click(function () {
+    //    $('#VMagazineCategoryId').hide();
+    //    $('#Success').hide();
+    //})
+    $('#MagazineName').click(function () {
+        $('#VMagazineName').hide();
+        $('#Success').hide();
+    })
+    $('#Date').click(function () {
+        $('#VDate').hide();
+        $('#Success').hide();
+    })
+    $('#Edition').click(function () {
+        $('#VEdition').hide();
+        $('#Success').hide();
+    })
+    $('#NumberOfCopies').click(function () {
+        $('#VNumberOfCopies').hide();
+        $("#valManageMagazine").hide();
+        $('#Success').hide();
+    })
+    $('#Price').click(function () {
+        $('#Msg').hide();
+        $('#VPrice').hide();
+        $('#Success').hide();
+    })
+    $('#IssueStartDate').click(function () {
+        $('#VDateValidation').hide()
+    })
+    $('#RenewalDate').click(function () {
+        $('#VDateValidation').hide()
+    })
+    //$('#ReceivedBy').click(function () {
+    //    $('#VReceivedBy').hide();
+    //    $('#Success').hide();
+    //})
+    function resetManageBooks() {
+        var RackNo = $('#RackId').val('');
+        var CategoryId = $('#MagazineCategoryId').val('');
+        var name = $('#MagazineName').val('');
+        var date = $('#Date').val('');
+        var Edition = $('#Edition').val('');
+        var NoOfCopies = $('#NumberOfCopies').val('');
+        var Price = $('#Price').val('');
+        var Publisher = $('#Publisher').val('');
+        var recievedBy = $('#ReceivedBy').val('');
+    }
+
+</script>
+<script>
+    $(document).ready(function () {
+        function TotalPriceAmount() {
+            debugger
+            var NoOfCopies = $('#NumberOfCopies').val()
+            var Amount = $('#Price').val()
+            if (NoOfCopies > 0) {
+                var TotalAmount = NoOfCopies * Amount;
+                $('#TotalMagazinePrice').val(TotalAmount);
+            }
+            else {
+                $('#TotalMagazinePrice').val('');
+            }
+        }
+    });
+
+    function TotalPriceCal() {
+        var NoOfCopies = $('#NumberOfCopies').val()
+        var Amount = $('#Price').val()
+        var TotalAmount = NoOfCopies * Amount;
+        $('#TotalMagazinePrice').val(TotalAmount);
+    }
+    function SpacesNotAllowed(evt) {
+        debugger
+        if (evt.keyCode == 32) {
+            return false;
+        }
+        return true;
+    }
+</script>
+

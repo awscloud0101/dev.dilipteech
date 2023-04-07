@@ -1,0 +1,997 @@
+﻿@using AsteriskBrowserAL.Helpers;
+@model AsteriskBrowserAL.Models.ProgressCard
+@{
+
+
+    int n = 0;
+    int nCount = 0;
+    string nMainTbFontSize = "";
+    string nSubTb1FontSize = "";
+    string nSubTb2FontSize = "";
+    string nSubTb3FontSize = "";
+
+    if (null != Model && null != Model.LstProgressCardData && Model.LstProgressCardData.Count() > 0)
+    {
+        if (Model.ClassNumber > 0)
+        {
+            if (Model.ClassNumber == 1 || Model.ClassNumber == 2)
+            {
+                nMainTbFontSize = "18px";
+                nSubTb1FontSize = "15px";
+                nSubTb2FontSize = "15px";
+                nSubTb3FontSize = "15px";
+            }
+            else if (Model.ClassNumber >= 3 && Model.ClassNumber <= 5)
+            {
+                nMainTbFontSize = "17px";
+                nSubTb1FontSize = "16px";
+                nSubTb2FontSize = "16px";
+                nSubTb3FontSize = "16px";
+            }
+            else if (Model.ClassNumber >= 6 && Model.ClassNumber <= 8)
+            {
+                nMainTbFontSize = "17px";
+                nSubTb1FontSize = "15px";
+                nSubTb2FontSize = "15px";
+                nSubTb3FontSize = "15px";
+            }
+            else
+            {
+                nMainTbFontSize = "18px";
+                nSubTb1FontSize = "15px";
+                nSubTb2FontSize = "15px";
+                nSubTb3FontSize = "15px";
+            }
+        }
+        n = Model.LstProgressCardData.Count();
+    }
+
+
+    double dTotTest1Marks = 0;
+    double dTotFA1Marks = 0;
+    double dTotTest2Marks = 0;
+    double dTotFA2Marks = 0;
+    double dTotAvgOfFA1AndFA2 = 0;
+    double dTotSA1Marks = 0;
+    double dTotTerm1Marks = 0;
+    double dTotTerm1GPA = 0;
+
+    double dTotTest3Marks = 0;
+    double dTotFA3Marks = 0;
+    double dTotTest4Marks = 0;
+    double dTotFA4Marks = 0;
+    double dTotAvgOfFA3AndFA4 = 0;
+    double dTotSA2Marks = 0;
+    double dTotTerm2Marks = 0;
+    double dTotTerm2GPA = 0;
+
+    double dTotAvgOfAllFAs = 0;
+    double dTotAvgOfAllSAs = 0;
+    double dTotTermMarks = 0;
+    double dTotTermGPA = 0;
+
+
+
+
+
+}
+
+@if (null != Model && null != Model.LstProgressCardData && Model.LstProgressCardData.Count() > 0)
+{
+    <div id="Hello">
+
+        @foreach (var result in Model.LstProgressCardData)
+        {
+            nCount++;
+
+            if (null == result.lstResultsBySubject)
+            {
+                continue;
+            }
+
+            <br />
+            <br />
+            <br />
+
+            <table style="font-family:'Segoe UI';table-layout:fixed;">
+                <tr>
+                    <td align="left" style="width:500px"><h2><strong>Demo @Model.InstituteName</strong></h2></td>
+                    <td align="center" style="width:1000px;margin-left:-2em;"><h2><strong>PROGRESS REPORT</strong></h2></td>
+                    <td align="left" style="width:500px"><h2><strong>MONTH : @Model.MonthAndYear</strong></h2></td>
+                </tr>
+            </table>
+            <hr style="background-color:black;margin-top:-1em;" />
+                <table style="font-family:'Segoe UI';table-layout:fixed">
+                    <tr>
+                        <td align="left" style="width:500px;font-size:20px"><strong>NAME : </strong>@result.StudentName</td>
+                        <td align="center" style="width:1000px;margin-left:-2em;font-size:20px"><strong>FATHER NAME : </strong>@result.FatherName</td>
+                        <td align="left" style="width:500px;font-size:20px"><strong>&nbsp;CLASS : </strong> @Model.ClassName</td>
+                    </tr>
+                    <tr>
+                        <td align="left" style="width:500px;font-size:20px"><strong>ADMISSION NO : </strong>@result.AdmissionNumber</td>
+                        <td align="center" style="width:1000px"></td>
+                        <td align="left" style="width:500px;font-size:20px"><strong>&nbsp;SECTION : </strong> @Model.SectionName</td>
+                    </tr>
+                </table>
+
+                <br />
+
+                <table style="width:100%;">
+                    <tr height="300px;">
+                        <td style="width:75%;">
+                            <table class="table table-hover" border="1" style="font-family:'Segoe UI';white-space:nowrap;border-collapse: collapse;table-layout:fixed;width:950px;font-size:@nMainTbFontSize">
+                                <tbody>
+                                    <tr>
+                                        <th rowspan="3" width="170px" align="left" valign="bottom">SUBJECTS</th>
+                                        <th colspan="9">TERM 1</th>
+                                        <th colspan="9">TERM 2</th>
+                                        <th colspan="5">TERM 1 + TERM 2</th>
+                                    </tr>
+                                    <tr style="white-space:nowrap;height:180px;">
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;text-align:center;"><p style="width:5px;">Test 1</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">FA 1</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">Test 2</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">FA 2</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;margin-left:-4.1em;">Average of FA1 &amp; FA2</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">SA 1</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">Total</p></td>
+                                        <td rowspan="2" style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">GRADE</p></td>
+                                        <td rowspan="2" style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">GPA</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">Test 3</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">FA 3</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">Test 4</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">FA 4</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;margin-left:-4.1em;">Average of FA3 &amp; FA4</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">SA2</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">Total</p></td>
+                                        <td rowspan="2" style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">GRADE</p></td>
+                                        <td rowspan="2" style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">GPA</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;margin-left:-4.1em;">Average of all FA tests</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;margin-left:-4.1em;">Average of SA1 &amp; SA2</p></td>
+                                        <td style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">Total</p></td>
+                                        <td rowspan="2" style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">GRADE</p></td>
+                                        <td rowspan="2" style="-webkit-transform:rotate(270deg);-webkit-transform-origin: 50% 50%;"><p style="width:5px;">GPA</p></td>
+                                    </tr>
+
+
+
+                                    <tr>
+                                        @*@if (null != result.lstTest1Results && result.lstTest1Results.Count() > 0)
+                                            {
+                                                <td style="width:15px;">@result.lstTest1Results.FirstOrDefault().MaxMarks</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="width:15px;"></td>
+                                            }*@
+                                        <td style="width:15px;text-align:center;font-weight:bold">20</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">10</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">20</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">10</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">20</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">80</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">100</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">20</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">10</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">20</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">10</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">20</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">80</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">100</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">20</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">80</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">100</td>
+
+                                    </tr>
+
+                                    @foreach (var ModelData in result.lstResultsBySubject)
+                                    {
+                                        <tr>
+                                            <td>@ModelData.SubjectName</td>
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTest1Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTest1Marks) && ModelData.DisplayTest1Marks != "A")
+                                                {
+                                                    dTotTest1Marks += Convert.ToDouble(ModelData.DisplayTest1Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayFA1Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayFA1Marks) && ModelData.DisplayFA1Marks != "A")
+                                                {
+                                                    dTotFA1Marks += Convert.ToDouble(ModelData.DisplayFA1Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTest2Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTest2Marks) && ModelData.DisplayTest2Marks != "A")
+                                                {
+                                                    dTotTest2Marks += Convert.ToDouble(ModelData.DisplayTest2Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayFA2Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayFA2Marks) && ModelData.DisplayFA2Marks != "A")
+                                                {
+                                                    dTotFA2Marks += Convert.ToDouble(ModelData.DisplayFA2Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayAvgFA1NFA2</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayAvgFA1NFA2) && ModelData.DisplayAvgFA1NFA2 != "A")
+                                                {
+                                                    dTotAvgOfFA1AndFA2 += Convert.ToDouble(ModelData.DisplayAvgFA1NFA2);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplaySA1Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplaySA1Marks) && ModelData.DisplaySA1Marks != "A")
+                                                {
+                                                    dTotSA1Marks += Convert.ToDouble(ModelData.DisplaySA1Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTerm1Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTerm1Marks) && ModelData.DisplayTerm1Marks != "A")
+                                                {
+                                                    dTotTerm1Marks += Convert.ToDouble(ModelData.DisplayTerm1Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTerm1Grade</td>
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTerm1GPA</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTerm1GPA))
+                                                {
+                                                    dTotTerm1GPA += Convert.ToDouble(ModelData.DisplayTerm1GPA);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTest3Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTest3Marks) && ModelData.DisplayTest3Marks != "A")
+                                                {
+                                                    dTotTest3Marks += Convert.ToDouble(ModelData.DisplayTest3Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayFA3Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayFA3Marks) && ModelData.DisplayFA3Marks != "A")
+                                                {
+                                                    dTotFA3Marks += Convert.ToDouble(ModelData.DisplayFA3Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTest4Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTest4Marks) && ModelData.DisplayTest4Marks != "A")
+                                                {
+                                                    dTotTest4Marks += Convert.ToDouble(ModelData.DisplayTest4Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayFA4Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayFA4Marks) && ModelData.DisplayFA4Marks != "A")
+                                                {
+                                                    dTotFA4Marks += Convert.ToDouble(ModelData.DisplayFA4Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayAvgFA3NFA4</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayAvgFA3NFA4) && ModelData.DisplayAvgFA3NFA4 != "A")
+                                                {
+                                                    dTotAvgOfFA3AndFA4 += Convert.ToDouble(ModelData.DisplayAvgFA3NFA4);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplaySA2Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplaySA2Marks) && ModelData.DisplaySA2Marks != "A")
+                                                {
+                                                    dTotSA2Marks += Convert.ToDouble(ModelData.DisplaySA2Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTerm2Marks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTerm2Marks) && ModelData.DisplayTerm2Marks != "A")
+                                                {
+                                                    dTotTerm2Marks += Convert.ToDouble(ModelData.DisplayTerm2Marks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTerm2Grade</td>
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTerm2GPA</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTerm2GPA))
+                                                {
+                                                    dTotTerm2GPA += Convert.ToDouble(ModelData.DisplayTerm2GPA);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayAvgOfAllFAs</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayAvgOfAllFAs) && ModelData.DisplayAvgOfAllFAs != "A")
+                                                {
+                                                    dTotAvgOfAllFAs += Convert.ToDouble(ModelData.DisplayAvgOfAllFAs);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayAvgSA1NSA2</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayAvgSA1NSA2) && ModelData.DisplayAvgSA1NSA2 != "A")
+                                                {
+                                                    dTotAvgOfAllSAs += Convert.ToDouble(ModelData.DisplayAvgSA1NSA2);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTotMarks</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTotMarks) && ModelData.DisplayTotMarks != "A")
+                                                {
+                                                    dTotTermMarks += Convert.ToDouble(ModelData.DisplayTotMarks);
+                                                }
+                                            }
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTotGrade</td>
+
+
+                                            <td style="width:15px;text-align:center">@ModelData.DisplayTotGPA</td>
+
+                                            @{
+                                                if (!string.IsNullOrWhiteSpace(ModelData.DisplayTotGPA))
+                                                {
+                                                    dTotTermGPA += Convert.ToDouble(ModelData.DisplayTotGPA);
+                                                }
+                                            }
+
+                                        </tr>
+                                                }
+
+                                    <tr>
+                                        <td>Total</td>
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotTest1Marks > 0)
+                                            {
+                                                @dTotTest1Marks
+                                            }
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotFA1Marks > 0)
+                                            {
+                                                @dTotFA1Marks
+                                            }
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotTest2Marks > 0)
+                                            {
+                                                @dTotTest2Marks
+                                            }
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotFA2Marks > 0)
+                                            {
+                                                @dTotFA2Marks
+                                            }
+
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotAvgOfFA1AndFA2 > 0)
+                                            {
+                                                @dTotAvgOfFA1AndFA2
+                                            }
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotSA1Marks > 0)
+                                            {
+                                                @dTotSA1Marks
+                                            }
+                                        </td>
+
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotTerm1Marks > 0)
+                                            {
+                                                @dTotTerm1Marks
+                                            }
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold"></td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @*@if (dTotTerm1GPA > 0)
+                                            {
+                                                @dTotTerm1GPA
+                                            }*@
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+
+                                            @if (dTotTest3Marks > 0)
+                                            {
+                                                @dTotTest3Marks
+                                            }
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotFA3Marks > 0)
+                                            {
+                                                @dTotFA3Marks
+                                            }
+
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotTest4Marks > 0)
+                                            {
+                                                @dTotTest4Marks
+                                            }
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotFA4Marks > 0)
+                                            {
+                                                @dTotFA4Marks
+                                            }
+
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotAvgOfFA3AndFA4 > 0)
+                                            {
+                                                @dTotAvgOfFA3AndFA4
+                                            }
+
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotSA2Marks > 0)
+                                            {
+                                                @dTotSA2Marks
+                                            }
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotTerm2Marks > 0)
+                                            {
+                                                @dTotTerm2Marks
+                                            }
+                                        </td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold"></td>
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @*@if (dTotTerm2GPA > 0)
+                                            {
+                                                @dTotTerm2GPA
+                                            }*@
+                                        </td>
+
+
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotAvgOfAllFAs > 0)
+                                            {
+                                                @dTotAvgOfAllFAs
+                                            }
+                                        </td>
+
+
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotAvgOfAllSAs > 0)
+                                            {
+                                                @dTotAvgOfAllSAs
+                                            }
+
+                                        </td>
+
+
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @if (dTotTermMarks > 0)
+                                            {
+                                                @dTotTermMarks
+                                            }
+                                        </td>
+
+
+                                        <td style="width:15px;text-align:center;font-weight:bold"></td>
+
+
+                                        <td style="width:15px;text-align:center;font-weight:bold">
+                                            @*@if (dTotTermGPA > 0)
+                                            {
+                                                @dTotTermGPA
+                                            }*@
+                                        </td>
+                                    </tr>
+
+                                    @foreach (var GradingSub in result.lstResultsForGradingSubjects)
+                                    {
+                                        <tr>
+                                            <td>@GradingSub.SubjectName</td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center">@GradingSub.DisplaySA1Grade</td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center">@GradingSub.DisplaySA2Grade</td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                            <td style="width:15px;text-align:center"></td>
+                                        </tr>
+                                    }
+
+                                    <tr>
+                                        <td>OVER ALL GPA</td>
+
+                                        @if (null != result.lstResultsBySubject && result.lstResultsBySubject.Count() > 0 && (dTotTerm1GPA > 0 || dTotTerm2GPA > 0 || dTotTermGPA > 0))
+                                        {
+                                            <td align="center" style="font-weight:bold" colspan="9">
+
+                                                @if (dTotTerm1GPA > 0)
+                                                {
+                                                    @(Math.Round(dTotTerm1GPA / result.lstResultsBySubject.Count(), 1))
+                                                }
+                                            </td>
+                                                                <td align="center" style="font-weight:bold" colspan="9">
+                                                                    @if (dTotTerm2GPA > 0)
+                                                                    {
+                                                                        @(Math.Round(dTotTerm2GPA / result.lstResultsBySubject.Count(), 1))
+                                                                    }
+                                                                </td>
+                                                                <td align="center" style="font-weight:bold" colspan="5">
+                                                                    @if (dTotTermGPA > 0)
+                                                                    {
+                                                                        @(Math.Round(dTotTermGPA / result.lstResultsBySubject.Count(), 1))
+                                                                    }
+                                                                </td>
+                                        }
+                                        else
+                                        {
+                                            <td colspan="9"></td>
+                                                                <td colspan="9"></td>
+                                                                <td colspan="5"></td>
+                                        }
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </td>
+
+
+
+                        <td width="100%">
+
+                            <table style="white-space:nowrap;width:100%;height:300px">
+                                <tr>
+                                    <td>
+
+                                        <table class="table table-hover" border="1" cellpadding="3" style="font-family:'Segoe UI';border-collapse: collapse;table-layout:fixed;font-size:@nSubTb1FontSize;">
+
+                                            <tbody>
+                                                <tr>
+                                                    <th width="270px" style="text-align:center">SUBJECT</th>
+                                                    <th width="25px">SA1</th>
+                                                    <th width="25px">SA2</th>
+                                                </tr>
+
+                                                @foreach (var skill in result.lstResultsForLifeSkills)
+                                                {
+                                                    <tr>
+                                                        <td>@skill.SubjectName</td>
+                                                        <td style="text-align:center">@skill.DisplaySA1Grade</td>
+                                                        <td style="text-align:center">@skill.DisplaySA2Grade</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+
+
+
+                                        <table class="table table-hover" border="1" cellpadding="3" style="font-family:'Segoe UI';border-collapse: collapse;table-layout:fixed;margin-top:0.3em;font-size:@nSubTb2FontSize;">
+                                            <tbody>
+
+                                                <tr>
+                                                    <td width="320px" colspan="4" align="center"><strong>STUDENT HEALTH RECORD</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Details</td>
+                                                    <td>Term1</td>
+                                                    <td>Term2</td>
+                                                    <td>Remarks</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Height</td>
+                                                    <td>@result.Term1Height</td>
+                                                    <td>@result.Term2Height</td>
+                                                    <td>@result.HeightRemarks</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Weight</td>
+                                                    <td>@result.Term1Weight</td>
+                                                    <td>@result.Term2Weight</td>
+                                                    <td>@result.WeightRemarks</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Blood Grp</td>
+                                                    <th align="center" colspan="3">
+                                                        @Model.BloodGroup
+                                                    </th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table table-hover" border="1" cellpadding="3" style="font-family:'Segoe UI';border-collapse: collapse;margin-top:0.3em;font-size:@nSubTb3FontSize;">
+                                            <tbody>
+                                                <tr>
+                                                    <th style="text-align:center;" width="350px" colspan="4"><strong>TEACHER ASSESSMENT</strong></th>
+                                                </tr>
+                                                <tr>
+                                                    <td width="50px">FA 1</td>
+                                                    <td colspan="3">@result.FA1TS</td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="50px">FA 2</td>
+                                                    <td colspan="3">@result.FA2TS</td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="50px">FA 3</td>
+                                                    <td colspan="3">@result.FA3TS</td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="50px">FA 4</td>
+                                                    <td colspan="3">@result.FA4TS</td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="30px">SA 1</td>
+                                                    <td colspan="3">@result.SA1TS</td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="30px">SA 2</td>
+                                                    <td colspan="3">@result.SA2TS</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+
+                        </td>
+                    </tr>
+                </table>
+
+                <table style="margin-top:-0.1em;">
+                    <tr style="white-space:nowrap;height:50px;">
+                        <td>
+
+                            <table class="table table-hover" cellpadding="2" border="1" style="font-family:'Segoe UI';width:100%;border-collapse: collapse;table-layout:fixed;font-size:17px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-weight:bold" width="190px"><strong>&nbsp;Month</strong></td>
+                                        <td style="font-weight:bold" align="center">June</td>
+                                        <td style="font-weight:bold" align="center">July</td>
+                                        <td style="font-weight:bold" align="center">Aug</td>
+                                        <td style="font-weight:bold" align="center">Sep</td>
+                                        <td style="font-weight:bold" align="center">Oct</td>
+                                        <td style="font-weight:bold" align="center">Nov</td>
+                                        <td style="font-weight:bold" align="center">Dec</td>
+                                        <td style="font-weight:bold" align="center">Jan</td>
+                                        <td style="font-weight:bold" align="center">Feb</td>
+                                        <td style="font-weight:bold" align="center">Mar</td>
+                                        <td style="font-weight:bold" align="center">Apr</td>
+                                        <td style="font-weight:bold" align="center">Total</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td><strong>&nbsp;Working Days</strong></td>
+                                        <td align="center">
+                                            @Model.nJuneWorkingDays
+                                        </td>
+                                        <td align="center">
+                                            @Model.nJulyWorkingDays
+                                        </td>
+                                        <td align="center">
+                                            @Model.nJAugWorkingDays
+                                        </td>
+                                        <td align="center">
+                                            @Model.nJSepWorkingDays
+                                        </td>
+                                        <td align="center">
+                                            @Model.nOctWorkingDays
+                                        </td>
+                                        <td align="center">
+                                            @Model.nNovWorkingDays
+                                        </td>
+                                        <td align="center">
+                                            @Model.nDecWorkingDays
+                                        </td>
+                                        <td align="center">
+                                            @Model.nJanWorkingDays
+                                        </td>
+                                        <td align="center">
+                                            @Model.nFebWorkingDays
+                                        </td>
+
+                                        <td align="center">
+                                            @Model.nMarWorkingDays
+                                        </td>
+                                        <td align="center">
+                                            @Model.nAprilWorkingDays
+                                        </td>
+                                        <td style="font-weight:bold" align="center">@Model.nTotalWorkingAttendance</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td width="100px;"><strong>&nbsp;No of Days Present</strong></td>
+                                        <td align="center">
+                                            @result.nJunePresentDays
+                                        </td>
+                                        <td align="center">
+                                            @result.nJulyPresentDays
+                                        </td>
+                                        <td align="center">
+                                            @result.nJAugPresentDays
+                                        </td>
+                                        <td align="center">
+                                            @result.nJSepPresentDays
+                                        </td>
+                                        <td align="center">
+                                            @result.nOctPresentDays
+                                        </td>
+                                        <td align="center">
+                                            @result.nNovPresentDays
+                                        </td>
+                                        <td align="center">
+                                            @result.nDecPresentDays
+                                        </td>
+                                        <td align="center">
+                                            @result.nJanPresentDays
+                                        </td>
+                                        <td align="center">
+                                            @result.nFebPresentDays
+                                        </td>
+
+                                        <td align="center">
+                                            @result.nMarPresentDays
+                                        </td>
+                                        <td align="center">
+                                            @result.nAprilPresentDays
+                                        </td>
+                                        <td style="font-weight:bold" align="center">@result.nTotalPresentAttendance</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>&nbsp;% Attendance</strong></td>
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nJunePresentDays, Model.nJuneWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nJulyPresentDays, Model.nJulyWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nJAugPresentDays, Model.nJAugWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nJSepPresentDays, Model.nJSepWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nOctPresentDays, Model.nOctWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nNovPresentDays, Model.nNovWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nDecPresentDays, Model.nDecWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nJanPresentDays, Model.nJanWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nFebPresentDays, Model.nFebWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nMarPresentDays, Model.nMarWorkingDays)
+                                        </td>
+
+                                        <td style="font-weight:bold" align="center">
+                                            @Utility.GetAttendancePercentage(result.nAprilPresentDays, Model.nAprilWorkingDays)
+                                        </td>
+
+                                        @{
+                                            double ntotalAvg = 0;
+                                            int nTotalPresent = 0;
+                                            int nTotalWorking = 0;
+
+                                            if (!string.IsNullOrEmpty(Model.nTotalWorkingAttendance))
+                                            {
+                                                nTotalWorking = Convert.ToInt32(Model.nTotalWorkingAttendance);
+                                            }
+                                            if (!string.IsNullOrEmpty(result.nTotalPresentAttendance))
+                                            {
+                                                nTotalPresent = Convert.ToInt32(result.nTotalPresentAttendance);
+                                            }
+
+                                            if (nTotalPresent > 0)
+                                            {
+                                                ntotalAvg = Math.Round((Convert.ToDouble(nTotalPresent) / Convert.ToDouble(nTotalWorking)) * 100,1);
+                                            }
+                                        }
+
+                                        <td style="font-weight:bold" align="center">
+                                        @if (ntotalAvg > 0)
+                                        {
+                                            @ntotalAvg
+                                        }
+                                       </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </td>
+
+
+
+                    </tr>
+
+                </table>
+
+
+
+                @*<table style="width:100%;font-family:'Segoe UI';font-size:13px;">
+                        <tbody>
+                            <tr>
+                                <th width="500px" style="text-align:center">
+                                    <strong>CLASS TEACHER</strong>
+                                </th>
+                                <th>
+                                </th>
+                                <th width="500px" style="text-align:center">
+                                    <strong>PRINCIPAL</strong>
+                                </th>
+                                <th width="500px" style="text-align:center">
+                                    <strong>PARENT</strong>
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>*@
+
+        if (nCount != n)
+        {
+            <div style="page-break-after:always">
+            </div>
+            }
+            else
+            {
+                nCount = 0;
+            }
+
+
+
+            dTotTest1Marks = 0;
+            dTotFA1Marks = 0;
+            dTotTest2Marks = 0;
+            dTotFA2Marks = 0;
+            dTotAvgOfFA1AndFA2 = 0;
+            dTotSA1Marks = 0;
+            dTotTerm1Marks = 0;
+            dTotTerm1GPA = 0;
+
+            dTotTest3Marks = 0;
+            dTotFA3Marks = 0;
+            dTotTest4Marks = 0;
+            dTotFA4Marks = 0;
+            dTotAvgOfFA3AndFA4 = 0;
+            dTotSA2Marks = 0;
+            dTotTerm2Marks = 0;
+            dTotTerm2GPA = 0;
+
+            dTotAvgOfAllFAs = 0;
+            dTotAvgOfAllSAs = 0;
+            dTotTermMarks = 0;
+            dTotTermGPA = 0;
+
+
+        }
+
+    </div>
+
+                                            }
+
+                                            @*<script>
+                                                    function onloadData() {
+                                                        PrintElem('#Hello');
+                                                    }
+
+                                                    window.onload = onloadData();
+
+                                                    function PrintElem(elem) {
+
+                                                        Popup(document.getElementById("Hello").innerHTML)
+                                                        var SectionId = $("#SelSectionId").val();
+                                                        var ExaminationId = $("#SelExaminationId").val();
+
+                                                        window.location.href = '/AReports/ProgressCard?SectionId=' + SectionId + "&ExaminationId=" + ExaminationId
+                                                    }
+
+
+
+
+                                                    function Popup(data) {
+
+                                                        var mywindow = window.open('', 'my div', 'height=400,width=300,size=landscape');
+                                                        mywindow.document.write('<p></p>');
+                                                        mywindow.document.write(data);
+                                                        mywindow.document.write('<p></p>');
+
+                                                        mywindow.document.close();
+                                                        mywindow.focus();
+
+                                                        mywindow.print();
+                                                        mywindow.close();
+                                                        window.location.href = "/AReports/ProgressCard";
+                                                        return true;
+                                                    }
+                                                </script>*@

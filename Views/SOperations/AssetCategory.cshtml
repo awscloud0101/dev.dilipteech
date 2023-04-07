@@ -1,0 +1,149 @@
+﻿
+@model IEnumerable<AsteriskBrowserAL.AssetCategory>
+
+@{
+    ViewBag.Title = "AssetCategory";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-shopping-cart"></i>
+            Inventory&Assests
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Asset Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+
+    @if (null != TempData["AssetCategory"])
+    {
+        @Html.Raw(TempData["AssetCategory"])
+    }
+
+    @if (null != Model)
+    {
+        @*<span style="color:red;font-weight:bold" id="Validation"></span>*@
+
+    int nsno = 1;
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="table-header">
+                <span style="font-family:calibri;"> Assets Category</span>
+                <div class="" style="float:right;margin-right:10px;">
+                    <a class="btncustom" href="@Url.Action("AssetCategoryC", "SOperations")" role="button" id="New" name="New">
+                   Add</a>
+  </div>
+
+            </div>
+                                                                        
+            
+            <div class="overflowscroll" style="height:450px;">
+
+                <table id="dynamic-table" class="table table-hover table-striped table-bordered nowrap dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Asset Name")
+                            </th>
+                            @*<th>
+                        @Html.DisplayName("Item Count")
+                    </th>*@
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AssetName)
+                                </td>
+                                @*<td>
+                            @Html.DisplayFor(modelItem => item.ItemsCount)
+                        </td>*@
+                                <td>
+                                    <div>
+                                        <a class="green" href="@Url.Action("AssetCategoryE", "SOperations", new { id = item.AssetCategoryId })">
+                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                        </a>
+                                        <a class="red" onclick="btnConfirm(@item.AssetCategoryId)">
+                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                        </a>
+                                        @*<a class="red" href="@Url.Action("HousesD", "SeAcademics", new { id = item.HouseId })">
+                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                </a>*@
+                                    </div>
+                                </td>
+                                @*<td>
+                            @Html.ActionLink("Edit", "HousesE", new { id = item.HouseId }) |
+                            @Html.ActionLink("Delete", "HousesD", new { id = item.HouseId })
+                        </td>*@
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    }
+    else
+    {
+        <div class="table-header">
+            AssetCategory
+            <a class="btncustom" href="@Url.Action("AssetCategoryC", "SOperations")" role="button" id="New" name="New">
+            Add</a>
+        </div>
+        <span style="color: red;"><b>   Records Not Found (0) </b></span>
+    }
+</section>
+<script>
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SOperations/ValidationForAssetCategoryD',
+                data: { id: Value },
+                success: function (data) {
+
+                    var url = '/SOperations/AssetCategoryD?id=' + Value;
+                    var title = "Asset Category";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+@Html.Action("DataTableScripts", "Base")
+
+

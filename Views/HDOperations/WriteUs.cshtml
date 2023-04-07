@@ -1,0 +1,181 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.CommentData>
+
+@{
+    ViewBag.Title = "Write Us";
+
+    var ParentCmts = Model.Where(m => m.IsSendByParent == 1).ToList();
+    var StaffCmts = Model.Where(m => m.IsSendByParent == 0).ToList();
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Help Desk
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Write Us</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+<div>
+    @if (null != TempData["msg"])
+    {
+        <span style="color:green;font-weight:bold" id="MsgValidation">@TempData["msg"].ToString()</span>
+    }
+</div>
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("WriteUs", "HDOperations", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("Index")</span>
+                @*<div> <span id="message" style="color:red">Message Send Successfully</span></div>*@
+                <form class="form-horizontal" role="form">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">Write Us</h5>
+                            <div class="widget-toolbar no-border">
+                                <div class="inline action-buttons" style="margin-left:12%">
+                                    <button class="btn btn-primary" style="width:75px;height:35px;" onclick="return SubmitForm();" name="Send" value="Send" id="Send" type="submit">
+                                        Send
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- form start -->
+                        <br />
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>@Html.Label("Select")&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <div class="col-sm-3">
+                                    @Html.DropDownList("CommentReceiverId", null, "--Select--", new { @class = "form-control " })
+                                </div>
+                                <div>
+                                    <span id="ValidationSelect" style="font-weight:bold;color:red;display:none">* Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>@Html.Label("Comments")</label>
+                            <div class="col-sm-3">
+                                <textarea rows="4" cols="50" name="Comment" class="form-control" maxlength="250" id="Comment"></textarea>
+                            </div>
+                            <div>
+                                <span id="ValidationComment" style="font-weight:bold;color:red;display:none">* Required</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</section>
+<br />
+<div class="table-header">
+    Grievances
+</div>
+<div class="row">
+    @foreach (var _ticketNo in Model.GroupBy(s => s.TicketNo))
+    {
+        <div class="col-sm-6 widget-container-col" id="widget-container-col-12">
+            <div class="widget-box collapsed" id="widget-box-12">
+                <div class="widget-header">
+                    <h4 class="widget-title lighter">Ticket No : @_ticketNo.FirstOrDefault().TicketNo</h4>
+                    <div class="widget-toolbar no-border">
+                        <a href="#" data-action="collapse">
+                            <i class="ace-icon fa fa-chevron-up"></i>
+                        </a>
+                        <a href="#" data-action="close">
+                            <i class="ace-icon fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main padding-6 no-padding-left no-padding-right" style="overflow:auto;height:300px">
+                        @foreach (var item in _ticketNo)
+                        {
+                            <div class="dialogs">
+                                <div class="itemdiv dialogdiv">
+                                    <div class="user">
+                                        <img alt="Alexa's Avatar" src="~/Content/images/NoPhoto.jpg" />
+                                    </div>
+                                    <div class="body">
+                                        <div class="time">
+                                            <i class="ace-icon fa fa-clock-o"></i>
+                                            <span class="green">
+                                                @item.dateTime.ToString("dd-MMM-yyyy hh:mm tt")
+                                            </span>
+                                        </div>
+                                        <div class="name">
+                                            @item.SentBy
+                                        </div>
+                                        <div class="text">
+                                            @item.Comment
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+    function SubmitForm() {
+        var Validation = true;
+        var VCommentReceiverId = $("#CommentReceiverId").val();
+        var VComment = $("#Comment").val().trim();
+        if (VCommentReceiverId == null || VCommentReceiverId == "" || VCommentReceiverId == undefined || VCommentReceiverId == 0) {
+            $("#ValidationSelect").show();
+            Validation = false;
+        }
+        if (VComment == null || VComment == "" || VComment == undefined) {
+            $("#ValidationComment").show();
+            Validation = false;
+        }
+        //$('#message').show();
+        return Validation;
+
+    }
+    $('#CommentReceiverId').click(function () {
+        $('#ValidationSelect').hide();
+        $('#MsgValidation').hide();
+        $('#Success').hide();
+    })
+    $('#Comment').click(function () {
+        $('#ValidationComment').hide();
+        $('#MsgValidation').hide();
+        $('#Success').hide();
+    })
+    var VCommentReceiverId = $("#CommentReceiverId").val('');
+</script>

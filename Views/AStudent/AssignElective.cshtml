@@ -1,0 +1,147 @@
+﻿@model AsteriskBrowserAL.Models.ElectiveSubjectsStudentViewData
+
+@{
+
+    ViewBag.Title = "Language Selection";
+
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Language Selection</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+           
+                @using (Html.BeginForm("AssignElective", "AStudent", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+
+
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Language Selection</span>
+
+
+                    </div>
+                    <div class="widget-box">
+                  
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                        <div class="col-sm-6">
+                                            <select id="Sectionid" name="Sectionid" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="AllStudents"></div>
+                }
+           
+           
+         </div>
+    </div>
+    @if (null != Model)
+    {
+        <input type="hidden" id="SelSectionId" name="SectionId" value="@Model.BatchId" />
+    }
+    else
+    {
+        <input type="hidden" id="SelSectionId" name="SectionId" />
+    }
+</section>
+
+
+<script>
+
+    function OnloadData() {
+        LoadClassDropdown();
+    }
+
+    function LoadClassDropdown() {
+        // var SelClassId = $("#SelClassId").val();
+        $.ajax({
+            url: '/AExamination/GetSectionDropDown',
+            success: function (result) {
+
+                var ClassNumberItems = $("#Sectionid")
+                ClassNumberItems.children().remove();
+                ClassNumberItems.append($("<option>").val("null").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    ClassNumberItems.append($("<option>").val(record.SectionId).text(record.SectionCode))
+                });
+
+                $("#Sectionid").append(ClassNumberItems);
+               
+                var selSectionId = $('#SelSectionId').val();
+                if (selSectionId > 0) {
+                    document.getElementById("Sectionid").value = selSectionId;
+                    GetStudents();
+                }
+            },
+            async: false
+        })
+    }
+
+    $('#Sectionid').change(function () {
+        var Sectionid = $('#Sectionid').val();
+
+        if (Sectionid < 1) {
+            $('#AllStudents').html("");
+        }
+        else {
+            GetStudents();
+            $('#AllStudents').html("");
+        }
+    });
+
+
+
+    function GetStudents() {
+
+        var SectionId = $("#Sectionid").val();
+        if (SectionId < 0)
+            return;
+
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AStudent/GetStudentsForLanguageAssigning',
+            data: { SectionId: SectionId },
+            success: function (Data) {
+                $('#AllStudents').html(Data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    window.onload = OnloadData();
+</script>
+

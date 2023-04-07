@@ -1,0 +1,296 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    ViewBag.Title = "AllExaminationReport";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examination Reports
+        </li>
+        <li class="active">All Examination report</li>
+    </ul><!-- /.breadcrumb -->
+}
+@Html.Action("DatePickerScripts", "Base")
+<section class="content">
+    <br />
+
+    <div class="row">
+        <div class=col-xs-12>
+                @if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                               All Examination Report
+                            </h5>
+                            <div class="widget-toolbar no-border">
+                                <div class="inline action-buttons">
+                                    <a onclick="GetData()" id="btnViewData2" value="View Data"><span class="btn btn-info btn-minier">View Data</span></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-header -->
+                        <!-- form start -->
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        @if (Model.IsCentral)
+                                        {
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Division")</label>
+                                                <div class="col-sm-6">
+                                                    @if (null != Model.lstDivision)
+                                                    {
+                                                        @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+                                                <div class="col-sm-6">
+                                                    <select id="CboBranch" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <input type="hidden" id="CboBranch" name="CboBranch" value="@Model.BranchId" />
+                                        }
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Class</label>
+                                            <div class="col-sm-6">
+                                                <select id="ClassId" name="ClassId" class="form-control"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Section</label>
+                                            <div class="col-sm-6">
+                                                <select id="SectionId" name="SectionId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="PartialView"></div>
+                }
+                <br />
+                <br />
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+        <input type="hidden" id="selSectionId" value="@Model.SectionId" />
+        <input type="hidden" id="selClassNumberId" value="@Model.ClassNumberId" />
+    }
+    else
+    {
+        <input type="hidden" id="selSectionId" />
+        <input type="hidden" id="selClassNumberId" />
+    }
+
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#divDownload').hide();
+        $('#divUpload').hide();
+        $('#divWidgetBody').hide();
+        LoadClassDropdown();
+    });
+
+    $('#DivisionId').change(function () {
+        debugger
+        var DivisionId = $('#DivisionId').val();
+        $('#TbSectionWiseReport').html('');
+        $('#CboBranch').html('');
+
+
+        if (DivisionId != 0) {
+            LoadBrancheDropdown()
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+
+            var ClassItems = $('#CboClassNumber');
+            ClassItems.children().remove();
+            ClassItems.append($("<option>").val(0).text(""));
+
+        }
+    });
+
+    function LoadBrancheDropdown() {
+        debugger
+        var DivisionId = $('#DivisionId').val();
+        $.ajax({
+            url: '/Common/GetBranchesByDivisionId',
+            data: { DivisionId: DivisionId },
+            success: function (data) {
+                var BranchItems = $('#CboBranch');
+
+                BranchItems.children().remove();
+
+                BranchItems.append($("<option>").val("0").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    if (record.IsCentral != true) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    }
+                });
+
+                $('#CboBranch').append(BranchItems);
+            },
+            aync: false
+        });
+    }
+
+    $('#CboBranch').change(function () {
+        LoadClassDropdown();
+    })
+
+    function LoadClassDropdown() {
+        var SelClassId = $("#selClassNumberId").val();
+        $.ajax({
+            url: '/AExaminationReports/LoadClassDropDown',
+            success: function (result) {
+                debugger
+                var ClassNumberItems = $("#ClassId")
+                ClassNumberItems.children().remove();
+                ClassNumberItems.append($("<option>").val("null").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    ClassNumberItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                });
+
+                $("#ClassId").append(ClassNumberItems);
+                var SelClassNumber = $("#selClassNumberId").val();
+                if (SelClassNumber > 0 && SelClassNumber != "") {
+                    document.getElementById("ClassId").value = SelClassNumber;
+                    LoadSectionDropdown();
+                }
+            },
+            async: false
+        })
+    }
+
+    $('#ClassId').change(function () {
+        $('#ExaminationId').empty();
+
+        var ClassId = $('#ClassId').val();
+
+        if (ClassId < 1) {
+            $('#ExaminationResults').html("");
+        }
+        else {
+            LoadSectionDropdown();
+            $('#ExaminationResults').html("");
+        }
+    });
+
+    function LoadSectionDropdown() {
+        var SelClassNumber = $("#ClassId").val()
+        var BranchId = $('#CboBranch').val();
+        if (SelClassNumber >= 0) {
+            $.ajax({
+                url: "/AExaminationReports/GetSectionslistByStudentActiveInActive",
+                data: { Classnumber: SelClassNumber, nBranchId: BranchId },
+                success: function (result) {
+                    var SectionList = $("#SectionId")
+                    SectionList.children().remove();
+                    SectionList.append($("<option>").val("-1").text("--Select--"))
+                    SectionList.append($("<option>").val("0").text("All"))
+                    $.each(result, function (e, record) {
+                        SectionList.append($("<option>").val(record.SectionId).text(record.SectionCode))
+                    })
+                    $("#SectionId").append(SectionList)
+                }
+            })
+        }
+        else {
+            document.getElementById("SectionId").value = ""
+
+            $("#SectionId").html("")
+        }
+    }
+   
+
+    function GetData() {
+        debugger
+        var DivisionId = $('#DivisionId').val();
+        var BranchId = $('#CboBranch').val();
+        var IsCentral = $('#IsCentral').val();
+        var Class = $('#ClassId').val();
+        var SectionId = $('#SectionId').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (IsCentral == "value") {
+            IsCentral = true;
+            if (DivisionId == "null" || DivisionId <= 0 && DivisionId != -1) {
+                Message += "Division,";
+                isValid = false;
+            }
+
+            if (BranchId == "null" || BranchId <= 0 && BranchId != -1) {
+                Message += " Branch,";
+                isValid = false;
+            }
+
+        }
+
+        if (Class == "" || Class == null || Class == "null") {
+            Message += " Class,";
+            isValid = false;
+        }
+
+        if (SectionId == "" || SectionId == "-1" || SectionId == null || SectionId == "null") {
+            Message += " Section,";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message.slice(",", -1);
+            return;
+        }
+        document.getElementById("Validation").innerHTML = "";
+        $.ajax({
+            url: '/AExaminationReports/GetAllExaminationReport',
+            data: { DivisionId: DivisionId, nBranchId: BranchId, ClassNumberId: Class, SectionId: SectionId },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#imagemodal').hide();
+                $('#PartialView').html(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+
+    }
+
+   
+</script>

@@ -1,0 +1,176 @@
+﻿@model AsteriskBrowserAL.Models.ItemModel
+
+@{
+    ViewBag.Title = "Stock Entry";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Stock Returns to Vendor</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("StockReturnsToVendor", "SOperations", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="Status" value="@Model.Status" />
+                }
+                else
+                {
+                    <input type="hidden" id="Status" value="false" />
+                }
+                <span style="color:red;font-weight:bold;" id="Validation"></span>
+                <br />
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Stock Returns to Vendor
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Sub Category</label>
+                                <div class="col-sm-6">
+                                    @if (null != Model)
+                                    {
+                                        if (null != Model.lstSubCategory)
+                                        {
+                                            @Html.DropDownListFor(model => model.SubCategoryId, new SelectList(Model.lstSubCategory, "InventorySubCategoryId", "SubCategoryName"), "--- Select ---", new { @class = "form-control", id = "SubCategoryId", name = "SubCategoryId" })
+                                        }
+                                        else
+                                        {
+                                            <select id="SubCategoryId" style="width:200px;" class="form-control" name="SubCategoryId"></select>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                        </div>
+                    </div>
+                </div>
+
+                <div id="items"></div>
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+    var Content = "";
+
+    $(document).ready(function () {
+        debugger
+
+        var Status = $('#Status').val();
+
+        if (Status == "value") {
+            var valid = OpenDialog("Data Saved", "", "Stock Returns to Vendor");
+
+            debugger
+
+            if (valid) {
+                GetItems();
+            }
+        }
+
+    });
+
+    $('#SubCategoryId').change(function () {
+        GetItems();
+
+    });
+
+    function GetItems() {
+        document.getElementById("Validation").innerHTML = "";
+        var SubCategoryId = $('#SubCategoryId').val();
+
+        if (SubCategoryId != "" || SubCategoryId == "null" || SubCategoryId == null) {
+            $.ajax({
+
+                url: '/SOperations/GetItemsForVendorReturns',
+                data: { SubCategoryId: SubCategoryId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#items').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            $('#items').html("");
+        }
+    }
+
+
+    function SubmitForm() {
+        var valid = true;
+        var Quantity = 0;
+
+        // Get table object
+        var myTable = document.getElementById("mytab1");
+
+        // loop for each row
+        for (var r = 1, n = myTable.rows.length; r < n; r++) {
+            var dValue = myTable.rows[r].cells[4].children[0].value;
+            Quantity += dValue;
+        }
+
+        if (Quantity == 0) {
+            valid = false;
+            document.getElementById('Validation').innerHTML = "Please enter quantity";
+        }
+        else {
+            debugger
+            for (var r = 1, n = myTable.rows.length; r < n; r++) {
+                var dValue = myTable.rows[r].cells[4].children[0].value;
+
+                if (dValue != "" && parseInt(dValue) > 0) {
+                    var bal = myTable.rows[r].cells[3].children[0].value;
+
+                    if (parseInt(bal) < parseInt(dValue)) {
+                        valid = false;
+                        document.getElementById('Validation').innerHTML = "Return quantity exceeds the Saleable closing stock for the SKU " + myTable.rows[r].cells[2].children[0].value;
+                    }
+                }
+
+            }
+        }
+
+        return valid;
+    }
+
+</script>

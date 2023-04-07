@@ -1,0 +1,248 @@
+﻿@model AsteriskBrowserAL.Models.StaffAttendanceModificationData
+
+@{
+    ViewBag.Title = "Modifications Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Reports
+        </li>
+        <li>
+            <i class=""></i>
+            Biometric
+        </li>
+        <li class="active">Modifications Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+<section class="content">
+    <br />
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ModificationsReport", "HRBiometric", FormMethod.Post))
+            {
+                <div class="box">
+                    <div class="row">
+                        <div class="box-body">                          
+                                <div class="form-group"> 
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Branch</label>
+                                            <div class="col-sm-4">
+                                                @Html.DropDownList("Branch", null, "--- Select ---", new { @class = "form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                        <br />
+                                      
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Date Range</label>
+                                                <div class="col-sm-4">
+                                                    <div class="input-group">
+                                                        @if (ViewBag.AuditDate != null)
+                                                        {
+                                                            <input type="text" class="form-control pull-right" id="daterange" value="@ViewBag.AuditDate" name="DateRange" autocomplete="off" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="text" class="form-control pull-right" id="daterange" name="DateRange" autocomplete="off" />
+                                                        }
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-calendar"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-3">
+                                                        <span style="color:red;font-weight:bold;display:none;" id="vdate">Please select Date range</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <br />
+                                        <br />
+                                        <div class="col-sm-12">
+                                            <button class="btn btn-primary col-xs-1 P2" style="width:80px" onclick="return GetAttendanceData();">
+                                                Show
+                                            </button>
+                                        </div>
+                                   
+                                </div>
+                         
+
+                        </div>
+                    </div>
+                    <br />
+                </div>
+            <div id="table">
+
+            </div>
+
+          
+            }
+        </div>
+    </div>
+</section>
+<div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+    <p style="position:absolute; top: 50%; left:50%;">
+        <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+    </p>
+</div>
+<script type="text/javascript">   
+    function GetAttendanceData() {
+        var branchName = document.getElementById("Branch").value;
+        var daterange = $('#daterange').val();     
+        if (daterange != "") {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/HRBiometric/ModificationsReportData',
+                data: { daterange: daterange, branchName: branchName },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $('#table').html(data);
+                },
+                error: errorFunc
+            })
+             .done(function () {
+                 $('#imagemodal').hide();
+             })
+           
+        }
+        return false
+    }
+        function errorFunc() {
+            //document.getElementById("display_box").style.display = "none";
+        }
+      
+        window.onload = GetAttendanceData();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

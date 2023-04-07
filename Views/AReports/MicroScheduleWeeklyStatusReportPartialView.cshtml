@@ -1,0 +1,228 @@
+﻿@model AsteriskBrowserAL.Models.MicroScheduleData
+
+@{
+    int nsno = 1;
+}
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+<div class="table-header">
+    Records Found (@Model.lstWeeklyStatusForOneSection.Count())
+    <div style="float:right">
+
+        <button class="btn btn-info btn-xs" id="btnExport">
+            <i class="ace-icon fa fa-download"> | Download</i>
+
+        </button>
+
+    </div>
+</div>
+
+<div style="overflow:auto;height:400px">
+
+    <table class="table tbhover table-striped table-bordered nowrap dynamic-table" id="Mydiv" >
+
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+
+                <th>
+                    @Html.DisplayName("Branch Name")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Section")
+                </th>
+                <th>
+                    @Html.DisplayName("Periods")
+                </th>
+
+                @foreach (var wd in Model.WeekDays)
+                {
+                    <th class="title">
+                        @wd.WeekName
+                        <br />
+                        <span>
+                            @wd.WeekDay
+                        </span>
+                    </th>
+                }
+            </tr>
+
+        </thead>
+        <tbody>
+            @if (Model.lstWeeklyStatusForOneSection.Count() > 0 && null!= Model.lstWeeklyStatusForOneSection)
+            {
+                foreach (var s in Model.lstWeeklyStatusForOneSection)
+                {
+                    if (null != s.Periods)
+                    {
+                        var count = @s.Periods.Count() + 1;
+
+                        <tr>
+                            <td style="text-align:center" rowspan="@count">@(nsno++)</td>
+
+                            <td style="text-align:center" rowspan="@count">@Model.BranchName</td>
+
+                            <td style="text-align:center" rowspan="@count">@s.SectionName</td>
+                        </tr>
+
+                        foreach (var pd in s.Periods)
+                        {
+                            <tr>
+                                <td>
+                                    <span>
+                                        @pd.PeriodName
+                                    </span>
+                                    <br />
+                                    <span>
+                                        @pd.PeriodTimings
+                                    </span>
+                                </td>
+                                <td>
+                                 @if (!string.IsNullOrWhiteSpace(pd.Monday))
+                                {
+                                     if(pd.MondaySyllabusStatus > 0)
+                                     {
+                                        <span class="badge badge-succes">Closed</span>
+                                     }
+                                     else
+                                     {
+                                        <span class="badge badge-warning">Open</span>
+                                     }
+                                }
+                                 else
+                                 {
+
+                                 }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(pd.Tuesday))
+                                {
+                                   if(pd.TuesdaySyllabusStatus > 0)
+                                     {
+                                        <span class="badge badge-succes">Closed</span>
+                                     }
+                                     else
+                                     {
+                                        <span class="badge badge-warning">Open</span>
+                                     }
+                                }
+                                    else
+                                    {
+
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(pd.Wednesday))
+                                    {
+                                        if (pd.WednesdaySyllabusStatus > 0)
+                                        {
+                                            <span class="badge badge-succes">Closed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning">Open</span>
+                                        }
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(pd.Thursday))
+                                    {
+                                        if (pd.ThursdaySyllabusStatus > 0)
+                                        {
+                                            <span class="badge badge-succes">Closed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning">Open</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(pd.Friday))
+                                    {
+                                        if (pd.FridaySyllabusStatus > 0)
+                                        {
+                                            <span class="badge badge-succes">Closed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning">Open</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(pd.Saturday))
+                                    {
+                                        if (pd.SaturdaySyllabusStatus > 0)
+                                        {
+                                            <span class="badge badge-succes">Closed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning">Open</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        
+                                    }
+
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(pd.Sunday))
+                                    {
+                                        if (pd.SundaySyllabusStatus > 0)
+                                        {
+                                            <span class="badge badge-succes">Closed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning">Open</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                }
+
+            }
+
+        </tbody>
+    </table>
+</div>
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+
+
+<script type="text/javascript">
+
+    $("#btnExport").click(function (e) {
+        ExportToExcel('Mydiv');
+    });
+
+   
+</script>

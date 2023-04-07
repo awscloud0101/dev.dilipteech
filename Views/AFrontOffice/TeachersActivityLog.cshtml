@@ -1,0 +1,398 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.TeachersDairyDetails>
+@{
+    ViewBag.Title = "Teachers Diary";
+
+    List<IGrouping<DateTime, AsteriskBrowserAL.Models.TeachersDairyDetails>> dictOrderedData = new List<IGrouping<DateTime, AsteriskBrowserAL.Models.TeachersDairyDetails>>();
+    if (null != ViewBag.PrintData)
+    {
+        dictOrderedData = ViewBag.PrintData;
+    }
+
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Reports
+        </li>
+        <li>
+            <i class=""></i>
+            Others
+        </li>
+        <li class="active">Teacher's Diary</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm())
+    {
+        <span id="Validation" style="color:red;font-weight:bold"></span>
+        <div class="box">
+            <br />
+            <div class="box-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Staff</label>
+                            <div class="col-sm-4">
+                                @Html.DropDownList("StaffId", null, "--Select--", new { @class = "form-control " })
+                            </div>
+
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-12">
+
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Date Range</label>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    @if (ViewBag.seldates != null)
+                                    {
+                                        <input type="text" class="form-control pull-right" id="reservation" value="@ViewBag.seldates" name="BetweenDates" autocomplete="off" />
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="form-control pull-right" id="reservation" name="BetweenDates" autocomplete="off" />
+                                    }
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <br />
+
+                    <div class="col-sm-3">
+                        <button class="btn btn-primary " style="width:80px" type="submit" onclick="return submitForm();">
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+            <br />
+        </div>
+
+
+
+        if (null != Model)
+        {
+            if (Model.Count() > 0)
+            {
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("")</span>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div class="box-header">
+                                <h3 class="box-title col-xs-10">Teacher's Diary</h3>
+                                <input class="btn btn-primary col-xs-1" type="button" value="Print " onclick="PrintElem('#mydiv')" />
+                            </div><!-- /.box-header -->
+
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover">
+                                    <tbody>
+                                        <tr>
+                                            <th>
+                                                @Html.DisplayName("Period")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Class")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Date")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Subject Name")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Name Of the Lesson/ Nature of Work Done")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("No Of Students Present")
+                                            </th>
+                                        </tr>
+
+                                        @if (Model.Count() > 0)
+                                        {
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.PeriodName)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.BatchName)
+                                                    </td>
+                                                    <td>
+                                                        @item.Date.Value.ToString("dd - MMM - yyyy")
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Subject)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Description)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.StudentsCount)
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <span style="color:red;font-weight:bold">Data not available to display</span>
+            }
+
+        }
+    }
+</section>
+
+
+   
+    <script type="text/javascript">
+
+        function submitForm() {
+            var validatestatus = validateTD();
+            if (validatestatus == false) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+
+        $('#StaffId').change(function () {
+            document.getElementById('Validation').innerHTML = "";
+        });
+
+        $('#reservation').change(function () {
+            document.getElementById('Validation').innerHTML = "";
+        });
+
+
+        function validateTD()
+        {
+            validation = true;
+            var StaffId = document.getElementById("StaffId").value;
+            var reservation = $('#reservation').val();
+            if (StaffId == "" && reservation == "") {
+                document.getElementById('Validation').innerHTML = "Please select both staff and Date Range";
+                validation = false;
+            }
+            else if(StaffId == "")
+            {
+                document.getElementById('Validation').innerHTML = "Please select staff";
+                validation = false;
+            }
+            else if(reservation == "")
+            {
+                document.getElementById('Validation').innerHTML = "Please select Date Range";
+                validation = false;
+            }
+
+            return validation;
+        }
+
+        $('#reservation').daterangepicker();
+
+
+        $('#daterange-btn').daterangepicker(
+                    {
+                        ranges: {
+                            'Today': [moment(), moment()],
+                            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                            'This Month': [moment().startOf('month'), moment().endOf('month')],
+                            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                        },
+                        startDate: moment().subtract(29, 'days'),
+                        endDate: moment()
+                    },
+            function (start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+            );
+    </script>
+
+
+
+    <script type="text/javascript">
+        function PrintElem(elem) {
+            Popup($(elem).html());
+        }
+
+        function Popup(data) {
+            var mywindow = window.open('', 'my div', 'height=300,width=600');
+            mywindow.document.write('<p></p>');
+            mywindow.document.write(data);
+            mywindow.document.write('<p></p>');
+
+            mywindow.document.close();
+            mywindow.focus();
+
+            mywindow.print();
+            mywindow.close();
+            return true;
+        }
+    </script>
+    <body>
+        <div id="mydiv" style="display:none">
+            @if (null != Model && Model.Count() > 0)
+            {
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <img class=" col-xs-11" id="avatar" width="50" height="43" src="@ViewBag.ImageData" style="margin-bottom:-1.5em;" />
+                        <b style="font-weight:bold; margin-left:0.3em; font-size:20px; font-family:'Segoe UI'">@ViewBag.InstituteName</b>
+                    </div>
+                    <div style="margin-left:3.7em; font-family:'Segoe UI'"><b>@ViewBag.InstituteAddres</b></div>
+                    <br />
+
+                    <hr style="width:100%; margin-bottom:-0.5em" />
+                    <hr style="width:100%;" />
+                    <div align="center" style="font:12%; font-family:'Segoe UI'"><b>TEACHERS DAIRY</b></div>
+                    <hr style="width:100%;" />
+                    <hr style="width:100%; margin-top:-0.5em" />
+                </div>
+
+                foreach (var dd in dictOrderedData)
+                {
+                    <table>
+                        <tr>
+                            <td style="width:430px;font-size:13px;">Date : @dd.Key.ToString("dd - MMM - yyyy")</td>
+
+                            <td>
+                                @if (null != ViewBag.StaffName)
+                                {
+                                    <p style="font-size:12px;">Staff Name :@ViewBag.StaffName</p>
+                                }
+                            </td>
+                        </tr>
+
+                    </table>
+                    <hr />
+                    <div class="col-xs-12 box-body table-responsive">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr style="font-size:13px; font-weight:bold; text-align:left;">
+                                    <th>
+                                        @Html.DisplayName("Period No")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Class")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Subject")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Name of the Lesson/ Nature of Work Done")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Students Present")
+                                    </th>
+                                    <th></th>
+                                </tr>
+                                @foreach (var item in dd)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.PeriodName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.BatchName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Subject)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Description)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.StudentsCount)
+                                        </td>
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    <br />
+                    <table>
+                        <tr>
+                            <td style="width:430px;">Signature of Teacher</td>
+                            <td>
+                                <p>Signature of Principle</p>
+                            </td>
+                        </tr>
+
+                    </table>
+                    <br />
+                    <br />
+                    <br />
+
+                }
+
+
+
+                <br />
+                <br />
+                <br />
+                <div class="col-xs-12">
+                    <table style="font-size:12px">
+                        <tr>
+                            <td>
+                                Note: 1) Daily schedule should be approved by HM every day before taking the classes.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                2) Leisure Periods & holidays should also be noted.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                3) No. of students should be noted after the class only.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                4) Diary should be handover to the HM on leaving the school by transfer/retirement etc.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                5) Every teacher i.e., SGT's, subject teachers, HM, Craft, drawing & PET/PD etc., should also be maintained.
+                            </td>
+
+                        </tr>
+                    </table>
+
+                </div>
+
+            }
+        </div>
+    </body>
+
+

@@ -1,0 +1,189 @@
+﻿@model AsteriskBrowserAL.Models.ExamShedulesData
+
+@{
+    ViewBag.Title = "SectionCreation";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">SectionCreation</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+    <div class="row">
+       
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+
+            <span style="color: red;">@Html.ValidationMessage("Validation")</span>
+            @*<span style="color:red;" id="Validation"></span>*@
+            <div class="box">
+                @using (Html.BeginForm("SectionCreationE", "SeAcademics", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+
+                    @Html.HiddenFor(model => model.ClassNumber)
+
+                    @Html.HiddenFor(model => model.SubscriptionId)
+                    @Html.HiddenFor(model => model.ExamId)
+
+
+                    <input type="hidden" id="SelSubId" value="@Model.SubscriptionId" />
+                    <input type="hidden" id="SelClass" value="@Model.ClassNumber" />
+                    <input type="hidden" id="SelSecId" value="@Model.ExamId" />
+                    <div class="table-header">
+
+
+                        Exam Schedules
+                        <small style="float:right;font-weight:bold;" class="textheader">
+                            @Html.ActionLink("Back to details", "SectionCreation", new { ClassNumber = @Model.ClassNumber, SubscriptionId = @Model.SubscriptionId, SectionId = @Model.ExamId })
+                        </small>
+
+                    </div>
+
+
+                    <div class="widget-box row" style="padding:10px;">
+
+                        <div class="row">
+
+
+
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Section Name")</label>
+
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(model => model.ExamName, new { @class = "form-control textlength", placeholder = "Exam Code", @id = "ExamCode" })
+                                        <span class="" style="color:red;font-weight:bold;" id="ESExamCode">
+                                        </span>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+
+
+                        <div class=" col-md-9">
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            @*<button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>*@
+                        </div>
+
+                        <br />
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    function submitForm() {
+        var validatestatus = validateES();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+
+    function validateES() {
+
+        var validate = true;
+
+        var ExamCode = document.getElementById("ExamCode").value;
+
+
+        if (ExamCode == "") {
+            document.getElementById("ESExamCode").innerHTML = "Please enter Section Name";
+            validate = false;
+        }
+        debugger
+
+        if (validate == true) {
+            var status = IsSectionExisted();
+            validate = status;
+        }
+
+        return validate;
+    };
+    debugger
+    function IsSectionExisted() {
+        var Status = true;
+        var ExamCode = $('#ExamCode').val();
+        var id = $('#SelSecId').val();
+        $.ajax({
+
+            url: '/SeAcademics/IsSectionExisted',
+            data: { type: "Edit", id: id, ExamName: "", ExamCode: $('#ExamCode').val(), SubId: $('#SelSubId').val(), ClassNumber: $('#SelClass').val()},
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                    document.getElementById("Validation").innerHTML = Data;
+                }
+            },
+            async: false
+        });
+
+        return Status;
+    }
+
+
+  
+    $('#ExamCode').focus(function () {
+        document.getElementById("ESExamCode").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+
+    function OnClick() {
+
+        $('#ExamName').val("");
+        $('#ExamCode').val("");
+
+        var CCEExamName = $("#CCEExamId option:selected").text();
+
+        if (CCEExamName != "--- Select ---") {
+            document.getElementById("ESExamName").innerHTML = "";
+            var NoOfCTs = $('#NoOfCTs').val();
+
+            $('#ExamName').val(CCEExamName + " - " + "CT" + (parseInt(NoOfCTs, 10) + 1))
+            $('#ExamCode').val(CCEExamName + " - " + "CT" + (parseInt(NoOfCTs, 10) + 1))
+        }
+    }
+
+</script>
+

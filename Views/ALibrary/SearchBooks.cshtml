@@ -1,0 +1,175 @@
+﻿@model  List<AsteriskBrowserAL.Models.SearchBooksData>
+
+@{
+    ViewBag.Title = "Search Books";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Issue Books</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            @*<h3>@Html.ActionLink("<<Issue Book Deatils", "IssueBook")</h3>*@
+        </div>
+    </div>
+   
+
+    @using (Html.BeginForm("SearchBooks", "ALibrary", FormMethod.Post))
+    {
+        <br />
+
+        @*<div class="page-header">
+                <h1>
+                    <small style="float:right;">
+                        @Html.ActionLink("Issue Books Details", "IssueBook")
+                    </small>
+                </h1>
+
+            </div>*@<!-- /.page-header -->
+        <span style="color: red;">@Html.ValidationMessage("Search Books")</span>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">Issue Books</h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Book Name</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("MasterBookId", null, " ", new { @class = "form-control select2", onchange = "this.form.submit();" })
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <br />
+                            
+                           
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hr hr-18 dotted hr-double"></div>
+        <div class="row">
+            <div class="col-xs-12">
+                @if (null != Model)
+                {
+                    if (Model.Count > 0)
+                    {
+                        int Sno = 1;
+                        <div class="table-header">
+                            Issue Books
+                        </div>
+
+
+                        <div style="overflow:auto">
+                            <table id="dynamic-table" class="table table-hover table-bordered table-striped nowrap dynamic-table" style="font-size:14px;">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayName("Sno")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Book Code")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Book Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Edition")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Author")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Publication")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Accession Number")
+                                        </th>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                 @Sno
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.BookCode)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.MasterBookName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Edition)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Author)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Publication)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.BarCodeNo)
+                                            </td>
+                                            <td>
+                                                @Html.ActionLink("IssueBook", "IssueBookD", new { @id = item.BookDetailsId })
+                                            </td>
+                                        </tr>
+                                        Sno++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <span style="color: red;"><b>Data is not available</b></span>
+                    }
+
+                }
+            </div>
+        </div>
+
+    }
+
+</section>
+@Html.Action("DataTableScripts", "Base")
+
+
+
+
+
+
+

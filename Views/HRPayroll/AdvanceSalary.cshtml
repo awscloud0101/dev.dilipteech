@@ -1,0 +1,147 @@
+﻿@model AsteriskBrowserAL.Models.AdvanceSalaryData
+           @{
+               
+           }
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Payrolls
+        </li>
+        <li class="active">Advance Salary</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("SetEmployeeSalary", "HRPayroll", FormMethod.Post))
+            {
+                <span id="error" style="color: red;"></span>
+
+
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Advance Salary</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-5 control-label no-padding-right">@Html.Label("Division")</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.ListDivisions, "DivisionId", "DivisionName"), "--- Select ---", new { @class = "form-control" })
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="col-sm-5 control-label no-padding-right">@Html.Label("Branch")</label>
+                                    <div class="col-sm-6">
+                                        @*@Html.DropDownListFor(model => model.BranchId,new SelectList(""),  "--- Select ---", new { @class = "form-control" })*@
+
+
+                                        <select id="BranchId" name="BranchId" class="form-control"></select>
+                                        <input type="hidden" id="BranchId1" name="BranchId1" value="@Model.BranchId" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <div id="StaffDetails"></div>
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+</section>
+
+<script>
+
+    window.onload = OnloadData();
+
+    function OnloadData() {
+        var DivisionId = $('#DivisionId').val();
+        LoadBranch();
+        var bid = $('#BranchId1').val();
+        GetStaffData(DivisionId, bid);
+    }
+
+    $('#DivisionId').change(function () {
+        LoadBranch();
+    });
+
+
+    function LoadBranch() {
+        var bid = $('#BranchId1').val();
+        $('#BranchId').empty();
+        $('#BranchId').append($("<option>").val("null").text("--- Select ---"));
+
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+                    var BranchItems = $('#BranchId');
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+                    $('#BranchId').append(BranchItems);
+
+                    if (bid > 0) {
+                        $('#BranchId').val(bid);
+                    }
+                },
+                aync: false
+            });
+        }
+    }
+
+    $('#BranchId').change(function () {
+        var DivisionId = $('#DivisionId').val(); 
+        var nBranchId = $('#BranchId').val();
+        GetStaffData(DivisionId, nBranchId);
+    });
+
+
+    function GetStaffData(DivisionId, nBranchId) {
+       
+        if (nBranchId != null) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/HRPayroll/GetEmployeeByBranchId',
+                data: { nSubscriptionId: nBranchId, nDivisionId: DivisionId },
+                success: function (data) {
+                    $('#StaffDetails').html(data);
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        }
+    }
+</script>

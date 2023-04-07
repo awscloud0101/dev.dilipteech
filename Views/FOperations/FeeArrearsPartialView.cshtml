@@ -1,0 +1,144 @@
+﻿@model List<AsteriskBrowserAL.Models.DiscountViewModel>
+
+@{
+    ViewBag.Title = "Fee Arrears";
+    int nsno = 1;
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+
+@if (Model != null && Model.Count() > 0)
+{
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="table-header">
+                Records Found (@Model.Count())
+                <div style="float:right;margin-right:10px;">
+                    <button type="submit" name="Save" class="btncustom P2">
+                       save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <input type="hidden" value="@Model.FirstOrDefault().StudentId" />
+    <input type="hidden" value="@Model.FirstOrDefault().FeeArrearId" />
+    <input type="hidden" value="@Model.FirstOrDefault().SubscriptionId" />
+    @*<input type="hidden" value="@Model.FirstOrDefault().ExamId"  />*@
+    <div class="widget-body table-responsive no-padding">
+        <div class="overflowscroll" style="overflow-x:hidden">
+
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Student Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Roll Number")
+                        </th>
+                        @if (bIsCoastal)
+                        {
+                            <th>
+                                @Html.DisplayName("Registration Number")
+                            </th>
+                        }
+                        
+                        <th>
+                            @Html.DisplayName("Section Name")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Arrear Amount")
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        <tr>
+
+                            <td>
+                                @(nsno++)
+                                @Html.Hidden("ArrearList.Index", (@i))
+                                @Html.Hidden("ArrearList[" + (@i) + "].StudentId", Model.ElementAt(i).StudentId)
+                                @Html.Hidden("ArrearList[" + (@i) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                @Html.Hidden("ArrearList[" + (@i) + "].FeeArrearId", Model.ElementAt(i).FeeArrearId)
+                                @Html.Hidden("ArrearList[" + (@i) + "].CourseId", Model.ElementAt(i).CourseId)
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).StudentName
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).RollNumber
+                            </td>
+                            @if (bIsCoastal)
+                            {
+                                <td>
+                                    @Model.ElementAt(i).OMRNumber
+                                </td>
+                            }
+                            <td>
+                                @Model.ElementAt(i).SectionName
+                            </td>
+                            <td>
+                                @Html.TextBox("ArrearList[" + (@i) + "].ArrearAmount", Model.ElementAt(i).ArrearAmount, new { @class = "form-control ", onkeypress = "return isNumberKey(event)", @style = "width:140px", @maxlength = "5" })
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+else
+{
+    <span style="font-weight:bold;color:red">Data not available to display</span>
+}
+@Html.Action("DataTableScripts", "Base")
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+
+
+

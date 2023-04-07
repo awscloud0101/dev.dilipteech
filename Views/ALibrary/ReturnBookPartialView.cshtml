@@ -1,0 +1,141 @@
+﻿@model IEnumerable<AsteriskBrowserAL.proc_GetIssuedBooksData_Result>
+
+<div class="row">
+    <div class="col-xs-12">
+        @using (Html.BeginForm("ReturnBookMultipleRestrns", "ALibrary", FormMethod.Post))
+        {
+            if (null != Model)
+            {
+                <div class="table-header">
+                    Books Details
+                     <button class="btn btn-success" id="returnData" name="return">Return</button>
+                </div>
+                <div style="overflow:auto">
+                    <table class="table table-hover table-bordered table-striped nowrap" style="font-size:14px;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayName("SNo")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("select")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Book Issued To")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Accession Number")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("BookName")
+                                </th>
+
+                                <th>
+                                    @Html.DisplayName("Issue Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Return Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Status")
+                                </th>
+                                <td></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Count() > 0)
+                            {
+                                int SNo = 1;
+                                for (int i = 0; i < Model.Count(); i++)
+                                {
+                                    @Html.Hidden("ReturnBookLst.Index", (@i))
+                                    @Html.Hidden("ReturnBookLst[" + (@i) + "].IssuedToName", Model.ElementAt(i).IssuedToName)
+                                    @Html.Hidden("ReturnBookLst[" + (@i) + "].BookCode", Model.ElementAt(i).BookCode)
+                                    @Html.Hidden("ReturnBookLst[" + (@i) + "].BookName", Model.ElementAt(i).BookName)
+                                    @Html.Hidden("ReturnBookLst[" + (@i) + "].IssueDate", Model.ElementAt(i).IssueDate)
+                                    @Html.Hidden("ReturnBookLst[" + (@i) + "].ReturnDate", Model.ElementAt(i).ReturnDate)
+                                    @Html.Hidden("ReturnBookLst[" + (@i) + "].BookStatus", Model.ElementAt(i).BookStatus)
+
+                                    <tr>
+                                        <td>
+                                            @SNo
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" id="Return" class="ckeckbox" value="@Model.ElementAt(i).BookDetailsId" name="Return" />
+                                        </td>
+                                        <td>
+
+                                            @Model.ElementAt(i).IssuedToName
+                                        </td>
+                                        <td>
+                                            @Model.ElementAt(i).BookCode
+
+                                        </td>
+                                        <td>
+                                            @Model.ElementAt(i).BookName
+
+                                        </td>
+                                        <td>
+                                            @Model.ElementAt(i).IssueDate
+
+                                        </td>
+                                        <td>
+                                            @Model.ElementAt(i).ReturnDate
+
+                                        </td>
+                                        <td>
+
+                                            @Model.ElementAt(i).BookStatus
+                                        </td>
+                                        <td>
+                                            <div class="hidden-sm hidden-xs action-buttons">
+                                                <a class="blue" href="@Url.Action("ReturnBookReturn", "ALibrary", new { PerticularBookDetailsId = Model.ElementAt(i).BookDetailsId, BookDetailsId = ViewBag.BookDetailsId, PublicationId = ViewBag.PublicationId, UserCategoryId = ViewBag.UserCategoryId, SectionId = ViewBag.SectionId, DeptId = ViewBag.DeptId, AuthorId = ViewBag.AuthorId, MasterBookId = ViewBag.MasterBookId })">
+                                                    Return
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    SNo++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="8">
+                                        <span style="color: red;"><b>Data is not available</b></span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+   
+    $('#returnData').click(function () {
+        debugger
+        var data = [];
+        //var data = $('.ckeckbox:checkbox:checked');
+        $('input.ckeckbox[type=checkbox]').each(function () {
+            if (this.checked)
+                data.push($(this).val());
+        });
+      
+        $.ajax({
+            url: '/ALibrary/ReturnBookMultipleRestrns',
+            type: 'POST',
+            data: { values: data },
+            asyn:false,
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+        return false;
+    })
+  
+
+   
+</script>

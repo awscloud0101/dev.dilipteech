@@ -1,0 +1,248 @@
+﻿
+@model AsteriskBrowserAL.Models.Mail
+
+@{
+    ViewBag.Title = "InboxMail";
+}
+<script src="//cdn.ckeditor.com/4.5.5/standard/ckeditor.js"></script>
+
+<br />
+<div class="col-sm-12">
+    <div class="tabbable">
+        <ul class="nav nav-tabs padding-12 tab-color-blue" id="myTab4">
+            <li class="active">
+                <a data-toggle="tab" href="#InboxTab">Inbox</a>
+            </li>
+            <li>
+                <a data-toggle="tab" href="#SentTab">Sent</a>
+            </li>
+            <li>
+                <a data-toggle="tab" href="#TrashTab">Trash</a>
+            </li>
+            <li class="li-new-mail pull-right" style="margin-bottom:0.5em" onclick="ComposeMail()">
+                <span class="btn btn-purple">
+                    <i class="fa fa-envelope"></i>
+                    Compose Mail
+                </span>
+            </li>
+        </ul>
+
+        <div class="tab-content" style="height:400px;overflow:auto">
+            <div id="InboxTab" class="tab-pane in active">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table id="simple-table" class="table table-bordered table-hover" style="overflow:auto;height:300px">
+                                    <thead>
+                                        @foreach (var item in Model.Inbox)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="message-item message-unread">
+                                                        <label class="inline">
+                                                            @*<input type="checkbox" class="ace" />*@
+                                                            <span class="lbl"></span>
+                                                        </label>
+                                                        <i class="message-star ace-icon fa fa-star orange2"></i>
+                                                        <span class="sender">@item.Username </span>
+                                                        <span class="time">@item.FirstInserted</span>
+                                                        <span class="summary">
+                                                            <span class="text">
+                                                                <a onclick="OpenMail(@item.Id,0)">
+                                                                    @item.subject
+                                                                </a>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </thead>
+                                </table>
+                            </div><!-- /.span -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="SentTab" class="tab-pane">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table id="simple-table" class="table  table-bordered table-hover" style="overflow:auto;height:300px">
+                                    <thead>
+                                        @foreach (var item in Model.Sent)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="message-item message-unread">
+                                                        <label class="inline">
+                                                            @*<input type="checkbox" class="ace" />*@
+                                                            <span class="lbl"></span>
+                                                        </label>
+                                                        <i class="message-star ace-icon fa fa-star orange2"></i>
+                                                        <span class="sender">@item.Username </span>
+                                                        <span class="time" style="float:right">@item.FirstInserted</span>
+                                                        <span class="summary">
+                                                            <span class="text">
+                                                                <a onclick="OpenMail(@item.Id,0)">
+                                                                    @item.subject
+                                                                </a>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </thead>
+                                </table>
+                            </div><!-- /.span -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="TrashTab" class="tab-pane">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table id="simple-table" class="table  table-bordered table-hover" style="overflow:auto;height:300px">
+                                    <thead>
+                                        @foreach (var item in Model.Trash)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="message-item message-unread">
+                                                        <label class="inline">
+                                                            @*<input type="checkbox" class="ace" />*@
+                                                            <span class="lbl"></span>
+                                                        </label>
+                                                        <i class="message-star ace-icon fa fa-star orange2"></i>
+                                                        <span class="sender">@item.Username </span>
+                                                        <span class="time">@item.FirstInserted</span>
+                                                        <span class="summary">
+                                                            <span class="text">
+                                                                <a onclick="OpenMail(@item.Id,1)">
+                                                                    @item.subject
+                                                                </a>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </thead>
+                                </table>
+                            </div><!-- /.span -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <div id="ModelBodyDiv" class="bolder grey">
+    </div>
+</div><!-- #dialog-confirm -->
+
+
+<script>
+    var value = ''
+     
+    function OpenMail(MailId, val) {
+        debugger
+        $.ajax({
+            url: "/AStudent/OpenMail",
+            data: { MailId: MailId, },
+            success: function (result) {
+                debugger
+                if (val == 0) {
+                    value = "Move To Trash"
+                }
+                else if (val == 1) {
+                    value = "Delete"
+                }
+                $('#ModelBodyDiv').html(result)
+                $("#dialog-confirm").removeClass('hide')
+                $("#dialog-confirm").removeData()
+                    .dialog({
+                        resizable: false,
+                        draggable: false,
+                        width: '700',
+                        modal: true,
+                        title: 'Inbox',
+                        open: function (event, ui) {
+                            debugger
+                            $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        },
+                        title_html: true,
+                        buttons: [
+                            {
+                                html: "<i class='ace-icon bigger-110'></i>&nbsp;" + value + "",
+                                "class": "btn btn-danger btn-minier",
+                                click: function () {
+                                    debugger
+                                    var Id = $('#InboxId').val()
+                                    if (Id > 0) {
+                                        if (val == 0) {
+                                            window.location = '/AStudent/MoveToTrash?MailId=' + Id
+                                        }
+                                        else if (val == 1) {
+                                            window.location = '/AStudent/DeleteMail?MailId=' + Id
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                html: "<i class='ace-icon bigger-110'></i>&nbsp; Close",
+                                "class": "btn btn-minier",
+                                click: function () {
+                                    $(this).dialog("close");
+                                }
+                            }
+                        ]
+                    });
+            },
+            async: false
+        })
+    }
+
+    function ComposeMail(FromId) {
+        $.ajax({
+            url: "/AStudent/ComposeMail",
+            data: { FromId: FromId},
+            success: function (result) {
+                debugger
+                $('#ModelBodyDiv').html(result)
+                $("#dialog-confirm").removeClass('hide')
+                $("#dialog-confirm").removeData()
+                    .dialog({
+                        resizable: false,
+                        draggable: false,
+                        position: { my: "center", at: "top" },
+                        width: '700',
+                        modal: true,
+                        title: 'Compose Mail',
+                        open: function (event, ui) {
+                            debugger
+                            $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        },
+                        title_html: true,
+                    });
+            },
+            async: false
+        })
+    }
+    function ReplyMail(FromId) {
+        debugger
+        $("#dialog-confirm").dialog('close')
+        debugger
+        ComposeMail(FromId)
+    }
+</script>

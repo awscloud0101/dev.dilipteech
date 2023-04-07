@@ -1,0 +1,336 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StaffLeavesReportData>
+@{
+    ViewBag.Title = "Employee Attendance";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Employee Attendance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+@*<script src="~/script/jquery-2.0.3.js"></script>
+<script src="~/script/jquery-ui.js"></script>
+<script src="~/js/jquery-1.10.2.js"></script>
+<script src="~/js/jquery-ui.js"></script>*@
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+<section class="content">
+
+    <br />
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("StaffLeaves", "HRReports", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("StaffLeaves")</span>
+                <span id="Validation" style="color:red;font-weight:bold"></span>
+
+                <div class="box">
+                    <br />
+                    <div class="row">
+                        <div class="box-body">
+                            <div class="col-sm-12">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Select Department</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("DepartmentId", null, "--Select--", new { @class = "form-control col-sm-6", id = "DepartmentId" })
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="departmentId">
+                                        <label style="color:red;font-weight:bold;"> Please  Select Depaertment</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Select Staff</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" name="StaffName" id="StaffId" class="form-control" spellcheck="false" />
+
+                                    </div>
+                                    <div class="col-sm-2" style="display:none;" id="staffId">
+                                        <label style="color:red;font-weight:bold;font-size:12px;">Select Staff</label>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                                <div class="col-sm-6">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Select Date Range</label>
+                                    <div class="col-sm-6">
+                                        <div class="input-group">
+                                            @if (ViewBag.AuditDate != null)
+                                            {
+                                                <input type="text" class="form-control pull-right" id="daterange" value="@ViewBag.AuditDate" name="DateRange" autocomplete="off" />
+                                            }
+                                            else
+                                            {
+                                                <input type="text" class="form-control pull-right" id="daterange" name="DateRange" autocomplete="off" />
+                                            }
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+
+                                            <div class="col-sm-3" style="display:none;" id="sDaterange">
+                                                <label style="color:red;font-weight:bold;"> Please Select Date Range  </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-sm-6">
+                                    @{
+                                            string Absent = ViewBag.Absent;
+                                            if (Absent == "Absent")
+                                            {
+                                                <input type="checkbox" value="Absent" name="Absent" id="Absent" checked="checked" />
+
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" value="Absent" name="Absent" id="Absent" />
+
+                                            }
+                                    }
+                                    <b>Absent</b>
+                                    @{
+                                            string Late = ViewBag.Late;
+                                            if (Late == "Late")
+                                            {
+                                                <input type="checkbox" value="Late" name="Late" id="Late" checked="checked" />
+
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" value="Late" name="Late" id="Late" />
+
+                                            }
+
+                                    }
+                                    <b>Late</b>
+                                    @{
+                                            string Leave = ViewBag.Leave;
+                                            if (Leave == "Leave")
+                                            {
+                                                <input type="checkbox" value="Leave" name="Leave" checked="checked" id="Leave" />
+
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" value="Leave" name="Leave" id="Leave" />
+
+                                            }
+                                    }
+
+                                    <b>Leave</b>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+
+
+
+                <div id="table">
+
+                </div>
+
+
+
+            }
+
+        </div>
+    </div>
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+            document.getElementById("Validation").innerHTML = "";
+        })
+        $('#daterange').daterangepicker();
+
+        $('#daterange-btn').daterangepicker(
+                    {
+                        ranges: {
+                            'Today': [moment(), moment()],
+                            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                            'This Month': [moment().startOf('month'), moment().endOf('month')],
+                            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                        },
+                        startDate: moment().subtract(29, 'days'),
+                        endDate: moment()
+                    },
+            function (start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+            );
+
+    </script>
+
+
+    <script type="text/javascript">
+        var StaffId = 0;
+        var Late = 0;
+        var Absent = 0;
+        var Leave = 0;
+
+        function CheckValidation() {
+            if ($('#DepartmentId').val() == -1) {
+                document.getElementById("Validation").innerHTML = "Please select Department";
+            }
+        }
+        $('#Absent').change(function () {
+            if (document.getElementById('Absent').checked == true) {
+                Absent = 1;
+                GetStaffAttendanceDataForStaffLeaves();
+            }
+            else {
+                Absent = 0;
+                GetStaffAttendanceDataForStaffLeaves();
+            }
+
+            CheckValidation();
+        })
+
+
+        $('#Late').change(function () {
+
+            if (document.getElementById('Late').checked == true) {
+                Late = 2;
+                GetStaffAttendanceDataForStaffLeaves();
+            }
+            else {
+                Late = 0;
+                GetStaffAttendanceDataForStaffLeaves();
+            }
+            CheckValidation();
+
+        })
+
+        $('#Leave').change(function () {
+
+            if (document.getElementById('Leave').checked == true) {
+                Leave = 3;
+                GetStaffAttendanceDataForStaffLeaves();
+            }
+            else {
+                Leave = 0;
+                GetStaffAttendanceDataForStaffLeaves();
+            }
+            CheckValidation();
+        })
+
+        $('#DepartmentId').change(function () {
+            var departmentId = $('#DepartmentId').val();
+            if (departmentId == "") {
+                $('#table').html("");
+                $('#StaffId').val("");
+                $('#daterange').val("");
+            }
+            if (departmentId >= 0 && departmentId != "") {
+                document.getElementById("Validation").innerHTML = "";
+                GetStaffAttendanceDataForStaffLeaves();
+            }
+
+        })
+
+        $('#StaffId').change(function () {
+            GetStaffAttendanceDataForStaffLeaves();
+        })
+
+        $('#daterange').change(function () {
+            GetStaffAttendanceDataForStaffLeaves();
+        })
+
+
+        $("#StaffId").keyup(function (e) {
+
+            var key = e.keyCode;
+
+            if (key == 8 || key == 46) {
+                StaffId = 0;
+                GetStaffAttendanceDataForStaffLeaves();
+            }
+        })
+
+
+        function GetStaffAttendanceDataForStaffLeaves() {
+            var DepartmentId = $('#DepartmentId').val();
+            var daterange = $('#daterange').val();
+            var StaffName = $('#StaffId').val();
+
+            if ((DepartmentId >= 0 && DepartmentId != "") || daterange != "" || StaffName != "") {
+                $('#imagemodal').show();
+                $.ajax({
+
+                    url: '/RAttendance/GetStaffAttendanceDataForStaffLeaves',
+                    data: { DepartmentId: DepartmentId, StaffName: StaffName, daterange: daterange, Absent: Absent, Late: Late, Leave: Leave },
+                    success: function (data) {
+                        $('#table').html(data);
+                    }, error: function () {
+                        $('#imagemodal').hide();
+
+                    }
+                    
+
+                }).done(function () {
+                    $('#imagemodal').hide();
+                });
+            }
+            else {
+                $('#table').html("");
+            }
+
+        }
+
+
+        $("#StaffId").autocomplete({
+            source: function (request, response) {
+                GetStaffAttendanceDataForStaffLeaves()
+            },
+        });
+    </script>
+}

@@ -1,0 +1,151 @@
+﻿@model IEnumerable<AsteriskBrowserAL.FeedBackType>
+
+@{
+    ViewBag.Title = "TeacherFeedback";
+}
+
+
+<ul class="breadcrumb">
+    <li>
+        <i class="menu-icon fa fa-gears"></i>
+        Settings
+    </li>
+    <li>
+        <i class=""></i>
+        Academics
+    </li>
+    <li class="active">Teacher Feedback</li>
+
+</ul><!-- /.breadcrumb -->
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <div class="space-6"></div>
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+        </div>
+    </div>
+    @if (null != TempData["TeacherFeedback"])
+    {
+        @Html.Raw(TempData["TeacherFeedback"])
+    }
+
+    @if (Model != null)
+    {
+        int nsno = 1;
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Teacher Feedback</span>
+
+                    <div class="" style="float:right;margin-right:10px;">
+                        <a class="btncustom P2" href="@Url.Action("TeacherFeedbackC", "SeAcademics")" role="button" id="New" name="New">Add</a>
+                    </div>
+
+                    <div class="" style="float:right;margin-right:10px;">
+                        <a class="btncustom P2" href="@Url.Action("TeacherFeedbackS", "SeAcademics")" role="button" id="New" name="New">Schedule</a>
+                    </div>
+                </div><!-- /.box-header -->
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Description")
+                            </th>
+
+
+
+                            @*<th></th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @item.Description
+                                </td>
+
+                               
+
+                            </tr>
+
+                        }
+                    </tbody>
+
+                </table>
+
+
+
+            </div>
+
+        </div>
+
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+    }
+    else
+    {
+        <div class="table-header">
+            TeacherFeedback
+
+            <a class="view-header-btn btn btn-info btn-xs P2" style="float:right" href="@Url.Action("TeacherFeedbackC", "SeAcademics")" role="button" id="New" name="New"><i class="fa fa-plus-circle"></i></a>
+        </div>
+        <span style="color: red;"><b>There are no Feedbacks</b></span>
+    }
+
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeAcademics/TeacherFeedbackC',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SeAcademics/TeacherFeedbackC?id=' + Value;
+                    var title = "TeacherFeedback";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+            //if (Value > 0) {
+            //    $.ajax({
+            //        url: '/SeAcademics/TeacherFeedbackS',
+            //        data: { Id: Value },
+            //        success: function (data) {
+
+            //            var url = '/SeAcademics/TeacherFeedbackS?id=' + Value;
+            //            var title = "TeacherFeedback";
+
+            //            OpenDialog(data, url, title);
+            //        },
+            //        async: false
+            //    });
+        }
+    }
+
+</script>
+

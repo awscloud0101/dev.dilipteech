@@ -1,0 +1,115 @@
+﻿
+@model AsteriskBrowserAL.Models.StudentSalesData
+@{
+
+    int sno = 1;
+}
+
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+
+@if (null != Model)
+{
+    if (null != Model.IstStockDetails && Model.IstStockDetails.Count() > 0)
+    {
+
+        <div class="table-header">
+            Records Found (@Model.IstStockDetails.Count())
+            <div style="float:right">
+                <button class="btn btn-info btn-xs" id="btnExport">
+                    <i class="ace-icon fa fa-share bigger-180"></i>
+                </button>
+            </div>
+        </div>
+
+
+        <table id="StockReportData" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Branch Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Kit Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Total Sale Kits")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Total Kits Count")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Remaining Kits")
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.IstStockDetails)
+                {
+                    
+                    <tr>
+
+                        <td>
+                            @(sno++)
+                        </td>
+                        <td>
+                            @item.BranchName
+                        </td>
+                        <td>
+                            @item.KitName
+                        </td>
+                        <td>
+                            @item.StudentSaleKitCount
+                        </td>
+                        <td>
+                            @item.TotalKitCount
+                        </td>
+                        <td>
+                           @item.ReamingkitCount
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+
+    }
+    else
+    {
+        <div style="color:red;font-weight:bold">Data not available to display</div>
+    }
+
+}
+
+@Html.Action("DataTableScripts", "Base")
+
+
+<script>
+    function submitform() {
+        $.ajax({
+            url: '/SReports/StockReport',
+            data: {},
+            success: function (result) {
+            }
+        })
+    };
+
+    $('#btnExport').click(function () {
+        window.location.href = "/SReports/StockReportExporttoExcell"
+        var Data = $("#StockReportData").html();
+
+    });
+
+</script>
+
+
+

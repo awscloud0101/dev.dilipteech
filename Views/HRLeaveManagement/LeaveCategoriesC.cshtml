@@ -1,0 +1,179 @@
+﻿@model AsteriskBrowserAL.Models.LeaveCategory
+@{
+                /**/
+
+                ViewBag.Title = "LeaveCategoriesC";
+}
+@section BreadCrumb{
+
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Leave Management
+        </li>
+        <li class="active">Leave Categories</li>
+    </ol>
+}
+
+<!-- /section:basics/content.breadcrumbs -->
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("LeaveCategoriesC", "HRLeaveManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("LeaveCategories")</span>
+                <div class="table-header">
+                    <span style="font-family:calibri;">Leave Categories</span>
+                    <small style="float:right;font-weight:bold;" class="textheader">
+                        @Html.ActionLink("Back to details", "LeaveCategories")
+                    </small>
+                </div>
+                <form class="form-horizontal" role="form">
+                    <div class="box">
+                        <span style="color:red;font-weight:bold;">@Html.ValidationMessage("LeaveCategories")</span>
+
+                        <br />
+
+                    </div>
+
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Category Name", new { @class = "required" })</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.CategoryName, new { id = "CategoryName", @class = "form-control", placeholder = "Category Name", @maxlength = "50", required = "required" })
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="CategoryName1">
+                                <label style="color:red;font-weight:bold;"> Required</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Category Code", new { @class = "required" })</label>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.CategoryCode, new { id = "CategoryCode", @class = "form-control", placeholder = "Category Code", @maxlength = "10", required = "required" })
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="CategoryCode1">
+                                <label style="color:red;font-weight:bold;"> Required</label>
+                            </div>
+                        </div>
+                        @for (int i = 0; i <= Model.LeaveTypeList.Count() - 1; i++)
+                        {
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> </label>
+                                <div class="col-sm-3">
+                                    @Html.Hidden("LeaveTypeList[" + (@i) + "].LeaveTypeId", Model.LeaveTypeList.ElementAt(i).LeaveTypeId)
+                                    <label>@Model.LeaveTypeList.ElementAt(i).LeaveTypeName</label>
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="CategoryCode1">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+
+
+
+                            @*<div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Consecutive Leaves Count", new { @class = "required" })</label>
+                                    <div class="col-sm-3">
+                                        @Html.TextBox("LeaveTypeList[" + (@i) + "].CLeaveCount", Model.LeaveTypeList.ElementAt(i).CLeaveCount, new { id = "CLeaveCount", @class = "form-control", placeholder = "Leave Count", @maxlength = "10",@readonly="true" })
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="CategoryCode1">
+                                        <label style="color:red;font-weight:bold;"> Required</label>
+                                    </div>
+                                </div>*@
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Annual Leaves Count", new { @class = "required" })</label>
+                                <div class="col-sm-3">
+                                    @Html.TextBox("LeaveTypeList[" + (@i) + "].LeaveTypeCount", "", new { id = "LeaveTypeCount", @class = "form-control", placeholder = "Leave Count", @maxlength = "10", required = "required" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="CategoryCode1">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+
+                        }
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+
+            }
+        </div>
+    </div>
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+
+    function validateLeaveCategories() {
+
+        document.getElementById("count").value = "1";
+        var CategoryName = document.getElementById("CategoryName").value;
+        var CategoryCode = document.getElementById("CategoryCode").value;
+
+        validate = true;
+
+        if (CategoryName == "") {
+            document.getElementById("CategoryName1").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("CategoryName1").style.display = "none";
+        }
+
+        if (CategoryCode == "") {
+            document.getElementById("CategoryCode1").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("CategoryCode1").style.display = "none";
+        }
+
+        //if (Desc == "") {
+        //    document.getElementById("descrHoliday").style.display = "inline";
+        //    validate = false;
+        //} else {
+        //    document.getElementById("descrHoliday").style.display = "none";
+        //}
+
+
+        return validate;
+    };
+
+    function submitForm() {
+        debugger
+        // var validatestatus = validateLeaveCategories();
+        // if (validatestatus == false) {
+        //    return false;
+        //  } else {
+        // return true;
+        //  }
+    };
+
+    $('#CategoryName').focus(function () {
+        $('#CategoryName1').hide();
+    });
+    $('#CategoryCode').focus(function () {
+        $('#CategoryCode1').hide();
+    });
+</script>
+
+
+
+

@@ -1,0 +1,228 @@
+﻿@model List<AsteriskBrowserAL.Models.ExaminationResultsData>
+
+@{
+    Layout = null;
+}
+
+@{
+    int sno = 1;
+    int Total = 0;
+    int Boys = 0;
+    int Girls = 0;
+    if (null != Model)
+    {
+        Total = Model.Count();
+        Boys = Model.Where(s => s.GenderId == 0).Count();
+        Girls = Model.Where(s => s.GenderId == 1).Count();
+    }
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> lstExamPapers = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+    if (null != Model && Model.Count() > 0 && Model.FirstOrDefault().lstExamResults.Count() > 0)
+    {
+        var data = Model.FirstOrDefault().lstExamResults;
+
+        if (null != data)
+        {
+            lstExamPapers = data.ToList();
+        }
+    }
+
+}
+
+<style>
+    table {
+        page-break-after: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    td {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tfoot {
+        display: table-footer-group;
+    }
+</style>
+
+@if (null != Model)
+{
+    if (Model.Count() > 0)
+    {
+        <div class="row">
+            <div class="col-lg-12" style="margin-top:1em;">
+                <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:19px;width:100%;border-collapse:collapse" border="1">
+                    <thead>
+                        <tr>
+                            <td colspan="9">
+                                <div class="row">
+                                    <div style="margin-left:0em;font-size:19px;font-weight:bold;margin-top:1em;">
+                                        <table width="100%">
+                                            <tr>
+                                                <td align="center" style="width:33px;font-weight:bold">
+                                                    <span style="font-size:32px;font-weight:bold">@Model.FirstOrDefault().InstituteName</span><br />
+                                                </td>
+                                            </tr>
+                                            @*<tr>
+                                                <td align="center" style="width:33px;font-weight:bold">
+                                                    <span style="font-size:28px;font-weight:bold">@Model.FirstOrDefault().InstituteName</span><br />
+                                                </td>
+                                            </tr>*@
+
+                                        </table>
+                                    </div>
+                                    <div style="margin-left:0em;font-size:19px;font-weight:bold;margin-top:1em;">
+                                        <table width="100%">
+                                            <tr>
+@if (Model.FirstOrDefault().ClassNumberName!=null&& Model.FirstOrDefault().ClassNumberName!="")
+{
+                                                <td align="left" style="width:33px;font-weight:bold">Class : @Model.FirstOrDefault().ClassNumberName </td>
+}
+else
+{
+    <td align="left" style="width:33px;font-weight:bold">Section : @Model.FirstOrDefault().SectionName </td>
+}
+                                                @if (Model.FirstOrDefault().lstExamResults.Count() > 0)
+                                                {
+                                                    <td align="left" style="width:33px;font-weight:bold">TestName :@lstExamPapers.FirstOrDefault().ExamName </td>
+                                                }
+                                                else
+                                                {
+                                                    <td align="left" style="width:33px;font-weight:bold">TestName :@Model.FirstOrDefault().ExamName<span>(@Model.FirstOrDefault().PaperName)</span> </td>
+                                                }
+                                                @if (Model.FirstOrDefault().lstExamResults.Count() > 0)
+                                                {
+                                                    <td align="left" style="width:33px;font-weight:bold"> Test Date : @lstExamPapers.FirstOrDefault().ExamDate.Value.ToString("dd-MMM-yyyy") </td>
+                                                }
+                                                else
+                                                {
+                                                    <td align="left" style="width:33px;font-weight:bold"> Test Date : @Model.FirstOrDefault().ExamDate.Value.ToString("dd-MMM-yyyy") </td>
+                                                }
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th colspan="3" align="right">Maximum Marks : </th>
+                            @if (null != lstExamPapers)
+                            {
+                                foreach (var type in lstExamPapers)
+                                {
+                                    <th>
+                                        @type.MaxMarks
+                                    </th>
+                                }
+                            }
+                            @if (Model.FirstOrDefault().lstExamResults.Count() > 0)
+                            {
+                                <th>
+                                    @lstExamPapers.Sum(s => s.MaxMarks)
+                                </th>
+                            }
+                            else
+                            {
+                                <th>
+                                    @Model.FirstOrDefault().MaxMarks
+                                </th>
+                            }
+                            <th rowspan="2">
+                                @Html.DisplayName("Rank")
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("AdmNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Name")
+                            </th>
+
+                            @if (null != lstExamPapers)
+                            {
+                                foreach (var type in lstExamPapers)
+                                {
+                                    <th>
+                                        @type.PaperName
+                                    </th>
+                                }
+                            }
+                            @if (Model.FirstOrDefault().lstExamResults.Count() > 0)
+                            {
+                                <th>
+                                    @Html.DisplayName("Total")
+                                </th>
+                            }
+                            else
+                            {
+                                <th>
+                                    @Html.DisplayName("Marks")
+                                </th>
+                            }
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr style="width:100%;">
+                                <td style="text-align:center;">
+                                    @(sno++)
+                                </td>
+                                <td style="text-align:left">
+                                    @item.AdmissionNumber
+                                </td>
+
+                                <td style="text-align:left">
+                                    @item.StudentName
+                                </td>
+                                @foreach (var mr in item.lstExamResults)
+                                {
+                                    <td style="text-align:left">
+                                        @mr.MarkswithRank
+                                    </td>
+                                }
+                                @if (item.IsAbsent == true)
+                                {
+                                    <td style="text-align:left">Absent</td>
+                                }
+                                else
+                                {
+                                    <td style="text-align:left">@item.Marks</td>
+                                }
+                                <td>
+                                    @if (item.MaxRank > 0)
+                                    {
+                                        @item.Rank <span>/</span> @item.MaxRank
+                                    }
+                                    else
+                                    {
+                                        @item.Rank
+                                    }
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold"> Data not available</span>
+    }
+
+}

@@ -1,0 +1,84 @@
+﻿@model AsteriskBrowserAL.Models.MonthwiseWorkingDaysData
+@{
+}
+<section>
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("StaffMonthWiseAttendance", "HRBiometric", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Staff Month Wise Attendance
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.SubscriptionId, new SelectList(Model.lstBraches.OrderBy(s => s.BranchId), "SubscriptionId", "Institute"), "--- Select ---", new { @Id = "SubscriptionId", @name = "SubscriptionId", @class = "form-control" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Month</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.MonthValue, new SelectList(Model.ListMonths, "MonthValue", "MonthName"), "--- Select ---", new { @class = "form-control", @id = "MonthValue" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="SearchData">
+                </div>
+            }
+
+        </div>
+    </div>
+
+</section>
+<script>
+    window.onload = LoadData();
+    function LoadData() {
+        var Month = $('#MonthValue').val();
+        var branchid = $('#SubscriptionId').val();
+
+        if (Month != "" && branchid != "") {
+            GetStaffAttendanceData(Month, branchid);
+        }
+    }
+
+    $('#SubscriptionId').change(function () {
+        $('#SearchData').html('');
+    })
+
+    $('#MonthValue').change(function () {
+        $('#SearchData').html('');
+        var Month = $('#MonthValue').val();
+        var branchid = $('#SubscriptionId').val();
+        if (Month != "" && branchid != "") {
+            GetStaffAttendanceData(Month, branchid)
+        }
+    });
+    function GetStaffAttendanceData(Month, branchid) {
+        $.ajax({
+            url: '/HRBiometric/StaffMonthWiseAttendanceData',
+            data: { Month: Month, branchid: branchid },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#SearchData').html(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+</script>

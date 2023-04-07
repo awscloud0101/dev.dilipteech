@@ -1,0 +1,290 @@
+﻿
+@model AsteriskBrowserAL.Models.StudentAdmissionRegisterData
+
+@{
+    ViewBag.Title = "Admitted Student Report";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Admitted Student Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+
+    <div class="row">
+        <div class=col-xs-12>
+
+            <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+            <span style="color:red;font-weight:bold" id="Validation"></span>
+
+
+
+            <div class="table-header">
+                <span style="font-family:calibri;">Admitted Student Report</span>
+                <div class="" style="float:right;margin-right:10px;">
+                    <a class="btncustom P2" id="ViewData" onclick="return submitForm();">View Data</a>
+                </div>
+
+            </div>
+            <div class="widget-box" style="padding:10px;">
+
+        
+             
+                 
+                        @if (Model.IsCentral)
+                        {
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4">Division</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-3">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                       
+
+                        }
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 " for="form-field-1">Date Range</label>
+                                    <div class="col-sm-6">
+                                        <div class="input-group" >
+                                            <input type="text" class="form-control pull-right" id="daterange" name="DateRange" autocomplete="off"  />
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label class="col-sm-3">Class</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.ClassNumberId, new SelectList(Model.IstClassNumber, "ClassNumber", "ClassNumberDisPlay"), "--Select--", new { @class = "form-control", id = "ClassNumberId" })
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                  
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Academic Year</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.AcademicYearId, new SelectList(Model.lstAcademicYear, "AcademicYearId", "Name"), "--Select--", new { @class = "form-control", id = "AcademicYearId" })
+                                    </div>
+
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="col-sm-3">
+                                        <input type="radio" id="Inquiry" value="1" name="Status" checked="checked" onclick="RedioButtonClick()" />
+                                        <b>Inquiry</b>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <input type="radio" id="Application" value="2" name="Status" onclick="RedioButtonClick()" />
+                                        <b>Registration</b>
+                                    </div>
+
+                                    <div class="col-sm-3">
+                                        <input type="radio" id="Admission" value="3" name="Status" onclick="RedioButtonClick()" />
+                                        <b>Admission</b>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                     
+
+                      
+                   
+          
+            </div>
+
+
+            <div class="overflowscroll">
+                <div id="InquiryandapplicationReports"></div>
+                <div id="AdmittedStudentRortdata">
+                </div>
+            </div>
+            </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    var DisplayValidation = "";
+
+    $('#DivisionId').change(function () {
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    function submitForm() {
+
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        $('#InquiryandapplicationReports').html("");
+        $('#AdmittedStudentRortdata').html("");
+
+        var Validation = ValidateAdmittedStudentReport();
+
+        if (Validation == false) {
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+            var IsCentral = $('#IsCentral').val();
+            var StatusValue = $("input[name=Status]:checked").val()
+
+
+            if (IsCentral == "value")
+                IsCentral = "true";
+
+            if (StatusValue == 1 || StatusValue == 2) {
+                $('#imagemodal').show();
+
+                $.ajax({
+
+                    url: '/AReports/GetStudentAdmittedReportData',
+                    data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), Date: $('#daterange').val(), ClassNumber: $('#ClassNumberId').val(), AcdamicYearId: $('#AcademicYearId').val(), Status: StatusValue, IsCentral: IsCentral },
+
+                    success: function (data) {
+                        $('#imagemodal').hide();
+                        $('#AdmittedStudentRortdata').html("");
+                        $('#InquiryandapplicationReports').html(data);
+                    }
+                })
+            }
+            else if (StatusValue == 3) {
+                $('#imagemodal').show();
+                $.ajax({
+                    url: '/AReports/GetStudentAdmittedReportDataAdmisstion',
+                    data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), Date: $('#daterange').val(), ClassNumber: $('#ClassNumberId').val(), AcdamicYearId: $('#AcademicYearId').val(), Status: StatusValue, IsCentral: IsCentral },
+                    success: function (data) {
+                        $('#imagemodal').hide();
+                        $('#InquiryandapplicationReports').html("");
+                        $('#AdmittedStudentRortdata').html(data);
+                    }
+                })
+            }
+
+        }
+    }
+
+    function RedioButtonClick() {
+
+        var StatusValue = $("input[name=Status]:checked").val()
+        if (StatusValue == 1 || StatusValue == 2) {
+            $('#AdmittedStudentRortdata').html("");
+        }
+        else if (StatusValue == 3) {
+            $('#InquiryandapplicationReports').html("");
+        }
+
+        $('#InquiryandapplicationReports').html("");
+        $('#AdmittedStudentRortdata').html("");
+    }
+
+
+    function ValidateAdmittedStudentReport() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+        var DateRange = $("#daterange").val();
+        var AcademicYear = $('#AcademicYearId').val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+        if (AcademicYear < 0) {
+            DisplayValidation += "Academic Year,"
+            valid = false
+        }
+
+        if (DateRange == null || DateRange == undefined || DateRange == " ") {
+            DisplayValidation += "Date Range,"
+            valid = false
+        }
+        if (ClassNumberId == -1 || ClassNumberId == null) {
+            DisplayValidation += "Class Number,"
+            valid = false
+        }
+        if (valid == false) {
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+
+        return valid;
+
+    };
+
+
+
+    $('#daterange').click(function () {
+        document.getElementById("Validation").innerHTML = "";
+    })
+</script>
+

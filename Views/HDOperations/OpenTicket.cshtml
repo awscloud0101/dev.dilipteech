@@ -1,0 +1,513 @@
+﻿@model AsteriskBrowserAL.Models.HdTicketsInfo
+@{
+    ViewBag.Title = "Open Ticket";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-key"></i>
+            <a href="#">  Help Desk</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Open Ticket</li>
+    </ul><!-- /.breadcrumb -->
+}
+<style>
+
+    .red {
+        color: #000 !important;
+        background: none;
+        border-radius: 5px;
+        padding: 4px 8px 4px 8px;
+        font-size: 10px;
+        cursor: pointer;
+    }
+
+
+    td,th{
+
+        width:auto;
+    }
+    
+</style>
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<div class="overflowscroll" style="height:450px;font-size:11px;">
+    @if (null != Model)
+    {
+        if (null != Model.MyTickets)
+        {
+
+            if (Model.MyTickets.Count() > 0)
+            {
+                int nSno = 1;
+                <div class="table-header">
+                    My Tickets (@Model.MyTickets.Count())
+                </div>
+                <table class="table dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Ticket ID")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Update")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Subject")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Status")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Last Replier")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Priority")
+                            </th>
+                            <td></td>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model.MyTickets)
+                        {
+                            if (item.taskData != null)
+                            {
+                                <tr>
+                                    <td>
+                                        @(nSno++)
+                                    </td>
+                                    <td>
+                                        @item.TicketNumber
+                                    </td>
+                                    <td>
+                                        @if (item.taskData.StatusDate.HasValue)
+                                {
+                                            @item.taskData.StatusDate.Value.ToString("dd-MMM-yyyy")
+                                        }
+                                        else
+                                        {
+                                        }
+                                    </td>
+                                    <td>
+                                        @item.HdTicketOwnerName
+                                    </td>
+                                    <td>
+                                        @item.taskData.Subject
+                                    </td>
+                                    <td>
+                                        @if (item.taskData.HDStatusId == 1)
+                                {
+                                            <span class="label label-purple arrowed-right arrowed-in">@item.taskData.StatusName</span>
+                                        }
+                                        @if (item.taskData.HDStatusId == 2)
+                                {
+                                            <span class="label label-warning">@item.taskData.StatusName</span>
+
+                                        } @if (item.taskData.HDStatusId == 3)
+                                {
+                                            <span class="label label-success arrowed-in arrowed-in-right">@item.taskData.StatusName</span>
+
+                                        } @if (item.taskData.HDStatusId == 4)
+                                {
+                                            <span class="label label-danger arrowed">@item.taskData.StatusName</span>
+                                        }
+
+                                    </td>
+
+                                    <td>
+                                        @item.LastReplierName
+                                    </td>
+                                    <td>
+                                        @if (item.taskData.PriorityId == 1)
+                                {
+                                            <meter value=".15" low=".25" title="Low"></meter>
+                                        }
+                                        @if (item.taskData.PriorityId == 2)
+                                {
+                                            <meter value=".5" low=".25" title="Medium"></meter>
+                                        }
+                                        @if (item.taskData.PriorityId == 3)
+                                {
+                                            <meter low=".25" optimum=".2" high=".75" value=".8" title="High"></meter>
+                                        }
+                                        @if (item.taskData.PriorityId == 4)
+                                {
+                                            <meter low=".25" optimum=".2" high=".85" value="1" title="Critical"></meter>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="hidden-sm hidden-xs action-buttons">
+                                            <a class="blue P2" id="TicketId" data-toggle="modal" data-target="#myModal" value="@item.HDTicketId" onclick="GetComments(@item.HDTicketId);">
+                                                <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+        else
+        {
+            <span style="font-weight:bold;color:red">My Tickets Not Available</span>
+        }
+
+        <div class="hr hr-18 dotted hr-double"></div>
+
+
+        if (null != Model.TissuesIssuedToMe)
+        {
+            if (Model.TissuesIssuedToMe.Count() > 0)
+            {
+                <div class="table-header">
+                    Tickets Issued To Me (@Model.TissuesIssuedToMe.Count())
+                </div>
+                int nsno = 1;
+                <table class="table dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Ticket ID")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Update")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Subject")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Status")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Last Replier")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Priority")
+                            </th>
+                            <td></td>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model.TissuesIssuedToMe)
+                        {
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @if (item.HDStatusId == 3 || item.HDStatusId == 5)
+                                    {
+                                        @item.TicketNumber
+                                    }
+                                    else
+                                    {
+                                        @Html.ActionLink(@item.TicketNumber, "OpenTicketE", new { TaskId = item.HDTaskId, priorityId = item.PriorityId, StatusId = item.HDStatusId })
+                                    }
+                                </td>
+
+                                <td>
+                                    @item.StatusDate.Value.ToString("dd-MMM-yyyy")
+                                </td>
+
+                                <td>
+                                    @item.HdTicketOwnerName
+                                </td>
+                                <td>
+                                    @item.Subject
+                                </td>
+                                <td>
+
+                                    @if (item.HDStatusId == 1)
+                                    {
+                                        <span class="label label-purple arrowed-right arrowed-in">@item.StatusName</span>
+                                    }
+                                    @if (item.HDStatusId == 2)
+                                    {
+                                        <span class="label label-warning">@item.StatusName</span>
+
+                                    } @if (item.HDStatusId == 3)
+                                    {
+                                        <span class="label label-success arrowed-in arrowed-in-right">@item.StatusName</span>
+
+                                    } @if (item.HDStatusId == 4)
+                                    {
+                                        <span class="label label-danger arrowed">@item.StatusName</span>
+                                    }
+
+                                </td>
+                                <td>
+                                    @item.LastReplierName
+                                </td>
+                                <td>
+                                    @if (item.PriorityId == 1)
+                                    {
+                                        <meter value=".15" low=".25" title="Low"></meter>
+                                    }
+                                    @if (item.PriorityId == 2)
+                                    {
+                                        <meter value=".5" low=".25" title="Medium"></meter>
+                                    }
+                                    @if (item.PriorityId == 3)
+                                    {
+                                        <meter low=".25" optimum=".2" high=".75" value=".8" title="High"></meter>
+                                    }
+                                    @if (item.PriorityId == 4)
+                                    {
+                                        <meter low=".25" optimum=".2" high=".85" value="1" title="Critical"></meter>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="blue P2" id="TicketId" data-toggle="modal" data-target="#myModal" value="@item.HDTicketId" onclick="GetComments(@item.HDTicketId);">
+                                            <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <span style="font-weight:bold;color:red"> Issued Tickets Not Available</span>
+            }
+        }
+        else
+        {
+            <span style="font-weight:bold;color:red"> Issued Tickets Not Available</span>
+        }
+
+        <div class="hr hr-18 dotted hr-double"></div>
+        if (null != Model.AllTickets)
+        {
+            if (Model.AllTickets.Count() > 0)
+            {
+
+                <div class="col-xs-12 widget-container-col" id="widget-container-col-3">
+
+                    <div class="widget-box widget-color-orange ui-sortable-handle collapsed" id="widget-box-3">
+                        <div class="widget-header widget-header-small">
+                            <h5 class="widget-title">
+                                <i style="color:cadetblue" class="ace-icon fa fa-comments-o"></i>
+                                Comments
+                            </h5>
+
+                            <div class="widget-toolbar">
+
+                                <a href="#" data-action="collapse" class="P2">
+                                    <i class="ace-icon fa fa-plus" data-icon-show="fa-plus" data-icon-hide="fa-minus"></i>
+                                </a>
+
+                                <a href="#" data-action="close" class="P2">
+                                    <i class="ace-icon fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="widget-body" style="display: none;">
+
+                            <div class="widget-main">
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        @foreach (var result in Model.AllTickets)
+                        {
+                                            <div class="col-sm-6">
+                                                <div class="widget-box transparent ui-sortable-handle collapsed" id="widget-box-12">
+                                                    <div class="widget-header">
+                                                        <h6 class="widget-title red lighter smaller">
+                                                            <b>
+                                                                <i style="color:cadetblue" class="ace-icon fa fa-comments-o">@result.Comments.Count()</i> &nbsp;
+                                                                @(!string.IsNullOrWhiteSpace(result.Subject) ? result.Subject.ToUpper() : "")
+                                                            </b>
+                                                        </h6>
+
+                                                        <div class="widget-toolbar no-border">
+                                                            <a href="#" data-action="collapse">
+                                                                <i class="ace-icon fa fa-chevron-up"></i>
+                                                            </a>
+                                                            <a href="#" data-action="fullscreen" class="orange2">
+                                                                <i class="ace-icon fa fa-expand"></i>
+                                                            </a>
+                                                            <a href="#" data-action="close">
+                                                                <i class="ace-icon fa fa-times"></i>
+                                                            </a>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="widget-body">
+                                                        <div class="widget-main padding-4">
+                                                            <div class="tab-content padding-8">
+
+                                                                <div class="comments ace-scroll" style="position: relative;">
+
+
+                                                                    <div class="scroll-track" style="display: none;"><div class="scroll-bar"></div></div>
+                                                                    <div class="scroll-content" style="max-height: 300px;">
+
+                                                                        @if (null == result)
+                                                                        {
+                                                                            continue;
+                                                                        }
+                                                                        @{
+                                                                            int count = result.Comments.Count();
+                                                                            string stfName = "";
+                                                                        }
+
+                                                                        @for (int i = 0; i < result.Comments.Count(); i++)
+                                                                        {
+                                                                            stfName = "";
+                                                                            if (count > i + 1)
+                                                                            {
+                                                                                stfName = "to " + result.Comments.ElementAt(i + 1).HdTicketStatusOwnerName;
+                                                                            }
+
+                                                                            <div class="itemdiv commentdiv">
+                                                                                <div class="user">
+                                                                                    <img src="~/Content/images/NoPhoto.jpg" />
+                                                                                </div>
+
+                                                                                <div class="body">
+                                                                                    <div class="name">
+
+                                                                                        <a href="#">@result.Comments.ElementAt(i).HdTicketStatusOwnerName</a>
+                                                                                    </div>
+
+                                                                                    <div class="time">
+                                                                                        <i class="ace-icon fa fa-clock-o"></i>
+                                                                                        <span class="green">@result.Comments.ElementAt(i).TicketDate.Value.ToString("dd-MMM-yyyy 'at' hh:mm")</span>
+                                                                                    </div>
+
+                                                                                    <div class="text">
+                                                                                        <i class="ace-icon fa fa-quote-left"></i>
+                                                                                        @result.Comments.ElementAt(i).Description
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            </div>
+                                                                            <div class="hr hr-18"></div>
+                                                                        }
+
+                                                                    </div>
+
+                                                                </div>
+
+
+
+
+                                                            </div>
+                                                        </div><!-- /.widget-main -->
+                                                    </div><!-- /.widget-body -->
+                                                </div><!-- /.widget-box -->
+                                            </div>
+
+                                                                            }
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                                                                                    }
+                                                                                }
+                                                                            }
+
+
+</div>
+<input type="hidden" id="SaveCount" />
+
+
+
+<script>
+
+    $("#TicketId").click(function () {
+        var TicketId = $('#TicketId').val();
+        GetComments();
+    });
+
+    function GetComments(TicketId) {
+        //Load Partial View
+        if (TicketId > 0) {
+            $.ajax({
+                url: '/HDOperations/TicketComments',
+                data: { TicketId: TicketId },
+                success: function (Data) {
+                    debugger
+
+                    $('#dValidation').html(Data);
+
+                    $("#dialog-confirm").removeClass('hide').dialog({
+                        resizable: false,
+                        draggable: false,
+                        width: '700',
+                        modal: true,
+                        title: "Ticket Comments",
+                        title_html: true,
+                        open: function (event, ui) {
+                            $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        },
+                        buttons: [
+                            {
+                                html: "&nbsp; &nbsp; Close &nbsp; &nbsp; ",
+                                "class": "btn btn-success btn-minier",
+                                click: function () {
+                                    $(this).dialog("close");
+                                }
+                            }
+                        ]
+                    });
+                }
+            })
+        }
+
+    }
+
+
+</script>
+
+
+@Html.Action("DataTableScripts", "Base")

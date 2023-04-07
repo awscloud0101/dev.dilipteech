@@ -1,0 +1,136 @@
+﻿@model AsteriskBrowserAL.Models.AttendanceRemarksViewModel
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Enrollment
+        </li>
+        <li class="active">Attendance Remarks</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<section class="content">
+    <div class="row">
+        <br/>
+        <small style="float:right;">
+           <h5>@Html.ActionLink("  Back to Attendance Register", "Attendance", new { DepartmentId = Model.DepartmentId })</h5>
+        </small>
+        @*<div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Attendance Register", "Attendance", new { DepartmentId = Model.DepartmentId, SelectDate = Model.AttendanceDate, isback = "yes", DivisionId = Model.DivisionId, BranchId = Model.BranchId })</h3>
+        </div>*@
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Save", "HREnrollment", FormMethod.Post, new { @class = "form-horizontal" }))
+            {   @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("Save")</span>
+
+               
+
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Remarks
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <button type="submit" name="Save" class="btn btn-info btn-xs P2">
+                                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+
+                            <!-- /.box-header -->
+                            <!-- form start -->
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                    @if (null != Model)
+                            {
+
+                                        <input type="hidden" name="DepartmentId" value="@Model.DepartmentId" />
+                                        <input type="hidden" name="SelectDate" value="@Model.AttendanceDate" />
+                                        <input type="hidden" name="DivisionId" value="@Model.DivisionId" />
+                                        <input type="hidden" name="BranchId" value="@Model.BranchId" />
+
+                                if (null != Model.StaffAttendanceCol && Model.StaffAttendanceCol.Count() > 0)
+                                {
+                                    for (int i = 0; i < Model.StaffAttendanceCol.Count(); i++)
+                                    {
+                                        @Html.Hidden("AttendanceRegisterData.Index", (@i + 10))
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].StaffId", Model.StaffAttendanceCol.ElementAt(i).StaffId)
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].EmployeeCategory", Model.StaffAttendanceCol.ElementAt(i).EmployeeCategory)
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].RegistrationNumber", Model.StaffAttendanceCol.ElementAt(i).RegistrationNumber)
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].AttendanceDisplayName", Model.StaffAttendanceCol.ElementAt(i).AttendanceDisplayName)
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].AttendanceDate", Model.StaffAttendanceCol.ElementAt(i).AttendanceDate)
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].AbsentType", Model.StaffAttendanceCol.ElementAt(i).AbsentType)
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].Remarks", Model.StaffAttendanceCol.ElementAt(i).Remarks)
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].IsChecked", Model.StaffAttendanceCol.ElementAt(i).IsChecked)
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].StaffName", Model.StaffAttendanceCol.ElementAt(i).StaffName)
+                                        @Html.Hidden("AttendanceRegisterData[" + (@i + 10) + "].DepartmentId", Model.StaffAttendanceCol.ElementAt(i).DepartmentId)
+                                    }
+                                }
+
+
+                                <div class="col-sm-7">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Attendance Date : ")</label>
+
+                                        <div class="col-sm-4">
+                                            <label class="control-label">@Model.AttendanceDate.ToString("dd-MMM-yyyy")</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Remarks")</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" name="remarks" class="form-control" id="Remarks" />
+                                        </div>
+                                        <div class="col-sm-9">
+                                            @Html.ValidationMessage("Remarks")
+                                        </div>
+                                    </div>
+                                </div>
+                                        <div class="col-sm-4">
+                                            <label class="control-label no-padding-right" for="form-field-1">@Html.Label("Employees : ")</label>
+                                            <br />
+                                            @if (null != Model.AttendanceRemarks && Model.AttendanceRemarks.Count() > 0)
+                                    {
+                                        foreach (var item in Model.AttendanceRemarks)
+                                        {
+                                            <label>@Html.DisplayFor(modelItem => item.StaffName)</label> 
+
+                                        }
+                                    }
+                                        </div>
+
+
+                            }
+
+
+
+
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    </div>
+                
+</section>

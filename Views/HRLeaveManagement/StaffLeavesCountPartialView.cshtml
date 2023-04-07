@@ -1,0 +1,110 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffWiseLeaveCount>
+
+@{
+
+}
+
+
+
+
+@if (null != Model && Model.Count > 0)
+{
+    int nsno = 1;
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="table-header">
+                Records Found (@Model.Count())
+
+                <div style="float:right;margin-right:10px;">
+                    <button type="submit" name="Save" class="btncustom P2 ">
+                        save
+                    </button>
+                </div>
+            </div>
+            
+            <div class="overflowscroll">
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Staff Name")
+                            </th>
+
+                            @if (null != Model.ElementAt(0).lstLeaveTypes)
+                            {
+                                foreach (var type in Model.ElementAt(0).lstLeaveTypes)
+                                {
+                                    <th>
+                                        @type.LeaveName
+                                    </th>
+                                }
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count(); i++)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.Hidden("StaffLeaveList.Index", (@i))
+                                    @Html.Hidden("StaffLeaveList[" + (@i) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                    @Html.Hidden("StaffLeaveList[" + (@i) + "].StaffLeaveCategoryId", Model.ElementAt(i).StaffLeaveCategoryId)
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @Html.Hidden("StaffLeaveList[" + (@i) + "].StaffId", Model.ElementAt(i).StaffId)
+                                    @Model.ElementAt(i).StaffName
+                                </td>
+                                @if (Model.ElementAt(i).lstLeaveTypes.Count() > 0)
+                                {
+                                    for (int j = 0; j < Model.ElementAt(i).lstLeaveTypes.Count(); j++)
+                                    {
+                                        @Html.Hidden("StaffLeaveList[" + (@i) + "].lstLeaveTypes.Index", (@j))
+
+                                        @*@Html.Hidden("StaffLeaveList[" + (@i) + "].lstLeaveTypes", Model.ElementAt(i).lstLeaveTypes)*@
+                                        @Html.Hidden("StaffLeaveList[" + (@i) + "].lstLeaveTypes[" + (@j) + "].LeaveTypeId", Model.ElementAt(i).lstLeaveTypes.ElementAt(j).LeaveTypeId)
+                                        @Html.Hidden("StaffLeaveList[" + (@i) + "].lstLeaveTypes[" + (@j) + "].StaffLeaveCountId", Model.ElementAt(i).lstLeaveTypes.ElementAt(j).StaffLeaveCountId)
+
+                                        <td>
+                                            @Html.TextBox("StaffLeaveList[" + (@i) + "].lstLeaveTypes[" + (@j) + "].RemaingCount", Model.ElementAt(i).lstLeaveTypes.ElementAt(j).RemaingCount, new { @class = "form-control col-sm-5 txtboxNum", onkeypress = "return isNumberKey(event)", @min = "0" })
+                                        </td>
+
+                                    }
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+            </div>
+
+        </div>
+    </div>
+}
+else
+{
+    <span style="color: red;"><b>No Data available to display</b></span>
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+</script>
+
+
+

@@ -1,0 +1,91 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentAttendanceApprove>
+@{
+    ViewBag.Title = "Student Attendance Freeze";
+    int sno = 1;
+}
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+    div:hover {
+        overflow: auto;
+    }
+</style>
+
+@if (Model != null && Model.Count() > 0)
+{
+
+    <div class="box-body table-responsive no-padding">
+        <div class="hideScrolling">
+            <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;" id="mytab1">
+                <tbody>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Branch")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Regular")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Special")
+                        </th>
+
+                    </tr>
+
+
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+
+                        <tr>
+                            <td>
+
+                                @(sno++)
+                            </td>
+                            <td>
+                                @Model.ElementAt(i).Branch
+                            </td>
+                            <td>
+                                @Html.Hidden("lstAttendanceDays.Index", (@i + 10))
+                                @Html.Hidden("lstAttendanceDays[" + (@i + 10) + "].StudentAttendanceFreezeId", Model.ElementAt(i).StudentAttendanceFreezeId)
+                                @Html.Hidden("lstAttendanceDays[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                @Html.TextBox("lstAttendanceDays[" + (@i + 10) + "].Regular", Model.ElementAt(i).Regular, new { @class = "form-control textlength txtboxNum", @readonly = "readonly", id = "regulardays", @style = "width:120px", value = "Readonly field" })
+                            </td>
+                            <td id="special">
+
+                                @Html.TextBox("lstAttendanceDays[" + (@i + 10) + "].Special", Model.ElementAt(i).Special, new { id = @Model.ElementAt(i).SubscriptionId, @class = "form-control textlength txtboxNum", name = "special", @min = "0", @Maxlength = "3", @style = "width:120px" })
+                            </td>
+
+
+
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+
+
+
+
+        </div>
+
+    </div>
+}
+
+<script type="text/javascript">
+
+    document.getElementById("regulardays").readOnly = true;
+</script>
+

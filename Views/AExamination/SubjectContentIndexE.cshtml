@@ -1,0 +1,150 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    ViewBag.Title = "Create Exam Schedules";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Subject Content Index</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <span style="color:red;" id="Validation"></span>
+            @using (Html.BeginForm("SubjectContentIndexE", "AExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" id="SubId" name="SubId" value="@Model.SubscriptionId" />
+                <input type="hidden" id="ClassNumber" name="ClassNumber" value="@Model.ClassNumber" />
+                <input type="hidden" id="SubjectId" name="SubjectId" value="@Model.SubjectId" />
+                <input type="hidden" id="ExamId" name="ExamId" value="@Model.ExaminationPapersId" />
+                @Html.HiddenFor(model => model.ClassNumber)
+                @Html.HiddenFor(model => model.SubjectId)
+                @Html.HiddenFor(model => model.ExaminationPapersId)
+
+                <div class="page-header">
+                    <h1>
+                        Subject Content Index
+                        <small style="float:right;">
+                            @Html.ActionLink("Back to details", "SubjectContentIndex", new { ClassNumber = Model.ClassNumber, SubjectId = Model.SubjectId, BranchId = Model.SubscriptionId })
+                        </small>
+                    </h1>
+                </div><!-- /.page-header -->
+
+
+                <!-- form start -->
+
+                <form class="form-horizontal" role="form">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Content Name")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.ExamCode, new { @class = "form-control textlength", placeholder = "Content Name", @id = "ExamCode" })
+                        </div>
+
+                        <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESExamCode">
+                        </span>
+                    </div>
+
+                    <div class="hr hr-18 dotted hr-double"></div>
+
+                    <div class="col-md-offset-3 col-md-9">
+                        <button class="btn btn-success btn-sm" name="Save" onclick="return submitForm();" type="submit">
+                            <i class="ace-icon fa fa-check bigger-50"></i>
+                            Save
+                        </button>
+
+                        &nbsp; &nbsp; &nbsp;
+                        <button class="btn btn-sm" type="reset">
+                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                            Reset
+                        </button>
+                    </div>
+
+                </form>
+            }
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    function submitForm() {
+        var validatestatus = validateES();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function validateES() {
+
+        var validate = true;
+        var ExamCode = document.getElementById("ExamCode").value;
+
+        if (ExamCode == "") {
+            document.getElementById("ESExamCode").innerHTML = "Please enter content name";
+            validate = false;
+        }
+
+        if (validate == true) {
+            var status = IsExaminationExisted();
+            validate = status;
+        }
+
+        return validate;
+    };
+
+    function IsExaminationExisted() {
+        debugger
+        var Status = true;
+        var ExId = $('#ExamId').val();
+        $.ajax({
+
+            url: '/AExamination/IsSubjectContentExisted',
+            data: { type: "Edit", id: ExId, ExamCode: $('#ExamCode').val(), SubId: $('#SubId').val(), ClassNumber: $('#ClassNumber').val(), SubjectId: $('#SubjectId').val() },
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                    document.getElementById("Validation").innerHTML = Data;
+                }
+
+            },
+            async: false
+        });
+
+        return Status;
+    }
+
+    $('#ExamCode').focus(function () {
+        document.getElementById("ESExamCode").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+</script>
+
+
+

@@ -1,0 +1,666 @@
+﻿@model AsteriskBrowserAL.Models.HdTicketsInfo
+
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+
+@if (null != Model)
+{
+    if (null != Model.MyTickets)
+    {
+
+        if (Model.MyTickets.Count() > 0)
+        {
+            int nSno = 1;
+            <div class="table-header">
+                My Tickets (@Model.MyTickets.Count())
+            </div>
+            @*<table class="table dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Ticket ID")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Update")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Subject")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Status")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Last Replier")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Priority")
+                            </th>
+                            <td></td>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model.MyTickets)
+                        {
+                            if (item.taskData != null)
+                            {
+                                <tr>
+                                    <td>
+                                        @(nSno++)
+                                    </td>
+                                    <td>
+                                        @item.TicketNumber
+                                    </td>
+                                    <td>
+                                        @if (item.taskData.StatusDate.HasValue)
+                                        {
+                                            @item.taskData.StatusDate.Value.ToString("dd-MMM-yyyy")
+                                        }
+                                        else
+                                        {
+                                        }
+                                    </td>
+                                    <td>
+                                        @item.HdTicketOwnerName
+                                    </td>
+                                    <td>
+                                        @item.taskData.Subject
+                                    </td>
+                                    <td>
+                                        @if (item.taskData.HDStatusId == 1)
+                                    {
+                                            <span class="label label-purple arrowed-right arrowed-in">@item.taskData.StatusName</span>
+                                        }
+                                        @if (item.taskData.HDStatusId == 2)
+                                    {
+                                            <span class="label label-warning">@item.taskData.StatusName</span>
+
+                                        } @if (item.taskData.HDStatusId == 3)
+                                    {
+                                            <span class="label label-success arrowed-in arrowed-in-right">@item.taskData.StatusName</span>
+
+                                        } @if (item.taskData.HDStatusId == 4)
+                                    {
+                                            <span class="label label-danger arrowed">@item.taskData.StatusName</span>
+                                        }
+
+                                    </td>
+
+                                    <td>
+                                        @item.taskData.HdTicketStatusOwnerName
+                                    </td>
+                                    <td>
+                                        @if (item.taskData.PriorityId == 1)
+                                        {
+                                            <meter value=".15" low=".25" title="Low"></meter>
+                                        }
+                                        @if (item.taskData.PriorityId == 2)
+                                        {
+                                            <meter value=".5" low=".25" title="Medium"></meter>
+                                        }
+                                        @if (item.taskData.PriorityId == 3)
+                                        {
+                                            <meter low=".25" optimum=".2" high=".75" value=".8" title="High"></meter>
+                                        }
+                                        @if (item.taskData.PriorityId == 4)
+                                        {
+                                            <meter low=".25" optimum=".2" high=".85" value="1" title="Critical"></meter>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="hidden-sm hidden-xs action-buttons">
+                                            <a class="blue" id="TicketId" data-toggle="modal" data-target="#myModal" value="@item.HDTicketId" onclick="GetComments(@item.HDTicketId);">
+                                                <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>*@
+        }
+    }
+    else
+    {
+        <span style="font-weight:bold;color:red">My Tickets Not Available</span>
+    }
+
+    <div class="hr hr-18 dotted hr-double"></div>
+
+
+    if (null != Model.TissuesIssuedToMe)
+    {
+        if (Model.TissuesIssuedToMe.Count() > 0)
+        {
+            <div class="table-header">
+                Tickets Issued To Me (@Model.TissuesIssuedToMe.Count())
+            </div>
+            int nsno = 1;
+            <table class="table dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Ticket ID")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Update")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Subject")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Status")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Last Replier")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Priority")
+                        </th>
+                        <td></td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model.TissuesIssuedToMe)
+                    {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @if (item.HDStatusId == 3 || item.HDStatusId == 5)
+                                {
+                                @item.TicketNumber
+                                }
+                                else
+                                {
+                                @Html.ActionLink(@item.TicketNumber, "OpenTicketE", new { TaskId = item.HDTaskId, priorityId = item.PriorityId, StatusId = item.HDStatusId },new { Class="P2"})
+                                }
+                        </td>
+
+                        <td>
+                            @item.StatusDate.Value.ToString("dd-MMM-yyyy")
+                        </td>
+
+                        <td>
+                            @item.HdTicketOwnerName
+                        </td>
+                        <td>
+                            @item.Subject
+                        </td>
+                        <td>
+
+                            @if (item.HDStatusId == 1)
+                                {
+                                <span class="label label-purple arrowed-right arrowed-in">@item.StatusName</span>
+                                }
+                            @if (item.HDStatusId == 2)
+                                {
+                                <span class="label label-warning">@item.StatusName</span>
+
+                                } @if (item.HDStatusId == 3)
+                                {
+                                <span class="label label-success arrowed-in arrowed-in-right">@item.StatusName</span>
+
+                                } @if (item.HDStatusId == 4)
+                                {
+                                <span class="label label-danger arrowed">@item.StatusName</span>
+                                }
+
+                            </td>
+                            <td>
+                                @item.HdTicketStatusOwnerName
+                            </td>
+                            <td>
+                                @if (item.PriorityId == 1)
+                                {
+                                <meter value=".15" low=".25" title="Low"></meter>
+                                }
+                                @if (item.PriorityId == 2)
+                                {
+                                <meter value=".5" low=".25" title="Medium"></meter>
+                                }
+                                @if (item.PriorityId == 3)
+                                {
+                                <meter low=".25" optimum=".2" high=".75" value=".8" title="High"></meter>
+                                }
+                                @if (item.PriorityId == 4)
+                                {
+                                <meter low=".25" optimum=".2" high=".85" value="1" title="Critical"></meter>
+                                }
+                            </td>
+                            <td>
+                                <div class="hidden-sm hidden-xs action-buttons">
+                                    <a class="blue P2" id="TicketId" data-toggle="modal" data-target="#myModal" value="@item.HDTicketId" onclick="GetComments(@item.HDTicketId);">
+                                        <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <span style="font-weight:bold;color:red"> Issued Tickets Not Available</span>
+        }
+    }
+    else
+    {
+        <span style="font-weight:bold;color:red"> Issued Tickets Not Available</span>
+    }
+
+    <div class="hr hr-18 dotted hr-double"></div>
+    if (null != Model.AllTickets)
+    {
+        if (Model.AllTickets.Count() > 0)
+        {
+
+            foreach (var result in Model.AllTickets)
+            {
+
+                if (null == result)
+                {
+                    continue;
+                }
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="widget-box collapsed">
+                            <div class="widget-header">
+                                <h4 class="widget-title lighter smaller">
+                                    <i class="ace-icon fa fa-comment blue"></i>
+                                    Replies @(!string.IsNullOrWhiteSpace(result.Subject) ? result.Subject.ToUpper() : "") <span data-toggle="tooltip" title="3 New Messages" class="badge bg-yellow">@result.Comments.Count()</span>
+                                </h4>
+                                <div class="widget-toolbar">
+                                    <a href="#" data-action="collapse">
+                                        <i class="ace-icon fa fa-chevron-down"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main no-padding">
+                                    <div class="dialogs ace-scroll">
+                                        <div class="scroll-track scroll-active" style="display: block;overflow-y:auto; height: 300px;"><div class="scroll-bar"></div></div><div class="scroll-content" style="overflow-y:scroll;height:300px">
+                                            @{
+                                                int count = result.Comments.Count();
+                                                string stfName = "";
+                                            }
+                                            @for (int i = 0; i < result.Comments.Count(); i++)
+                                            {
+                                                stfName = "";
+                                                if (count > i + 1)
+                                                {
+                                                    stfName = "to " + result.Comments.ElementAt(i + 1).HdTicketStatusOwnerName;
+                                                }
+
+                                                <div class="itemdiv dialogdiv">
+                                                    <div class="user">
+                                                        @* <img alt="Alexa's Avatar" src="assets/avatars/avatar1.png">*@
+                                                        <img src="~/Content/images/NoPhoto.jpg" />
+                                                    </div>
+                                                    <div class="body">
+                                                        <div class="time">
+                                                            <i class="ace-icon fa fa-clock-o"></i>
+                                                            <span class="green">@result.Comments.ElementAt(i).TicketDate.Value.ToString("dd-MMM-yyyy 'at' hh:mm")</span>
+                                                        </div>
+                                                        <div class="name">
+                                                            <span class="label label-info arrowed arrowed-in">@result.Comments.ElementAt(i).HdTicketStatusOwnerName</span>
+                                                            <span class="label label-info arrowed arrowed-in-right">@stfName</span>
+                                                        </div>
+                                                        <div class="text">@result.Comments.ElementAt(i).Description</div>
+                                                    </div>
+                                                </div>
+
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div><!-- /.widget-main -->
+                            </div><!-- /.widget-body -->
+                        </div>
+                    </div>
+                </div>
+
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="widget-box transparent" id="recent-box">
+            <div class="widget-header">
+                <h4 class="widget-title lighter smaller">
+                    <i class="ace-icon fa fa-rss orange"></i>RECENT
+                </h4>
+
+                <div class="widget-toolbar no-border">
+                    <ul class="nav nav-tabs" id="recent-tab">
+                        @*<li class="active">
+                                <a data-toggle="tab" href="#task-tab" aria-expanded="true">Tasks</a>
+                            </li>
+
+                            <li class="">
+                                <a data-toggle="tab" href="#member-tab" aria-expanded="false">Members</a>
+                            </li>*@
+
+                        <li class="active">
+                            <a data-toggle="tab" href="#comment-tab" aria-expanded="false">Comments</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="widget-body">
+                <div class="widget-main padding-4">
+                    <div class="tab-content padding-8">
+
+                        <div id="comment-tab" class="tab-pane">
+
+
+
+
+                            <div class="comments ace-scroll" style="position: relative;">
+
+                                <div class="scroll-track scroll-active" style="display: block; height: 300px;"><div class="scroll-bar" style="height: 288px; top: 12px;"></div></div><div class="scroll-content" style="max-height: 300px;">
+                                   
+                                @*<div class="widget-box widget-color-dark ui-sortable-handle" id="widget-box-7" style="opacity: 1;">
+                                    <div class="widget-header widget-header-small">
+                                        <h6 class="widget-title smaller">With Labels &amp; Badges</h6>
+
+
+                                        <div class="widget-toolbar action-buttons">
+                                            <span class="label label-info"></span>
+                                            &nbsp;
+                                            <a href="#" data-action="collapse">
+                                                <i class="ace-icon fa fa-chevron-up"></i>
+                                            </a>
+                                            &nbsp;
+                                            <a href="#" data-action="reload">
+                                                <i class="ace-icon fa fa-refresh blue"></i>
+                                            </a>
+                                            &nbsp;
+                                            <a href="#" data-action="fullscreen" class="orange2">
+                                                <i class="ace-icon fa fa-expand"></i>
+                                            </a>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="widget-body">
+                                        <div class="widget-main">
+                                            <div class="alert alert-info">
+                                                Lorem ipsum dolor sit amet, consectetur adipiscing.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>*@
+                                
+                                
+                                 <div class="itemdiv commentdiv">
+                                        <div class="user">
+                                            <img alt="Bob Doe's Avatar" src="assets/images/avatars/avatar.png">
+                                        </div>
+
+                                        <div class="body">
+                                            <div class="name">
+                                                <a href="#">Bob Doe</a>
+                                            </div>
+
+                                            <div class="time">
+                                                <i class="ace-icon fa fa-clock-o"></i>
+                                                <span class="green">6 min</span>
+                                            </div>
+
+                                            <div class="text">
+                                                <i class="ace-icon fa fa-quote-left"></i>
+                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque commodo massa sed ipsum porttitor facilisis …
+                                            </div>
+                                        </div>
+
+                                        <div class="tools">
+                                            <div class="inline position-relative">
+                                                <button class="btn btn-minier bigger btn-yellow dropdown-toggle" data-toggle="dropdown">
+                                                    <i class="ace-icon fa fa-angle-down icon-only bigger-120"></i>
+                                                </button>
+
+                                                <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                                                    <li>
+                                                        <a href="#" class="tooltip-success" data-rel="tooltip" title="" data-original-title="Approve">
+                                                            <span class="green P2">
+                                                                <i class="ace-icon fa fa-check bigger-110"></i>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+
+                                                    <li>
+                                                        <a href="#" class="tooltip-warning" data-rel="tooltip" title="" data-original-title="Reject">
+                                                            <span class="orange P2">
+                                                                <i class="ace-icon fa fa-times bigger-110"></i>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+
+                                                    <li>
+                                                        <a href="#" class="tooltip-error" data-rel="tooltip" title="" data-original-title="Delete">
+                                                            <span class="red P2">
+                                                                <i class="ace-icon fa fa-trash-o bigger-110"></i>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="itemdiv commentdiv">
+                                        <div class="user">
+                                            <img alt="Jennifer's Avatar" src="assets/images/avatars/avatar1.png">
+                                        </div>
+
+                                        <div class="body">
+                                            <div class="name">
+                                                <a href="#">Jennifer</a>
+                                            </div>
+
+                                            <div class="time">
+                                                <i class="ace-icon fa fa-clock-o"></i>
+                                                <span class="blue">15 min</span>
+                                            </div>
+
+                                            <div class="text">
+                                                <i class="ace-icon fa fa-quote-left"></i>
+                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque commodo massa sed ipsum porttitor facilisis …
+                                            </div>
+                                        </div>
+
+                                        <div class="tools">
+                                            <div class="action-buttons bigger-125">
+                                                <a href="#">
+                                                    <i class="ace-icon fa fa-pencil blue"></i>
+                                                </a>
+
+                                                <a href="#">
+                                                    <i class="ace-icon fa fa-trash-o red"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="itemdiv commentdiv">
+                                        <div class="user">
+                                            <img alt="Joe's Avatar" src="assets/images/avatars/avatar2.png">
+                                        </div>
+
+                                        <div class="body">
+                                            <div class="name">
+                                                <a href="#">Joe</a>
+                                            </div>
+
+                                            <div class="time">
+                                                <i class="ace-icon fa fa-clock-o"></i>
+                                                <span class="orange">22 min</span>
+                                            </div>
+
+                                            <div class="text">
+                                                <i class="ace-icon fa fa-quote-left"></i>
+                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque commodo massa sed ipsum porttitor facilisis …
+                                            </div>
+                                        </div>
+
+                                        <div class="tools">
+                                            <div class="action-buttons bigger-125">
+                                                <a href="#">
+                                                    <i class="ace-icon fa fa-pencil blue"></i>
+                                                </a>
+
+                                                <a href="#">
+                                                    <i class="ace-icon fa fa-trash-o red"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="itemdiv commentdiv">
+                                        <div class="user">
+                                            <img alt="Rita's Avatar" src="assets/images/avatars/avatar3.png">
+                                        </div>
+
+                                        <div class="body">
+                                            <div class="name">
+                                                <a href="#">Rita</a>
+                                            </div>
+
+                                            <div class="time">
+                                                <i class="ace-icon fa fa-clock-o"></i>
+                                                <span class="red">50 min</span>
+                                            </div>
+
+                                            <div class="text">
+                                                <i class="ace-icon fa fa-quote-left"></i>
+                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque commodo massa sed ipsum porttitor facilisis …
+                                            </div>
+                                        </div>
+
+                                        <div class="tools">
+                                            <div class="action-buttons bigger-125">
+                                                <a href="#">
+                                                    <i class="ace-icon fa fa-pencil blue"></i>
+                                                </a>
+
+                                                <a href="#">
+                                                    <i class="ace-icon fa fa-trash-o red"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hr hr8"></div>
+
+                            <div class="center">
+                                <i class="ace-icon fa fa-comments-o fa-2x green middle"></i>
+
+                                &nbsp;
+                                <a href="#" class="btn btn-sm btn-white btn-info">
+                                    See all comments &nbsp;
+                                    <i class="ace-icon fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+
+                            <div class="hr hr-double hr8"></div>
+                        </div>
+                    </div>
+                </div><!-- /.widget-main -->
+            </div><!-- /.widget-body -->
+        </div><!-- /.widget-box -->
+    </div><!-- /.col -->
+
+</div>
+
+
+<input type="hidden" id="SaveCount" />
+
+
+
+<script>
+
+    $("#TicketId").click(function () {
+        var TicketId = $('#TicketId').val();
+        GetComments();
+    });
+
+    function GetComments(TicketId) {
+        //Load Partial View
+        if (TicketId > 0) {
+            $.ajax({
+                url: '/HDOperations/TicketComments',
+                data: { TicketId: TicketId },
+                success: function (Data) {
+                    debugger
+
+                    $('#dValidation').html(Data);
+
+                    $("#dialog-confirm").removeClass('hide').dialog({
+                        resizable: false,
+                        draggable: false,
+                        width: '700',
+                        modal: true,
+                        title: "Ticket Comments",
+                        title_html: true,
+                        open: function (event, ui) {
+                            $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        },
+                        buttons: [
+                            {
+                                html: "&nbsp; &nbsp; Close &nbsp; &nbsp; ",
+                                "class": "btn btn-success btn-minier",
+                                click: function () {
+                                    $(this).dialog("close");
+                                }
+                            }
+                        ]
+                    });
+                }
+            })
+        }
+
+    }
+
+
+</script>
+
+
+@Html.Action("DataTableScripts", "Base")

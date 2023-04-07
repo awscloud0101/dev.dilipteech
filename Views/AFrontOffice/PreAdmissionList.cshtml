@@ -1,0 +1,349 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionData
+@{
+
+    ViewBag.Title = "Pre Admission List";
+
+}
+
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+ <!-- daterange picker -->
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+       <li> <i class="menu-icon fa fa-graduation-cap"></i>
+        <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Front Office
+        </li>
+        <li class="active">Pre-Admission List</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("PreAdmissionList", "AFrontOffice", FormMethod.Post))
+            {
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Pre-Admission List</span>
+                  
+                     
+                        <div  style="float:right;margin-right:10px;">
+                            <a id="ViewData" name="ViewData" class="btncustom P2">View Data</a>
+                        </div>
+                    
+                  
+                </div>
+
+                <div class="widget-box">
+
+
+        <input type="hidden" id="isCentral" name="isCentral" value="@Model.IsCentral.ToString()" />
+
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    @if (null != Model)
+                    {
+                        if (Model.IsCentral == true)
+                        {
+
+                            <div class="col-sm-6">
+                                <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Division</label>
+                                <div class="col-sm-6" style="font:12px arial;">
+                                    <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Branch</label>
+                                <div class="col-sm-6" style="font:12px arial;">
+                                    <select id="BranchId" name="BranchId" class="form-control"></select>
+                                </div>
+                            </div>
+
+                          
+
+                        }
+                    }
+                    
+                    <div class="col-sm-6">
+                        <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Date Range</label>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+
+                                <input type="text" class="form-control pull" id="daterange" name="DateRange" autocomplete="off" style="width:100%"  />
+                                <div class="input-group-addon" >
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="col-sm-4">
+                            <input type="radio" id="Inquiry" value="1" name="Status" checked="checked" onchange="ClearData()" />
+                            <b>Inquiry</b>
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="radio" id="Application" value="2" name="Status" onchange="ClearData()" />
+                            <b>Registration</b>
+                        </div>
+                        <div class="col-sm-4"></div>
+
+                    </div>
+                </div>
+
+
+              
+            </div>
+
+        </div>
+       
+    </div>
+
+                <div id="SearchDiv">
+
+                </div>
+            }
+           
+        </div>
+    </div>
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+
+</section>
+
+
+
+<script>
+
+
+    function OnloadData() {
+        var IsCentral = $("#isCentral").val()
+        if (IsCentral == "True") {
+            LoadDivisionDropdown();
+        }
+    }
+    window.onload = OnloadData();
+    function LoadDivisionDropdown() {
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        document.getElementById("Validation").innerHTML = "";
+        LoadBranchDropdown();
+
+
+
+    })
+
+    $("#BranchId").change(function () {
+        var BranchId = document.getElementById("BranchId").value;
+        document.getElementById("Validation").innerHTML = "";
+        if (BranchId >= 0) {
+
+        }
+        else {
+            $("#SearchDiv").html("")
+        }
+    })
+
+    $('#daterange').click(function () {
+        document.getElementById("Validation").innerHTML = "";
+    })
+
+    function LoadBranchDropdown() {
+        var DivisionId = $("#DivisionId").val()
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: true },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                }
+            })
+        }
+        else {
+            document.getElementById("BranchId").value = ""
+            $("#BranchId").html("")
+            $("#SearchDiv").html("")
+        }
+    }
+
+
+
+    $("#ViewData").click(function () {
+        var isValid = true;
+        isValid = Validation();
+        if (isValid == true) {
+            debugger
+            PerformSearch()
+
+        }
+    })
+
+    function Validation() {
+        var IsCentral = $("#isCentral").val()
+        var DivisionId = $("#DivisionId").val()
+        var BranchId = $("#BranchId").val()
+        var DateRange = $("#daterange").val()
+        var IsValid = true;
+        var ValidationString = "Please Select ";
+        if (IsCentral == "True") {
+            if (DivisionId < 0) {
+                ValidationString += "Division,"
+                IsValid = false
+            }
+            if (BranchId < 0) {
+                ValidationString += "Branch,"
+                IsValid = false
+            }
+
+        }
+        if (DateRange == null || DateRange == undefined || DateRange =="") {
+            ValidationString += "Date Range,"
+            IsValid = false
+        }
+        if (IsValid == false) {
+            document.getElementById("Validation").innerHTML = ValidationString;
+        }
+        return IsValid;
+    }
+
+    function ClearData() {
+        $("#SearchDiv").html("");
+    }
+
+    $("#Student").autocomplete({
+        source: function (request, response) {
+            if (request.term.length >= 3) {
+                debugger
+                var isValid = true;
+                isValid = Validation();
+                if (isValid == true) {
+                    PerformSearch()
+
+                }
+            }
+        }
+
+    });
+
+    function PerformSearch() {
+        var Date = $("#daterange").val();
+        var Status = $("input[name=Status]:checked").val()
+        var BranchId = $("#BranchId").val();
+        var DivisionId = $("#DivisionId").val();
+
+        if (Date != "" || SearchTerm != "") {
+            if (Status == 1) {
+                $('#imagemodal').show();
+                $.ajax({
+                    url: '/AFrontOffice/GetInquiryDetailsOfStudets',
+                    data: { Date: Date, SubscriptionId: BranchId, DivisionId: DivisionId },
+                    success: function (result) {
+                        $('#imagemodal').hide();
+                        $("#SearchDiv").html("");
+                        $("#SearchDiv").html(result);
+                    }
+                }).done(function () {
+                    $('#imagemodal').hide();
+                })
+            }
+            else if (Status == 2) {
+                $('#imagemodal').show();
+                $.ajax({
+                    url: '/AFrontOffice/GetApplicationDetailsOfStudets',
+                    data: { Date: Date, SubscriptionId: BranchId, DivisionId: DivisionId },
+                    success: function (result) {
+                        $('#imagemodal').hide();
+                        $("#SearchDiv").html("");
+
+                        $("#SearchDiv").html(result);
+                    }
+                }).done(function () {
+                    $('#imagemodal').hide();
+                })
+            }
+        }
+
+    }
+   
+    //function GetPreRegisterDate()
+    //{
+    //    $('#PreAdminRange').daterangepicker();
+
+    //    $('#PreAdminRange-btn').daterangepicker(
+    //              {
+    //                  ranges: {
+    //                      'Today': [moment(), moment()],
+    //                      'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+    //                      'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+    //                      'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+    //                      'This Month': [moment().startOf('month'), moment().endOf('month')],
+    //                      'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    //                  },
+    //                  startDate: moment().subtract(29, 'days'),
+    //                  endDate: moment()
+    //              },
+    //      function (start, end) {
+    //          $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    //      }
+    //      );
+    //}
+
+
+
+</script>

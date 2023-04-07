@@ -1,0 +1,491 @@
+﻿@model AsteriskBrowserAL.Models.StockTransferData
+
+@{
+    ViewBag.Title = "Stock Transfer";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Stock Transfer</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+@Html.Action("DatePickerScripts", "Base")
+
+<br />
+<section class="content">
+    <form id="myForm" method="post">
+        <div class="row">
+            <div class="col-xs-12">
+                @using (Html.BeginForm("StockTrasnsfer", "SOperations", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <span style="color:red;font-weight:bold;" id="Validation"></span>
+
+                            @if (null != Model)
+                            {
+                                if (Model.IsSaved)
+                                {
+                                    <input type="hidden" id="Status" value="true" />
+                                    <input type="hidden" id="DCNumber" value="@Model.DCNumber" />
+                                    <input type="hidden" id="SubId" value="@Model.SubscriptionId" />
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="Status" value="false" />
+                                }
+                            }
+
+                            <div class="widget-box">
+                                <div class="widget-header widget-header-flat widget-header-small">
+                                    <h5 class="widget-title">
+                                        Stock Transfer
+                                    </h5>
+
+                                    <div class="widget-toolbar no-border">
+                                        <div class="inline action-buttons">
+                                            <input type="radio" name="rbTransferType" checked="checked" value="Kit"><span style="margin-right:2em;">Kit</span>
+                                            <input type="radio" name="rbTransferType" value="Item" />Item
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+                <div id="Kit"></div>
+                <hr />
+                @if (null != Model)
+                {    <div class="widget-box">
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.lstDivision)
+                                            {
+                                                @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), "--- Select ---", new { @class = "form-control", id = "DivisionId" })
+                                            }
+                                            else
+                                            {
+                                                <select id="DivisionId" style="width:200px;" class="form-control"></select>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                        <div class="col-sm-6">
+                                            <select id="Branch" style="width:200px;" name="SubscriptionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4">Transfer Date</label>
+                                        <div class="col-xs-6">
+                                            <div id="DatePicker" class="input-group date">
+                                                <input class="form-control" type="text" id="TransferDate" name="TransferDate" autocomplete="off" placeholder="Transfer Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+
+            </div>
+        </div>
+    </form>
+</section>
+
+<script>
+    var rbTransferType = "";
+    var Content = "";
+    var nCount = 0;
+    var nFocusCount = 0;
+    var noOnclick = 0;
+    var SelCellIndex = 0;
+    var SelRowIndex = 0;
+    var IsTargetText = false;
+
+    //$(window).focus(function () {
+    //    IsTargetText = false;
+    //});
+
+    $(document).ready(function () {
+        GetDataOnrbClick();
+
+        if ($('#Status').val() == "true") {
+            Content = "Stock transferred";
+            dialogForChallan();
+        }
+    });
+
+    $(document).on('focus', '#DatePicker', function () {
+       
+        $(this).datepicker({
+            startDate: "1/1/1900",
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+    $(document).on('focus', 'td', function (e) {
+
+        nFocusCount += 1;
+
+    });
+
+
+    $(document).on('focusout', 'td', function (e) {
+        debugger
+        nCount += 1;
+        if (nCount == 1) {
+
+            var KitId = 0;
+            var ItemId = 0;
+            nFocusCount = 0;
+
+            if (rbTransferType == "Kit") {
+                KitId = $(this).closest('tr').find('#KitId').val();
+                var Quantity = $(this).closest('tr').find('#Quantity').val();
+                SelRowIndex = $(this).closest('tr').index();
+
+                if (parseInt(Quantity, 10) > 0) {
+
+                    var ExistedQty = $(this).closest('tr').find('#ExistedQty').val();
+
+                    if (parseInt(Quantity, 10) > parseInt(ExistedQty, 10)) {
+
+                        Content = "Entered quantity exceeds existed quantity"
+                        dialogForNotExists();
+                    }
+                    else {
+                        CheckStockExistance(KitId, Quantity);
+                    }
+                }
+                else {
+                    nCount = 0;
+                }
+            }
+            else {
+                ItemId = $(this).closest('tr').find('#ItemId').val();
+
+                var Quantity = $(this).closest('tr').find('#Quantity').val();
+                SelRowIndex = $(this).closest('tr').index();
+
+                if (parseInt(Quantity, 10) > 0) {
+                    var ExistedQty = $(this).closest('tr').find('#ExistedQty').val();
+
+                    if (parseInt(Quantity, 10) > parseInt(ExistedQty, 10)) {
+
+                        Content = "Entered quantity exceeds existed quantity"
+                        dialogForNotExists();
+                    }
+                }
+                else {
+                    nCount = 0;
+                }
+            }
+        }
+        else {
+            e.stopImmediatePropagation();
+            nCount = 0;
+            e.preventDefault();
+        }
+
+    });
+
+    function CheckStockExistance(KitId, Quantity) {
+        $.ajax({
+
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            },
+            url: '/SOperations/CheckStockExistance',
+            data: { KitId: KitId, Quantity: Quantity },
+            success: function (data) {
+                debugger
+                if (data != "") {
+                    debugger
+                    if (data == "Items are not available") {
+                        Content = data;
+                        dialogForNotExists();
+                    }
+                    else {
+                        Content = data;
+                        dialogForStockAvaiability();
+                    }
+                }
+            },
+            async: false
+        });
+    }
+
+    $('input[name="rbTransferType"]').click(function radioButton() {
+
+        rbTransferType = $(this).val();
+        GetDataOnrbClick();
+    });
+
+    $('#DivisionId').change(function () {
+
+        $('#Branch').children().remove();
+        $('#Branch').append("");
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId > 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (data) {
+
+                    $('#Branch').children().remove();
+
+                    $('#Branch').append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        $('#Branch').append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                },
+                aync: false
+            });
+        }
+    });
+
+    function GetDataOnrbClick() {
+        debugger
+        rbTransferType = $('input[name=rbTransferType]:checked', '#myForm').val();
+
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            },
+
+            url: '/SOperations/PopulateDataToTransfer',
+            data: { rbTransferType: rbTransferType },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (Data) {
+                $('#Kit').html(Data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide()
+        });
+    }
+
+
+    function SubmitForm() {
+        debugger
+        var valid = true;
+
+        var Quantity = 0;
+
+        // Get table object
+        var myTable = document.getElementById("mytab1");
+
+        if (rbTransferType == "Kit") {
+            // loop for each row
+            for (var r = 1, n = myTable.rows.length; r < n; r++) {
+                var dValue = myTable.rows[r].cells[3].children[0].value;
+                Quantity += parseInt(dValue, 10);
+            }
+        }
+        else {
+            for (var r = 1, n = myTable.rows.length; r < n; r++) {
+                var dValue = myTable.rows[r].cells[4].children[0].value;
+                Quantity += parseInt(dValue, 10);
+            }
+        }
+
+        if (Quantity == 0) {
+            Content = "Enter quantity";
+            OpenDialog(Content, "", "Stock Transfer");
+
+            valid = false;
+        }
+
+        if (valid == false)
+            return valid;
+
+        var Branch = $('#Branch').val();
+
+        if (Branch < 1 || Branch == "null" || Branch == null) {
+            valid = false;
+            Content = "Select branch";
+            OpenDialog(Content, "", "Stock Transfer");
+        }
+        else {
+            var dtTransferDate = $('#TransferDate').val();
+            if (dtTransferDate == "") {
+                valid = false;
+                Content = "Select transfer date";
+                OpenDialog(Content, "", "Stock Transfer");
+            }
+        }
+
+        return valid;
+    }
+
+    function dialogForStockAvaiability() {
+        debugger
+        $('#dValidation').html(" <i class='ace-icon fa fa-hand-o-right blue bigger-120'></i>&nbsp; " + Content);
+
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            draggable: false,
+            width: '400',
+            height: '350',
+            modal: true,
+            title: 'Stock Transfer',
+            title_html: true,
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            buttons: [
+                {
+                    html: "&nbsp;&nbsp;OK&nbsp;&nbsp;",
+                    "class": "btn btn-success btn-minier",
+                    click: function () {
+                        nCount = 0;
+                        $(this).dialog("close");
+                        //StockTransfer(KitId, EnteredQuantity);
+                    }
+                },
+                {
+                    html: "Cancel",
+                    "class": "btn btn-danger btn-minier",
+                    click: function () {
+                        debugger
+                        nCount = 0;
+                        if (rbTransferType == "Kit") {
+                            $('#mytab1 tbody').find('tr:eq(' + SelRowIndex + ')').find('td:eq(3) input').val("0");
+                        }
+                        else {
+                            $('#mytab1 tbody').find('tr:eq(' + SelRowIndex + ')').find('td:eq(4) input').val("0");
+                        }
+
+                        $(this).dialog("close");
+
+                    }
+                }
+            ]
+        });
+
+        return false;
+    }
+
+    function dialogForNotExists() {
+        debugger
+        $('#dValidation').html(" <i class='ace-icon fa fa-hand-o-right blue bigger-120'></i>&nbsp; " + Content);
+
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            draggable: false,
+            width: '320',
+            modal: true,
+            title: 'Stock Transfer',
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            title_html: true,
+            buttons: [
+                {
+                    html: "OK",
+                    "class": "btn btn-info btn-minier",
+                    click: function () {
+
+                        nCount = 0;
+                        $(this).dialog("close");
+
+                        if (rbTransferType == "Kit") {
+                            $('#mytab1 tbody').find('tr:eq(' + SelRowIndex + ')').find('td:eq(3) input').val("0");
+                        }
+                        else {
+                            $('#mytab1 tbody').find('tr:eq(' + SelRowIndex + ')').find('td:eq(4) input').val("0");
+                        }
+
+
+                    }
+                }
+            ]
+        });
+
+        return false;
+    }
+
+    function dialogForChallan() {
+
+
+        $('#dValidation').html(" <i class='ace-icon fa fa-hand-o-right blue bigger-120'></i>&nbsp; " + Content);
+
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            draggable: false,
+            width: '320',
+            modal: true,
+            title: 'Stock Transfer',
+            title_html: true,
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            buttons: [
+                {
+                    html: "OK",
+                    "class": "btn btn-info btn-minier",
+                    click: function () {
+
+
+                        $(this).dialog("close");
+                        var DCNo = $('#DCNumber').val();
+
+                        if (DCNo > 0) {
+                            window.location.href = '/SOperations/DeliveryChallan?DCNum=' + DCNo + '&SubId=' + $('#SubId').val() + '&Type=' + "trans";
+                        }
+                    }
+                }
+            ]
+        });
+
+        return false;
+    }
+</script>
+
+
+

@@ -1,0 +1,211 @@
+﻿@model AsteriskBrowserAL.Models.ClassTimingsViewData
+@{
+    ViewBag.Title = "ClassTimings";
+
+
+    //int nSelDurationId = 0;
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            TimeTable
+        </li>
+        <li class="active">Class Timings</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+   
+
+    @if (null != Model)
+    {
+        using (Html.BeginForm("ClassTimings", "ATimetable", FormMethod.Post))
+        {
+
+            if (Model.BatchId.HasValue)
+            {
+                <input type="hidden" id="BatchId" name="BatchId" value="@Model.BatchId.Value" />
+
+            }
+            else
+            {
+                <input type="hidden" id="BatchId" name="BatchId" value="0" />
+            }
+
+            <input type="hidden" id="ClassTimingsId" name="ClassTimingsId" value="@Model.ClassTimingsId" />
+            <input type="hidden" id="DurationId" name="DurationId" value="@Model.DurationId" />
+
+            <span style="color:red;" id="CTCombo"></span>
+            <div class="table-header">
+
+                Class Timings
+
+                @*<div style="float:right">
+                        <a class="btn btn-info btn-xs" href="@Url.Action("ClassTimingsC", "ATimetable")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200 pull-right"></i></a>
+                    </div>*@
+               
+                    <div class="" style="float:right;margin-right:10px;">
+
+                        <a class="btncustom P2"><span  onclick="return submitForm()" type="submit">Add</span></a>
+                    </div>
+             
+
+            </div>
+
+            <div class="widget-box">
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <div class="col-xs-12">
+
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary(true)
+                                <span style="color: red;">@Html.ValidationMessage("Class Timings")</span>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+
+                                                <div class="col-sm-6">
+
+                                                    @if (null != Model.lstBranch)
+                                                    {
+                                                        @Html.DropDownListFor(model => model.SubscriptionId, new SelectList(Model.lstBranch, "SubscriptionId", "Institute"), "--- Select Branch ---", new { @class = "form-control", @id = "Branch" })
+                                                    }
+                                                    else
+                                                    {
+                                                        <select id="ClassNumber">
+                                                            <option>
+                                                                --- Select Branch ---
+                                                            </option>
+                                                        </select>
+                                                    }
+
+
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <input name="val" type="hidden" id="val" value="1" />
+
+
+                <div id="SearchData" ></div>
+
+        }
+    }
+
+
+</section>
+
+
+<script>
+
+
+    $(document).ready(function () {
+
+        debugger
+        var Branch = $('#Branch').val();
+
+        if (Branch > 0) {
+
+            GetPeriods();
+        }
+    });
+
+    $('#Branch').change(function () {
+
+        GetPeriods();
+    });
+
+
+    function GetPeriods() {
+        debugger
+
+        var Branch = $("#Branch").val();
+        if (Branch > 0) {
+
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ATimetable/ClassTimingsData',
+                data: { Branch: Branch },
+                success: function (data) {
+                    $('#imagemodal').hide();
+
+                    $("#SearchData").html(data)
+                },
+                aync: false
+            })
+        }
+    }
+
+    window.onload = OnloadData();
+
+    $('#Branch').change(function () {
+        document.getElementById('Validation').innerHTML = ""
+    })
+
+    function submitForm() {
+
+        var Branch = $('#Branch').val();
+        //var DurationId = $('#DurationId').val();
+
+        if (Branch == "") {
+
+            document.getElementById("CTCombo").innerHTML = "Please select the Branch";
+            return false;
+        }
+            //else if (DurationId == "null" || DurationId == "") {
+            //    document.getElementById("CTCombo").innerHTML = "Please select the Duration";
+            //    return false;
+            //}
+        else {
+            window.location.href = '/ATimetable/ClassTimingsC?Branch=' + Branch + '';
+        }
+    };
+    function btnConfirm(Value) {
+        var Branch = $('#Branch').val();
+        if (Value > 0) {
+            $.ajax({
+                url: '/ATimetable/ValidationForClassTimingsD',
+                data: { id: Value },
+                success: function (data) {
+
+                    var url = '/ATimetable/ClassTimingsD?id=' + Value + '&nSubscriptionId=' + Branch;
+                    var title = "Class Timings";
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+
+
+

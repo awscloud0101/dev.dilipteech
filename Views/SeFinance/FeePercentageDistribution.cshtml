@@ -1,0 +1,251 @@
+﻿
+@model List<AsteriskBrowserAL.Models.t_FeePercentageData>
+@{
+    ViewBag.Title = "Fee Percentage Distribution";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Fee Percentage Distribution</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!--Main Content-->
+<section class="content">
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("FeePercentageDistribution", "SeFinance", FormMethod.Post))
+            {
+                <input type="hidden" id="SelAyId" value="@ViewBag.AcademicYearId" />
+
+                if (Convert.ToString(TempData["SaveMsg"]) == "true")
+                {
+
+                    <p align="center">
+                        <span class="savedinfo">
+
+
+
+                            <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                            <br />
+                            <span id="spnSave" style="color:green;font-weight:bold;">Data saved</span>
+                            <br />
+
+                            <a href="" class="cls1 btncustom">Close</a>
+                            <script>
+
+                                $(document).ready(function () {
+                                    $(".cls1").click(function () {
+
+                                        $(".savedinfo").css("display", "none")
+                                    });
+
+
+
+                            </script>
+                        </span>
+                    </p>
+                   
+                }
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Tution Fee Percentage Distribution</span>
+
+                </div>
+
+
+                    <div class="widget-box">
+            
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 ">Academic Year</label>
+                                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                <select id="CboAcademicYear" name="AcademicYearId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                          
+                        </div>
+                    </div>
+
+                    if (Model != null && Model.Count() > 0)
+                    {
+                    <br />
+
+                    <div id="divPercentage">
+                        <span id="Validation" style="color:red;font-weight:bold"></span>
+                        <div class="table-header">
+                            Records Found(@Model.Count)
+                            <div style="float:right;margin-right:10px;">
+                                <button name="Save" onclick="return submitForm()" class="btncustom P2">
+                       Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style="overflow:auto">
+                            <table class="table tbhover table-striped table-bordered" id="mytab1">
+                                <tbody>
+                                    @for (int i = 0; i < Model.Count(); i++)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Model.ElementAt(i).Name
+                                            </td>
+                                            <td>
+                                                @Html.Hidden("FeeList.Index", (@i))
+                                                @Html.Hidden("FeeList[" + @i + "].FeePercentageId", Model.ElementAt(i).FeePercentageId)
+                                                @Html.Hidden("FeeList[" + @i + "].FeePercentageCategoryId", Model.ElementAt(i).FeePercentageCategoryId)
+                                                @Html.Hidden("FeeList[" + @i + "].DataName", Model.ElementAt(i).Name)
+                                                @Html.TextBox("FeeList[" + @i + "].Percentage", Model.ElementAt(i).Percentage, new { id = "percentage", @min = "0", @class = "percentage txtboxNum form-control col-xs-3 hideMsg", @maxlength = "3", style = "width:120px" })
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                    }
+                    else if (ViewBag.AcademicYearId > 0)
+                    {
+                    <span id="Validation" style="color:red;font-weight:bold">Data is not available,set installements</span>
+                    }
+
+                    }
+                </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    $('.hideMsg').click(function () {
+        $('#spnSave').hide();
+    })
+
+    $(document).ready(function () {
+        LoadAcademicYearCombo();
+    });
+
+
+    function LoadAcademicYearCombo() {
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                $('#imagemodal').hide();
+
+                var ObjAyYear = $("#CboAcademicYear")
+                ObjAyYear.children().remove();
+                ObjAyYear.append($("<option>").val(-1).text("--Select--"))
+
+                $.each(result, function (i, elm) {
+                    ObjAyYear.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(ObjAyYear)
+
+                if ($('#SelAyId').val() > 0) {
+                    $('#CboAcademicYear').val($('#SelAyId').val());
+                }
+
+            },
+            async: false
+        })
+
+    }
+
+    $('#CboAcademicYear').change(function () {
+        PopulateData();
+    });
+
+    function PopulateData() {
+        if ($('#CboAcademicYear').val() < 1) {
+
+            if ($('#divPercentage') != "undefined")
+                $('#divPercentage').html('');
+
+            return;
+        }
+
+        window.location.href = '/SeFinance/FeePercentageDistribution?AcademicYearId=' + $('#CboAcademicYear').val();
+    }
+
+
+
+    $("#percentage").keypress(function (e) {
+        //if the letter is not digit then display error and don't type anything
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            //display error message
+            return false;
+        }
+    });
+
+    function validatePercentage() {
+
+        var validate = true;
+        var TotalVal = getTotalvalue();
+        if (TotalVal != 0) {
+            if (TotalVal == 100) {
+                document.getElementById("Validation").innerHTML = " "
+                validate = true;
+            } else {
+                document.getElementById("Validation").innerHTML = "Percentage value should be 100"
+                validate = false;
+            }
+        } else {
+            document.getElementById("Validation").innerHTML = "Enter value in percentage"
+            validate = false;
+        }
+
+        return validate;
+    }
+
+    function getTotalvalue() {
+
+        var TotalVal = 0;
+        var myTable = document.getElementById("mytab1");
+        var dValue = null;
+        var n = myTable.rows.length;
+
+        $('#mytab1 tr').each(function (index) {
+            dValue = $(this).find('#percentage').val();
+            TotalVal += parseInt(dValue, 10);
+        })
+
+        return TotalVal;
+    }
+
+    function submitForm() {
+        var validPercentage = validatePercentage();
+        if (validPercentage == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+</script>
+
+
+
+

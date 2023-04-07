@@ -1,0 +1,206 @@
+﻿@{
+    ViewBag.Title = "HallTicket";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+                 <i class="menu-icon fa fa-graduation-cap"></i>
+            Transactions
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Hall Ticket</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!--Main Content-->
+<section class="content">
+ 
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm())
+            {
+
+                <div class="box">
+                    <div class="box-body">
+                        <div class="row">
+
+                            <div class="col-xs-12">
+                                <br />
+                                <div class="form-group">
+                                    <div class="row">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Select Class")</label>
+
+                                        <div class="col-sm-4">
+                                            @Html.DropDownList("BatchId", null, "--- Select ---", new { @class = "form-control col-sm-6", onchange = "GetExaminationsByBatch();" })
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="Student">
+                                            <label style="color:red;font-weight:bold;"> Please Select Student </label>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Select Exam")</label>
+
+                                        <div class="col-sm-4">
+                                            <select id="examsId" name="examsId" class="form-control" title="-- Select --">
+                                                <option name="exam" value="">--- Select ---</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-sm-3" style="display:none;" id="FPTo">
+                                            <label style="color:red;font-weight:bold;"> Please Select Particular </label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                                <div>
+                                    <input type="button" onclick="return PrintHallTickets('#mydiv');" name="Save" value="Generate" class="btn btn-primary" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+
+            }
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    var lstStudents;
+    function GetExaminationsByBatch() {
+        var batchId = $('#BatchId').val();
+
+        $.ajax({
+            url: '/AStudent/LoadExams',
+            data: { batchId: batchId },
+            success: function (data) {
+                var items = '<option name="exam" value="">--- Select ---</option>';
+                $.each(data, function (i, data) {
+                    items += "<option value='" + data.ExamId + "'>" + data.ExamName + "</option>";
+                });
+                $("#examsId").html(items);
+            }
+        });
+    };
+
+    function PrintHallTickets(value) {
+        var batchId = $('#BatchId').val();
+        var examId = $('#examsId').val();
+        $.ajax({
+            url: '/AStudent/ExaminationPaperData',
+            data: { batchId: batchId, examId: examId },
+            success: function (data) {
+                var printData = data.exampaperdata;
+                var institute = data.institute;
+
+                $("#divResults").empty();
+                //var res = '<img src="~/Content/images/nophoto.jpg />';
+                //............................dynamically creating table y using ajax.........................
+                $.each(printData, function (i, printData) {
+                    result = printData;
+                    //...........................Creating Hall Ticket...........................
+                    html = "";
+                    //dynamically creating a div section of institute Details
+                    div = '<div style="height:12%"><div class="row"><div class="col-xs-12 box-body table-responsive"><img class="col-xs-11" id="avatar" src="' + institute.InstituteLogo + '" width="60" height="53" style="margin-bottom:-1.5em;" /><label style="font-weight:bold; margin-left:0.3em; font-size:20px;" id="instName">' + institute.InstituteName + '</label></div>';
+                    div += '<b><label style="margin-left:4.1em;" id="instAddress">' + institute.InstituteAddress + '</label></b><br /><hr style="width:100%; margin-bottom:-0.5em" /><hr style="width:100%;" /><div align="center"><b><u id="title">' + printData[0].ExamName + " - Hall Ticket" + '</u></d></div></div></div>';
+
+                    //creating table of student details
+                    table1 = '<div style="height:6%;"><table class="table table-hover box-body table-responsive" style="width:100%;font-size:12px;"><tbody style="width:100%"><tr><td><b>Hall Ticket No : </b><text>' + printData[0].HallTicketNo + '</text></td><td><b>Class : </b><text>' + printData[0].ClassName + '</text></td><td><b>Time : </b><text>' + printData[0].StartTime + '</text></td><td rowspan="2"></td></tr>';
+                    table1 += '<tr><td><b>Name : </b><text>' + printData[0].StudentName + '</text></td><td><b>Group : </b><text>' + printData[0].Section + '</text></td><td><b>Room No : </b></td></tr></tbody></table></div>';
+
+                    //creating table of details of Examination
+                    html = '<div style="height:15%;"><table id="tbodyId1" class="table table-hover" border="1" rules="all" cellpadding="5" style="width:100%;font-size:12px;">';
+
+                    html += '<tbody><tr><th align="left">Subject Name</th>';
+                    $.each(result, function (j, result) {
+                        //appending all Exam Papers
+                        html += '<td>' + result.SubjectName + '</td>'
+                    });
+
+                    html += '</tr><tr><th align="left">Date</th>'
+                    $.each(result, function (j, result) {
+                        //Appending Exam Dates
+                        var ExamDate = new Date(parseInt(result.ExamDate.replace("/Date(", "").replace(")/", ""), 10));
+                        var FExamDate = (ExamDate.getMonth() + 1) + '/' + ExamDate.getDate() + '/' + ExamDate.getFullYear();
+                        html += '<td>' + getFormattedDate(FExamDate) + '</td>'
+                    });
+
+                    html += '</tr><tr><th align="left">Invg.Sign</th>'
+                    $.each(result, function (j, result) {
+                        html += '<td></td>'
+                    });
+
+                    html += '</tr></tbody></table></div><hr style="border-top:dotted 1px;margin-top:-0.5em;" id="dotts" />';
+
+                    //Appending Hall Ticket Details of students to the div section
+                    $("#divResults").append(div);
+                    $("#divResults").append(table1);
+                    $("#divResults").append(html);
+
+                });
+
+                PrintElem(value);
+            }
+        });
+        return false;
+    };
+
+    //formating Date to get the format of dd-MMM-yyyy ex:(1-Dec-2015)
+    function getFormattedDate(input) {
+        var pattern = /(.*?)\/(.*?)\/(.*?)$/;
+        var result = input.replace(pattern, function (match, p1, p2, p3) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return (p2 < 10 ? "0" + p2 : p2) + "-" + months[(p1 - 1)] + "-" + p3;
+        });
+        return result;
+    }
+
+    //printing Data of students Hall Tickets
+    function PrintElem(elem) {
+        var tbody = $("#tbodyId1");
+        if (tbody.children().length > 0) {
+            Popup($(elem).html());
+        }
+    }
+
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+<html>
+<body>
+    <div id="mydiv" style="display:none">
+        <div id="divResults" class="col-xs-12 box-body table-responsive" style="font-family:'Segoe UI';height:100%">
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,320 @@
+﻿
+@model AsteriskBrowserAL.SlabSettings
+
+
+@{
+    ViewBag.Title = "SlabSettings";
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            SeHR
+        </li>
+        <li class="active">SlabSettings</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<!-- /section:basics/content.breadcrumbs -->
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<script>
+    $("#id-btn-dialog2").on('click', function (e) {
+        e.preventDefault();
+
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            width: '320',
+            modal: true,
+            title: "   SlabSettings",
+            title_html: true,
+            buttons: [
+                {
+                    html: "<i class='ace-icon fa fa-trash-o bigger-110'></i>&nbsp; Delete",
+                    "class": "btn btn-danger btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+                ,
+                {
+                    html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Cancel",
+                    "class": "btn btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+    });
+</script>
+
+
+<section class="content">
+
+    <br />
+    <div class="row" >
+        <div class="col-xs-12">
+            @Html.ValidationMessage("SlabSettings")
+            <span style="font-weight:bold;color:red" id="Validation"></span>
+            <span style="color:red;" id="EPCombos"></span>
+            @if (null != TempData["Subjects"])
+            {
+                @Html.Raw(TempData["SlabSettings"])
+            }
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+
+                    <h5 class="widget-title">
+                        SlabSettings
+                    </h5>
+                    <div style="float:right;" class="inline action-buttons">
+                        @*<a href="@Url.Action("SlabSettingsC", "SeHR")" role="button" id="New" name="New" onclick="return submitForm();"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+                         
+                            <a class="blue P2" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+                         
+                    </div>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Component Type")</label>
+
+                                    <div class="col-sm-6">
+                                        @Html.DropDownList("ComponentTypeId", new List<SelectListItem>
+                                             {
+                                                                   new SelectListItem{ Text="-- Select --", Value = "0" },
+                                                new SelectListItem{ Text="Percentage", Value = "1" },
+                                                new SelectListItem{ Text="Fixed", Value = "2" }
+                                             }, new { @class = "form-control", @id = "ComponentTypeId" })
+                                        
+                                       
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="desBatchId">
+                                        <label style="color:red;font-weight:bold; width:130px;">select ComponentType </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Components")</label>
+
+                                    <div class="col-sm-6">
+                                        @*@Html.DropDownList("PayrollCategoryComponentId", null, "--Select Component--", new { @class = "form-control", @id = "ComponentId", @onchange = "" })*@
+                                        <select id="ComponentId" name="ComponentId" class="form-control"></select>
+
+                                    </div>
+                                    <div class="col-sm-3" style="display:none;" id="desBatchId">
+                                        <label style="color:red;font-weight:bold; width:130px;">select Component </label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div id="SearchViewDiv">
+               
+            </div>
+            
+        </div>
+    </div>
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+
+<script type="text/javascript">
+
+    //$(document).ready(function () {
+    //    $('#dtSlabSettings').dataTable().fnDestroy();
+    //})
+
+    $('#ComponentTypeId').change(function () {
+        document.getElementById("Validation").style.display = "none"
+        $('#ComponentId').empty();
+
+        var ComponentTypeId = $('#ComponentTypeId').val();
+
+        if (ComponentTypeId > 0) {
+            GetComponents();
+
+        }
+    });
+
+    function GetComponents() {
+        debugger
+        var ComponentTypeId = $('#ComponentTypeId').val();
+
+        if (ComponentTypeId > 0) {
+            $.ajax({
+
+                url: '/SeHR/GetComponentsByType',
+                data: { ComponentTypeId: ComponentTypeId },
+                success: function (data) {
+
+                    var ComponentsItems = $("#ComponentId")
+                    ComponentsItems.children().remove();
+                    ComponentsItems.append($("<option>").val("null").text("--- Select ---"))
+                    $.each(data, function (e, record) {
+                        ComponentsItems.append($("<option>").val(record.PayrollCategoryComponentId).text(record.CategoryName))
+                    });
+
+                    $("#ComponentId").append(ComponentsItems);
+
+                },
+                aync: false
+            });
+        }
+    }
+
+    $('#ComponentId').change(function () {
+        debugger
+        var Id = $('#ComponentId').val();
+        
+                if (Id > 0) {
+                    $('#imagemodal').show();
+                    $.ajax({
+                        url: '/SeHR/SlabSettingsData',
+                        data: { ComponentId: Id }, 
+                        success: function (Data) {
+                            $('#imagemodal').hide();
+                            $("#SearchViewDiv").html(Data);
+                        },
+                    })
+                }
+                else {
+                    $("#SearchViewDiv").html("");
+                }
+        
+    });
+
+     
+
+        function validateSubjects() {
+
+            document.getElementById("count").value = "1";
+            var BatchId = document.getElementById("BatchId").value;
+            validate = true;
+
+            if (BatchId == "") {
+                document.getElementById("desBatchId").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("desBatchId").style.display = "none";
+            }
+
+            return validate;
+        };
+
+        function submitForm() {
+            var validatestatus = validateSubjects();
+            if (validatestatus == false) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+        $('#BatchId').click(function () {
+            document.getElementById('desBatchId').style.display = "none"
+        })
+
+        function btnConfirm(Value) {
+            debugger
+            if (Value > 0) {
+                $.ajax({
+                    url: '/SeHR/ValidationForSubjectsD',
+                    data: { id: Value },
+                    success: function (data) {
+
+                        var url = '/SeAcademics/SubjectsD?id=' + Value;
+                        var title = "Subjects";
+
+                        OpenDialog(data, url, title);
+                    },
+                    async: false
+                });
+            }
+        }
+
+        $('#New').click(function () {
+            debugger
+            debugger
+            var ComponentTypeId = $('#ComponentTypeId').val();
+            var ComponentId = $('#ComponentId').val();
+
+            if (ComponentId < 1) {
+                document.getElementById("Validation").innerHTML = "Please select Component"
+            }
+            else {
+
+                if (ComponentId > 0) {
+                    $('#imagemodal').show();
+                    $.ajax({
+                        url: '/SeHR/ValidateSlabData',
+                        data: { ComponentId: ComponentId },
+                        success: function (Data) {
+                            $('#imagemodal').hide();
+                            if(Data == true)
+                                OpenDialog("Don't Create more than one", "", "SlabSettings");
+                            else
+                                window.location.href = "/SeHR/SlabSettingsC?ComponentId=" + ComponentId + "&ComponentTypeId=" + ComponentTypeId
+                        },
+                    })
+                }
+                else {
+                    window.location.href = "/SeHR/SlabSettingsC?ComponentId=" + ComponentId + "&ComponentTypeId=" + ComponentTypeId
+                }
+            }
+
+        });
+
+        function btnConfirm(Value) {
+            debugger
+            if (Value > 0) {
+                $.ajax({
+                    url: '/SeHR/ValidationForSubjectsD',
+                    data: { id: Value },
+                    success: function (data) {
+
+                        var url = '/SeAcademics/SubjectsD?id=' + Value;
+                        var title = "Subjects";
+
+                        OpenDialog(data, url, title);
+                    },
+                    async: false
+                });
+            }
+        }
+
+      
+</script>
+
+

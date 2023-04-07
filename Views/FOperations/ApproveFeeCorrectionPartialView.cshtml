@@ -1,0 +1,188 @@
+﻿@model List<AsteriskBrowserAL.Models.FeeCorrectionViewModel>
+@{
+    var Status = "";
+    ViewBag.Title = "Approve Bank Deposit Correction";
+}
+
+
+@if (Model != null && Model.Count > 0)
+{
+    int nsno = 1;
+ 
+
+    <div class="table-header">
+        Records Found (@Model.Count())
+    </div><!-- /.box-header -->
+
+
+        <div class="overflowscroll">
+
+            <table class="table tbhover table-striped table-bordered dynamic-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">
+                            S.No.
+                        </th>
+
+                        <th style="min-width:140Px">
+                            @Html.DisplayName("Branch Name")
+                        </th>
+                        <th style="min-width:140Px">
+                            @Html.DisplayName("Payment Date")
+                        </th>
+                        <th style="min-width:200Px">
+                            @Html.DisplayName("Student Name")
+                        </th>
+                        <th style="min-width:156Px">
+                            @Html.DisplayName("ERP Receipt No")
+                        </th>
+                        <th style="min-width:126Px">
+                            @Html.DisplayName("Template No")
+                        </th>
+
+                        <th style="min-width:160Px">
+                            @Html.DisplayName("Manual Receipt No")
+                        </th>
+
+                        <th style="min-width:152Px">
+                            @Html.DisplayName("New Template No")
+                        </th>
+
+                        <th style="min-width:195Px">
+                            @Html.DisplayName("New Manual Receipt No")
+                        </th>
+
+                        <th style="min-width:195Px">
+                            @Html.DisplayName("Receipt Amount")
+                        </th>
+                        <th style="min-width:195Px">
+                            @Html.DisplayName("Old Payment Mode")
+                        </th>
+                        <th style="min-width:195Px">
+                            @Html.DisplayName("New Payment Mode")
+                        </th>
+                        <th style="min-width:195Px">
+                            @Html.DisplayName("Fee Account Type")
+                        </th>
+
+                        <th style="min-width:140Px">
+                            @Html.DisplayName("Modified Date")
+                        </th>
+
+                        <th style="min-width:121Px">
+                            @Html.DisplayName("Request Type")
+                        </th>
+                        <th style="min-width:200Px">
+                            @Html.DisplayName("Remarks")
+                        </th>
+
+                        <th>
+                            @Html.DisplayName("Status")
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                {
+                        <tr>
+                            <td>
+                                @(nsno++)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.BranchName)
+                            </td>
+                            <td>
+                                @item.TransactionDateDisplay
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.StudentName)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ReceiptNo)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.OldTemplateNo)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DisplayManualReceiptNo)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NewTemplateNo)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DisplayNewManualReceiptNo)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.OldAmount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DisplayPaymentMode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NewPaymentMode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DisplayNewManualReceiptNo)
+                            </td>
+
+                            <td>
+                                @item.NewDateDisplay
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RequestTypeDisplay)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Remarks)
+                            </td>
+
+                            <td>
+                                @if (item.ActionStatus == 0)
+                                {
+                                    Status = "Pending";
+                                }
+                                @if (item.ActionStatus == 1)
+                                {
+                                    Status = "Accepted";
+                                }
+                                @if (item.ActionStatus == 2)
+                                {
+                                    Status = "Rejected";
+                                }
+
+                                @Html.DisplayName(Status)
+                            </td>
+
+                            @if (item.ActionStatus == 0)
+                    {
+                                <td>
+                                    <a role="button" id="lnkApprove" onclick="ApproveFC(@item.FeeCorrectionId, @item.SubscriptionId,1,@item.RequestType)">Approve </a> |
+
+                                    <a role="button" id="lnkRejecty" onclick="ApproveFC(@item.FeeCorrectionId,@item.SubscriptionId,2,@item.RequestType)">Reject</a>
+                                </td>
+                            }
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+  
+}
+else
+{
+    <span style="color:red;font-weight:bold">Data is not available</span>
+}
+
+
+
+@Html.Action("DataTableScripts", "Base", new { Ispaging = false, allowScroll = true, strHeight = "400px" })

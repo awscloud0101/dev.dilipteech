@@ -1,0 +1,138 @@
+﻿@model List<AsteriskBrowserAL.Models.MoneySpentViewModel>
+@{
+    int sno = 1;
+}
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+       
+
+                @if (Model != null && Model.Count > 0)
+                {
+                    <div class="table-header">
+                        Records Found (@Model.Count)
+                        </div>
+                        <div style="overflow:auto; max-height:430px;">
+                            <table id="tbPettyCash" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                           S.No.
+                                        </th>
+
+                                        <th style="min-width:140px">
+                                            @Html.DisplayName("Date")
+                                        </th>
+                                        <th style="min-width:200px">
+                                            @Html.DisplayName("Account Head")
+                                        </th>
+                                        <th style="min-width:200px">
+                                            @Html.DisplayName("Account Sub Head")
+                                        </th>
+                                        <th style="min-width:120Px">
+                                            @Html.DisplayName("Voucher No")
+                                        </th>
+                                        <th style="min-width:140px">
+                                            @Html.DisplayName("Spent Amount")
+                                        </th>
+                                        <th style="min-width:140Px">
+                                            @Html.DisplayName("Paid To")
+                                        </th>
+                                        <th style="min-width:200Px">
+                                            @Html.DisplayName("Approved By")
+                                        </th>
+                                        <th style="min-width:250Px">
+                                            @Html.DisplayName("Narration")
+                                        </th>
+                                        <th style="min-width:250Px">
+                                            @Html.DisplayName("Status")
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                        {
+                                        <tr>
+                                            <td>
+                                                @(sno++)
+                                            </td>
+
+                                            <td>
+                                                @if (item.TransactionDate.HasValue)
+                                                    {
+                                                    @item.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                                                    }
+                                            </td>
+                                            <td>
+                                                @item.HeadName
+                                            </td>
+                                            <td>
+                                                @item.SubHeadName
+                                            </td>
+                                            <td>
+                                                @item.DisplayVoucherNo
+                                            </td>
+                                            <td style="text-align:right">
+                                                @item.Amount
+                                            </td>
+                                            <td>
+                                                @item.PaidTo
+                                            </td>
+                                            <td>
+                                                @item.ApprovedPersonname
+                                            </td>
+                                            <td>
+                                                @item.Description
+                                            </td>
+
+                                            @if (item.ActionStatus == 3)
+                                                {
+                                                    if (item.TransactionDate.GetValueOrDefault().Date == DateTime.Today)
+                                                    {
+                                                        <td>
+                                                            @if (!string.IsNullOrWhiteSpace(item.ActionStatusDisplay))
+                                                            {
+                                                                @item.ActionStatusDisplay
+                                                            }
+
+                                                            @Html.ActionLink("Request", "MoneySpentEdit", new { TransactionId = item.PettyCashTransactionId },new { @Class="P2"})
+                                                        </td>
+                                                    }
+
+                                                    <td>
+                                                        <a role="button" id="lnkCancel" class="P2" onclick="CancelRequest(@item.PettyCashTransactionId)">Cancel</a>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                <td style="min-width:120px">
+                                                    @item.ActionStatusDisplay
+                                                </td>
+
+                                                <td>
+                                                    @Html.ActionLink("Details", "MoneySpentDetails", new { CorrectionId = item.PettyCashCorrectionId },new {@class="P2"})
+                                                </td>
+                                                }
+                                        </tr>
+                                        }
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        }
+                        else
+                        {
+                        <span style="color:red;font-weight:bold">Transactions are not done yet </span>
+                        }
+
+
+
+                        @Html.Action("DataTableScripts", "Base")
+
+                        <script type="text/javascript">
+
+                        </script>
+
+
+

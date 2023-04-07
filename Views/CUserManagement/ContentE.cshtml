@@ -1,0 +1,197 @@
+﻿@model  AsteriskBrowserAL.Content
+@{
+    ViewBag.Title = "Edit Content";
+
+    int ModuleId = ViewBag.ModuleId;
+    bool IsCentral = Model.IsCentral.GetValueOrDefault();
+    bool IsBrowser = Model.IsBrowser.GetValueOrDefault();
+    bool IsSchool = Model.IsSchool.GetValueOrDefault();
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Controls
+        </li>
+        <li>
+            <i class=""></i>
+            CUserManagement
+        </li>
+        <li class="active">Content</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Content", "Content", new { nModuleId = ModuleId, nPageId = Model.PageId })</h3>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color: red;">@Html.ValidationMessage("ContentName")</span>
+
+            <div class="box">
+                <!-- form start -->
+                @using (Html.BeginForm("ContentE", "CUserManagement", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.ValidationSummary(true)
+                    <div class="box-body">
+                        <div class="box-header">
+
+                            <button class="btn btn-primary pull-right" type="submit" style="width:80px;float:right;" onclick="return ValidateForm();">
+                                Save
+                            </button>
+                        </div>
+
+                        @Html.HiddenFor(model => model.PageId)
+                        @Html.HiddenFor(model => model.ContentId)
+
+                        <input type="hidden" name="ModuleId" value="@ViewBag.ModuleId" />
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Content Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextAreaFor(model => model.ContentName, new { @class = "form-control col-sm-5 textlength", placeholder = "ContentName", @id = "ContentName", @onchange = "removeError();" })
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="vContentName">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Content URI")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextAreaFor(model => model.ContentURI, new { @class = "form-control col-sm-5 textlength", placeholder = "ContentURI", @id = "ContentURI", @onchange = "removeError();" })
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="vContentURI">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Browser URL")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.CBURL, new { @class = "form-control col-sm-5 textlength", placeholder = "CBURL", @id = "CBURL", @onchange = "removeError();" })
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="vCBURL">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Order No")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.COrderId, new { @class = "form-control col-sm-5 txtboxNum", placeholder = "COrderId", @id = "COrderId", @onchange = "removeError();" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="vCOrderId">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <div class="col-xs-12 col-lg-offset-3">
+                                <div class="col-sm-3" style="width:100px">
+                                    @Html.CheckBoxFor(Modelitem => IsBrowser, new { @name = "IsBrowser", width = "100px" })
+                                    <span class="lbl bigger-120">Browser</span>
+                                </div>
+
+                                <div class="col-sm-3" style="width:100px">
+                                    @Html.CheckBoxFor(Modelitem => IsCentral, new { @name = "IsCentral", width = "100px" })
+                                    <span class="lbl bigger-120">Central</span>
+                                </div>
+
+                                <div class="col-sm-3" style="width:100px">
+                                    @Html.CheckBoxFor(Modelitem => IsSchool, new { @name = "IsSchool", width = "100px" })
+                                    <span class="lbl bigger-120">School</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+
+    function ValidateForm() {
+        var bValidationPass = true;
+
+        var strContentName = $('#ContentName').val();
+        var strContentURI = $('#ContentURI').val();
+        var strCOrderId = $('#COrderId').val();
+        var strCBURL = $('#CBURL').val();
+
+
+
+        if (strContentName == "" || strContentName == null || strContentName == undefined) {
+            bValidationPass = false;
+            $('#vContentName').show();
+        }
+
+        if (strContentURI == "" || strContentURI == null || strContentURI == undefined) {
+            bValidationPass = false;
+            $('#vContentURI').show();
+
+        }
+
+
+        if (strCOrderId == "" || strCOrderId == null || strCOrderId == undefined) {
+            bValidationPass = false;
+            $('#vCOrderId').show();
+        }
+        if (strCBURL == "" || strCBURL == null || strCBURL == undefined) {
+            bValidationPass = false;
+            $('#vCBURL').show();
+        }
+
+
+
+        return bValidationPass;
+    }
+
+    $('#ContentName').focus(function () {
+        $('#vContentName').hide();
+    })
+    $('#ContentURI').focus(function () {
+        $('#vContentURI').hide();
+    })
+
+    $('#COrderId').focus(function () {
+        $('#vCOrderId').hide();
+    })
+    $('#CBURL').focus(function () {
+        $('#vCBURL').hide();
+    })
+
+
+</script>

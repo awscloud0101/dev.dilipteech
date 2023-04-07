@@ -1,0 +1,210 @@
+﻿@model AsteriskBrowserAL.Models.StudentTransferHistoryData
+
+@{
+    ViewBag.Title = "Student Transfer History";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+    <li>
+        <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Student Transfer History</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ExcelStudentTransferHistoryReportDT", "AReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Student Transfer History</span>
+
+
+                    </div>
+
+                    <div class="widget-box">
+
+             
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Division</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+
+                          
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Types</label>
+                                            <table class="col-sm-6">
+                                                <tr>
+                                                    <td><input type="radio" id="Class" value="true" name="Status"><b> &nbsp; &nbsp;Class </b> </td>
+
+                                                    <td><input type="radio" id="Section" value="false" name="Status"><b>&nbsp; &nbsp;Section</b> </td>
+
+                                                    <td><input type="radio" id="Branch" value="false" name="Status"><b>&nbsp; &nbsp;Branch</b>  </td>
+                                                    <td><input type="radio" id="InActive" value="false" name="Status"><b>&nbsp; &nbsp;InActive</b>  </td>
+
+                                                    <td><input type="radio" id="Active" value="false" name="Status"><b>&nbsp; &nbsp;Active</b>  </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+                <div id="StudentTransferDetails"></div>
+
+
+            }
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+    var status = 0;
+    var DisplayValidation = "";
+
+    $('#DivisionId').change(function () {
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("0").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    $('#BranchId').change(function () {
+        GetStudentTransferHistoryData();
+    })
+
+
+    $('#Class').change(function () {
+        GetStudentTransferHistoryData();
+    })
+
+    $('#Section').change(function () {
+        GetStudentTransferHistoryData();
+    })
+
+    $('#Branch').change(function () {
+        GetStudentTransferHistoryData();
+    })
+
+     $('#InActive').change(function () {
+    	GetStudentTransferHistoryData();
+    })
+
+    $('#Active').change(function () {
+    	GetStudentTransferHistoryData();
+    })
+
+    function GetStudentTransferHistoryData() {
+
+        $('#StudentTransferDetails').html('');
+
+        var BranchId = $('#BranchId').val();
+        var Divisionid = $('#DivisionId').val();
+        var IsCentral = $('#IsCentral').val();
+
+        if (Divisionid == 0 || BranchId == 0)
+            return;
+
+        if (document.getElementById('Class').checked) {
+            status = 1;
+        }
+        if (document.getElementById('Section').checked) {
+            status = 2;
+        }
+        if (document.getElementById('Branch').checked) {
+            status = 3;
+        }
+         if (document.getElementById('InActive').checked) {
+        	status = 4;
+        }
+        if (document.getElementById('Active').checked) {
+        	status = 5;
+        }
+        if (IsCentral == "value")
+            IsCentral = "true";
+
+        if (status == 0)
+            return;
+
+        $.ajax({
+            url: '/AReports/GetStudentTransferHistoryData',
+            data: { nDivisionId: Divisionid, nBranchId: BranchId, IsCentral: IsCentral, nstatus: status },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#imagemodal').hide();
+                $('#StudentTransferDetails').html(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+</script>
+
+

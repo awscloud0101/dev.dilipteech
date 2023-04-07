@@ -1,0 +1,231 @@
+﻿@model AsteriskBrowserAL.Models.PettyCashDaySheetData
+@{
+    ViewBag.Title = "Petty Cash Day Sheet";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Petty Cash
+        </li>
+        <li class="active">Petty Cash Day Sheet</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+ 
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("PettyCashDaySheetExcel", "FPettyCash", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Petty Cash Day Sheet</span>
+                        <div  style="float:right;margin-right:10px;">
+                            <a class="P2" id="ViewData" value="View Data" name="ViewData" onclick="return submitForm();">
+                            <span class="btncustom">View Data</span></a>
+                        </div>
+
+                    </div>
+
+
+
+
+                    <div class="widget-box">
+
+             
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+
+                                @if (Model.IsCentral == true)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Division</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+
+              
+                                <div class="row">
+                                    <div class="col-xs-12">
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Date</label>
+                                            <div class="col-sm-6">
+                                                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                    <input class="form-control" type="text" id="Date" name="Date" autocomplete="off" placeholder="Select Date" required="required" title="Please select the date" />
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+                }
+
+                <div id="SearchData"></div>
+            }
+
+        </div>
+     </div>
+</section>
+
+
+
+<script type="text/javascript">
+
+    var DisplayValidation = "";
+
+    $('#DivisionId').change(function () {
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    function submitForm() {
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        var Validation = ValidatePettyCashDaySheet();
+
+        if (Validation == false) {
+
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+            var IsCentral = $('#IsCentral').val();
+            if (IsCentral == "value")
+                IsCentral = "true";
+            $.ajax({
+
+                url: '/FPettyCash/GetBranchPettyCashDayReoptData',
+                data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), Date: $('#Date').val(), IsCentral: IsCentral },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#SearchData').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+    function ValidatePettyCashDaySheet() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+        var dtToDate = $('#Date').val();
+        if (dtToDate == "") {
+            valid = false;
+            DisplayValidation += "Date, ";
+        }
+
+        return valid;
+
+    };
+
+
+
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+</script>

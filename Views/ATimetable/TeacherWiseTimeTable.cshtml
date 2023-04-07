@@ -1,0 +1,171 @@
+﻿@model AsteriskBrowserAL.Models.TeacherWiseTimeTableData
+@{
+    ViewBag.Title = "Teacher wise TimeTable";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            TimeTable
+        </li>
+        <li class="active">Teacher wise TimeTable</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<section class="content">
+    <br />
+
+    @using (Html.BeginForm("TeacherwiseTimeTable", "ATimeTable", FormMethod.Post))
+    {
+
+        <span style="color:red;" id="Validation"></span>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Teacher wise TimeTable
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Staff</label>
+                                            <div class="col-sm-6">
+                                                @if (null != Model.lstStaff)
+                                                {
+                                                    @Html.DropDownListFor(model => model.StaffId, new SelectList(Model.lstStaff, "StaffId", "StaffName"), "-- Select --", new { @class = "form-control", @id = "StaffId" })
+                                                }
+                                                else
+                                                {
+                                                    <select id="StaffId">
+                                                        <option>
+                                                            --- Select Staff ---
+                                                        </option>
+                                                    </select>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+                                            <div class="col-sm-6">
+                                                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                    <input class="form-control" type="text" name="FillUpDate" id="FillUpDate" autocomplete="off" placeholder="Select Start Date" />
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div id="SearchData"></div>
+    }
+
+</section>
+
+
+
+
+
+
+
+<script>
+
+
+    jQuery(function ($) {
+        $('#StaffId').change(function () {
+            document.getElementById("Validation").innerHTML = "";
+            GetData();
+        });
+
+        $('#FillUpDate').change(function () {
+            document.getElementById("Validation").innerHTML = "";
+            GetData();
+        });
+
+
+   
+
+        function GetData() {
+
+            var StaffId = $("#StaffId").val();
+            var FillUpDate = $("#FillUpDate").val();
+            if (StaffId > 0 && FillUpDate != "") {
+
+                $('#imagemodal').show();
+                $.ajax({
+                    url: '/ATimeTable/GetTeacherWiseTimeTable',
+                    data: { StaffId: StaffId, dtDate: FillUpDate },
+                    success: function (data) {
+                        $('#imagemodal').hide();
+                        $("#SearchData").html(data)
+                    },
+                    aync: false
+                })
+            }
+        }
+    })
+        
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

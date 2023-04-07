@@ -1,0 +1,53 @@
+﻿@using AsteriskBrowserAL.Helpers;
+
+@{
+    int nUserId = Utility.GetUserOriginalId();
+    string strPrefix = "";
+    string url = "";
+    bool bExists = false;
+
+    AsteriskGMSEntities dbCentral = new AsteriskGMSEntities(Utility.GetCentralDatabase());
+
+    int nSubId = Utility.GetLoggedSubscriptiond();
+
+    if (nSubId > 0)
+    {
+        BranchAllPrefix Prefix = dbCentral.BranchAllPrefix.FirstOrDefault(b => b.SubscriptionId == nSubId);
+
+        if (null != Prefix)
+        {
+            strPrefix = Prefix.BranchCode;
+        }
+    }
+
+    if (!string.IsNullOrWhiteSpace(strPrefix) && nUserId > 0)
+    {
+        url = "http://docs.gms-erp.com/GMS/Progress%20Cards/" + strPrefix + "_" + nUserId + ".pdf";
+
+        bExists = Utility.IsURLExists(url);
+    }
+}
+
+<br/>
+
+@*@if (bExists)
+{
+    <h5>
+        <span>Click <a style="text-underline-position:below" href="@url">here</a>    for downloading your child progress card.</span>
+    </h5>
+}
+else
+{
+    <h5>
+        <span>We will upload your child progress card soon. Please wait ....</span>
+    </h5>
+}*@
+
+<div>
+    <div class="box-body">
+
+        
+        @*<img src="~/Content/images/Progress Card.PNG"  style="height:50%;width:100%" />*@  
+    </div>
+</div>
+

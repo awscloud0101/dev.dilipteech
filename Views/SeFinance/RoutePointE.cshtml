@@ -1,0 +1,151 @@
+﻿
+@model AsteriskBrowserAL.Models.VehicleRoutePointViewModel
+
+@{
+    ViewBag.Title = "Route Point";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Route Point</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <br />
+
+    @using (Html.BeginForm("RoutePointE", "SeFinance", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        <div class="row">
+            <div class="col-xs-12">
+
+                <input type="hidden" name="VehicleRouteId" value="@Model.VehicleRouteId" id="SelTransportId" />               
+                <input type="hidden" name="BranchId" value="@Model.BranchId" id="SelBranchId" />
+
+                @Html.HiddenFor(model => model.VehicleRoutePointId)
+                <input type="hidden" name="VehicleRoutePointId" value="@Model.VehicleRoutePointId" id="SelVehicleRoutePointId" />
+                <span style=" color:red;font-weight:bold;" id="Validation"></span>
+            
+
+                    <div class="page-header">
+                        <h1>
+                            Route Point
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "RoutePoint", new { TransportPlanId = (null != Model) ? (Model.VehicleRouteId) : 0 })
+                            </small>
+                        </h1>
+                    </div><!-- /.page-header -->
+
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Route Point Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.RoutePoint, new { @class = "form-control textlength", @id = "RoutepointName", placeholder = "Route point Name" })
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="RoutepointNameVal">
+                            </span>
+
+                        </div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+       
+
+    }
+
+</section>
+
+
+
+<script type="text/javascript">
+    function validateRoutePoint() {
+
+        var RoutePointName = document.getElementById("RoutepointName").value;
+        var vechileRoutePointId = $('#SelVehicleRoutePointId').val();
+
+
+        validate = true;
+
+        if (RoutePointName == "") {
+            document.getElementById("RoutepointNameVal").innerHTML = "Please enter name";
+            validate = false;
+        }
+
+        if (validate == true) {
+            validate = IsNameExists();
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateRoutePoint();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#RoutepointName').focus(function () {
+        document.getElementById("RoutepointNameVal").innerHTML = "";
+    });
+
+
+    function IsNameExists() {
+        var val = true;
+        $.ajax({
+
+            url: '/SeFinance/IsRoutePointName/',
+            data: { Type: "Edit", Id: $('#SelVehicleRoutePointId').val(), RoutepointName: document.getElementById("RoutepointName").value, TransportPlanId: $('#SelTransportId').val(), BranchId: $('#SelBranchId').val() },
+            success: function (data) {
+
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            },
+            async: false
+        });
+
+        return val;
+    }
+
+</script>
+
+
+
+
+
+
+
+
+

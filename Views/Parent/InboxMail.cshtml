@@ -1,0 +1,332 @@
+﻿
+@model AsteriskBrowserAL.Models.Mail
+@{
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+@{
+    ViewBag.Title = "InboxMail";
+}
+
+<style>
+    #tabs {
+        overflow: auto;
+        width: 100%;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        #tabs li {
+            margin: 0;
+            padding: 0;
+            float: left;
+        }
+
+        #tabs a {
+            -moz-box-shadow: -4px 0 0 rgba(0, 0, 0, .2);
+            -webkit-box-shadow: -4px 0 0 rgba(0, 0, 0, .2);
+            box-shadow: -4px 0 0 rgba(0, 0, 0, .2);
+            background: #3c8dbc;
+            background: -moz-linear-gradient(220deg, transparent 10px, #3c8dbc 10px);
+            background: -webkit-linear-gradient(220deg, transparent 10px, #3c8dbc 10px);
+            background: -o-linear-gradient(220deg, transparent 10px, #3c8dbc 10px);
+            background: linear-gradient(220deg, transparent 10px, #3c8dbc 10px);
+            text-shadow: 0 1px 0 rgba(0,0,0,.5);
+            color: #fff;
+            float: left;
+            font: bold 12px/35px 'Lucida sans', Arial, Helvetica;
+            height: 35px;
+            padding: 0 30px;
+            text-decoration: none;
+        }
+
+        #tabs #current a {
+            background: #fff;
+            background: -moz-linear-gradient(220deg, transparent 10px, #fff 10px);
+            background: -webkit-linear-gradient(220deg, transparent 10px, #fff 10px);
+            background: -o-linear-gradient(220deg, transparent 10px, #fff 10px);
+            background: linear-gradient(220deg, transparent 10px, #fff 10px);
+            text-shadow: none;
+            color: #333;
+        }
+
+    #content {
+        background-color: white;
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+        background-image: -webkit-linear-gradient(top, white, #d8e8f7);
+        background-image: -moz-linear-gradient(top, white, #d8e8f7);
+        background-image: -o-linear-gradient(top, white, #d8e8f7);
+        background-image: linear-gradient(top, white, #d8e8f7);
+        -moz-border-radius: 0 2px 2px 2px;
+        -webkit-border-radius: 0 2px 2px 2px;
+        border-radius: 0 2px 2px 2px;
+        -moz-box-shadow: 0 2px 2px #000, 0 -1px 0 white inset;
+        -webkit-box-shadow: 0 2px 2px #000, 0 -1px 0 white inset;
+        box-shadow: 0 2px 2px #000, 0 -1px 0 #fff inset;
+        padding: 30px;
+    }
+
+</style>
+
+<script src="//cdn.ckeditor.com/4.5.5/standard/ckeditor.js"></script>
+
+<br />
+<section class="content">
+    <ul id="tabs">
+        <li><a href="#" class="tab1">Inbox</a></li>
+        <li><a href="#" class="tab2">Sent</a></li>
+        <li><a href="#" class="tab3">Trash</a></li>
+        <li class="li-new-mail pull-right" style="margin-bottom:0.5em" onclick="ComposeMail()">
+            <span class="btn btn-purple">
+                <i class="fa fa-envelope"></i>
+                Compose Mail
+            </span>
+        </li>
+    </ul>
+    <div id="content">
+        <div id="tab1" class="tabContent">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="simple-table" class="table table-bordered table-hover" style="overflow:auto;height:300px">
+                                <thead>
+                                    @foreach (var item in Model.Inbox)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="message-item message-unread">
+                                                    <label class="inline">
+                                                        @*<input type="checkbox" class="ace" />*@
+                                                        <span class="lbl"></span>
+                                                    </label>
+                                                    <i class="message-star ace-icon fa fa-star orange2"></i>
+                                                    <span class="sender">@item.Username </span>
+                                                    <span class="time">@item.FirstInserted</span>
+                                                    <span class="summary">
+                                                        <span class="text">
+                                                            <a onclick="OpenMail(@item.Id,0)">
+                                                                @item.subject
+                                                            </a>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </thead>
+                            </table>
+                        </div><!-- /.span -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="tab2" class="tabContent">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="simple-table" class="table  table-bordered table-hover" style="overflow:auto;height:300px">
+                                <thead>
+                                    @foreach (var item in Model.Sent)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="message-item message-unread">
+                                                    <label class="inline">
+                                                        @*<input type="checkbox" class="ace" />*@
+                                                        <span class="lbl"></span>
+                                                    </label>
+                                                    <i class="message-star ace-icon fa fa-star orange2"></i>
+                                                    <span class="sender">@item.Username </span>
+                                                    <span class="time" style="float:right">@item.FirstInserted</span>
+                                                    <span class="summary">
+                                                        <span class="text">
+                                                            <a onclick="OpenMail(@item.Id,0)">
+                                                                @item.subject
+                                                            </a>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </thead>
+                            </table>
+                        </div><!-- /.span -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="tab3" class="tabContent">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="simple-table" class="table  table-bordered table-hover" style="overflow:auto;height:300px">
+                                <thead>
+                                    @foreach (var item in Model.Trash)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="message-item message-unread">
+                                                    <label class="inline">
+                                                        @*<input type="checkbox" class="ace" />*@
+                                                        <span class="lbl"></span>
+                                                    </label>
+                                                    <i class="message-star ace-icon fa fa-star orange2"></i>
+                                                    <span class="sender">@item.Username </span>
+                                                    <span class="time">@item.FirstInserted</span>
+                                                    <span class="summary">
+                                                        <span class="text">
+                                                            <a onclick="OpenMail(@item.Id,1)">
+                                                                @item.subject
+                                                            </a>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </thead>
+                            </table>
+                        </div><!-- /.span -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <div id="ModelBodyDiv" class="bolder grey">
+    </div>
+</div><!-- #dialog-confirm -->
+
+<script>
+    $(document).ready(function () {
+        $("#content .tabContent").hide(); //Hide all content
+
+        $("#tabs li:first").attr("id", "current"); // Activate first tab
+
+        $("#tab1").show(); // Show first tab content
+
+        $('#tabs a').click(function (e) {
+            e.preventDefault();
+            $("#content .tabContent").hide(); //Hide all content
+
+            $("#tabs li").attr("id", ""); //Reset id's
+
+            $(this).parent().attr("id", "current"); // Activate this
+            var title = $(this).attr('class');
+            $('#' + title).show(); // Show content for current tab
+        });
+    });
+</script>
+
+<script>
+    var value = ''
+    function OpenMail(MailId, val) {
+        $.ajax({
+            url: "/Parent/OpenMail",
+            data: { MailId: MailId, },
+            success: function (result) {
+                debugger
+                if (val == 0) {
+                    value = "Move To Trash"
+                }
+                else if (val == 1) {
+                    value = "Delete"
+                }
+                $('#ModelBodyDiv').html(result)
+                $("#dialog-confirm").removeClass('hide')
+                $("#dialog-confirm").removeData()
+                    .dialog({
+                        resizable: false,
+                        draggable: false,
+                        width: '700',
+                        modal: true,
+                        title: 'Inbox',
+                        open: function (event, ui) {
+                            debugger
+                            $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        },
+                        title_html: true,
+                        buttons: [
+                            {
+                                html: "<i class='ace-icon bigger-110'></i>&nbsp;" + value + "",
+                                "class": "btn btn-danger btn-minier",
+                                click: function () {
+                                    debugger
+                                    var Id = $('#InboxId').val()
+                                    if (Id > 0) {
+                                        if (val == 0) {
+                                            window.location = '/Parent/MoveToTrash?MailId=' + Id
+                                        }
+                                        else if (val == 1) {
+                                            window.location = '/Parent/DeleteMail?MailId=' + Id
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                html: "<i class='ace-icon bigger-110'></i>&nbsp; Close",
+                                "class": "btn btn-minier",
+                                click: function () {
+                                    $(this).dialog("close");
+                                }
+                            }
+                        ]
+                    });
+            },
+            async: false
+        })
+    }
+
+    function ComposeMail(FromId) {
+        $.ajax({
+            url: "/Parent/ComposeMail",
+            data: { FromId: FromId },
+            success: function (result) {
+                debugger
+                $('#ModelBodyDiv').html(result)
+                $("#dialog-confirm").removeClass('hide')
+                $("#dialog-confirm").removeData()
+                    .dialog({
+                        resizable: false,
+                        draggable: false,
+                        width: '700',
+                        position: { my: "center", at: "top" },
+                        modal: true,
+                        title: 'Compose Mail',
+                        open: function (event, ui) {
+                            debugger
+                            $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        },
+                        title_html: true,
+                    });
+            },
+            async: false
+        })
+    }
+
+    function ReplyMail(FromId) {
+        $("#dialog-confirm").dialog('close')
+        ComposeMail(FromId)
+    }
+</script>
+<style>
+    .ui-dialog .ui-dialog-title {
+        float: left;
+        margin: .1em 0;
+        white-space: nowrap;
+        width: 90%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: bold;
+        color: white;
+    }
+</style>

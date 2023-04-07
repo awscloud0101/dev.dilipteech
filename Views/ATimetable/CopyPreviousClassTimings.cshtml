@@ -1,0 +1,111 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ClassTimingsViewData>
+
+@{
+    ViewBag.Title = "Class Timings";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            TimeTable
+        </li>
+        <li class="active">Class Timings</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+            <h3>@Html.ActionLink("<< Class Timings", "ClassTimings", new { BatchId = ViewBag.SelectedBatchId })</h3>
+        </div>
+    </div>
+    <br />
+    @using (Html.BeginForm("CopyPreviousClassTimings", "ATimetable", FormMethod.Post))
+    {
+        @Html.ValidationMessage("Class Timings")
+        <p>
+            <b>Selected Class :</b>  @ViewBag.SelBatchName
+        </p>
+
+        if ((ViewBag.SelectedBatchId > 0) && (null != Model))
+        {
+            <div>
+                <span style="color: red;">
+                    <b>Are you sure you want to copy this?</b>
+                </span>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title col-xs-11">Previous Class Timings</h3>
+                            <button class="btn btn-primary col-xs-1" type="submit">
+                                Save
+                            </button>
+                        </div><!-- /.box-header -->
+                        <div class="box-body table-responsive no-padding">
+                            <table class="table table-hover">
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayName("Previous Class Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Start Time")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("End Time")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Is Break")
+                                        </th>
+                                        <th></th>
+                                    </tr>
+
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.BatchName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.ItemName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.ItemStartTime)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.ItemEndTime)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.IsBreak)
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <span style="color: red;"><b>Data not available to display</b></span>
+        }
+    }
+</section>
+

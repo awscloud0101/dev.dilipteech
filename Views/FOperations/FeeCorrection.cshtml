@@ -1,0 +1,743 @@
+﻿@model AsteriskBrowserAL.Models.FeeCorrectionViewModel
+@{
+    ViewBag.Title = "Fee Correction";
+    List<SelectListItem> PaymentMode = new List<SelectListItem>()
+        {
+        new SelectListItem()
+        {
+        Text = "Cash",
+        Value = "1"
+        },
+
+        new SelectListItem()
+        {
+        Text = "Cheque",
+        Value = "3"
+        },
+        new SelectListItem()
+        {
+        Text = "Swipe",
+        Value = "5"
+        },
+        new SelectListItem()
+        {
+        Text = "Online",
+        Value = "6"
+        }
+        };
+}
+
+
+
+@*<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />*@
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<link href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Fee Correction</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<!--Main Content-->
+<section class="content">
+
+
+    @using (Html.BeginForm("FeeCorrection", "FOperations", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        <input type="hidden" name="NewManualReceiptNo" id="FtsManualReceiptNoId" spellcheck="false" class="form-control" />
+        <input type="hidden" name="NewDate" id="ManualReceiptDate" spellcheck="false" class="form-control" />
+        <input type="hidden" name="ManualDescription" id="ManualDescription" spellcheck="false" class="form-control" />
+        <input type="hidden" name="RequestType" id="nRequestType" />
+        <input type="hidden" name="NewTemplateNo" id="FCNewTemplateNo" spellcheck="false" class="form-control" />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+
+                    Fee Correction
+
+                </div>
+                <div class="widget-box">
+                    
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Enter ERP Receipt No/Template No")</label>
+
+                                    <div class="col-sm-3">
+                                        <input type="text" name="ReceiptNumber" id="OnlineReceiptNumber" value="@Model.ReceiptNo" spellcheck="false" class="form-control" />
+                                    </div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+
+                <div id="SearchData">
+
+                </div>
+
+                <div id="divCorrection" style="display:none">
+
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                Correction Request
+                            </h5>
+                        </div>
+
+                        <div>
+                            <label style="color:red;" id="Validation"></label><br />
+                        </div>
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="col-sm-10">
+                                            <div class="col-sm-6">
+                                                <button class="btn btn-info btn-minier" style="width:180px;" type="button" onclick="OpenTemplateDialogue()"><text id="Print">New Template No</text></button>
+                                            </div>
+
+                                            <div class="col-sm-3">
+                                                <label id="NTemplateNo" name="NTemplateNo"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br />
+
+                                    <div class="form-group">
+                                        <div class="col-sm-10">
+                                            <div class="col-sm-6">
+                                                <button class="btn btn-info btn-minier P2" style="width:180px;" type="button" onclick="OpenManualReceiptDialogue()"><text id="Print">New Manual Receipt</text></button>
+                                            </div>
+
+                                            <div class="col-sm-3">
+                                                <label id="NManualReceiptNo" name="NewManualReceiptNo"></label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <br />
+
+                                    <div class="form-group">
+                                        <div class="col-md-6">
+                                            <div class="col-sm-4">
+                                                <label class="control-label no-padding-right" for="form-field-1">Modify Transaction Date</label>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <div id="datepickerModifyDate" class="input-group date datepicker" data-date-format="dd/mm/yyyy">
+                                                    <input class="form-control" type="text" name="NewTransactiondate" id="ModifyDate" autocomplete="off" placeholder="Select Date" value="@DateTime.Today.ToShortDateString()" />
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <div class="col-md-6">
+                                            <div class="col-sm-4">
+                                                <label class="control-label no-padding-right" for="form-field-1">Remarks</label>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <input class="form-control" type="text" name="Remarks" id="CtlRemarks" autocomplete="off" placeholder="Enter remarks" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @*<div class="widget-body">
+                                        <div class="widget-main">*@
+                                           
+                                                    <div class="form-group">
+                                                        <div class="col-md-6">
+                                                            <div class="col-sm-4">
+                                                                <label class="control-label no-padding-right" for="form-field-1">Payment Mode</label>
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    @Html.DropDownList("PaymentMode", PaymentMode, new { @class = "form-control col-sm-5", onchange = "GetPaymentModeControls();", @id = "PaymentMode", @name = "PaymentMode" })
+                                                                </div>
+                                                            </div>
+                                                    </div>
+
+
+                                            <div id="paymode" style="display:none;">
+                                                <div class="form-group">
+                                                    <div class="col-md-6">
+                                                        <div class="col-sm-4">
+                                                            <label class="control-label no-padding-right" for="form-field-1">@Html.Label("Bank Name")</label>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <select id="Bank" name="BankId" class="form-control col-sm-6"></select>
+                                                            </div>
+                                                            <div class="col-sm-2" style="display:none;" id="fBank">
+                                                                <label style="color:red;font-weight:bold;font-size:12px;"> Please Select Bank </label>
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-6">
+                                                        <div class="col-sm-4 ">
+                                                            <label id="dd">DD #</label>
+                                                            <label id="chequeId">Cheque #</label>
+
+                                                            <label id="account">Account #</label>
+                                                            <label id="batch">Batch #</label>
+                                                            <label id="online">Transaction Id</label>
+                                                        </div>
+
+                                                        <div class="col-sm-6">
+                                                            @Html.TextBox("ChequeNo", null, "", new { @class = "form-control col-sm-6 textlength", onkeypress = "return isNumberKey(event)", @min = "6", @maxlength = "6", @id = "cheque", @name = "cheque" })
+                                                        </div>
+                                                        <div class="col-sm-2" style="display:none;" id="fChequeNo">
+                                                            <label style="color:red;font-weight:bold;font-size:12px;">Required</label>
+                                                        </div>
+                                                        <span style="color:red;font-weight:bold;font-size:12px;" id="ChequeNoVal"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group ">
+                                                    <div class="col-md-6">
+                                                        <div class="col-sm-4">
+                                                            <label class="control-label no-padding-right" for="form-field-1">@Html.Label("Dated")</label>
+                                                            </div>
+
+                                                            <div class="col-sm-6">
+                                                                <div id="Chdatepicker" class="input-group date datepicker" data-date-format="dd/mm/yyyy">
+                                                                    <input class="form-control" type="text" name="ChequeDate" id="ChequeDate" autocomplete="off" placeholder="Select Date" />
+                                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="display:none;" id="fChequeDate">
+                                                                <label style="color:red;font-weight:bold;font-size:12px;">Required</label>
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                            </div>
+                                        @*</div>
+
+                                    </div>*@
+                                    <br />
+                                    <br />
+                                    <div class="form-group">
+                                        <div class="col-sm-6">
+                                            <div class="col-sm-6">
+                                                <button class="btn btn-info btn-minier P2" style="width:180px;" type="submit" onclick="return SubmitModifyForm()"><text id="Modify">Modify</text></button>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <button class="btn btn-info btn-minier P2" style="width:180px;" type="submit" onclick="return SubmitCancelForm()"><text id="CancelTransaction">Cancel Transaction</text></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+    @*Template no popup*@
+    <div id="divTemplateNo" role="dialog">
+    </div>
+
+    @*Manual Receipt no popup*@
+    <div id="divManualReceiptNo" style="max-width: 800px;" role="dialog">
+        
+    </div>
+
+    @Html.Action("DatePickerScripts", "Base")
+</section>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+
+<script>
+
+    function SubmitModifyForm() {
+
+        var NTemplateNo = $('#NTemplateNo').html();
+        var ManualReceipto = $('#NManualReceiptNo').html();
+        var NewDate = $('#ModifyDate').val();
+        var Remarks = $('#CtlRemarks').val();
+        var validate = true;
+
+        var paymentMode = document.getElementById("PaymentMode").value;
+
+        if (NTemplateNo == "" && ManualReceipto == "" && NewDate == "") {
+            document.getElementById("Validation").innerHTML = "Please specify any details : Template number <br/> Manual receipt number <br/> Modify Date";
+            return false;
+        }
+
+        if (Remarks == "") {
+            document.getElementById("Validation").innerHTML = "Remarks required";
+            return false;
+        }
+
+        var id = 1;
+        $('#nRequestType').val(id);
+
+        var RequestType = document.getElementById("Validation").innerHTML;
+        $('#ctlRequestType').val();
+        if (paymentMode > 1) {
+
+            var ChequeDate = document.getElementById("ChequeDate").value;
+            var ChequeNo = document.getElementById("cheque").value;
+            var Bank = document.getElementById("Bank").value;
+
+            if (ChequeDate == "") {
+                document.getElementById("fChequeDate").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fChequeDate").style.display = "none";
+            }
+
+            if (ChequeNo == "") {
+                document.getElementById("fChequeNo").style.display = "inline";
+                validate = false;
+            } else if (paymentMode == 2 || paymentMode == 3 && ChequeNo.length < 6) {
+                document.getElementById("ChequeNoVal").innerHTML = "Length must be six digits"
+                validate = false;
+            }
+            else if (paymentMode == 5 && ChequeNo.length < 4) {
+                document.getElementById("ChequeNoVal").innerHTML = "Length must be four digits"
+                validate = false;
+            }
+            else {
+                document.getElementById("fChequeNo").style.display = "none";
+                document.getElementById("ChequeNoVal").innerHTML = "";
+            }
+
+            if (Bank == "0") {
+                document.getElementById("fBank").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("fBank").style.display = "none";
+            }
+            return validate;
+        }
+
+
+        return true;
+    }
+
+    function SubmitCancelForm() {
+
+        var id = 2;
+        $('#nRequestType').val(id);
+        return true;
+    }
+
+
+    $("#OnlineReceiptNumber").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            $('#OnlineReceiptNumber').html('');
+            document.getElementById("divCorrection").style.display = "none";
+            $('#SearchData').html('');
+        };
+    });
+
+
+    function LoadData() {
+        var No = $("#OnlineReceiptNumber").val();
+        LoadBanks();
+        if (No.length >= 3)
+            PopulateData(No);
+    }
+
+    window.load = LoadData();
+
+
+    $("#OnlineReceiptNumber").autocomplete(
+           {
+               source: function (request, response) {
+
+                   $('#SearchData').html('');
+
+                   if (request.term.length < 3) {
+                       return;
+                   }
+                   $('#imagemodal').show();
+
+                   $.ajax({
+
+                       error: function (jqXHR, textStatus, errorThrown) {
+                           alert(errorThrown);
+                           $('#imagemodal').hide();
+                       },
+
+                       url: "/FOperations/GetReceiptNumbers",
+                       type: "POST",
+                       dataType: "json",
+                       data: { strVal: request.term },
+                       success: function (json) {
+                           response($.map(json, function (data, id) {
+                               return {
+                                   label: data.ReceiptNo + " (" + data.NewTemplateNo + ")",
+                                   value: data.ReceiptNo,
+                                   id: data.ReceiptNo,
+                               };
+                           }));
+                           $('#imagemodal').hide();
+                       },
+                   });
+               },
+               minLength: 3,
+               select: function SelectEvent(event, ui) {
+                   PopulateData(ui.item.value);
+               }
+           });
+
+
+    function PopulateData(ReceiptNo) {
+        $.ajax
+           ({
+               error: function (jqXHR, textStatus, errorThrown) {
+                   alert(errorThrown);
+                   document.getElementById("divCorrection").style.display = "none";
+                   $('#imagemodal').hide();
+               },
+
+               url: "/FOperations/GetFeePaymentDetailsByReceiptNo",
+               data: { strReceiptNo: ReceiptNo },
+               beforeSend: function () {
+                   $('#imagemodal').show();
+               },
+               success: function (data) {
+                   $('#SearchData').html(data);
+
+                   var nActionStatus = $('#ActionStatusId').val();
+
+                   if (nActionStatus == 0)
+                       document.getElementById("divCorrection").style.display = "none";
+                   else
+                       document.getElementById("divCorrection").style.display = "inline";
+               }
+
+           }).done(function () {
+               $('#imagemodal').hide();
+           });
+    }
+
+    function OpenTemplateDialogue() {
+        $('#divTemplateNo').html('');
+        var TemplateNo = 0;
+
+        var $dialog = $('#divTemplateNo')
+
+      .dialog({
+                resizable: false,
+                draggable: false,
+                width: '700',
+                modal: true,
+                title: 'Template Number',
+                open: function (event, ui) {
+
+                    $(this).load("@Url.Action("TemplateNumber")"); // Loades the template number partial view
+                },
+                title_html: true,
+                buttons: [
+                    {
+                        html: "OK",
+                        "class": "btn btn-danger btn-minier",
+                        click: function () {
+                            TemplateNo = $('#RequiredTemplateNum').val();
+
+                            if (TemplateNo > 0) {
+
+                                if (ValidateTemplateNumberControls() == false) //validating the message popup
+                                    return;
+
+                                $('#FCNewTemplateNo').val(TemplateNo);
+                                document.getElementById("NTemplateNo").innerHTML = "Template Number : " + TemplateNo;
+                                $(this).dialog("close");
+                            }
+                        }
+                    },
+                    {
+                        html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                        "class": "btn btn-minier",
+                        click: function () {
+                        $('#NTemplateNo').html('')
+                        $('#FCNewTemplateNo').val('0');
+                        $(this).dialog("close");
+                    }
+                }
+                ],
+            });
+
+            //$('#divTemplateNo').dialog('open');
+            //$('#divTemplateNo').dialog('option', 'position', 'center');
+            //$('#divTemplateNo').dialog('option', 'width', 'auto');
+       
+
+        return TemplateNo;
+    };
+
+    function OpenManualReceiptDialogue() {
+        var ManualReceiptno = 0;
+        var dtManualDate = 0;
+        var Description = "";
+        $('#divManualReceiptNo').html('');
+
+
+        $('#divManualReceiptNo').load("@Url.Action("ManualReceiptNumber")"); // Loades the tempalte number partial view
+
+
+        var $dialog = $('#divManualReceiptNo')
+
+        .dialog({
+            resizable: false,
+            draggable: false,
+            width: '700',
+            modal: true,
+                title: 'Manual Receipt Number',
+                open: function (event, ui) {
+                },
+            title_html: true,
+            buttons: [
+                {
+                    html: "OK",
+                    "class": "btn btn-danger btn-minier",
+                    click: function () {
+                        debugger
+
+                        ManualReceiptno = $('#ManualReciptNo').val();
+
+                        if (ManualReceiptno > 0) {
+
+                            if (ValidateManualReceiptControls() == false) //validating the message popup manual Rec
+                                return;
+
+                            dtManualDate = $('#ManualReciptDate').val();
+                            Description = $('#ManualReciptDescription').val();
+                            document.getElementById("FtsManualReceiptNoId").value = ManualReceiptno; // javascript
+                            document.getElementById("ManualReceiptDate").value = dtManualDate;
+                            document.getElementById("ManualDescription").value = Description;
+
+                            document.getElementById("NManualReceiptNo").innerHTML = " Manual Receipt No : " + ManualReceiptno;
+                            $('#ModifyDate').val(dtManualDate);
+
+                            $(this).dialog("close");
+                        }
+                    }
+                },
+                {
+                    html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                    "class": "btn btn-minier",
+                    click: function () {
+                        $('#NManualReceiptNo').html("");
+                        $(this).dialog("close");
+                    }
+                }
+            ],
+            });
+
+            //$('#divManualReceiptNo').dialog('open');
+            //$('#divManualReceiptNo').dialog('option', 'position', 'center');
+            //$('#divManualReceiptNo').dialog('option', 'width', 'auto');
+            //$('#divManualReceiptNo').dialog('option', 'resize', 'auto');
+      
+
+        return TemplateNo;
+    };
+
+
+
+
+
+    $(document).on('focus', '.datepicker', function () {
+        debugger
+
+        $(this).datepicker({
+            startDate: "1/1/1900",
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+    });
+
+    function ValidateManualReceiptControls() {
+
+        var validate = true;
+        var ValidateMessage = "";
+        var ManualDate = $('#ManualReciptDate').val();
+        var MDescription = $('#ManualReciptDescription').val();
+
+        var StartRange = $("#StartRange").val();
+        var EndRange = $("#EndRange").val();
+        var Enteredno = $("#ManualReciptNo").val();
+        var expectedno = $("#expectedno").val();
+
+
+        if (ManualDate == "") {
+            validate = false;
+            ValidateMessage += "Select Date,";
+        }
+
+        if (MDescription == "") {
+            validate = false;
+            ValidateMessage += "Enter Description,";
+        }
+
+        if (Enteredno == "") {
+            validate = false;
+            ValidateMessage += "Enter manual receipt number,";
+        }
+
+        if (parseInt(Enteredno) < parseInt(expectedno)) {
+            validate = false;
+            ValidateMessage += "Entered receipt number already in use,";
+        }
+
+        if (parseInt(Enteredno) > parseInt(EndRange)) {
+            validate = false;
+            ValidateMessage += "Entered receipt number not in a range,";
+        }
+
+        if (Enteredno < expectedno) {
+            validate = false;
+            ValidateMessage += "Manual receipt number already in use, ";
+        }
+
+        if (!validate) {
+            $('#Validate').show();
+            document.getElementById('Validate').innerHTML = "Please fill the fields : " + ValidateMessage;
+
+        } else {
+            document.getElementById('Validate').innerHTML = "";
+        }
+
+        return validate;
+    }
+
+    function GetPaymentModeControls() {
+        debugger
+        var paymentMode = document.getElementById("PaymentMode").value;
+
+        if (paymentMode == 1) {
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('paymode').style.display = 'none'
+            document.getElementById("fChequeDate").style.display = "none";
+            document.getElementById("fChequeNo").style.display = "none";
+            document.getElementById("fBank").style.display = "none";
+
+        }
+        else if (paymentMode == 2) {
+            document.getElementById('dd').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 3) {
+            document.getElementById('chequeId').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '6');
+        }
+        else if (paymentMode == 4) {
+            document.getElementById('account').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+        }
+        else if (paymentMode == 5) {
+            document.getElementById('batch').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            document.getElementById('online').style.display = 'none';
+            $("#cheque").attr('maxlength', '4');
+        }
+        else if (paymentMode == 6) {
+            document.getElementById('batch').style.display = 'none';
+            document.getElementById('online').style.display = 'inline';
+            document.getElementById('ChequeDate').style.display = 'inline';
+            document.getElementById('paymode').style.display = 'inline';
+            document.getElementById('dd').style.display = 'none';
+            document.getElementById('chequeId').style.display = 'none';
+            document.getElementById('account').style.display = 'none';
+            $("#cheque").attr('maxlength', '8');
+        }
+
+    }
+
+    $("#PaymentMode").change(function () {
+        debugger
+        $('#ChequeDate').html("");
+        $('#cheque').html("");
+    })
+    function LoadBanks() {
+
+        $.ajax({
+            url: '/Common/GetBanks',
+            success: function (data) {
+
+                var ObjBank = $('#Bank');
+
+                ObjBank.children().remove();
+
+                ObjBank.append($("<option>").val("0").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    ObjBank.append($("<option>").val(record.BankId).text(record.BankName));
+                });
+
+                $('#Bank').append(ObjBank);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        })
+    }
+
+</script>

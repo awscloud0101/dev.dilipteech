@@ -1,0 +1,360 @@
+﻿@model AsteriskBrowserAL.Models.FeePaymentsData
+@{
+    Layout = "~/Views/Shared/Parent_Layout.cshtml";
+}
+@{
+    ViewBag.Title = "Online Payment";
+
+    if (null != Model)
+    {
+        if (Model.IsMobile)
+        {
+            Layout = "";
+        }
+    }
+
+}
+
+
+@if (null != Model && Model.IsMobile)
+{
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/png" href="~/Content/images/Asterisk.png">
+
+        <title>
+            Asterisk | GMS
+        </title>
+
+        @*@Styles.Render("~/Content/css")
+            @Scripts.Render("~/bundles/modernizr")
+            @Scripts.Render("~/bundles/jquery")
+            @Scripts.Render("~/bundles/jqueryval")*@
+
+        <meta name="description" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+        <!-- bootstrap & fontawesome -->
+        <link rel="stylesheet" href="~/assets/font-awesome/4.2.0/css/font-awesome.min.css" />
+
+        <!-- page specific plugin styles -->
+        <!-- text fonts -->
+        <link rel="stylesheet" href="~/assets/fonts/fonts.googleapis.com.css" />
+
+        <!-- ace styles -->
+        <link rel="stylesheet" href="~/assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+
+        <script src="~/assets/js/ace-extra.min.js"></script>
+        <link href="~/assets/css/checkbox.css" rel="stylesheet" />
+
+
+    </head>
+
+    <div class="page-header">
+        <br />
+        <h1>
+            Online Payment
+        </h1>
+        <span>Enabled payment option for Online Modes (Net Banking, Credit Card and Debit Card) only.</span>
+    </div><!-- /.page-header -->
+
+}
+else
+{
+    @Html.Action("DataTableScripts", "Base")
+}
+
+
+
+
+@*@section BreadCrumb{
+
+        <ul class="breadcrumb">
+            <li class="active">Online Payment</li>
+        </ul>
+    }*@
+
+
+@if (null != Model && null != Model.lstFeeDetails && Model.lstFeeDetails.Count() > 0)
+            {
+                int Sno = 1;
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="widget-body">
+                <div class="widget-main">
+                    <span id="Validation" style="font-weight:bold;color:red"></span>
+                    <div class="alert alert-info">
+                        
+                        <div class="hidden-sm hidden-xs action-buttons pull-right">
+                            <a class="blue" role="button" name="ReceiptNo" data-receipt="@Model.ReceiptNumber"><i class="ace-icon fa fa-print bigger-160"></i></a>
+                        </div>     
+
+                        <table class="table table-striped table-hover nowrap">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        Total Due :
+                                    </th>
+                                    <th>
+
+                                        @Model.DueAmount
+                                        <input type="hidden" id="DueAmount" value="@Model.DueAmount" />
+                                        <input type="hidden" id="nStudentId" value="@Model.StudentId" />
+                                        <input type="hidden" id="IsMobile" value="@Model.IsMobile" />
+                                        <input type="hidden" id="FatherEmail" value="@Model.FatherMail" />
+                                    </th>
+                                    <th>
+
+                                        <div class="input-group col-sm-6">
+                                            <input type="text" class="form-control search-query txtboxNum" placeholder="Amount" id="PayAmount" name="PayAmount" />
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-info btn-sm" id="btnPay" onclick="PayMoney()">
+                                                    <span class="ace-icon  icon-on-right bigger-110"></span>
+                                                    Pay
+                                                </button>
+                                            </span>
+                                        </div>
+                                        <br />
+                                        <div class="input-group col-xs-12">
+
+                                            @*<div class="col-xs-4">
+                                                    <input type="radio" id="ICICI" value="1" name="Status" />
+                                                    <img width="100" src="~/Content/images/ICICI.jpg" />
+                                                </div>*@
+
+                                            <div class="col-xs-4">
+                                                <input type="radio" id="Payu" value="2" name="Status" />
+                                                <img width="100" src="~/Content/images/PayuLogo.png" />
+                                            </div>
+                                            @*<div class="col-xs-4">
+                                                <input type="radio" id="HDFC" value="3" name="Status" />
+                                                <img width="100" style="height:35px" src="~/Content/images/HDFCLogo.png" />
+                                            </div>*@
+
+                                        </div>
+                                    </th>
+                                    <th>
+
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="table-header">
+                <div class="txtTableHeader">
+                    Fee Details
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead style="text-align:center;">
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                Particular Name
+                            </th>
+                            <th class="centerAlign">
+                                Fee Amount
+                            </th>
+                            <th class="centerAlign">
+                                Concession Amount
+                            </th>
+                            <th class="centerAlign">
+                                Net Amount
+                            </th>
+
+                            <th class="centerAlign">
+                                Paid Amount
+                            </th>
+
+                            <th class="centerAlign">
+                                Due Amount
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @for (int i = 0; i < Model.lstFeeDetails.Count(); i++)
+                        {
+
+                            <tr>
+                                <td>
+                                    @(Sno++)
+                                </td>
+                                <td style="text-align:left;">
+                                    @Model.lstFeeDetails.ElementAt(i).FeeParticularName
+                                </td>
+                                <td style="text-align:right;">
+                                    @Model.lstFeeDetails.ElementAt(i).FeeAmount.ToString()
+                                </td>
+                                <td style="text-align:right;">
+                                    @Model.lstFeeDetails.ElementAt(i).DiscountAmount.ToString()
+                                </td>
+                                <td style="text-align:right;">
+                                    @Model.lstFeeDetails.ElementAt(i).NetAmount.ToString()
+                                </td>
+                                <td style="text-align:right;">
+                                    @Model.lstFeeDetails.ElementAt(i).PaidAmount.ToString()
+                                </td>
+                                <td style="text-align:right;">
+                                    @Model.lstFeeDetails.ElementAt(i).DueAmount.ToString()
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+
+
+<script>
+    $(".txtboxNum").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+            // Allow: Ctrl+A
+        (e.keyCode == 65 && e.ctrlKey === true) ||
+            // Allow: Ctrl+C
+        (e.keyCode == 67 && e.ctrlKey === true) ||
+            // Allow: Ctrl+X
+        (e.keyCode == 88 && e.ctrlKey === true) ||
+            // Allow: home, end, left, right
+        (e.keyCode >= 35 && e.keyCode <= 39)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+
+    function PayMoney() {
+        debugger
+        var PayAmount = parseInt($("#PayAmount").val());
+        var DueAmount = parseInt($("#DueAmount").val());
+        var IsMobile = $('#IsMobile').val();
+
+        if (IsMobile == "value") {
+            IsMobile = true;
+        }
+
+        var StudentId = $("#nStudentId").val();
+        var Status = $("input[name=Status]:checked").val()
+        document.getElementById("Validation").innerHTML = ""
+        var FatherEmail = $("#FatherEmail").val();
+
+        if (FatherEmail != "" && FatherEmail != "Empty") {
+            if (PayAmount > 0) {
+                if (DueAmount > PayAmount) {
+                    if (Status > 0) {
+                        if (Status == 1) {
+                            window.location.href = '/PayMoney/PayICICI?nStudentId=' + StudentId + '&dPayingAmount=' + PayAmount + '&IsMobile=' + IsMobile + '&Status=' + Status;
+                        } else if (Status == 2) {
+                            window.location.href = '/PayMoney/PayUMoneyPay?nStudentId=' + StudentId + '&dPayingAmount=' + PayAmount;
+                        } else if (Status == 3) {
+                            window.location.href = '/PayMoney/PayHDFC?nStudentId=' + StudentId + '&dPayingAmount=' + PayAmount + '&Status=' + Status;
+                        }
+
+                    } else {
+                        document.getElementById("Validation").innerHTML = "Select Payment Gateway"
+                    }
+                }
+                else {
+                    document.getElementById("Validation").innerHTML = "Amount is greater than due amount"
+
+                }
+            }
+            else {
+                document.getElementById("Validation").innerHTML = "Please enter amount"
+            }
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "Please update the father email in the Student Details"
+
+        }
+
+    }
+
+
+</script>
+
+<script>
+
+    $('a[name=ReceiptNo]').click(function () {
+         debugger
+         var rceipt = $(this).data("receipt");
+
+         if (rceipt == null || rceipt == "")
+         {
+             document.getElementById('Validation').innerHTML = "Make Payment and Generate Print"
+             return false;
+         }
+
+        $('#imagemodal').show();
+
+        $.ajax({
+
+            url: '/FOperations/FeePaymentsReprint',
+            data: { strReceipt: rceipt },
+            success: function (Data) {
+                $('#mydiv').html(Data);
+
+                $('#imagemodal').hide();
+
+                PrintElem('#mydiv');
+                document.body.style.cursor = 'default';
+
+            },
+            error: function (data) {
+                document.body.style.cursor = 'default';
+            }
+        }).done(function () {
+
+        });
+    });
+
+
+    function PrintElem(elem) {
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'mydiv', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+
+</script>
+
+<div id="PrintDiv" style="display:none;">
+    <div id="mydiv" style="height:100%">
+    </div>
+</div>

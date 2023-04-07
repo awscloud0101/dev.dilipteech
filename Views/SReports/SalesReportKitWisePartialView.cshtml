@@ -1,0 +1,95 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentSalesData>
+@{
+    ViewBag.Title = "Sales Report";
+}
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="hr hr-18 dotted hr-double"></div>
+
+        @if (null != Model)
+            {
+                int sno = 1;
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="table-header">
+                        Records Found (@Model.Count())
+                        <div style="float:right">
+
+                            <button class="btn btn-info btn-xs" type="submit" id="btnExport">
+                                <i class="ace-icon fa fa-share bigger-180"></i>
+
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="overflow:auto;height:500px;">
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Kit Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Transaction Date")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Sold Quantity")
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @(sno++)
+                            </td>
+                            <td>
+                                @item.BranchName
+                            </td>
+                            <td>
+                                @item.KitName
+                            </td>
+
+                            <td>
+                                @if (item.TransactionDate.HasValue)
+                                {
+                            @item.TransactionDate.Value.ToString("dd-MMM-yyyy")
+                                }
+                            </td>
+
+                            <td>
+                                @item.KitSoldQuantity
+                            </td>
+                        </tr>
+                    }
+
+                    </tbody>
+                </table>
+            </div>
+
+
+        }
+        else
+        {
+
+                <span style="color: red;"><b>No Records Found</b></span>
+                }
+            </div>
+</div>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+
+

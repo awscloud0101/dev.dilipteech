@@ -1,0 +1,497 @@
+﻿@model AsteriskBrowserAL.Models.HDTicketsData
+
+@{
+    int nsno = 1;
+    ViewBag.Title = "Edit Ticket";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Help Desk
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Open Ticket</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>@Html.ActionLink("<< Tickets", "OpenTicket", new { priorityId = @Model.SelpriorityId, StatusId = @Model.SelStatusId })</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("OpenTicketE", "MnHelpDesk", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                @Html.HiddenFor(model => model.HDTaskId)
+                @Html.HiddenFor(model => model.HDTicketId)
+                @Html.HiddenFor(model => model.TicketNumber)
+                @Html.HiddenFor(model => model.Subject)
+                @Html.HiddenFor(model => model.TicketDate)
+                @Html.HiddenFor(model => model.HDTicketTypeId)
+                @Html.HiddenFor(model => model.HDTicketOwnerId)
+                @Html.HiddenFor(model => model.SelpriorityId)
+                @Html.HiddenFor(model => model.SelStatusId)
+
+                <div class="box">
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("Holidays")</span>
+                    <div class="box-header">
+                        <h3 class="box-title">@Model.Subject</h3>
+                        <br />
+                        <br />
+                        <button class="btn btn-primary" type="submit" style="width:80px;" onclick="return Validations();">
+                            Save
+                        </button>
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+
+                    <div class="box-body">
+                        <div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Ticket ID")</label>
+
+                                <div class="col-sm-3">
+                                    :&nbsp; @Model.TicketNumber
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Created On")</label>
+
+                                <div class="col-sm-3">
+                                    :&nbsp; @Model.TicketDate.Value.ToString("dd - MMM - yyyy")
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Staus")</label>
+
+                                <div class="col-sm-3">
+                                    <select id="HDStatusId" name="HDStatusId" class="form-control"></select>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label style="color:red;font-weight:bold;" id="HDStatusIdVal"> </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Updated On")</label>
+
+                                <div class="col-sm-3">
+                                    :&nbsp; @Model.StatusDate.Value.ToString("dd - MMM - yyyy")
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Owner")</label>
+
+                                <div class="col-sm-3">
+                                    :&nbsp; @Model.HdTicketOwnerName
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Category")</label>
+
+                                <div class="col-sm-3">
+                                    :&nbsp; @Model.CategoryName
+                                </div>
+
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Priority")</label>
+
+                                <div class="col-sm-3">
+                                    <select id="PriorityId" name="PriorityId" class="form-control"></select>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label style="color:red;font-weight:bold;" id="PriorityIdVal"> </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Issue Type")</label>
+
+                                <div class="col-sm-3">
+                                    <select id="HDTicketType" name="HDTicketTypeId" class="form-control"></select>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label style="color:red;font-weight:bold;" id="HDTicketTypeIdVal"> </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Assigned To")</label>
+
+                                <div class="col-sm-3">
+                                    <select id="HDTicketStatusOwnerId" name="HDTicketStatusOwnerId" class="form-control"></select>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label style="color:red;font-weight:bold;" id="HDTicketStatusOwnerIdVal"> </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Owner")</label>
+
+                                <div class="col-sm-3">
+                                    :&nbsp; @Model.HdTicketOwnerName
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label style="color:red;font-weight:bold;" id="HDTicketStatusOwnerIdVal"> </label>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+
+                                <div class="col-sm-4">
+                                    @Html.TextBoxFor(model => model.TaskDescription, new { @class = "form-control col-sm-5", @id = "EventName", placeholder = "Description" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="EEventName">
+                                    <label style="color:red;font-weight:bold;"> Please select Event </label>
+                                </div>
+                            </div>
+
+
+                            @*<div class="form-group">
+                                        <div class="box-body table-responsive no-padding">
+                                            <div style="overflow:auto; height:250px;">
+                                                <!-- DIRECT CHAT -->
+                                                <div class="box box-warning direct-chat direct-chat-warning">
+                                                    <div class="box-header with-border">
+                                                        <h3 class="box-title">Notes</h3>
+                                                        <div class="box-tools pull-right">
+                                                            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                        </div>
+                                                    </div><!-- /.box-header -->
+                                                    <div class="box-body">
+                                                        <input type="file" id="fileInput" name="file" />
+                                                        <input type='button' id='go' value="Add"  class="btn btn-primary"/>
+                                                    <div id="UploadPartial"></div>
+
+                                                    </div><!-- /.box-body -->
+
+                                                </div><!--/.direct-chat -->
+                                            </div><!-- /.col -->
+                                        </div>
+
+                                </div>*@
+
+
+                        </div>
+
+
+
+                    </div>
+                </div>
+
+                if (null != Model.Comments && Model.Comments.Count() > 0)
+                {
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="box-body table-responsive no-padding">
+                                <div style="overflow:auto; height:250px;">
+                                    <!-- DIRECT CHAT -->
+                                    <div class="box box-warning direct-chat direct-chat-warning">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Replies</h3>
+                                            <div class="box-tools pull-right">
+                                                <span data-toggle="tooltip" title="3 New Messages" class="badge bg-yellow">@Model.Comments.Count()</span>
+                                                <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                            </div>
+                                        </div><!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="direct-chat-messages">
+                                                @foreach (var s in Model.Comments)
+                                                {
+
+                                                    if (nsno % 2 == 0)
+                                                    {
+                                                    <!-- Message to the right -->
+                                                        <div class="direct-chat-msg right">
+                                                            <div class="direct-chat-info clearfix">
+                                                                <span class="direct-chat-name pull-right">@s.HdTicketStatusOwnerName</span>
+                                                                <span class="direct-chat-timestamp pull-left">@s.StatusDate.Value.ToString("dd - MMM - yyyy")</span>
+                                                            </div><!-- /.direct-chat-info -->
+                                                            <img class="direct-chat-img" src="~/dist/img/user1-128x128.jpg" alt="message user image" /><!-- /.direct-chat-img -->
+                                                            <div class="direct-chat-text">
+                                                                @s.Description
+                                                            </div><!-- /.direct-chat-text -->
+                                                        </div><!-- /.direct-chat-msg -->
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="direct-chat-msg">
+                                                            <div class="direct-chat-info clearfix">
+                                                                <span class="direct-chat-name pull-left">@s.HdTicketStatusOwnerName</span>
+                                                                <span class="direct-chat-timestamp pull-right">@s.StatusDate.Value.ToString("dd - MMM - yyyy")</span>
+                                                            </div><!-- /.direct-chat-info -->
+                                                            <img class="direct-chat-img" src="~/dist/img/user4-128x128.jpg" alt="message user image" /><!-- /.direct-chat-img -->
+                                                            <div class="direct-chat-text">
+                                                                @s.Description
+                                                            </div><!-- /.direct-chat-text -->
+                                                        </div><!-- /.direct-chat-msg -->
+
+                                                    }
+
+                                                    nsno++;
+                                                }
+
+
+                                            </div><!--/.direct-chat-messages-->
+
+
+                                        </div><!-- /.box-body -->
+
+                                    </div><!--/.direct-chat -->
+                                </div><!-- /.col -->
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+                }
+
+            }
+        </div>
+
+    </div>
+    <input type="hidden" id="HDStatusIdSel" value="@Model.HDTicketStatus" />
+    <input type="hidden" id="PriorityIdSel" value="@Model.PriorityId" />
+    <input type="hidden" id="HDTicketTypeIdSel" value="@Model.HDTicketTypeId" />
+    <input type="hidden" id="TicketCategoryIdSel" value="@Model.TicketCategoryId" />
+
+    <input type="hidden" id="HDTicketStatusOwnerIdSel" value="@Model.HDTicketStatusOwnerId" />
+    <input type="hidden" id="HDTicketOwnerIdSel" value="@Model.HDTicketOwnerId" />
+    <input type="hidden" id="StatusOwnerEmployeeNo" value="@Model.HDTicketStatusOwnerId" />
+
+</section>
+
+
+<script type="text/javascript">
+
+    function OnloadData() {
+        LosadPriority();
+        LoadSatus();
+        LoadType();
+        LoadStatusOwners();
+        //LoadCategory()
+    }
+
+    $("#go").click(function () {
+        alert("fghfkj")
+        var fd = new FormData();
+        fd.append("file", document.getElementById('fileInput').files[0]);
+        alert(fd)
+        $.ajax({
+            url: "/MCalendar/HolidaysC/",
+            type: 'POST',
+            data: fd,
+            processData: false,
+            contentType: false,
+            Success: function () {
+
+            }
+        })
+    });
+
+    function LosadPriority() {
+        $.ajax({
+            url: "/MnHelpDesk/LoadPriorities",
+            success: function (data) {
+                var PriorityItems = $('#PriorityId')
+                PriorityItems.children().remove();
+                PriorityItems.append($("<option>").val("null").text("--Select--"))
+                $.each(data, function (i, record) {
+                    PriorityItems.append($("<option>").val(record.HDPriorityId).text(record.Priority));
+                });
+                $('#PriorityId').append(PriorityItems);
+                var SelPriorityId = $("#PriorityIdSel").val()
+                if (SelPriorityId > 0) {
+                    document.getElementById("PriorityId").value = SelPriorityId
+                }
+
+            }
+
+        });
+    }
+
+
+
+    function LoadSatus() {
+        $.ajax({
+            url: "/MnHelpDesk/LoadSatus",
+            success: function (data) {
+                var StatusItems = $('#HDStatusId')
+                StatusItems.children().remove();
+                StatusItems.append($("<option>").val("null").text("--Select--"))
+                $.each(data, function (i, record) {
+                    StatusItems.append($("<option>").val(record.HDStatusId).text(record.HDStatusName));
+                });
+                $('#HDStatusId').append(StatusItems);
+                var HDStatusId = $("#HDStatusIdSel").val()
+
+                if (HDStatusId > 0) {
+                    document.getElementById("HDStatusId").value = HDStatusId
+                }
+
+            }
+
+        });
+    }
+
+
+
+    function LoadType() {
+        $.ajax({
+            url: "/MnHelpDesk/LoadType",
+            success: function (data) {
+                var StatusItems = $('#HDTicketType')
+                StatusItems.children().remove();
+                StatusItems.append($("<option>").val("null").text("--Select--"))
+                $.each(data, function (i, record) {
+                    StatusItems.append($("<option>").val(record.HDTicketTypeId).text(record.HDTicketTypeName));
+                });
+                $('#HDTicketType').append(StatusItems);
+                var HDStatusId = $("#HDTicketTypeIdSel").val()
+
+                if (HDStatusId > 0) {
+                    document.getElementById("HDTicketType").value = HDStatusId
+                }
+
+            }
+
+        });
+    }
+
+
+
+
+    //function LoadCategory() {
+    //    $.ajax({
+    //        url: "/MnHelpDesk/LoadCategory",
+    //        success: function (data) {
+    //            var TypeItems = $('#TicketCategoryId')
+    //            TypeItems.children().remove();
+    //            TypeItems.append($("<option>").val("null").text("--Select--"))
+    //            $.each(data, function (i, record) {
+    //                TypeItems.append($("<option>").val(record.HDCategoryId).text(record.CategoryName));
+    //            });
+    //            $('#TicketCategoryId').append(TypeItems);
+    //            var TicketCategoryIdSel = $("#TicketCategoryIdSel").val()
+
+    //            if (TicketCategoryIdSel > 0) {
+    //                document.getElementById("TicketCategoryId").value = TicketCategoryIdSel
+    //            }
+
+
+    //        }
+
+    //    });
+    //}
+
+
+    function LoadStatusOwners() {
+        var HDTicketStatusOwnerIdSel = $("#HDTicketStatusOwnerIdSel").val()
+        $.ajax({
+            url: "/MnHelpDesk/LoadStatusOwners",
+            data: { HDTicketStatusOwnerIdSel: HDTicketStatusOwnerIdSel },
+            success: function (data) {
+                var Staff = $('#HDTicketStatusOwnerId')
+                Staff.children().remove();
+                Staff.append($("<option>").val("null").text("--Select--"))
+                $.each(data, function (i, record) {
+                    Staff.append($("<option>").val(record.StaffId).text(record.FirstName));
+                });
+                $('#HDTicketStatusOwnerId').append(Staff);
+                var HDTicketStatusOwnerId = $("#StatusOwnerEmployeeNo").val()
+                if (HDTicketStatusOwnerId != "" && HDTicketStatusOwnerId != null && HDTicketStatusOwnerId != "null") {
+                    document.getElementById("HDTicketStatusOwnerId").value = HDTicketStatusOwnerId
+                }
+            }
+
+        });
+    }
+
+
+    function Validations() {
+
+        var Valid = true
+        var HDStatusId = $("#HDStatusId").val();
+        var HDTicketTypeId = $("#HDTicketTypeId").val();
+        var PriorityId = $("#PriorityId").val();
+        var HDTicketStatusOwnerId = $("#HDTicketStatusOwnerId").val();
+        if (HDStatusId == "" || HDStatusId == "null" || HDStatusId == null) {
+            document.getElementById("HDStatusIdVal").innerHTML = "Please select Status"
+            Valid = false
+        }
+
+        if (HDTicketTypeId == "" || HDTicketTypeId == "null" || HDTicketTypeId == null) {
+            document.getElementById("HDTicketTypeIdVal").innerHTML = "Please select issue type"
+            Valid = false
+        }
+
+
+        if (PriorityId == "" || PriorityId == "null" || PriorityId == null) {
+            document.getElementById("PriorityIdVal").innerHTML = "Please select priority"
+            Valid = false
+        }
+
+        if (HDTicketStatusOwnerId == "" || HDTicketStatusOwnerId == "null" || HDTicketStatusOwnerId == null) {
+            document.getElementById("HDTicketStatusOwnerIdVal").innerHTML = "Please select issued to"
+            Valid = false
+        }
+
+        return Valid;
+
+    }
+
+    $("#HDStatusId").change(function () {
+        document.getElementById("HDStatusIdVal").innerHTML = ""
+    })
+
+
+    $("#HDTicketTypeId").change(function () {
+        document.getElementById("HDTicketTypeIdVal").innerHTML = ""
+
+    })
+
+
+    $("#HDTicketStatusOwnerId").change(function () {
+        document.getElementById("HDTicketStatusOwnerIdVal").innerHTML = ""
+
+    })
+
+
+    $("#PriorityId").change(function () {
+        document.getElementById("PriorityIdVal").innerHTML = ""
+
+    })
+
+    window.onload = OnloadData();
+</script>
+

@@ -1,0 +1,108 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StudentTeacherAssesmentViewModel>
+@{
+    ViewBag.Title = "TeacherAssesmentPartialView";
+    int nSNo = 1;
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+@if (null != Model && Model.Count() > 0)
+{
+
+
+        <div class="col-xs-12">
+
+            <div class="table-header">
+                Records Found (@Model.Count())
+                <div style="float:right;margin-right:10px;">
+                    <button type="submit" name="Save" class="btncustom P2" >
+                       Save
+                    </button>
+                </div>
+            </div>
+        </div>
+  
+                <input type="hidden" value="@ViewBag.ClassId" name="ClassNumber" />
+                <input type="hidden" value="@ViewBag.Examid" name="ExamId" />
+
+
+                <div class="col-sm-12">
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Roll Number")
+                                </th>
+                                @if (bIsCoastal)
+                                {
+                                    <th>
+                                        @Html.DisplayName("Registration Number")
+                                    </th>
+                                }
+                                <th>
+                                    @Html.DisplayName("Marks")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Teacher Assesment")
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Count(); i++)
+                            {
+                                <tr>
+                                    <td>
+                                        @(nSNo++)
+                                        @Html.Hidden("lstTeacherStudent[" + @i + "].StudentId", Model.ElementAt(i).StudentId)
+                                        @Html.Hidden("lstTeacherStudent[" + @i + "].ExaminationId", Model.ElementAt(i).ExaminationId)
+                                        @Html.Hidden("lstTeacherStudent[" + @i + "].StudentTeacherAssesmentId", Model.ElementAt(i).StudentTeacherAssesmentId)
+                                        @Html.Hidden("lstTeacherStudent[" + @i + "].ExamMarks", Model.ElementAt(i).ExamMarks)
+
+
+
+
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).StudentName
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).RollNumber
+                                    </td>
+                                    @if (bIsCoastal)
+                                    {
+                                        <td>
+                                            @Model.ElementAt(i).OMRNumber
+                                        </td>
+                                    }
+                                    <td>
+                                        @Model.ElementAt(i).ExamMarks
+                                    </td>
+                                    <td>
+                                        @Html.DropDownList("lstTeacherStudent[" + @i + "].TeacherAssesmentId", new SelectList(ViewBag.TeacherAssesment, "TeacherAssesmentId", "AssesmentName", Model.ElementAt(i).TeacherAssesmentId), "-- Select --", new { @class = "form-control", @style = "width:250px;" })
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+         
+}
+else
+{
+    <div class="col-xs-12">
+        <span style="font-weight:bold;color:red">Data not available to display</span>
+    </div>
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+
+

@@ -1,0 +1,101 @@
+﻿@model AsteriskBrowserAL.Models.ItemModel
+
+@if (null != Model)
+{
+    
+    <div class="hr hr-18 dotted hr-double"></div>
+   
+    <div class="table-header">
+      Kit Items
+
+        <div style="float:right;">
+
+            <button type="button" disabled="disabled" onclick="RemoveItems()" name="Remove" id="btnRemove" class="btn btn-info btn-xs P2">
+           <i class="ace-icon fa fa-minus-square bigger-160"></i>
+            </button>
+        </div>
+
+    </div>
+    if (null != Model.lstItems && Model.lstItems.Count() > 0)
+    {
+        int nsno = 1;
+        <div style="overflow:auto;height:290px">
+            <table id="KitDetailsTable" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                <tbody>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Item")
+                        </th>
+                        <th>
+                            @Html.DisplayName("SKU Code")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Qty")
+                        </th>
+
+
+                    </tr>
+                    @for (int i = 0; i < Model.lstItems.Count(); i++)
+                    {
+                        <tr>
+                            @Html.Hidden("lstKitItem.Index", (@i))
+                            @Html.Hidden("lstKitItem[" + @i + "].KitDetailsId", Model.lstItems.ElementAt(i).KitDetailsId, new { id = "HiddenDetailsId" })
+                            @Html.Hidden("lstKitItem[" + @i + "].InventorySubCategoryItemId", Model.lstItems.ElementAt(i).InventorySubCategoryItemId, new { id = "HiddenItemId" })
+                            @Html.Hidden("lstKitItem[" + @i + "].ItemName", Model.lstItems.ElementAt(i).ItemName)
+                            @Html.Hidden("lstKitItem[" + @i + "].SKUCode", Model.lstItems.ElementAt(i).SKUCode)
+                            <td>
+                                @(nsno++)
+                            </td>
+                            <td>
+                                @Model.lstItems.ElementAt(i).ItemName
+                            </td>
+                            <td>
+                                @Model.lstItems.ElementAt(i).SKUCode
+                            </td>
+                            <td>
+                                @if (Model.IsEdit)
+                                {
+                                    @Html.TextBox("lstKitItem[" + @i + "].Quantity", Model.lstItems.ElementAt(i).Quantity, new { @class = "form-control textlength", @maxlength = "2", @min = "0", onkeypress = "return isNumberKey(event)", @max = "100000", @id = "KitItemValue", @style = "width:100px" })
+                                }
+                                else
+                                {
+                                    @Model.lstItems.ElementAt(i).Quantity
+                                }
+                            </td>
+
+                            @*@if (Model.IsEdit)
+                    {
+                        <td>
+                            <a role="button">Remove</a>
+                        </td>
+                    }*@
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    }
+    else
+    {
+            <span style="color: red;"><b>No receords found</b></span>
+            }
+            }
+            else
+            {
+            <span style="color: red;"><b>No records found</b></span>
+            }
+
+
+            <script>
+                function isNumberKey(evt) {
+                    var charCode = (evt.which) ? evt.which : event.keyCode
+                    if (charCode > 31 && (charCode < 48 || charCode > 57))
+                        return false;
+                    return true;
+                }
+            </script>

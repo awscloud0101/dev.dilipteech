@@ -1,0 +1,257 @@
+﻿@model AsteriskBrowserAL.Models.DivisionViewModel
+@{
+    ViewBag.Title = "Division";
+}
+
+
+
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            General
+        </li>
+        <li class="active">Division</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+
+    <div class="row">
+    <div class="col-xs-12">
+
+        @using (Html.BeginForm("Divisions", "SeGeneral", FormMethod.Post))
+            {
+
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(true)
+            <span id="ErrorId" style="color:red;font-weight:bold"></span>
+            <div class="row">
+                <div class="col-xs-12">
+                  
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Divisions</span>
+                        <div class="" style="float:right;margin-right:10px;">
+
+                            <a href="@Url.Action("DivisionsC", "SeGeneral")"  class="btncustom view-header-btn P2">Add</a>
+                            @*<a name="Save" class="btn btn-info btn-minier view-header-btn P2" role="button" onclick="return SubmitForm()">*@
+                            <button class="btncustom view-header-btn P2" onclick="return SubmitForm();" type="submit">
+                               Save
+
+                            </button>
+                            @*<i class="ace-icon fa fa-floppy-o bigger-180"></i>*@
+                            @*</a>*@   </div>
+
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+                    <div class="widget-box">
+
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6" >
+                                            <label class="col-sm-4 " style="line-height:15px;" >Select Division</label>
+                                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                   
+                        <div id="SearchDiv">
+                  
+                        </div>
+                    </div>
+            
+                
+
+                  
+
+
+                    <input type="hidden" name="AssignedBranches" id="AssignedBranches" />
+                    <input type="hidden" name="RemovedBranches" id="RemovedBranches" />
+                    @if (null != Model)
+                    {
+                        <input type="hidden" id="SelDivisionId" value="@Model.DivisionId" />
+                    }
+                    else
+                    {
+                        <input type="hidden" id="SelDivisionId" />
+                    }
+                </div>
+                </div>
+                }
+         
+
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    function SubmitForm()
+    {
+        debugger
+        var Division = $("#DivisionId").val()
+
+        if (Division < 1)
+        {
+            document.getElementById("ErrorId").innerHTML = "Please select division "
+            return false;
+        }
+        return true
+    }
+
+    function onloadData() {
+        GetDivisionDropDown();
+    }
+    window.onload = GetDivisionDropDown();
+
+    function GetDivisionDropDown() {
+        var SelDivisionId = $("#SelDivisionId").val();
+        $.ajax({
+            url: '/SeGeneral/GetDivisionDropDown',
+            success: function (Data) {
+                var Divisions = $('#DivisionId')
+                Divisions.children().remove();
+                Divisions.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    Divisions.append($("<option>").val(record.DivisionId).text(record.DivisionName));
+                });
+                $('#DivisionId').append(Divisions);
+                if (SelDivisionId > 0) {
+                    document.getElementById("DivisionId").value = SelDivisionId                 
+                    $.ajax({
+                        url: '/SeGeneral/GetAssignedBranches',
+                        data: { DivisionId: SelDivisionId },
+                        
+                        success: function (result) {
+                            $("#SearchDiv").html(result)
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+
+
+    $("#DivisionId").change(function () {
+        debugger
+        $('#AssignedBranches').val = '';
+        $('#RemovedBranches').val = '';
+
+        document.getElementById("ErrorId").innerHTML = ""
+        var Division = $("#DivisionId").val();
+        var skillsSelect = document.getElementById("DivisionId");
+
+        var selectedText = skillsSelect.options[skillsSelect.selectedIndex].text
+        if (Division > 0) {
+            $.ajax({
+                url: '/SeGeneral/GetAssignedBranches',
+                data: { DivisionId: Division },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (result) {
+                    $("#SearchDiv").html(result)
+                    document.getElementById("AssignedDivisionName").innerHTML = "(" + selectedText + ")";
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            $("#SearchDiv").html("")
+        }
+    })
+
+
+    function Submit() {
+        var isvalid = true;
+
+        var SeleDivision = $("#DivisionId").val()
+        var AssignedBranches = $("#AssignedBranches").val()
+        var RemovedBranches = $("#RemovedBranches").val()
+
+        if (SeleDivision > 0) {
+
+            isvalid = true;
+        }
+        else {
+            document.getElementById("ErrorId").innerHTML = "Please select division"
+            isvalid = false;
+
+
+        }
+        if ((AssignedBranches != "" && AssignedBranches != null) || RemovedBranches != "" && RemovedBranches != null) {
+            isvalid = true;
+        }
+        else {
+            isvalid = false;
+        }
+        return isvalid;
+    }
+
+
+    function btnConfirm(Value) {
+
+        debugger
+
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeGeneral/ValidationForDivisionsD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SeGeneral/DivisionsD?id=' + Value;
+                    var title = "Division";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+
+

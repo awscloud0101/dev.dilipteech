@@ -1,0 +1,247 @@
+﻿@model AsteriskBrowserAL.Models.ManualRangeData
+@{
+    ViewBag.Title = "Manual Range Report";
+
+    int sno = 1;
+    string color = string.Empty;
+    string BranchName = string.Empty;
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Manual Range Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<style>
+    .red {
+        color: red;
+    }
+</style>
+
+
+<section class="content">
+            <br />
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="page-header">
+                        <h1>
+                            <small style="float:right;">
+                                @Html.ActionLink("Back To Details", "ManualRange")
+                            </small>
+                        </h1>
+                    </div>
+                    @using (Html.BeginForm("ManualRangeDetails", "SeFinance", FormMethod.Post))
+                    {
+                        if (Model != null)
+                        {
+
+                            <input type="hidden" id="SubscriptionId" value="@Model.SubscriptionId" />
+
+                            <span style="color:red;font-weight:bold" id="Validation"></span>
+
+    <div class="widget-box">
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">
+                Manual Range Details
+            </h5>
+            <div class="widget-toolbar no-border">
+                <div class="inline dropdown-hover">
+                </div>
+            </div>
+        </div>
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="col-xs-6">
+                            <label class="col-xs-4">Select Range</label>
+                            <div class="col-xs-6">
+                                @Html.DropDownListFor(model => model.ManualRangesList, new SelectList(Model.ManualRangesList, "RangeId", "TemplateNumber"), "--- Select ---", new { @class = "form-control", @id = "rangeId" })
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="col-sm-12" for="form-field-1">
+                                <span style="font-weight:bold" id="AmountInBank"> </span>
+                            </label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div style='display:none;' id='business'>
+                                <label class="col-xs-4">In-Active Ranges</label>
+                                <select id="inActive" name="ManualReceipitId" style="width:200px;" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+            <div id="SearchData">
+            </div>
+            }
+            else
+            {
+            <div style="color:red;font-weight:bold">Data not available to display</div>
+            }
+
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+    function GetRangersList() {
+        var range = $('#rangeId').val();
+        var nSubscriptionId = $('#SubscriptionId').val();
+        if (range > 0) {
+            if (range != null)
+                $.ajax({
+                    url: '/SeFinance/GetManuaRanges',
+                    data: { range: range, nSubscriptionId: nSubscriptionId },
+                    success: function (data) {
+                        debugger
+                        document.getElementById('AmountInBank').innerHTML = data.Message;
+                        document.getElementById('AmountInBank').value = data.range;
+                    },
+                    aync: false
+                });
+        }
+        if (range > 0) {
+            if (range != null)
+                $.ajax({
+                    url: '/SeFinance/GetManualRangeList',
+                    data: { range: range, nSubscriptionId: nSubscriptionId },
+                    beforeSend: function () {
+                        $('#imagemodal').show();
+                    },
+                    success: function (data) {
+                        $('#SearchData').html(data)
+                    }
+                }).done(function () {
+                    $('#imagemodal').hide();
+                });
+        }
+        else {
+            $('#SearchData').html("");
+        }
+    }
+
+
+
+    $('#rangeId').change(function () {
+        var rangeId = $('#rangeId').val();
+        if (rangeId != 0) {
+            var range = $('#rangeId').val();
+            var nSubscriptionId = $('#SubscriptionId').val();
+            if (range > 0) {
+                if (range == 2) {
+                    $("#business").show();
+                    $.ajax({
+                        url: '/SeFinance/GetManualRangeActiveRangeDropDwon',
+                        data: { range: range, nSubscriptionId: nSubscriptionId },
+                        success: function (data) {
+
+                            var RangeItems = $('#inActive');
+
+                            RangeItems.children().remove();
+
+                            RangeItems.append($("<option>").val("null").text("--- Select ---"));
+
+                            $.each(data, function (i, record) {
+                                RangeItems.append($("<option>").val(record.ManualReceipitId).text(record.RunningNumbers));
+                            });
+                            $('#inActive').append(RangeItems);
+
+                        },
+                        aync: false
+                    });
+
+                }
+                else {
+                    $('#SearchData').html("")
+                    $("#business").hide();
+
+                }
+                if (range == 1) {
+                    GetRangeOneData();
+                    $("#AmountInBank").show();
+                }
+                else {
+                    $('#SearchData').html("")
+                    $("#AmountInBank").hide();
+
+                }
+            }
+        }
+        else {
+            $('#SearchData').html("")
+            $("#AmountInBank").hide();
+            $("#business").hide();
+        }
+    });
+
+    function GetRangeOneData() {
+        var range = $('#rangeId').val();
+        var nSubscriptionId = $('#SubscriptionId').val();
+        $.ajax({
+            url: '/SeFinance/GetManuaRanges',
+            data: { range: range, nSubscriptionId: nSubscriptionId },
+            success: function (data) {
+                debugger
+                document.getElementById('AmountInBank').innerHTML = data.Message;
+                document.getElementById('AmountInBank').value = data.range;
+            },
+            aync: false
+        });
+        $.ajax({
+            url: '/SeFinance/GetManualRangeList',
+            data: { range: range, nSubscriptionId: nSubscriptionId },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#SearchData').html(data)
+                $("#business").hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    $('#inActive').change(function () {
+        var inActive = $('#inActive').val();
+        var nSubscriptionId = $('#SubscriptionId').val();
+        if (inActive > 0) {
+            $.ajax({
+                url: '/SeFinance/GetManualRangeInActiveListData',
+                data: { inActive: inActive, nSubscriptionId: nSubscriptionId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#SearchData').html(data)
+                    $("#AmountInBank").hide();
+
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+
+            $('#SearchData').html("")
+            $("#AmountInBank").hide();
+        }
+    });
+</script>
+

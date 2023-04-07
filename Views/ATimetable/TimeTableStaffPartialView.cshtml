@@ -1,0 +1,294 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffData>
+
+@{
+    List<AsteriskBrowserAL.Subjects> Colours = new List<AsteriskBrowserAL.Subjects>();
+
+    Colours.Add(new Subjects { SubjectId = 0, SubjectName = "label-orange" });
+    Colours.Add(new Subjects { SubjectId = 1, SubjectName = "label-blue" });
+    Colours.Add(new Subjects { SubjectId = 2, SubjectName = "label-PaleVioletRed" });
+    Colours.Add(new Subjects { SubjectId = 3, SubjectName = "label-LightSeaGreen" });
+    Colours.Add(new Subjects { SubjectId = 4, SubjectName = "label-success" });
+    Colours.Add(new Subjects { SubjectId = 5, SubjectName = "label-Salmon" });
+    Colours.Add(new Subjects { SubjectId = 6, SubjectName = "label-purple" });
+    Colours.Add(new Subjects { SubjectId = 7, SubjectName = "label-info" });
+
+}
+
+@{
+    int Count = Colours.Count();
+    int i = 0;
+    string aTagId = "";
+    string Id = "";
+}
+<style>
+    .login-dialog .modal-dialog {
+        width: 300px;
+    }
+</style>
+
+<style>
+    .member tbody tr {
+        cursor: pointer;
+    }
+
+    .login-dialog .modal-dialog {
+        width: 300px;
+    }
+</style>
+
+<input type="hidden" id="SelectStaff" />
+
+<table class="table table-bordered table-striped table-hover nowrap">
+    <tbody class="member" id="StaffMember">
+        @foreach (var s in Model)
+        {
+            aTagId = "";
+            aTagId = s.StaffId + "-Close";
+            if (i == Count - 1)
+            {
+                i = 0;
+            }
+            Id = "";
+            Id = s.StaffId + "-" + s.SubjectId;
+
+            string color = Colours.FirstOrDefault(c => c.SubjectId == i).SubjectName;
+
+
+            <tr>
+
+                <td>
+
+                    <div class="item  @Id existingTag inline action-buttons @color " id="@Id" data-class="@color" name="@s.ShortName">
+
+                        @*<a class="closeButton" id="@aTagId" style="display:none" onclick="CloseDiv(this)"></a>*@
+                        @s.FirstName
+                    </div>
+                    <input type="hidden" id="SectionId" name="batchId" value="@s.batchId" />
+                </td>
+            </tr>
+
+            i++;
+        }
+    </tbody>
+
+</table>
+
+<input type="hidden" id="Count" value="1" />
+
+
+
+<div class="source-code runnable">
+    <!--
+    BootstrapDialog.show({
+        title: 'Period-Teacher Allocation',
+        message: 'Hi Apple!',
+        {
+            label: 'Yes',
+            cssClass: 'btn-primary',
+            action: function(){
+                alert('Hi Orange!');
+            }
+        } {
+            label: 'No',
+            action: function(dialogItself){
+        RemoveAssignedStaff()
+                dialogItself.close();
+            }
+        }]
+    });
+    -->
+
+
+</div>
+
+<script>
+    function RemoveAssignedStaff() {
+        debugger
+        var SelStaff = $("#SelectStaff").val();
+        $(".right #" + SelStaff).remove()
+
+    }
+
+    $(function () {
+
+        debugger
+        //Over all Drag and Drop Functionality
+        $('.left .item').draggable({
+
+            revert: true,
+            proxy: 'clone'
+        });
+        $('.right td.drop').droppable({
+            onDragEnter: function () {
+                $(this).addClass('over');
+            },
+            onDragLeave: function () {
+
+                $(this).removeClass('over');
+            },
+            onDrop: function (e, source) {
+
+                debugger
+
+                var Data = source.innerHTML;
+
+                $(this).removeClass('over');
+
+                var Id = source.getAttribute("id")   //Combination staffid-subjectid
+
+                if ($(source).hasClass('assigned')) {
+                    $(this).append(source);
+
+                    AppendStaffWithSubjects(source, Id)
+                }
+                else {
+                    var c = $(source).clone().addClass('assigned');
+                    //  $(this).empty().append(c);
+
+                    if (($(this).find('.' + Id).length == 0) && ($(this).find('#' + Id + '-P').length == 0) && ($(this).find('#' + Id + '-Q').length == 0) && ($(this).find('#' + Id + '-R').length == 0) && ($(this).find('#' + Id + '-S').length == 0) && ($(this).find('#' + Id + '-T').length == 0) && ($(this).find('#' + Id + '-U').length == 0) && ($(this).find('#' + Id + '-V').length == 0)) {
+                        $(this).append(c);
+                        AppendStaffWithSubjects(source, Id)
+                    }
+
+                    ////Commented to disable drag in Periods Tabel
+                    ////c.draggable({
+                    ////    revert: true
+                    ////});
+                }
+            }
+        });
+
+        function AppendStaffWithSubjects(source, Id) {
+            document.getElementById(Id).innerHTML = '<div class="tools action-buttons"><a class="closeButton" onclick="CloseDragDiv(this.id)"></a></div>' + source.getAttribute("name")//assigning Selected Staff with alias name Subject Code
+
+            //Removing the style to work  Close
+            // to remove the draggable functionality in right table
+            $(".right #" + Id).css({ "top": "" });
+            $(".right #" + Id).css({ "position": "" });
+            $(".right #" + Id).css({ "left": "" });
+            $(".right #" + Id).addClass("StaffAssigned")
+            $(".right #" + Id).addClass("profile-activity")
+
+            var Count = document.getElementById("Count").value //Just to maintain the unique it no other purpose
+            var newId = Id + "-" + Count
+            $(".right #" + Id).attr('id', newId);
+
+            Count = parseInt(Count) + 1
+            document.getElementById("Count").value = Count
+
+            $(".right #" + newId + " a").attr("id", newId + "-a")   // adding id to close anchor tag with refernece "-a"
+
+            //Restriction if Staff already alloted to same period
+            var CountVal = 1;
+
+            if (CountVal > 0) {
+                IsStaffAlreadyAssignedPeriod(newId)
+            }
+        }
+
+        $('.left').droppable({
+            accept: '.assigned',
+            onDragEnter: function (e, source) {
+                $(source).addClass('trash');
+            },
+            onDragLeave: function (e, source) {
+                debugger
+                $(source).removeClass('trash');
+            },
+            onDrop: function (e, source) {
+                debugger
+                $(source).remove();
+            }
+        });
+    });
+
+
+
+    //To know is Staff Already Assigned to period
+    function IsStaffAlreadyAssignedPeriod(id) {
+        debugger
+        var WeekDate = $("#WeekNumberId option:selected").text()
+
+        var PeriodNWeek = $(".right #" + id).closest("td").attr('id')
+        var SectionId = $("#SectionId").val();
+
+        document.getElementById("SelectStaff").value = id
+
+        $.ajax({
+            url: '/ATimetable/IsStaffAlreadyAssignedPeriod',
+            data: { StaffIdNSubjectId: id, WeekDate: WeekDate, PeriodNWeek: PeriodNWeek, nSectionId: SectionId },
+            success: function (result) {
+                debugger
+                if (result != "") {
+                    //Display Model with Validation if Yes then Continue if No Remove the Staff from the Cell (method RemoveAssignedStaff)
+
+                    if (confirm('Staff already alloted to period ,are you sure want to assign?')) {
+                        // Save it!
+                    } else {
+                        RemoveAssignedStaff();
+                    }
+
+                    // CallDialogScripts();
+                }
+
+            }
+        })
+    }
+
+    function CallDialogScripts() {
+        debugger
+        $.ajax({
+            url: '/Base/DialogueScripts',
+            success: function (data) {
+                debugger
+                $('#dialogScripts').html(data);
+                debugger
+                $('#dValidation').html("<i class='ace-icon fa fa-hand-o-right blue bigger-120'></i>&nbsp; Staff already alloted to period ,Are you sure want to assign?");
+                debugger
+                $("#dialog-confirm").removeClass('hide').dialog({
+                    resizable: false,
+                    draggable: false,
+                    width: '320',
+                    modal: true,
+                    title: "Teacher Allocation",
+                    title_html: true,
+                    buttons: [
+                        {
+                            html: "<i class='ace-icon bigger-110'></i>&nbsp; Yes",
+                            "class": "btn btn-success btn-minier",
+                            click: function () {
+                                debugger
+
+                                $('#dialogScripts').html("");
+                                $(this).dialog("close");
+
+                                //$(this).draggable('enable')
+                            }
+                        }
+                        ,
+                        {
+                            html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; No",
+                            "class": "btn btn-minier",
+                            click: function () {
+                                debugger
+                                RemoveAssignedStaff();
+
+                                $('#dialogScripts').html("");
+
+                                $(this).dialog("close");
+
+                                $(this).draggable('enable')
+                            }
+                        }
+                    ]
+                });
+
+
+            },
+            async: false
+        })
+    }
+
+</script>
+
+

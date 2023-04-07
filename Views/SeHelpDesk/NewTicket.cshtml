@@ -1,0 +1,441 @@
+﻿@model AsteriskBrowserAL.Models.NewTicketModelData
+@{
+    ViewBag.Title = "New Ticket";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Manage
+        </li>
+        <li>
+            <i class=""></i>
+            Help Desk
+        </li>
+        <li class="active">New Ticket</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+@*<script src="~/script/jquery-2.0.3.js"></script>
+<script src="~/script/jquery-ui.js"></script>
+<script src="~/js/jquery-1.10.2.js"></script>
+<script src="~/js/jquery-ui.js"></script>*@
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 13px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+<section class="content">
+    <br/>
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("NewTicket", "MnHelpDesk", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+    <input type="hidden" name="FromPlayerId" id="FromPlayerId" />
+    <input type="hidden" name="ToPlayerId" id="ToPlayerId" />
+                
+                <input type="hidden" value="@Model.FromPlayerId" id="SelFromPlayerId"/>
+    <input type="hidden" value="@Model.ToPlayerId" id="SelToPlayerId" />
+
+    <input type="hidden" value="@Model.FromPlayerName" id="SelFromPlayerName" />
+    <input type="hidden" value="@Model.ToPlayerName" id="SelToPlayerName" />
+
+    <span id="Validation" style="color:red;font-weight:bold"></span>
+                <div class="box">
+                    <div class="box-header">
+                        <h4 class="box-title">New Ticket</h4>
+                        <br />
+                        <br />
+                        <button type="submit" class="btn btn-primary" onclick="return SubmitForm()" id="Send" name="Send" style="width:80px">Send</button>
+                    </div><!-- /.box-header -->
+
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+
+                                    <label class="col-sm-3 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Category")</label>
+                                    <div class="col-sm-3">
+                                        @Html.DropDownListFor(model => model.TicketCategoryId, new SelectList(Model.lstHDCategory, "HDCategoryId", "CategoryName"), "--- Select ---", new { @class="form-control", id="Category" })
+                                    </div>
+
+                                    <label class="col-sm-3 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Priority")</label>
+                                    <div class="col-sm-3">
+                                        @Html.DropDownListFor(model => model.PriorityId, new SelectList(Model.lstHDPriority, "HDPriorityId", "Priority"), "--- Select ---", new { @class = "form-control", id = "Priority" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br/>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+
+                                    <label class="col-sm-3 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Status")</label>
+                                    <div class="col-sm-3">
+                                        @Html.DropDownListFor(model => model.HDStatusId, new SelectList(Model.lstHDStatus, "HDStatusId", "HDStatusName"), "--- Select ---", new { @class = "form-control", id="Status" })
+                                    </div>
+
+                                    <label class="col-sm-3 control-label no-padding-right"><span style="color:red;font-weight:bold">*</span>@Html.Label("Type")</label>
+                                    <div class="col-sm-3">
+                                        @Html.DropDownListFor(model => model.HDTicketTypeId, new SelectList(Model.lstTicketType, "HDTicketTypeId", "HDTicketTypeName"), "--- Select ---", new { @class = "form-control", id="Type" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>Issued By</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" id="IssuedBy" name="IssuedBy" class="form-control"/>
+                                    </div>
+
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>Report To</label>
+                                    <div class="col-sm-3">
+                                            <input type="text" id="ReportTo" name="ReportTo" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>Subject</label>
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(model => model.Subject, new { @class = "form-control textlength", id = "Subject" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*</span>Description</label>
+                                    <div class="col-sm-9">
+                                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control textlength", id = "Description" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Attachments</label>
+                                    <div class="col-sm-9">
+                                        <input type="File" accept="image/*" multiple="multiple" name="Attachment" id="Attachment" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+
+                            <div class="col-sm-12">
+                                <div class="form-group">
+
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1"></label>
+                                    <div class="col-sm-4">
+                                        <select multiple="multiple" style="width:350px;height:200px;" id="ImageName" name="ImageName">
+                                            @if(null != Model.lstAttachedImages)
+                                            {
+                                                foreach(HttpPostedFileBase file in Model.lstAttachedImages)
+                                                {
+                                                    <option value="@file.FileName">@file.FileName</option>
+                                                }
+                                            }
+                                        </select>
+
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <input type="submit" onclick="return AddClick()" name="Add" id="Add" class="btn btn-primary" value="Add" /><br/><br/>
+                                        <input type="submit" onclick="return RemoveClick()" class="btn btn-primary" id="Remove" name="Remove" value="Remove" />
+
+                                    </div>
+                                    </div>
+                                </div>
+                                </div>
+
+                            </div>
+                        </div>
+                <br />
+            }
+        </div>
+    </div>
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var selFromPlayerId = $('#SelFromPlayerId').val();
+            var selToPlayerId = $('#SelToPlayerId').val();
+
+            var selFromPlayerName = $('#SelFromPlayerName').val();
+            var selToPlayerName = $('#SelToPlayerName').val();
+
+            $('#FromPlayerId').val(selFromPlayerId);
+            $('#ToPlayerId').val(selToPlayerId);
+            $('#IssuedBy').val(selFromPlayerName);
+            $('#ReportTo').val(selToPlayerName);
+        });
+
+        var IssuedByEmployeeNumber = "";
+        var ReportToEmployeeNumber = "";
+        var FromPlayerId = "";
+        var ToPlayerId = "";
+        var ImageUrl = "";
+
+
+        function SubmitForm()
+        {
+            var valid = true;
+            var Category = $('#Category').val();
+            var Priority = $('#Priority').val(); 
+            var Status =  $('#Status').val();
+            var TicketType =  $('#Type').val();
+            var Subject = $('#Subject').val();
+            var Description = $('#Description').val();
+
+            if(Category == "" || Category < 1)
+            {
+                valid = false;
+            }
+
+            if (Priority == "" || Priority < 1) {
+                valid = false;
+            }
+
+            if (Status == "" || Status < 1) {
+                valid = false;
+            }
+
+            if (TicketType == "" || TicketType < 1) {
+                valid = false;
+            }
+
+            if (Subject == "") {
+                valid = false;
+            }
+
+            if (Description == "") {
+                valid = false;
+            }
+
+            if (IssuedByEmployeeNumber == "") {
+                valid = false;
+            }
+
+            if (ReportToEmployeeNumber == "") {
+                valid = false;
+            }
+
+            if(valid == false)
+            {
+                document.getElementById("Validation").innerHTML = "Fields marked with (*) are mandatory"
+            }
+
+            return valid;
+        }
+
+        $("#IssuedBy").autocomplete({
+
+            source: function (request, response) {
+                $('#imagemodal').show();
+                $.ajax({
+                    url: "/MnHelpDesk/GetPlayers",
+                    data: { Player: request.term, EmployeeNumber: IssuedByEmployeeNumber },
+
+                    success: function (json) {
+                        response($.map(json, function (data, id) {
+
+                            return {
+                                label: data.EmployeeName,
+                                value: data.EmployeeName,
+                                EmployeeNumber: data.EmployeeNumber,
+                                FromPlayerId :data.PlayerId
+                            };
+                        }));
+                    },
+                }).done(function () {
+                    $('#imagemodal').hide();
+                });
+            },
+            minLength: 1,
+            select: function SelectEvent(event, ui) {
+
+                IssuedByEmployeeNumber = ui.item.EmployeeNumber;
+                $('#FromPlayerId').val(ui.item.FromPlayerId);
+            }
+        });
+
+
+        $("#ReportTo").autocomplete({
+
+            source: function (request, response) {
+                $('#imagemodal').show();
+                $.ajax({
+                    url: "/MnHelpDesk/GetPlayers",
+                    data: { Player: request.term, EmployeeNumber: IssuedByEmployeeNumber },
+
+                    success: function (json) {
+                        response($.map(json, function (data, id) {
+
+                            return {
+                                label: data.EmployeeName,
+                                value: data.EmployeeName,
+                                EmployeeNumber: data.EmployeeNumber,
+                                ToPlayerId: data.PlayerId
+                            };
+                        }));
+                    },
+                }).done(function () {
+                    $('#imagemodal').hide();
+                });
+            },
+            minLength: 1,
+            select: function SelectEvent(event, ui) {
+
+                ReportToEmployeeNumber = ui.item.EmployeeNumber;
+                $('#ToPlayerId').val(ui.item.ToPlayerId);
+            }
+        });
+
+
+        $('#Attachment').change(function () {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                ImageUrl = e.target.result;
+            }
+            reader.readAsDataURL(this.files[0]);
+        });
+
+        function AddClick()
+        {
+            if($('#Attachment').val() == "")
+            {
+                return false;
+            }
+        }
+
+        function RemoveClick()
+        {
+            if ($("#ImageName option:selected").length < 1)
+            {
+                return false;
+            }
+        }
+
+        function AddAttachment() {
+
+            var selectedFile = ($("#Attachment"))[0].files[0];
+
+            if (selectedFile) {
+                var ImageItems = $('#ImageName');
+
+                ImageItems.append($("<option>").val(selectedFile.name).text(selectedFile.name));
+                $('#ImageName').append(ImageItems);
+            }
+
+            //$.ajax({
+
+            //    url: '/MnHelpDesk/AddAttachments',
+            //    type:'POST',
+            //    success: function (data) {
+
+            //        var ImageItems = $('#ImageName');
+
+            //        ImageItems.append($("<option>").val(data.path).text(data.Attachment.FileName));
+            //        $('#ImageName').append(ImageItems);
+            //    }
+            //});
+
+            return false;
+        };
+
+        function RemoveAttachment()
+        {
+            $("#ImageName option:selected").remove();
+            return false;
+        }
+
+        //$("input[type=file]").change(function () {
+        //    if (this.files && this.files[0]) {
+        //        var reader = new FileReader();
+        //        reader.onload = imageIsLoaded;
+        //        reader.readAsDataURL(this.files[0]);
+
+        //        // This is what you should do
+        //        $('#ImageName').val(this.files[0].name);
+        //    }
+        //});
+
+
+        //var files = $('#files')[0].files; //where files would be the id of your multi file input
+        ////or use document.getElementById('files').files;
+
+        //for (var i = 0, f; f = files[i]; i++) {
+
+        //    var reader = new FileReader();
+
+        //    reader.onload = function (e) {
+        //        //$('#pprev_' + fileCount)
+        //        //.attr('src', e.target.result)
+        //        //.css("display", "block");
+
+        //        reader.readAsDataURL(this.files[0]);
+
+        //        // This is what you should do
+        //        $('#ImageName').val(this.files[0].name);
+        //    };
+
+        //    reader.readAsDataURL(f);
+
+        //}
+
+
+    </script>
+
+
+
+
+}
+
+
+
+

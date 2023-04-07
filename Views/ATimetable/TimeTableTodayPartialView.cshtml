@@ -1,0 +1,509 @@
+﻿<link rel="shortcut icon" href="../favicon.ico">
+<link href="~/assets/css/normalize.css" rel="stylesheet" />
+<link href="~/assets/css/demo.css" rel="stylesheet" />
+<link href="~/assets/css/component.css" rel="stylesheet" />
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+<script src="~/assets/js/jquery.stickyheader.js"></script>
+<script scr="Common/js/ExportHTML.js"></script>
+
+<style>
+    .fontVal {
+        font-size: 14px;
+    }
+
+    #MovableTable tr:hover {
+        background: !important;
+    }
+
+    #MovableTable td:hover {
+        background: #c4e2d1;
+    }
+
+    #MovableTable table tr {
+        cursor: pointer;
+    }
+
+    .bgClassG {
+        background-color: #78AB46;
+        border: 1px solid #ddd;
+    }
+
+    .bgClassR {
+        background-color: #FC5555;
+        border: 1px solid #ddd;
+    }
+
+    .selectedTd {
+        background: #c4e2d1;
+    }
+</style>
+
+<style>
+    body {
+        font-size: 12pt;
+        font-family: Calibri;
+        padding: 10px;
+    }
+
+    table {
+        border: 1px solid black;
+    }
+
+    th {
+        border: 1px solid black;
+        padding: 5px;
+        background-color: grey;
+        color: white;
+    }
+
+    td {
+        border: 1px solid black;
+        padding: 5px;
+    }
+
+    input {
+        font-size: 12pt;
+        font-family: Calibri;
+    }
+
+    .MyDiv {
+        text-align: left;
+        position: relative;
+        color: #EEE;
+        font-size: 12px;
+        font-family: Times;
+        display: inline-block;
+        border: none;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        padding: 8px;
+        margin: 5px;
+    }
+</style>
+@{
+    var random = new Random();
+}
+
+<div class="hr hr-18 dotted hr-double"></div>
+<div class="table-header">
+    Timetable Today
+    <div style="float:right">
+
+        <button type="submit" value="Export Table data into Excel" class="btn btn-info btn-minier" id="btnClick">
+            <i class="ace-icon fa fa-download"> | Download</i>
+        </button>
+    </div>
+</div>
+
+<div class="col-sm-12" id="MovableTable">
+    <table class="table-bordered overflow-y Movable" id="tbTimeTable">
+        <thead>
+            <tr>
+                <th>
+                    <span>
+                        Periods/
+                    </span>
+                    <br />
+                    <span>
+                        Sections
+                    </span>
+                </th>
+                @foreach (var c in Model.ClassTimings)
+                {
+                    <th class="title">
+                        <span>
+                            @c.ItemName
+                        </span>
+                        <br />
+                        <span>
+                            ( @c.ItemStartTime - @c.ItemEndTime )
+                        </span>
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PeriodTimingsData)
+            {
+
+                <tr>
+
+                    <th class="time">
+                        <span>
+                            @item.ClassName
+                        </span>
+                        <br />
+                        <span>
+                            @item.SectionName
+                        </span>
+                    </th>
+
+                    @foreach (var p in item.PeriodTimings)
+                    {
+                        var color = String.Format("#{0:X6}", random.Next(0x1000000)); // = "#A197B9"
+
+                        <td>
+                            @if (null != p.lstMondayTutorsWithSubject && p.lstMondayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstMondayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    string DivId = p.PeriodsId + "-M" + "-" + d.TutorId;
+
+                                    <div class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </div>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstTuesdayTutorsWithSubject && p.lstTuesdayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstTuesdayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    string DivId = p.PeriodsId + "-T" + "-" + d.TutorId;
+
+                                    <div class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </div>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstWednesdayTutorsWithSubject && p.lstWednesdayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstWednesdayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    <div class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </div>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstThursdayTutorsWithSubject && p.lstThursdayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstThursdayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+
+                                    <div class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </div>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstFridayTutorsWithSubject && p.lstFridayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstFridayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    <div class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </div>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstSaturdayTutorsWithSubject && p.lstSaturdayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstSaturdayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+                                     
+                                    <div class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </div>
+                                    <br />
+                                }
+                            }
+                            else if (null != p.lstSundayTutorsWithSubject && p.lstSundayTutorsWithSubject.Count > 0)
+                            {
+                                string bgColor = "";
+
+                                foreach (var d in p.lstSundayTutorsWithSubject)
+                                {
+                                    if (d.AttendnaceStatus == "A" || d.AttendnaceStatus == "L")
+                                    {
+                                        bgColor = "bgClassR";
+                                    }
+                                    else
+                                    {
+                                        bgColor = "bgClassG";
+                                    }
+
+                                    <div class="@bgColor MyDiv">
+
+                                        <span class="fontVal">
+                                            @d.SubjectDisplay
+                                        </span>
+                                        <br />
+                                        <span class="fontVal">
+                                            @d.TutorDisplay
+                                        </span>
+                                    </div>
+                                    <br />
+                                }
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@*<div class="col-sm-2">
+        <br />
+        <br />
+        <div class="col-sm-12 pricing-span-body">
+
+            <div class="">
+                <div class="widget-box pricing-box-small ">
+                    <div class="widget-header">
+                        <h5 class="widget-title">Substitute Staff</h5>
+                    </div>
+                    <div class="widget-body" style="overflow:auto; height:200px;">
+                        <div class="widget-main no-padding">
+                            <div class="left" id="StaffData">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>*@<!-- /.row -->
+<input type="hidden" name="SelectedStaffandSubject" id="SelectedStaffandSubject" />
+
+<script>
+    //$("#btnClick").click(function (e) {
+    //    debugger
+    //    ExportToExcel('tbTimeTable');
+    //});
+
+    $("#btnClick").on('click', function (event) {
+        debugger
+        TimeTableExportToExcel("tbTimeTable", "#87AFC6", "Exported Excel");
+    });
+
+    //$("#btnClick").click(function (e) {
+    //    debugger
+    //    window.open('data:application/vnd.ms-excel,' + $('#MovableTable').html());
+    //    e.preventDefault();
+    //});
+
+    function GetSubstituteStaff(Period) {
+        debugger
+        var Day = $("#Date").val();
+
+        if (Period != "") {
+            $("#imagemodal").show();
+
+            $("#MovableTable tbody tr td  ").removeClass("selectedTd");
+            $("#" + Period).closest("td").addClass("selectedTd")
+
+            //document.getElementById(Period).style.background = "#438EB9"
+            document.getElementById("SelectedStaffandSubject").value = Period //on div double click storing the Div Id
+            $.ajax({
+                url: '/ATimetable/GetSubstituteStaffByPeriod',
+                data: { Period: Period, Day: Day },
+                success: function (result) {
+                    $("#StaffData").html(result)
+                    $("#imagemodal").hide();
+                }
+            })
+        }
+    }
+
+    function TimeTableExportToExcel(tableid) {
+
+        var tab_text = "<table border='2px'><tr >";
+        var textRange; var j = 0;
+        tab = document.getElementById(tableid); // id of table
+
+        for (j = 0 ; j < tab.rows.length ; j++) {
+            tab_text = tab_text + tab.rows[j].innerHTML + "</tr>";
+            //tab_text=tab_text+"</tr>";
+        }
+
+        tab_text = tab_text + "</table>";
+        tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
+        tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // remove if u want images in your table
+        tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // reomves input params
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+        {
+            document.getElementById('txtArea1').contentWindow;
+            txtArea1.document.open("txt/html", "replace");
+            txtArea1.document.write(tab_text);
+            txtArea1.document.close();
+            txtArea1.focus();
+            sa = txtArea1.document.execCommand("SaveAs", true, "Fee Due Report.xls");
+        }
+        sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
+
+        return (sa);
+    }
+    //function ExportToExcel(tableName, headerbdcolor, filename) {
+
+    //    if (tableName.trim() === "")
+    //    {
+    //        alert("No table supplied to export data")
+    //        return;
+    //    }
+
+    //    if (headerbdcolor.trim() === "")
+    //    {
+    //        headerbdcolor = "#87AFC6"
+    //    }
+
+    //    if (filename.trim() === "")
+    //    {
+    //        filename = "ExportedData"
+    //    }
+
+    //    var export_data = "";
+    //    var arraytablenames = tableName.split("|");
+
+    //    if (arraytablenames.length > 0) {
+    //        for (var i = 0 ; i < arraytablenames.length ; i++) {
+    //            export_data += "<table border='2px'><tr bgcolor='" + headerbdcolor+"'>";
+    //            objTable = document.getElementById(arraytablenames[i]);
+
+    //            if(objTable === undefined)
+    //            {
+    //                alert("Table not found");
+    //                return;
+    //            }
+    //            for (var j = 0 ; j < objTable.rows.length ; j++) {
+    //                export_data += objTable.rows[j].innerHTML + "</tr>"
+    //            }
+
+    //            export_data += "</table>";
+    //        }
+
+    //        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+    //        {
+    //            document.getElementById('txtArea1').contentWindow;
+    //            txtArea1.document.open("txt/html", "replace");
+    //            txtArea1.document.write(tab_text);
+    //            txtArea1.document.close();
+    //            txtArea1.focus();
+    //            sa = txtArea1.document.execCommand("SaveAs", true, filename +".xls");
+    //        }
+    //        else{
+    //        sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
+    //        }
+    //    }
+
+    //}
+</script>

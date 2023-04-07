@@ -1,0 +1,256 @@
+﻿@model AsteriskBrowserAL.Models.BatchStudentDataView
+
+@{
+    ViewBag.Title = "BatchC";
+}
+
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Batch</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-4>
+            <h3>@Html.ActionLink("<< Batch Details ", "Batch", new { CourseId = ViewBag.Selected_CourseId })</h3>
+        </div>
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("BatchE", "SeAcademics", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("BatchE")</span>
+                @Html.HiddenFor(model => model.BatchId)
+
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title ">Edit Batch</h3>
+
+
+                        <div class="box-body">
+                            <button class="btn btn-primary" type="submit" onclick="return submitForm();">
+                                Save
+                            </button>
+
+                        </div><!-- /.box-header -->
+                        <!-- form start -->
+                        @Html.HiddenFor(model => model.BatchId)
+                        @Html.HiddenFor(model => model.CourseId)
+
+
+                        @if (Model.IsSchool == true)
+                        {
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Co-Batch")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.CoBatchId, null, "--Select--", new { @class = "form-control ", id = "CoBatchId" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="coBatchId">
+                                    <label style="color:red;font-weight:bold;"> Please Select CoBatch </label>
+                                </div>
+                            </div>
+                        }
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Batch Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.BatchName, new { @class = "form-control textlength", placeholder = "Batch Name", id = "BatchName" })
+                            </div>
+
+
+                            <div class="col-sm-3" style="display:none;" id="batchName">
+                                <label style="color:red;font-weight:bold;"> Please Enter BatchName </label>
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Start Date")</label>
+
+                            <div class="col-sm-6">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div id="datepicker" class="input-group date">
+                                            <input class="form-control" type="text" name="StartDate" id="StartDate" value="@Model.StartDate.Value.ToShortDateString()" placeholder="Select Start Date" autocomplete="off" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="startDate">
+                                <label style="color:red;font-weight:bold;"> Please  Select StartDate </label>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("End Date")</label>
+
+                            <div class="col-sm-6">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div id="datepicker" class="input-group date">
+                                            <input class="form-control" type="text" name="EndDate" id="EndDate" value="@Model.EndDate.Value.ToShortDateString()" placeholder="Select End Date" autocomplete="off" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="endDate">
+                                <label style="color:red;font-weight:bold;"> Please  Select EndDate </label>
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="IsDateValid">
+                                <label style="color:red;font-weight:bold;">Start Date should be less than End Date </label>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <label class="col-sm-1 control-label no-padding-right" for="form-field-1">@Html.Label("Students")</label>
+                                <div class="col-sm-2">
+                                    <p> @Html.ListBox("ExistingStudentList", (MultiSelectList)ViewBag.ExistingStudentList, new { @style = "width: 270px;", size = 8 })  </p>
+                                    <input class="btn btn-primary" type="submit" name="remove"
+                                           id="remove" value="Remove" />
+                                </div>
+
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Non Existing Students")</label>
+                                <div class="col-sm-3">
+                                    <p> @Html.ListBox("NonExistingStudents", (MultiSelectList)ViewBag.NonExistingStudents, new { @style = "width: 270px;", size = 8 }) </p>
+
+                                    <input class="btn btn-primary" type="submit" name="add"
+                                           id="add" value="Add" /><br />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+        <input type="hidden" id="count" name="count" value="0" />
+    </div>
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+<script type="text/javascript">
+    function validateBatch() {
+
+        document.getElementById("count").value = "1";
+        var StartDate = document.getElementById("StartDate").value;
+        var EndDate = document.getElementById("EndDate").value;
+        var BatchName = document.getElementById("BatchName").value;
+
+        var IsSchool = $('#School').val();
+
+        validate = true;
+        if (IsSchool != "") {
+            var CoBatchId = $('#CoBatchId').val();
+            if (CoBatchId == 0) {
+                document.getElementById("coBatchId").style.display = "inline";
+                validate = false;
+            }
+            else {
+                document.getElementById("coBatchId").style.display = "none";
+            }
+        }
+        if (StartDate == "") {
+            document.getElementById("startDate").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("startDate").style.display = "none";
+        }
+
+        if (EndDate == "") {
+            document.getElementById("endDate").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("endDate").style.display = "none";
+        }
+        if (BatchName == "") {
+            document.getElementById("batchName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("batchName").style.display = "none";
+        }
+
+
+        if (StartDate != "" && EndDate != "") {
+
+            if (new Date(EndDate).getTime() == new Date(StartDate).getTime()) {
+                document.getElementById("IsDateValid").style.display = "inline";
+                validate = false;
+            }
+            else if (new Date(EndDate).getTime() < new Date(StartDate).getTime()) {
+                document.getElementById("IsDateValid").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("IsDateValid").style.display = "none";
+            }
+        }
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateBatch();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    $('#StartDate').focus(function () {
+        $('#startDate').hide();
+    });
+    $('#EndDate').focus(function () {
+        $('#endDate').hide();
+    });
+    $('#BatchName').focus(function () {
+        $('#batchName').hide();
+    });
+    if ($('#School').val() !="") {
+        $('#CoBatchId').focus(function () {
+            $('#coBatchId').hide();
+        });
+    }
+</script>
+
+

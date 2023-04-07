@@ -1,0 +1,124 @@
+﻿@model AsteriskBrowserAL.Models.MonthwiseWorkingDaysData
+@{
+}
+<section>
+    <div class="row">
+        <div class="col-xs-12">
+           @using (Html.BeginForm("StaffMonthWiseAttendance", "HROperations", FormMethod.Post, new { @class = "form-horizontal" }))
+           {
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        Staff Month Wise Attendance
+                    </h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.SubscriptionId, new SelectList(Model.lstBraches, "SubscriptionId", "Institute"), "--- Select ---", new { @Id = "SubscriptionId", @name = "SubscriptionId" })
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Month</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.MonthValue, new SelectList(Model.ListMonths, "MonthValue", "MonthName"), "--- Select ---", new { @class = "form-control", @id = "MonthValue" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="SearchData">
+            </div>
+           }
+               
+        </div>
+    </div>
+   
+</section>
+<script>
+    $('#MonthValue').change(function () {
+        GetStaffAttendanceData()
+    });
+    function GetStaffAttendanceData() {
+        var Month = $('#MonthValue').val();
+        var branchid = $('#SubscriptionId').val();
+        debugger
+        $.ajax({
+            url: '/HROperations/StaffMonthWiseAttendanceData',
+            data: { Month: Month, branchid: branchid },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#SearchData').html(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+
+    //function submitform() {
+    //    debugger
+    //    var valid = false;
+    //    var date = $('#MonthValue').val();
+    //    debugger
+    //    var d = new Date(date);
+    //    var n = d.getDate();
+    //    var year = date.getYear();
+    //    var month = date.getMonth();
+    //    var x = new Date(year, month, 1, -1).getDate();
+    //    alert(x);
+
+    //    $('#myTab tbody tr').each(function () {
+    //        debugger
+
+    //        var allCells = $(this).find('td');
+
+    //        alert(allCells)
+
+    //        if (allCells.length != 0) {
+
+               
+
+
+    //            allCells.each(function (x, td) {
+    //                debugger
+
+    //                if (x > 2) {
+    //                    var Sdays = $(td).find(".SupplementaryDays").val();
+    //                    alert(Sdays);
+
+    //                    var pdays = $(td).find('.PaidDays').val();
+
+    //                    if (Sdays > x) {
+
+    //                        document.getElementById("Valid").innerHTML = "Scored marks are greater than max marks for";
+    //                        valid = false;
+    //                        return valid;
+    //                    }
+
+    //                }
+
+    //                if (valid == false)
+    //                    return valid;
+    //            });
+
+    //        }
+
+    //        if (valid == false)
+    //            return valid;
+
+    //    });
+
+    //    return valid;
+    //};
+</script>

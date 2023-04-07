@@ -1,0 +1,229 @@
+﻿
+@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    ViewBag.Title = "Circulars Report";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Circulars</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm("Circulars", "AExamination", FormMethod.Post))
+    {
+        @Html.ValidationMessage("CircularsReport")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Circulars
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <a class="blue P2" id="NewExamination" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    @Html.DropDownListFor(model => model.BatchId, new SelectList(Model.lstSubscriptions, "SubscriptionId", "Institute"), "-- Select --", new { @class = "form-control", id = "SubscriptionId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Class</label>
+                                                <div class="col-sm-6">
+                                                    <select id="ClassNumber" name="ClassNumber" class="form-control"></select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                }
+
+                                <br />
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div id="SearchData" class="row">
+        </div>
+
+
+        if (null != Model)
+        {
+            <input style="display:none" id="SelClass" value="@Model.ClassNumber" />
+
+            <input style="display:none" id="SelSubId" value="@Model.SubscriptionId" />
+
+        }
+        else
+        {
+
+            <input style="display:none" id="SelClass" value="0" />
+
+            <input style="display:none" id="SelSubId" value="0" />
+
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        var SelSubId = $('#SelSubId').val();
+          if (SelSubId >= 0) {
+            GetClassNumbers();
+        }
+    });
+
+    $('#NewExamination').click(function () {
+        
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+
+        if (ClassNumber < 0 && BranchId < 0 || ClassNumber == "null" && BranchId == ""  ) {
+            document.getElementById("Validation").innerHTML = "Please select both class and branch";
+            return false;
+        }
+        else if (ClassNumber < 0 || ClassNumber=="null") {
+            document.getElementById("Validation").innerHTML = "Please select the class";
+            return false;
+        }
+        else if (BranchId < 0 || BranchId=="") {
+            document.getElementById("Validation").innerHTML = "Please select the branch";
+            return false;
+        }
+
+        else {
+            window.location.href = "/AExamination/CircularsC?ClassNumber=" + ClassNumber + "&BranchId=" + BranchId;
+        }
+
+    });
+
+    //$('#SubscriptionId').change(function () {
+
+    //    $("#SearchData").html("");
+    //    document.getElementById('ClassNumber').value = "0";
+
+
+    //});
+    $('#SubscriptionId').change(function () {
+
+        $("#SearchData").html("");
+
+        var BranchId = $('#SubscriptionId').val();
+        if (BranchId >= 0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+        if (BranchId >= 0) {
+            GetClassNumbers();
+        }
+    })
+
+
+
+
+    function GetClassNumbers() {
+
+        var BranchId = $('#SubscriptionId').val();
+        $.ajax({
+            url: '/AExamination/GetClassNumbersList',
+            data: { nBranchId: BranchId },
+            success: function (data) {
+
+                var classnumbersItems = $('#ClassNumber');
+
+                classnumbersItems.children().remove();
+
+                classnumbersItems.append($("<option>").val("null").text("--- Select ---"));
+                $.each(data, function (i, record) {
+                    classnumbersItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+                });
+                $('#ClassNumber').append(classnumbersItems);
+            }
+        });
+    }
+    $('#ClassNumber').change(function () {
+
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+        if (ClassNumber >=0) {
+            document.getElementById("Validation").innerHTML = "";
+        }
+        if (ClassNumber >= 0 && BranchId !="") {
+            GetCirculars();
+        }
+    });
+
+
+
+
+    function GetCirculars() {
+        $("#SearchData").html("");
+        var ClassNumber = $('#ClassNumber').val();
+        var BranchId = $('#SubscriptionId').val();
+
+        $('#imagemodal').show();
+        if (BranchId >= 0 && ClassNumber >= 0) {
+            $.ajax({
+                url: '/AExamination/GetCircularReport',
+                data: { BranchId: BranchId, ClassNumber: ClassNumber },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchData").html(Data);
+                }
+            });
+        }
+    }
+
+</script>
+
+
+
+
+
+
+

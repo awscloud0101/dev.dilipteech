@@ -1,0 +1,422 @@
+﻿@model AsteriskBrowserAL.Models.BankDepositViewModel
+@{
+    ViewBag.Title = "Bank Deposit";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class="fa fa-gears"></i>
+            Operations
+        </li>
+        <li class="active">Bank Deposit</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+
+            <div class="table-header">
+
+                Bank Deposit Details
+                <small style="float:right;">
+                    @Html.ActionLink("Back to details", "BankDeposit", new { dtFromdate = Model.FromDate, dtToDate = Model.ToDate })
+                </small>
+
+            </div>
+
+            @using (Html.BeginForm("BankDepositC", "FOperations", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <span style="color:red;font-weight:bold;">@Html.ValidationMessage("BankDeposit")</span>
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                @Html.HiddenFor(model => model.FromDate)
+                @Html.HiddenFor(model => model.ToDate)
+
+                <input type="hidden" value="@Model.FirstInserted.ToShortDateString()" id="dtStartDate" />
+                <input type="hidden" value="@Model.LastYearInserted.ToShortDateString()" id="dtLastYearStartDate" />
+                <input type="hidden" value="@Model.LastUpdated.ToShortDateString()" id="dtEndDate" />
+                <input type="hidden" value="@Model.LastYearEndDate.ToShortDateString()" id="dtLastYearEndDate" />
+                <input type="hidden" value="@Model.FinancialYearDate.ToShortDateString()" id="dtFinancialYearDate" />
+
+                <span style="color:red;font-weight:bold;">@Html.ValidationMessage("BankDeposit")</span>
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                <div class="widget-box">
+                    <div class="page-header">
+
+                        Bank Deposit
+
+
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <div style="float:right;">
+                                    <button class="btn btn-info btn-xs" type="submit" onclick="return submitForm();">
+                                        <i class="ace-icon fa fa-floppy-o ">
+                                            | Save
+                                        </i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4"><span style="color:red;">*</span>Deposit Date</label>
+                                        <div class="col-xs-6">
+                                            <div id="DepositDatePicker" class="input-group date">
+                                                <input class="form-control" type="text" value="@Model.DepositDate.ToShortDateString()" id="DepositDateVal" name="DepositDate" autocomplete="off" placeholder="Deposit Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label no-padding required" for="form-field-1">Deposit Time</label>
+                                            <div class="col-xs-6">
+                                                <div class="input-group bootstrap-timepicker">
+                                                    <input id="timepicker" name="DepositTime" type="text" class="form-control input-small" value="@Model.DepositTime" placeholder="Deposit Time">
+                                                    <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                </div>
+                                <br />
+                                <div class="col-sm-12" id="Summary">
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4"><span style="color:red;">*</span>Bank</label>
+                                        <div class="col-xs-6">
+                                            <div>
+                                                @Html.DropDownListFor(model => model.BankId, new SelectList(Model.LstBankDepositCardsBanks, "BankDepositCardsId", "CardName"), new { @class = "form-control", id = "CboBanks" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="col-xs-6">
+                                        <div class="col-xs-12">
+                                            <label class="col-xs-4"><span style="color:red;">*</span>Cash Amount</label>
+                                            <div class="col-xs-6">
+                                                <div>
+                                                    @Html.TextBoxFor(model => model.CashAmount, new { @class = "form-control textlength txtboxNum", @style = "text-align:right", id = "txtCashAmount" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4"><span style="color:red;">*</span>Cheque Amount</label>
+                                        <div class="col-xs-6">
+                                            <div>
+                                                @Html.TextBoxFor(model => model.ChequeAmount, new { @class = "form-control textlength txtboxNum", @style = "text-align:right", id = "txtChequeAmount" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="col-xs-6">
+                                        <div class="col-xs-12">
+                                            <label class="col-xs-4"><span style="color:red;">*</span>Person Name</label>
+                                            <div class="col-xs-6">
+                                                <div>
+                                                    @Html.TextBoxFor(model => model.Personname, new { @class = "form-control", id = "txtPersonName" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-xs-4"><span style="color:red;">*</span>Remarks</label>
+                                        <div class="col-xs-6">
+                                            <div>
+                                                @Html.TextBoxFor(model => model.Remarks, new { @class = "form-control", id = "txtRemarks", @maxlimit = "250" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- form start -->
+                    @Html.HiddenFor(model => model.FromDate)
+                    @Html.HiddenFor(model => model.ToDate)
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+ 
+
+
+<script type="text/javascript">
+
+    function OnLoadata() {
+        debugger
+        SetDepositDateLimit();
+        SetDepositTimePicker();
+        LoadSummary();
+    }
+
+    function SetDepositTimePicker() {
+
+        $('#timepicker').timepicker({
+            showMeridian: false,
+            minuteStep: 1,
+            showSeconds: true,
+        })
+    }
+
+    function SetDepositDateLimit() {
+
+        $('#DepositDatePicker').datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: false
+        });
+
+        //var StartDate = new Date($('#dtStartDate').val());
+
+        //var EndDate = new Date($('#dtEndDate').val());
+
+        //$('#DepositDatePicker').datepicker('setStartDate', StartDate).datepicker('setEndDate', EndDate);
+    }
+
+    window.onload = OnLoadata();
+
+    function submitForm() {
+        debugger
+        var dtStartDate = $('#dtStartDate').val();
+        var dtLastYearStartDate = $('#dtLastYearStartDate').val();
+        var dtEndDate = $('#dtEndDate').val();
+        var dtLastYearEndDate = $('#dtLastYearEndDate').val();
+        var Date = $('#DepositDateVal').val();
+        var Time = $('#timepicker').val();
+        var BankId = $('#CboBanks').val();
+        var ChequeAmount = $('#txtChequeAmount').val();
+        var CashAmount = $('#txtCashAmount').val();
+        var PersonName = $('#txtPersonName').val();
+        var Remarks = $('#txtRemarks').val();
+        var FinancialYearDate = $('#dtFinancialYearDate').val();
+        //var DepositDate = Date.parse(Date);
+        //var StartDate = Date.parse(dtStartDate);
+        //var EndDate = Date.parse(dtEndDate);
+        //var LastYearStartDate = Date.parse(dtLastYearStartDate);
+        //var LastYearEndDate = Dtae.parse(dtLastYearEndDate);
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        if (isValid == true) {
+            var status = IsBankDepositDateExisted(dtStartDate, dtLastYearStartDate, dtEndDate, dtLastYearEndDate, Date, FinancialYearDate);
+            isValid = status;
+            if (isValid == false)
+                return isValid;
+            else
+                isValid = true;
+        }
+
+        if (Date == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Deposit Date";
+            isValid = false;
+        }
+        //16-4-17 > 18-4-17
+        //if (Date < dtStartDate && Date <= dtEndDate) {
+        //    if (isValid)
+        //        {
+        //        Message += ",";
+
+        //        Message += "Deposit Date should be less than last deposit date ";
+        //    }
+        //    isValid = false;
+        //}
+
+        //if (Date < dtLastYearStartDate && dtLastYearEndDate > Date) {
+        //    if (isValid)
+        //        {
+        //        Message += ",";
+
+        //        Message += "Deposit Date should be less than last year deposit date";
+        //    }
+        //    isValid = false;
+        //}
+
+        if (Time == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Deposit Time";
+            isValid = false;
+        }
+
+        if (BankId < 1) {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Bank";
+            isValid = false;
+        }
+
+        if (CashAmount < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Cash Amount";
+            isValid = false;
+        }
+
+        if (ChequeAmount < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Cheque Amount";
+            isValid = false;
+        }
+
+
+        if (PersonName == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Person Name";
+            isValid = false;
+        }
+
+
+        if (Remarks == "") {
+            if (!isValid)
+                Message += ",";
+
+            Message += "Remarks";
+            isValid = false;
+        }
+
+
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+            return false;
+        }
+
+
+        //  isValid = IsDepositedDateExists();
+        return isValid;
+    }
+
+    $('#DepositDateVal').focus(function () {
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+    function IsBankDepositDateExisted(dtStartDate, dtLastYearStartDate, dtEndDate, dtLastYearEndDate, Date, FinancialYearDate) {
+        var Status = true;
+
+        $.ajax({
+
+            url: '/FOperations/IsBankDepositDateExisted',
+            data: { dtStartDate: dtStartDate, dtLastYearStartDate: dtLastYearStartDate, dtEndDate: dtEndDate, dtLastYearEndDate: dtLastYearEndDate, Date: Date, FinancialYearDate: FinancialYearDate },
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                    document.getElementById("Validation").innerHTML = Data;
+                }
+            },
+            async: false
+        });
+
+        return Status;
+    }
+    function CheckAmounts() {
+
+
+    }
+
+    function LoadSummary() {
+        var InquiryDate = $('#DepositDateVal').val();
+
+        if (InquiryDate != "") {
+            $.ajax({
+                url: '/FOperations/GetBankDepositSummary',
+                data: { dtStartDate: InquiryDate },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#Summary').html(data);
+                },
+                aync: false
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+    var lastJQueryTS = 0;
+
+    $('#DepositDateVal').change(function () {
+
+        var send = true;
+        if (typeof (event) == 'object') {
+
+            if (event.timeStamp - lastJQueryTS < 300) {
+                send = false;
+            }
+
+            lastJQueryTS = event.timeStamp;
+        }
+
+        if (send) {
+            LoadSummary();
+        }
+    });
+
+
+    function IsDepositedDateExists() {
+        var val = true;
+        $.ajax({
+
+            url: '/FOperations/IsDepositExistedf/',
+            data: { dtDepositDate: $('#DepositDateVal').val() },
+            success: function (data) {
+
+                if (data != "") {
+                    document.getElementById("Validation").innerHTML = data;
+                    val = false;
+                }
+            },
+            async: false
+        });
+
+        return val;
+    }
+
+
+</script>

@@ -1,0 +1,65 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Staff>
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>          
+        </li>
+        <li>
+            <i class=""></i>
+            Staff
+        </li>
+        <li class="active">Registered Staff</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>@Html.ActionLink("New Registration", "EmployeeRegistration")</h3>
+        </div>
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("RegisteredStaff", "MStaff", FormMethod.Post))
+            {
+                <span style="color:red" id="Error"></span>
+                <div id="searchDiv">
+                    @Html.Partial("RegisterSatffPartialView", Model)
+                </div>
+            }
+        </div>
+    </div>
+
+
+
+</section>
+
+<script>
+    function NotConformedStaff()
+    {
+        $.ajax({
+            url: "/HREnrollment/GetNotConfirmedStaff",
+            success:function(Data)
+            {
+                if (Data.length > 0)
+                {
+                    $('#searchDiv').html(Data)
+
+                }
+                else {
+                    document.getElementById("Error").innerHTML = "No Staff available for Confirmation"
+                }
+            }
+        })
+    }
+    window.onload = NotConformedStaff();
+</script>

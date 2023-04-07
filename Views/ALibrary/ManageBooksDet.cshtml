@@ -1,0 +1,200 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.BookDetailsViewModel>
+
+@{
+    ViewBag.Title = "ManageBooksDet";
+    int nsno = 1;
+}
+
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Manage Books Details</li>
+    </ol>
+</section>
+<!-- /section:basics/content.breadcrumbs -->
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            @*<h3>@Html.ActionLink("<< Manage Book Details", "ManageBooks", new { BookCategoryId = ViewBag.SelectedCategoryId })</h3>*@
+        </div>
+    </div>
+    <br />
+    @if (Model != null)
+    {
+        if (Model.Count() > 0)
+        {
+            <div>
+                @using (Html.BeginForm("ManageBooksDet", "ALibrary", FormMethod.Post))
+                {
+                    <div class="page-header">
+                        <h1>
+                            <small style="float:right;">
+                                @Html.ActionLink("Back To Details", "ManageBooks", new { BookCategoryId = Model.FirstOrDefault().BookCategoryId , MasterBookDataId  =Model.FirstOrDefault().MasterBookId})
+                            </small>
+                        </h1>
+                    </div><!-- /.page-header -->
+                    if (TempData["Msg"] != null)
+                    {
+                        <span style="color:green;font-weight:bold">@TempData["Msg"]</span>
+                    }
+                    @Html.ValidationMessage("Manage Books")
+
+                    @*<div>
+                            <span id="validation" style="color:red">please enter remark</span>
+                        </div>*@
+                    <div class="row">
+                        <div class="col-xs-12">
+
+                            @Html.ValidationMessage("Book Details")
+                            <div class="table-header">
+                                Book Details
+                                <button type="submit" class="btn btn-info btn-xs" style="float:right" name="button" id="Save">
+                                    <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                                </button>&nbsp;&nbsp;&nbsp;
+                                <button type="button" id="Generate" @*onclick="return false"*@ class="btn btn-info btn-xs" style="float:right">
+                                    <i class="ace-icon fa fa-print bigger-180"></i>
+                                </button>
+                            </div>
+                            <div style="overflow:auto">
+                                <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                                    <thead>
+                                        <tr>
+                                            <th>@Html.DisplayName("S No")</th>
+                                            <th>
+                                                @Html.DisplayName("Master Book Name")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Accession Number")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Availability")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Remarks")
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.Count(); i++)
+                                        {
+                                            <tr>
+
+                                                <td>
+                                                    @(nsno++)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => Model.ElementAt(i).MasterBookName)
+                                                    @*@Html.DisplayFor(modelItem => item.MasterBookName)*@
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => Model.ElementAt(i).BookCode)
+                                                    @*@Html.DisplayFor(modelItem => item.BookCode)*@
+                                                </td>
+
+                                                @*<td>
+                                                        @Html.DisplayFor(modelitem => Model.ElementAt(i).BarCodeNo)
+                                                    </td>*@
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => Model.ElementAt(i).BookStatusData)
+                                                </td>
+
+                                                <td>
+                                                    @Html.Hidden("lstBookDetailsViewModel[" + (@i + 10) + "].ManageBookId", Model.ElementAt(i).ManageBookId)
+
+
+                                                    @Html.Hidden("lstBookDetailsViewModel[" + (@i + 10) + "].BookDetailsId", Model.ElementAt(i).BookDetailsId)
+                                                    @Html.Hidden("lstBookDetailsViewModel.Index", (@i + 10))
+                                                    @Html.TextBox("lstBookDetailsViewModel[" + (@i + 10) + "].Remarks", Model.ElementAt(i).Remarks, new { @class = "textbox", @id = "remark",@maxlength="100" })
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <span style="color:red;font-weight:bold">Data not available</span>
+        }
+
+    }
+    @Html.Action("DataTableScripts", "Base")
+</section>
+<script>
+    $('#Generate').click(function () {
+        debugger
+        var id = '@ViewData["id"]'
+        var BookCategoryId = $('#BookCategoryId').val()
+        debugger
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/ALibrary/ManageBookDetailsPrint?id=' + id,
+            id: id,
+            success: function (data) {
+                $('#table').html(data);
+                PrintData(data);
+            }
+        }).done(function (data) {
+            $('#imagemodal').hide();
+        });
+    })
+    function PrintElem(elem) {
+        debugger
+        Popup($(elem).html());
+    }
+    function PrintData(data) {
+        debugger
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+@*<script>
+
+        $('#Save').onclick(function () {
+            debugger
+            var remark = $('#remark').val();
+            var valid = true;
+            if (remark == "" || remark == null || remark == undefined) {
+                $('#validation').show();
+                valid = false;
+
+            }
+            return valid;
+        });
+
+        $('#remark').focus(function () {
+            debugger
+            $('#validation').hide();
+        });
+        $(document).ready(function () {
+            $('#validation').hide();
+        });
+        //function pageLoad() {
+
+        //}
+        //window.onload = pageLoad;
+    </script>*@

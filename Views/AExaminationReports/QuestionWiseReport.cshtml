@@ -1,0 +1,368 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    ViewBag.Title = "QuestionWiseReport";
+    //List<SelectListItem> lstListItems = new List<SelectListItem>()
+    //{
+    //    new SelectListItem() {Text="---Select---",Value="0" },
+    //    new  SelectListItem() { Text="All",Value="1"},
+    //    new  SelectListItem() { Text="Boy",Value="2"},
+    //    new  SelectListItem() { Text="Girl",Value="3"},
+    //};
+    List<SelectListItem> lstListItems = new List<SelectListItem>()
+    {
+        new SelectListItem() {Text="---Select---",Value="0" },
+        new  SelectListItem() { Text="All",Value="1"},
+        new  SelectListItem() { Text="Correct",Value="2"},
+        new  SelectListItem() { Text="Wrong",Value="3"},
+    };
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examination Reports
+        </li>
+        <li class="active">Question Wise Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<span id="ValidationMSG" style="color:red;font-weight:bold"> </span>
+
+<section class="content">
+    <div class="col-xs-12">
+        <div class="widget-box">
+            <div class="widget-header widget-header-flat widget-header-small">
+                <h5 class="widget-title ">Student Performance Report - Question wise </h5>
+                <div class="widget-toolbar no-border">
+                    <div class="inline action-buttons">
+                        <a class="P2" onclick="GetData()" id="btnViewData2" value="View Data"><span class="btn btn-info btn-minier">View Data</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget-body">
+                <div class="widget-main">
+                    @if (Model.IsCentral)
+                    {
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="col-xs-6">
+                                    <label class="col-xs-4">Division</label>
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <label class="col-xs-4">Branch</label>
+                                    <div class="col-xs-6">
+                                        <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                    }
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-xs-6">
+                                <label class="col-xs-4">Class</label>
+                                <div class="col-xs-6">
+                                    <select id="ClassId" name="ClassId" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label class="col-xs-4">Examination</label>
+                                <div class="col-xs-6">
+                                    <select id="ExaminationId" name="ExaminationId" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-xs-6">
+                                <label class="col-xs-4">Subjects</label>
+                                <div class="col-xs-6">
+                                    <select id="SubjectId" name="SubjectId" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="col-xs-4 control-label no-padding-right" for="form-field-1">Status</label>
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("StatusId", new SelectList(lstListItems, "Value", "Text", 0), new { @class = "form-control", id = "StatusId", name = "StatusId" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /.box-header -->
+            </div>
+
+        </div>
+        <br />
+        <br />
+
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div data-size="800" style="width:100%">
+                        <div id="GraphDiv" style="height:250px; width: 100%;overflow-x:auto"> </div>
+                    </div>
+                    <div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div id="DataDiv"></div>
+</section>
+
+
+
+<script src="~/Scripts/canvasjs.min.js"></script>
+
+<script>
+
+    function QuestionWiseReportGraph() {
+        debugger
+        var Correct = [];
+        var Wrong = [];
+
+        $.getJSON("/AExaminationReports/QuestionWiseReportGraph/", function (data) {
+            debugger
+            for (var i = 0; i <= data.length - 1; i++) {
+                Correct.push({ x: data[i].QuestionNo, y: parseInt(data[i].CorrectCount) });
+            }
+            for (var i = 0; i <= data.length - 1; i++) {
+                Wrong.push({ x: data[i].QuestionNo, y: parseInt(data[i].WrongCount) });
+            }
+            var chart = new CanvasJS.Chart("GraphDiv", {
+                title: {
+                    text: 'Question Wise Report'
+                },
+                dataPointWidth: 10,
+                width: 1500,
+                data: [{
+                    type: "stackedColumn",
+                    name: "Correct",
+                    color: "#0CCF12",
+                    showInLegend: true,
+                    dataPoints: Correct
+                }, {
+                    type: "stackedColumn",
+                    name: "Wrong",
+                    color: "#F21313",
+                    showInLegend: true,
+                    dataPoints: Wrong
+                },]
+            });
+            chart.render();
+        });
+    }
+</script>
+
+<script>
+
+    window.onload = GetClassList()
+
+    $('#DivisionId').change(function () {
+        //$('#StatusId').val('0');
+        //$('#ClassId').val('0');
+        $('#GraphDiv').html('');
+        $('#DataDiv').html('');
+        var nDivisionId = $('#DivisionId').val();
+        if (nDivisionId != 0) {
+            $.ajax({
+
+                url: '/AReports/GetStudentStrengthBranchesByDivisionId',
+                data: { DivisionId: nDivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+                    BranchItems.append($("<option>").val("-1").text("-- All --"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#ClassId').change(function () {
+        debugger
+        //$('#StatusId').val('0')
+        //$('#SubjectId').val('0')
+        $('#GraphDiv').html('');
+        $('#DataDiv').html('');
+        var nClassId = $('#ClassId').val();
+        if (nClassId != 0) {
+            $.ajax({
+
+                url: '/AExaminationReports/GetExaminationforClass',
+                data: { nclassId: nClassId },
+                success: function (data) {
+
+                    var ExaminationsItems = $('#ExaminationId');
+
+                    ExaminationsItems.children().remove();
+
+                    ExaminationsItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        ExaminationsItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+                    });
+
+                    $('#ExaminationId').append(ExaminationsItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#ExaminationId').change(function () {
+        debugger
+        //$('#StatusId').val('')
+        $('#GraphDiv').html('');
+        $('#DataDiv').html('');
+        var nClassId = $('#ClassId').val();
+
+        if (nClassId != 0) {
+            $.ajax({
+
+                url: '/AExaminationReports/GetSubjectsforClass',
+                data: { nclassId: nClassId },
+                success: function (data) {
+
+                    var SubjectsItems = $('#SubjectId');
+
+                    SubjectsItems.children().remove();
+
+                    SubjectsItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        SubjectsItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+                    });
+
+                    $('#SubjectId').append(SubjectsItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+        //$('#StatusId').val('0');
+        //$('#ClassId').val('0');
+        //$('#ExaminationId').val('0')
+        //$('#SubjectId').val('0')
+        $('#GraphDiv').html('');
+        $('#DataDiv').html('');
+        var BranchId = $('#BranchId').val();
+        if (BranchId > 0) {
+            GetClassList();
+        }
+    })
+
+    function GetClassList() {
+        var nDivisionId = $('#DivisionId').val();
+        var BranchId = $('#BranchId').val();
+        $.ajax({
+            url: '/AStudent/LoadClassDropDown',
+            success: function (data) {
+                var ClassItems = $('#ClassId');
+                ClassItems.children().remove();
+                ClassItems.append($("<option>").val("null").text("--- Select ---"));
+                $.each(data, function (i, record) {
+                    ClassItems.append($("<option>").val(record.CourseId).text(record.CourseName));
+                });
+                $('#ClassId').append(ClassItems);
+            }
+        });
+    }
+
+
+    $('#SubjectId').change(function () {
+        $('#GenderId').val('0');
+        $('#GraphDiv').html('');
+        $('#DataDiv').html('');
+    })
+
+    function GetData(){
+        debugger
+        $('#DataDiv').html('')
+        var message = "Please fill the mandatory fields :  ";
+        var Validation = true;
+        var Gender = $('#StatusId').val();
+        var DivisionId = $('#DivisionId').val()
+        var ClassId = $('#ClassId').val()
+        var ExaminationId = $('#ExaminationId').val()
+        var BranchId = $('#BranchId').val()
+        var SubjectId = $('#SubjectId').val()
+
+        if (DivisionId == "0" || DivisionId == "" || DivisionId == "null") {
+            message += "Division,";
+            Validation = false;
+        }
+        if (BranchId == "0" || BranchId == "" || BranchId == "null") {
+            message += "Branch,";
+            Validation = false;
+        }
+        if (ClassId == "0" || ClassId == "" || ClassId == "null") {
+            message += "Class,";
+            Validation = false;
+        }
+        if (ExaminationId == "0" || ExaminationId == null || ExaminationId == "null") {
+            message += "Examination,";
+            Validation = false;
+        }
+        if (SubjectId == "" || SubjectId == null || SubjectId == "null" || SubjectId == "0") {
+            message += "Subject,";
+            Validation = false;
+        }
+        if (Gender == "" || Gender == null || Gender == "null" || Gender == "0") {
+            message += "Status,";
+            Validation = false;
+        }
+        document.getElementById('ValidationMSG').innerHTML = message.slice(",",-1);
+
+        var SubjectId = $('#SubjectId').val()
+
+        if (Validation == true) {
+            document.getElementById('ValidationMSG').innerHTML = '';
+            $('#imagemodal').show()
+            $.ajax({
+                url: '/AExaminationReports/GetQuestionWiseReport',
+                data: { ExaminationId: ExaminationId, SubjectId: SubjectId, nBranchId: BranchId, nDivisionId: DivisionId, StatusId: Gender },
+                success: function (data) {
+                    $('#imagemodal').hide()
+                    QuestionWiseReportGraph();
+                    $('#DataDiv').html(data)
+                }
+            });
+        }
+    }
+</script>

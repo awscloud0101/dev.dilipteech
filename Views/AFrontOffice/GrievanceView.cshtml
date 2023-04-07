@@ -1,0 +1,193 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.CommentData>
+
+@{
+    ViewBag.Title = "GrievanceView";
+}
+
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            AFrontOffice
+        </li>
+        <li class="active">Parent Grievances</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+
+<section class="content">
+    <br />
+    @if (null != Model)
+    {
+        int SNo = 1;
+        if (Model.Count() > 0)
+        {
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="table-header">
+                        Parent Grievances
+                    </div>
+                    <div>
+                        <table class="table table-bordered table-striped" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th>
+                                       S.No.
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("From (Father Name)")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Stundet Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Section")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Email")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Mobile Number")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Comment")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Action")
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@(SNo++)</td>
+                                        <td>
+                                            @item.FatherName
+                                        </td>
+                                        <td>
+                                            @item.Name
+                                        </td>
+                                        <td>
+                                            @item.Section
+                                        </td>
+                                        <td>
+                                            @item.FatherEmail
+                                        </td>
+                                        <td>
+                                            @item.FatherMobileNumber
+                                        </td>
+                                        <td>
+                                            @item.Comment
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <a class="green" onclick="DialogBoxPop('@item.TicketNo',@item.CommentId)">
+                                                    <i class="ace-icon fa fa-reply bigger-130"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        }
+        else
+        {
+            <div class="table-header">
+                Grievance Information
+            </div>
+            <span style="color: red;"><b>Data is not available</b></span>
+        }
+    }
+</section>
+
+<div id="DivComment" style="display:none;height:250Px;background-color:#F1F1F1" role="dialog">
+    <div class="box" style="border-radius: 1em">
+        <div class="box-body">
+            <div id="DialogBox"> </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .ui-widget-overlay {
+        background: rgba(0,0,0,.25);
+        opacity: .5;
+        filter: Alpha(Opacity=50);
+        border-radius: 1em;
+    }
+
+    .ui-widget-header {
+        border: 1px solid #438EB9;
+        background: #438EB9 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
+        color: #ffffff;
+        font-weight: bold;
+    }
+
+    .ui-dialog .ui-dialog-buttonpane {
+        margin-top: 0em;
+    }
+</style>
+
+<script>
+
+    function DialogBoxPop(Value, CommentId) {
+        debugger
+        $("#DialogBox").html('')
+        $.ajax({
+            url: '/AFrontOffice/GrievanceDialogBox',
+            data: { TicketNo: Value },
+            success: function (Data) {
+                $("#DialogBox").html(Data)
+                var $dialog = $('#DivComment')
+                $('#DivComment').dialog({
+                    width: 600,
+                    height: 'auto',
+                    resizable: true,
+                    title: 'Comment',
+                    modal: true,
+                    closeOnEscape: false,
+                    responsive: true,
+                    show: "slide",
+                    autoOpen: false,
+                    dialogClass: 'ui-widget-overlay',
+                    buttons: {
+                        "Send": function () {
+                            debugger
+                            var Comment = $('#Comment').val();
+                            if (Comment == "") {
+                                $('#Commentmsg').show();
+                                return;
+                            }
+                            else {
+                                $(this).dialog("close");
+                                window.location = "/AFrontOffice/SaveStaffComment?commentId=" + CommentId + "&comment=" + Comment + "";
+                            }
+                        },
+                    },
+                });
+                $dialog.dialog('open');
+
+                e.preventDefault();
+                return false;
+
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+</script>

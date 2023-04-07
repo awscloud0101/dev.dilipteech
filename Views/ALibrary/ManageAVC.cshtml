@@ -1,0 +1,140 @@
+﻿
+@model AsteriskBrowserAL.ManageAV
+@{
+
+}
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Manage AV</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+<section class="content">
+
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ManageAVC", "ALibrary", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("ManageAV")</span>
+                <div class="page-header">
+                    <br />
+                    <h1>
+                        Manage AV
+                        <small style="float:right;">
+                            @Html.ActionLink("Back To Details", "ManageAV", new { avCategoryId = @Model.AVCategoryId })
+                        </small>
+                    </h1>
+                </div>
+
+                    <!-- form start -->
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right " for="form-field-1">@Html.Label("AV Name")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.AVName, new { @required = "required", autocomplete = "off", @class = "form-control col-sm-5 textlength", placeholder = "AV Name", @id = "AVName" })
+                        </div>
+                    </div>
+                    <input type="hidden" name="AVCategoryId" value="@Model.AVCategoryId" />
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Inward Date")</label>
+                        <div class="col-sm-3">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div id="datepicker" class="input-group date">
+                                        @Html.TextBoxFor(model => model.InwardDate, new { @class = "form-control col-sm-6", @id = "InwardDate" })
+                                        <span class="input-group-addon "><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right " for="form-field-1">@Html.Label("DVD Or CD Source")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.DVDOrCDSource, new { @required = "required", autocomplete = "off", @class = "form-control col-sm-5 textlength", placeholder = "DVDOrCDSource", @id = "DVDOrCDSource" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right " for="form-field-1">@Html.Label("Number Of Copies")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.NumberOfCopies, new { @required = "required", autocomplete = "off", @class = "form-control col-sm-5 textlength", placeholder = "Number Of Copies", @maxlength = "3", @id = "NumberOfCopies", @onkeypress = "return isNumberKey(event)" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right " for="form-field-1">@Html.Label("Price")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.Price, new { @required = "required", autocomplete = "off", @class = "form-control col-sm-5 allownumericwithdecimal textlength", placeholder = "Price", @id = "Price", @maxlength = "7" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right " for="form-field-1">@Html.Label("Payment Details")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.PaymentDetails, new { @required = "required", autocomplete = "off", @class = "form-control col-sm-5 textlength", @maxlength = 10, placeholder = "Payment Details", @id = "PaymentDetails" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right " for="form-field-1">@Html.Label("Remarks")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.Remarks, new { @required = "required", autocomplete = "off", @class = "form-control col-sm-5 textlength", @maxlength = 10, placeholder = "Remarks", @id = "Remarks" })
+                        </div>
+                    </div>
+
+                    <div class="hr hr-18 dotted hr-double"></div>
+                    <div class="col-md-offset-3 col-md-9">
+                        <button class="btn btn-success btn-sm" onclick="return submitForm()" type="submit">
+                            <i class="ace-icon fa fa-check bigger-50"></i>
+                            Save
+                        </button>
+                        &nbsp; &nbsp; &nbsp;
+                        <button class="btn btn-sm" type="reset">
+                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+
+<script>
+    $(".allownumericwithdecimal").on("keypress keyup", function (event) {
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+</script>

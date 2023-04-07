@@ -1,0 +1,530 @@
+﻿@model AsteriskBrowserAL.Models.DaysheetViewModel
+@{
+    ViewBag.Title = "Day Sheet";
+    var Feepay = Model.lstLedgerFeeParticularsName.Where(d => d.IsPaymentMode == false).ToList();
+    int nSNo = 0;
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Tally
+        </li>
+        <li class="active">Allow Tally Integration</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<div id="dialogAdmission" title="DaySheetRemarks" style="display:none">
+    <div class="widget">
+        <div class="widget-Header">
+            <div class="col-sm-12" style="display:none;" id="ValidationT">
+                <label style="color:red;font-weight:bold;">Remarks already existed for selected date</label>
+            </div>
+        </div>
+        <div class="widget-main">
+            <div class="row">
+                Allow Tally Integration Yes or No
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Main Content-->
+<section class="content">
+    <br />
+    @using (Html.BeginForm("AllowTallyIntegration", "FTally", FormMethod.Post))
+    {
+        <input type="hidden" id="cntrlIndividual" />
+        <input type="hidden" id="SubscriptionId" name="SubscriptionId" value="@Model.SubscriptionId" />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+
+                        <h5 class="widget-title">
+                            Allow Tally Integration
+                        </h5>
+
+
+                        <div class="widget-toolbar no-border">
+                            <div class="inline action-buttons">
+                                <div style="float:right;">
+                                    <button class="btn btn-info btn-xs" style="margin-top:2px" type="submit" name="Buttontype">
+                                        Save
+                                    </button>
+                                </div>
+                                @*<button type="submit" onclick="return OpenAdmCofirmDialog()" class="btn btn-info btn-xs">
+                                        <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                                    </button>*@
+                            </div>
+                        </div>
+
+                    </div><!-- /.box-header -->
+
+                    <div class="widget-body">
+
+                        <div class="widget-main">
+                            <div class="row">
+
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Allow Tally Integration")</label>
+                                        <div class="col-sm-3">
+                                            <label>@Html.RadioButtonFor(m => m.IsTransferred, true, new { @name = "Yes", @id = "Yes" }) Yes</label>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label>
+                                                @Html.RadioButtonFor(m => m.IsTransferred, false, new
+                                     {
+                                         @name = "No",
+                                         @id = "No"@*, @checked = "checked"*@}) No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div id="setup" style="display:none">
+                                <div class="row">
+
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Allow Petty Cash Transactions")</label>
+                                            <div class="col-sm-3">
+                                                <label>@Html.RadioButtonFor(m => m.IsPrivate, true, new { @name = "IsPrivate", @id = "IsPrivate" }) Yes</label>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>
+                                                    @Html.RadioButtonFor(m => m.IsPrivate, false, new
+                                         {
+                                             @name = "IsPrivate",
+                                             @id = "IsPrivate"
+                                                    }) No
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+
+                                <div class="row">
+
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Tally Installation Type")</label>
+                                            <div class="col-sm-3">
+                                                <label>@Html.RadioButtonFor(m => m.IsCentral, false, new { @name = "IsCentral", @id = "IsCentral" }) Stand Alone Installation</label>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>
+                                                    @Html.RadioButtonFor(m => m.IsCentral, true, new
+                                         {
+                                             @name = "IsCentral",
+                                             @id = "IsCentral"
+                                                    }) Tally Server Installation
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+
+                                <div class="row">
+
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Tally Integration Model")</label>
+                                            <div class="col-sm-3">
+                                                <label>
+                                                    @Html.RadioButtonFor(m => m.IsIncome, true, new { @name = "IsIncome", @id = "IsIncome" }) Consolidated Information
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>
+                                                    @Html.RadioButtonFor(m => m.IsIncome, false, new
+                                         {
+                                             @name = "IsIncome",
+                                             @id = "IsIncome"
+                                                    }) Student Level Integration
+
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="space-4"></div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="widget-box">
+                                            <div class="widget-header">
+                                                <h5 class="widget-title">
+                                                    Transaction types to import
+                                                </h5>
+                                                <div class="widget-toolbar">
+                                                    <a href="#" data-action="collapse">
+                                                        <i class="ace-icon fa fa-chevron-up"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div class="widget-body">
+                                                <div class="widget-main">
+
+                                                    <div class="row">
+                                                        <table id="tab1" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                                                            <thead>
+
+                                                                <tr>
+                                                                    @*<th>
+                                                @Html.DisplayName("S.No")
+                                            </th>*@
+                                                                    <th>
+                                                                        @Html.DisplayName("Transaction Type")
+                                                                    </th>
+                                                                    <th>
+                                                                        @Html.DisplayName("Ledger Name")
+                                                                    </th>
+                                                                    <th>
+                                                                        @Html.DisplayName("Selected for Import")
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @for (int i = 0; i < Model.lstFeeParticularsName.Count(); i++)
+                                                                {
+                                                                    var ModeLedgername = "ModeLedgername_" + nSNo;
+                                                                    var ModeCheck = "ModeCheck_" + nSNo;
+                                                                    <tr>
+                                                                        @Html.Hidden("lstFeeParticularsName.Index", (@i))
+                                                                        @Html.Hidden("lstFeeParticularsName[" + (@i) + "].PaymentModeId", Model.lstFeeParticularsName.ElementAt(i).PaymentModeId)
+                                                                        @Html.Hidden("lstFeeParticularsName[" + (@i) + "].FeeParticularName", Model.lstFeeParticularsName.ElementAt(i).FeeParticularName)
+                                                                        @Html.Hidden("lstFeeParticularsName[" + (@i) + "].IsPaymentMode", Model.lstFeeParticularsName.ElementAt(i).IsPaymentMode)
+                                                                        @Html.Hidden("lstFeeParticularsName[" + (@i) + "].IsMoveToTally", Model.lstFeeParticularsName.ElementAt(i).IsMoveToTally)
+                                                                        @*<td>
+                                                    @(nSNo++)
+
+                                                </td>*@
+
+                                                                        <td>
+                                                                            @Model.lstFeeParticularsName.ElementAt(i).FeeParticularName
+                                                                            <input type="hidden" id="Branchname" value="@Model.lstFeeParticularsName.ElementAt(i).FeeParticularName" />
+                                                                        </td>
+                                                                        <td>
+                                                                            @Html.TextBox("lstFeeParticularsName[" + (@i) + "].Ledgername", Model.lstFeeParticularsName.ElementAt(i).Ledgername, new { @style = "width:220px;text-align:center", @id = @ModeLedgername, onkeypress = "return setCheckbox(3)", name = @Model.lstFeeParticularsName.ElementAt(i).Ledgername })
+                                                                            @Html.Hidden("lstFeeParticularsName[" + (@i) + "].Ledgername", Model.lstFeeParticularsName.ElementAt(i).Ledgername)
+                                                                        </td>
+                                                                        <td>
+                                                                            @Html.CheckBox("lstFeeParticularsName[" + (@i) + "].IsMoveToTally", Model.lstFeeParticularsName.ElementAt(i).IsMoveToTally, new { @id = "ModeCheck" + nSNo, @disabled = "disabled" })
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+
+                                                            </tbody>
+                                                        </table>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-4"></div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="widget-box">
+                                            <div class="widget-header">
+                                                <h5 class="widget-title">
+                                                    Transactions to be imported
+                                                </h5>
+                                                <div class="widget-toolbar">
+                                                    <a href="#" data-action="collapse">
+                                                        <i class="ace-icon fa fa-chevron-up"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div class="widget-body">
+                                                <div class="widget-main">
+
+                                                    <div class="row">
+                                                        <table id="tab2" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                                                            <thead>
+
+                                                                <tr>
+                                                                    <th>
+                                                                        @Html.DisplayName("Name of the Transaction")
+                                                                    </th>
+                                                                    <th>
+                                                                        @Html.DisplayName("Academic Year")
+                                                                    </th>
+                                                                    <th>
+                                                                        @Html.DisplayName("Ledger Name")
+                                                                    </th>
+                                                                    <th>
+                                                                        @Html.DisplayName("Selected for Import")
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @for (int i = 0; i < Feepay.Count(); i++)
+                                                                {
+                                                                <tr>
+                                                                    @Html.Hidden("lstLedgerFeeParticularsName.Index", (@i))
+                                                                    @Html.Hidden("lstLedgerFeeParticularsName[" + (@i) + "].Id", Feepay.ElementAt(i).Id)
+                                                                    @Html.Hidden("lstLedgerFeeParticularsName[" + (@i) + "].TransactionType", Feepay.ElementAt(i).TransactionType)
+                                                                    @Html.Hidden("lstLedgerFeeParticularsName[" + (@i) + "].IsFinanceIncome", Feepay.ElementAt(i).IsFinanceIncome)
+                                                                    @Html.Hidden("lstLedgerFeeParticularsName[" + (@i) + "].FeeParticularName", Feepay.ElementAt(i).FeeParticularName)
+                                                                    @Html.Hidden("lstLedgerFeeParticularsName[" + (@i) + "].IsPaymentMode", Feepay.ElementAt(i).IsPaymentMode)
+                                                                    @Html.Hidden("lstLedgerFeeParticularsName[" + (@i) + "].IsMoveToTally", Feepay.ElementAt(i).IsMoveToTally)
+                                                                    @Html.Hidden("lstLedgerFeeParticularsName[" + (@i) + "].AcademicYearId", Feepay.ElementAt(i).AcademicYearId)
+                                                                    @*<td>
+            @(sno++)
+        </td>*@
+                                                                    <td>
+                                                                        @Feepay.ElementAt(i).FeeParticularName
+                                                                        <input type="hidden" id="Branchname" value="@Feepay.ElementAt(i).FeeParticularName" />
+                                                                    </td>
+                                                                    <td>
+                                                                        @Feepay.ElementAt(i).AyName
+                                                                    </td>
+                                                                    <td>
+                                                                        @Html.TextBox("lstLedgerFeeParticularsName[" + (@i) + "].Ledgername", Feepay.ElementAt(i).Ledgername, new { @style = "width:220px;text-align:center", @id = "FeeLedgername[]", name = @Feepay.ElementAt(i).Ledgername })
+                                                                        @Html.Hidden("lstLedgerFeeParticularsName[" + (@i) + "].Ledgername", Feepay.ElementAt(i).Ledgername)
+                                                                    </td>
+                                                                    <td>
+                                                                        @Html.CheckBox("lstLedgerFeeParticularsName[" + (@i) + "].IsMoveToTally", Feepay.ElementAt(i).IsMoveToTally, new { @id = "FeeCheck[]", @disabled = "disabled" })
+                                                                    </td>
+                                                                </tr>
+                                                                }
+
+                                                            </tbody>
+                                                        </table>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    }
+
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        if ($("#Yes").is(":checked")) {
+            $('#setup').css("display", "block")
+                        }
+        else {
+                    $('#setup').css("display", "none")
+                        }
+});
+    
+    $('#Yes').click(function () {
+        $('#setup').css("display", "block")
+        document.getElementById("Validation").innerHTML = ""
+        $('#cntrlIndividual').val(true);
+
+
+    });
+
+    $('#No').click(function () {
+        document.getElementById("Validation").innerHTML = ""
+        $('#setup').css("display", "none")
+        $('#cntrlIndividual').val(false);
+    });
+
+    $('#RemarksId').focusin(function () {
+        $('#Validationfortestbox').hide();
+    });
+
+
+    function validateEP() {
+        debugger
+        var Status = true;
+        var datetime = $('#datetime').val();
+        $.ajax({
+
+            url: '/FOperations/VerifyDaysSheet',
+            data: { datetime: datetime },
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                }
+            },
+            async: false
+        });
+
+        return Status;
+    }
+
+    function OpenAdmCofirmDialog() {
+        debugger;
+        var SubscriptionId = $('#SubscriptionId').val();
+        var UserName = "";
+        var $dialog = $('#dialogAdmission').dialog({
+            resizable: true,
+            draggable: false,
+            width: '600',
+            modal: true,
+            closeOnEscape: false,
+            responsive: true,
+            title: 'Update',
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            title_html: true,
+            buttons: [
+                {
+                    html: "Save",
+                    "class": "btn btn-success btn-minier",
+                    click: function () {
+                        debugger
+                        if ($("#Yes").is(":checked")) {
+                            UserName = "Yes";
+                        }
+                        else {
+                            UserName = "No";
+                        }
+                        // do something
+                        //var Remarks = document.getElementById('RemarksId').value;
+                        //if (Remarks == null || Remarks == "" || Remarks == " ") {
+                        //    $("#Validationfortestbox").show();
+                        //    return false;
+                        //}
+                        //else {
+                        $(this).dialog("close");
+                        window.location.href = "/FTally/SaveData?SubscriptionId=" + SubscriptionId + "&UserName=" + UserName;
+                        //}
+
+                    }
+
+                },
+                {
+                    html: 'Close',
+                    "class": "btn btn-danger btn-minier",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+    }
+
+//    $(document).on("keyup","[id*='FeeLedgername']",function() { 
+//    // code goes here...
+//        debugger
+//        var thiss = $(this);
+//        var myLength = $(this).val().length;
+//        var m = thiss.form.name;
+//        if (myLength > 0) {
+//                 $(this).prop('checked', true)
+//            } else{
+//                 $(this).prop('checked', false)
+//            }
+//});
+
+//     $(document).on("keyup","[id*='ModeLedgername']",function() { 
+//    // code goes here...
+//         debugger
+//         var myLength = $(this).val().length();
+//         if (myLength > 0) {
+//                $("#ModeCheck").prop('checked', true)
+//            } else{
+//                $("#ModeCheck").prop('checked', false)
+//            }
+//});
+
+    
+function setCheckbox(id){
+    debugger
+    var text = "ModeLedgername_" + id;
+        var ModeLedgername = $('#text').val();
+        var ModeCheck = $('#ModeCheck_' + id).val();
+         var myLength = ModeLedgername.length();
+         if (myLength > 0) {
+                $("#ModeCheck_"+id).prop('checked', true)
+            } else{
+                $("#ModeCheck").prop('checked', false)
+            }
+    }
+    //function SubmitForm() {
+
+    //    var valid = false;
+
+    //    $("#tab1 tr").each(function (index) {
+    //        debugger
+    //        // traverse through all the rows
+    //        if (index != 0) { // if the row is not the heading one
+
+    //            var ModeLedgerName = $(this).find('#ModeLedgername').val();
+
+    //            if (ModeLedgerName > 0) {
+    //                $("#ModeCheck").prop('checked', true)
+    //            } else {
+    //                $("#ModeCheck").prop('checked', false)
+    //            }
+
+    //        }
+    //    });
+
+    //     $("#tab2 tr").each(function (index) {
+    //        debugger
+    //        // traverse through all the rows
+    //        if (index != 0) { // if the row is not the heading one
+
+    //            var FeeLedgerName = $(this).find('#FeeLedgername').val();
+
+    //            if (FeeLedgerName > 0) {
+    //                $("#FeeCheck").prop('checked', true)
+    //            } else {
+    //                $("#FeeCheck").prop('checked', false)
+    //            }
+
+    //        }
+    //    });
+
+    //if (bSave == false && valid == true) {
+    //    document.getElementById("Validation").innerHTML = "Fields should not be empty";
+    //    valid = false;
+    //}
+    //return valid;
+    //};
+</script>

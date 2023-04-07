@@ -1,0 +1,141 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    int sno = 1;
+}
+<div class="hr hr-18 dotted hr-double"></div>
+@if (null != Model)
+{
+    if (Model.lstResults.Count() > 0)
+    {
+        <div class="box">
+            <div class="table-header">
+                Records Found (@Model.lstResults.Count)
+                <div style="float:right">
+                    <a id="btnPDF" value="PDF"><span class="btn btn-info btn-xs btn-danger">PDF</span></a>
+                    <button class="btn btn-info btn-xs btn-success" type="submit" id="btnExport">Excel </button>
+                    <a onclick="PrintElem(2)" value="Print"><span class="btn btn-info btn-xs btn-warning">Print</span></a>
+
+                </div>
+            </div>
+
+            <div class="box-body table-responsive no-padding">
+                <table class="table tbhover table-striped table-bordered dynamic-table" id="mytab1" style="font-size:14px;">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Staff Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Employee Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Section")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Exam")
+                            </th>
+
+                            @if (Model.Percent == 0)
+                            {
+                                <th>
+                                    @Html.DisplayName("Percentile")
+                                </th>
+                            }
+                            else
+                            {
+                                <th>
+                                    @Html.DisplayName("Percentile")
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.lstResults)
+                        {
+                            <tr>
+                                <td>
+                                    @(sno++)
+                                </td>
+                                <td>
+                                    @item.StaffName
+                                </td>
+
+                                <td>
+                                    @item.EmployeeNumber
+                                </td>
+                                <td>
+                                    @item.BranchName
+                                </td>
+                                <td>
+                                    @item.SectionName
+                                </td>
+                                <td>
+                                    @item.ExamName
+                                </td>
+
+                                <td>@item.MarksScored</td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold"> Data not available</span>
+    }
+
+}
+@Html.Action("DataTableScripts", "Base")
+
+
+
+
+<script>
+
+    $('#btnPDF').click(function () {
+        $('#Status').val(1);
+        $("#OnsubmitData").submit();
+    })
+    $('#btnExport').click(function () {
+        $('#Status').val(0);
+    })
+
+    
+    function PrintElem(value) {
+        debugger
+        $.ajax({
+            url: '/AExaminationReports/SubjectWiseStaffPerformance',
+            type:'POST',
+            data: { Status: value },
+            success: function (data) {
+                Popup(data);
+            }
+        })
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>

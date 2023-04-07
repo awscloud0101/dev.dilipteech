@@ -1,0 +1,260 @@
+﻿@model AsteriskBrowserAL.PayrollCategory
+
+@{
+    ViewBag.Title = "Create PayrollCategory";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Payroll Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<!--Main Content-->
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Payroll Category Details", "PayrollCategory")</h3>
+        </div>
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                @using (Html.BeginForm("PayrollCategoryC", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    <div class="box-body">
+                        <div class="box-header">
+                            <h3 class="box-title">Payroll Category</h3>
+                            <br />
+                            <br />
+                            <button class="btn btn-primary " type="submit" style="width:80px;" onclick="return submitForm();">
+                                Create
+                            </button>
+                        </div><!-- /.box-header -->
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <span style="color: red;">@Html.ValidationMessage("PayrollCategory")</span>
+
+
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Category Name")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.CategoryName, new { @class = "form-control col-sm-5 textlength", placeholder = "Category Name", @id = "CategoryName", @onchange = "removeError();" })
+                                </div>
+
+                                <div class="col-sm-3" style="display:none;" id="categoryname">
+                                    <label style="color:red;font-weight:bold;"> Please Enter The Category Name </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Percentage Value")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.PercentageValue, new { @class = "form-control col-sm-5", placeholder = "Percentage Value", @type = "Number", @min = "0", @max = "100" })
+                                </div>
+
+                                <div class="col-sm-3" style="display:none;" id="percentageValue">
+                                    <label style="color:red;font-weight:bold;"> Please Enter Percentage Value </label>
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="percentageValueLimit">
+                                    <label style="color:red;font-weight:bold;"> Percentage value should be less than 100 </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Percentage Of")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.DropDownList("PercentageOf", null, "--Select --", new { @class = "form-control col-sm-5", placeholder = "Percentage of", @id = "PercentageOf", @onchange = "removeError();" })
+                                </div>
+                                <div class="col-sm-3" style="display:none;" id="percentageOf">
+                                    <label style="color:red;font-weight:bold;"> Please  Select PercentageOf </label>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right"></label>
+
+                                <div class="col-sm-6">
+                                    @Html.CheckBoxFor(model => model.Status)
+                                    <span class="lbl bigger-120">Is Active</span>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    @Html.ValidationMessageFor(model => model.Status)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right"></label>
+                                <div class="col-sm-6">
+                                    @Html.CheckBoxFor(model => model.IsDeductable)
+                                    <span class="lbl bigger-120">Is Deductable</span>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    @Html.ValidationMessageFor(model => model.IsDeductable)
+                                </div>
+                            </div>
+
+                            <br />
+                            <p>In case of fixed amount, Enter 0% and select Lump Sum as 'Percentage of'</p>
+                            <hr />
+
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+        <input type="hidden" id="count" name="count" value="0" />
+    </div>
+</section>
+
+
+
+<script type="text/javascript">
+
+    $('#PercentageValue').focus(function () {
+        document.getElementById("percentageValueLimit").style.display = "none";
+    });
+
+    function validatePayroll() {
+
+        document.getElementById("count").value = "1";
+        var CategoryName = document.getElementById("CategoryName").value;
+        var PercentageValue = document.getElementById("PercentageValue").value;
+        var PercentageOf = document.getElementById("PercentageOf").value;
+
+        validate = true;
+
+        if (CategoryName == "") {
+            document.getElementById("categoryname").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("categoryname").style.display = "none";
+        }
+
+        if (PercentageValue == "") {
+            document.getElementById("percentageValue").style.display = "inline";
+            validate = false;
+        } else {
+
+            if (PercentageValue > 100)
+            {
+                document.getElementById("percentageValueLimit").style.display = "inline";
+                validate = false;
+            }
+            else
+            {
+                document.getElementById("percentageValueLimit").style.display = "none";
+            }
+
+            document.getElementById("percentageValue").style.display = "none";
+        }
+        if (PercentageOf =="") {
+            document.getElementById("percentageOf").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("percentageOf").style.display = "none";
+        }
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validatePayroll();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var CategoryName = document.getElementById("CategoryName").value;
+        var PercentageValue = document.getElementById("PercentageValue").value;
+        var PercentageOf = document.getElementById("PercentageOf").value;
+
+        if (count != 0) {
+            if (CategoryName != "") {
+                document.getElementById("categoryname").style.display = "none";
+            } else {
+                document.getElementById("categoryname").style.display = "inline";
+            }
+
+            if (PercentageValue != "") {
+                document.getElementById("percentageValue").style.display = "none";
+            } else {
+                document.getElementById("percentageValue").style.display = "inline";
+            }
+
+            if (PercentageOf != "") {
+                document.getElementById("percentageOf").style.display = "none";
+            } else {
+                document.getElementById("percentageOf").style.display = "inline";
+            }
+
+        }
+    };
+
+
+    $('#CategoryName').click(function () {
+        document.getElementById('categoryname').style.display = "none"
+    })
+
+
+    $('#PercentageValue').click(function () {
+        document.getElementById('percentageValue').style.display = "none"
+    })
+
+    $('#PercentageOf').click(function () {
+        document.getElementById('percentageOf').style.display = "none"
+    })
+
+
+    $('#PercentageOf').click(function () {
+        document.getElementById('percentageOf').style.display = "none"
+    })
+
+</script>
+
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+
+

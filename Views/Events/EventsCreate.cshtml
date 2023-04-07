@@ -1,0 +1,246 @@
+﻿@model AsteriskBrowserAL.Models.EventsDetails
+
+@{
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="fa fa-money"></i>
+            Events
+        </li>
+        <li>
+            <i class="fa fa-gears"></i>
+            Events
+        </li>
+        <li class="active">PTM</li>
+    </ul><!-- /.breadcrumb -->
+}
+@Html.Action("DatePickerScripts", "Base")
+
+
+@if (@Model.EventId != null)
+{
+    <input type="hidden" id="EventId" value="@Model.EventId" />
+}
+@if (Model.EventDate != null)
+{
+    <input type="hidden" id="StartDate" value="@Model.EventDate" />
+}
+
+<input type="hidden" id="SlotNo" />
+
+<span style="color:red;font-weight:bold" id="Validation"></span>
+<br />
+<br />
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <div class="table-header">
+
+                Bank PTM
+                <small style="float:right;">
+                    @Html.ActionLink("Back to details", "Events", new { })
+                </small>
+                <div class="widget-toolbar no-border">
+                    <div class="inline action-buttons">
+                        <div style="float:right;">
+                            <button class="btn btn-info btn-xs" type="submit" onclick="return submitForm();">
+                                <i class="ace-icon fa fa-floppy-o ">
+                                    | Save
+                                </i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="color:red;font-weight:bold">*C</span>lass</label>
+                    <div class="col-sm-6">
+                        @Html.DropDownList("CourseId", null, "--Select--", new { @class = "form-control", @id = "CourseId", required = "required" })
+                    </div>
+                </div>
+            </div>
+            <br />
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="color:red;font-weight:bold">*S</span>ubject</label>
+                    <div class="col-sm-6">
+                        @Html.TextBoxFor(model => model.Subject, new { @class = "form-control", id = "Subject", required = "required" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="font-weight:bold"></span>Remarks</label>
+                    <div class="col-sm-6">
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", id = "Description" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*S</span>tart Time </label>
+                    <div class="col-sm-6">
+                        @*<div class="input-group bootstrap-timepicker timepicker">
+                                <input id="timepicker" name="StartTime" type="text" value="00:00:00" class="form-control input-small" placeholder="Schedule Time">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                            </div>*@
+                        @*<input id="StartTime" name="StartTime" type="text" value="00:00:00" class="form-control input-small" placeholder="Schedule Time">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>*@
+                        @*<input class="form-control" id="StartTime" name="StartTime" placeholder="HH:MM AM/PM" type="text" required />*@
+                        <div class="input-group bootstrap-timepicker">
+                            <input id="StartTime" name="StartTime" type="text" class="form-control input-small" value="@Model.StartTime" placeholder="Start Time">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                        </div>
+                    </div>
+                    <label>eg: 09:00 AM</label>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*E</span>nd Time </label>
+                    <div class="col-sm-6">
+                        <div class="input-group bootstrap-timepicker">
+                            <input id="EndTime" name="EndTime" type="text" class="form-control input-small" value="@Model.EndTime" placeholder="End Time">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                        </div>
+                        @*<input class="form-control" id="EndTime" name="EndTime" placeholder="HH:MM AM/PM" type="text" required />*@
+                    </div>
+                    <label>eg: 09:00 PM</label>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="font-weight:bold"></span>Slot Time (Minutes)</label>
+                    <div class="col-sm-6">
+                        @Html.TextBoxFor(model => model.SlotTime, new { @class = "form-control", id = "SlotTime", required = "required" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-4"><span style="font-weight:bold"></span>Break Time (Minutes) </label>
+                    <div class="col-sm-6">
+                        @Html.TextBoxFor(model => model.BreakTime, new { @class = "form-control", id = "BreakTime", required = "required" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            @*<div class="row">
+                    <div class="col-sm-12">
+                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">No Of Slots</label>
+                        <div class="col-sm-6">
+                            <label id="SlotNumber" style="font-weight:bold"></label> <a onclick="GetSlotsCount()">No. Of Slots</a>
+                        </div>
+                    </div>
+                </div>*@
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        SetDepositTimePicker();
+    });
+
+    function SetDepositTimePicker() {
+
+        $('#StartTime').timepicker({
+            showMeridian: false,
+            minuteStep: 1,
+            showSeconds: true,
+        })
+        $('#EndTime').timepicker({
+            showMeridian: false,
+            minuteStep: 1,
+            showSeconds: true,
+        })
+
+    }
+
+    function submitForm() {
+        debugger
+        var message = "";
+
+        var Validate = true;
+
+        var Subject = $('#Subject').val()
+        var Description = $('#Description').val()
+        var SlotTime = $('#SlotTime').val()
+        var BreakTime = $('#BreakTime').val()
+        var SlotNumber = $('#SlotNo').val()
+        var StartTime = $('#StartTime').val()
+        var EndTime = $('#EndTime').val()
+        var eventId = $('#eventId').val()
+        var Date = $('#StartDate').val()
+        var CourseId = $('#CourseId').val()
+
+        if (Subject == "" || Subject == undefined) {
+            Validate = false;
+            message += "Subject, ";
+        }
+
+
+        //if (Description == "" || Description == undefined) {
+        //    Validate = false;
+        //    message += "Description, ";
+        //}
+
+
+        //if (SlotTime == "" || SlotTime == undefined || SlotTime == 0) {
+        //    Validate = false;
+        //    message += "SlotTime, ";
+        //}
+
+
+
+        //if (BreakTime == "" || BreakTime == undefined || BreakTime == 0) {
+        //    Validate = false;
+        //    message += "BreakTime, ";
+        //}
+
+
+        if (StartTime == "" || StartTime == undefined) {
+            Validate = false;
+            message += "StartTime, ";
+        }
+
+
+        if (EndTime == "" || EndTime == undefined) {
+            Validate = false;
+            message += "EndTime, ";
+        }
+
+        if (CourseId == "" || CourseId == undefined) {
+            Validate = false;
+            message += "CourseId, ";
+        }
+
+        if (!Validate)
+            document.getElementById("Validation").innerHTML = " Please complete this mandatory field"
+
+        if (Validate == true) {
+            document.getElementById("Validation").innerHTML = ""
+            $.ajax({
+                url: '/Events/EventsC',
+                type: 'POST',
+                data: { eventId: eventId, Subject: Subject, Description: Description, SlotTime: SlotTime, BreakTime: BreakTime, SlotNumber: SlotNumber, StartTime: StartTime, EndTime: EndTime, Date: Date, CourseId: CourseId },
+                success: function (data) {
+                    location.reload();
+                },
+                aync: false
+            });
+        }
+    }
+
+</script>
+

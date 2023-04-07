@@ -1,0 +1,202 @@
+﻿@model AsteriskBrowserAL.PettyCashSubHead
+
+@{
+    ViewBag.Title = " PettyCashSubHeadsC";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Petty Cash Sub Heads</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            @*<h3>@Html.ActionLink("Back To Details", "PettyCashSubHeads")</h3>*@
+            @*<button class="btn btn-primary" style="width:80px" type="button" onclick="location.href='@Url.Action("PettyCashSubHeads", "SePettyCash")'">New</button>*@
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("PettyCashSubHeadsC", "SeFinance", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(model => model.PettyCashHeadId)
+
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Petty Cash Sub Heads</span>
+                    <small style="float:right;font-weight:bold;" class="textheader">
+                        @Html.ActionLink("Back to details", "PettyCashSubHeads", new { PettyCashHeadId = @Model.PettyCashHeadId })
+                    </small>
+
+                </div>
+                    <!-- form start -->
+                    <form class="form-horizontal" role="form">
+                        <div class="box">
+                            <span style="color:red;font-weight:bold;">@Html.ValidationMessage("PettyCashSubHeads")</span>
+
+                         
+
+                        </div>
+                        <span style="color: red;">@Html.ValidationMessage("PettyCashSubHeads")</span>
+                        <div class="widget-box row" style="padding:10px;">
+
+                            <div class="col-sm-5">
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Sub Head Name")</label>
+
+                                    <div class="col-sm-8">
+                                        @Html.TextBoxFor(model => model.SubHeadName, new { @class = "form-control col-sm-5", placeholder = "Sub-Head Name", MaxLength = "35", @id = "SubHeadName" })
+                                        <div class="" style="display:none;" id="subHeadName">
+                                            <label style="color:red;font-weight:bold;">Required</label>
+                                        </div>
+                                    </div>
+
+                                   
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-5">
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+
+                                    <div class="col-sm-8">
+                                        @Html.TextBoxFor(model => model.Description, new { @class = "form-control col-sm-5", placeholder = "Description", MaxLength = "35", @id = "Description" })
+                                        <div class="" style="display:none;" id="description">
+                                            <label style="color:red;font-weight:bold;">Required</label>
+                                        </div>
+                                    
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-2">
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label no-padding-right"></label>
+                                    <div class="col-sm-10">
+                                        <div class="col-sm-3">
+                                            @if (Model.IsActive == null)
+                                            {
+                                                Model.IsActive = false;
+                                            }
+
+                                            @Html.CheckBoxFor(model => model.IsActive.Value, new { Name = "IsActive" })
+                                            <input name="IsActive" type="hidden" value="false" />
+                                        </div>
+
+                                        <span class="lbl bigger-110">Is Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                           
+                            <div class=" col-md-9">
+                                <div class="hr hr-18 dotted hr-double"></div>
+                                <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                    <i class="ace-icon fa fa-check bigger-50"></i>
+                                    Save
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <button class="btn btn-sm" type="reset">
+                                    <i class="ace-icon fa fa-undo bigger-50"></i>
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    }
+                </div>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+<script type="text/javascript">
+    function validateSubHeads() {
+
+        document.getElementById("count").value = "1";
+        var SubHeadName = document.getElementById("SubHeadName").value;
+        var Description = document.getElementById("Description").value;
+
+        validate = true;
+
+        if (SubHeadName == "") {
+            document.getElementById("subHeadName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("subHeadName").style.display = "none";
+        }
+        if (Description == "") {
+            document.getElementById("description").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("description").style.display = "none";
+        }
+
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateSubHeads();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var SubHeadName = document.getElementById("SubHeadName").value;
+        var Description = document.getElementById("Description").value;
+
+
+        if (count != 0) {
+            if (PettyCashSchedule != "") {
+                document.getElementById("subHeadName").style.display = "none";
+            } else {
+                document.getElementById("subHeadName").style.display = "inline";
+            }
+        }
+
+        if (count != 0) {
+            if (Description != "") {
+                document.getElementById("description").style.display = "none";
+            } else {
+                document.getElementById("description").style.display = "inline";
+            }
+        }
+    };
+
+    $('#SubHeadName').click(function () {
+        document.getElementById('subHeadName').style.display = "none"
+    })
+    $('#Description').click(function () {
+        document.getElementById('description').style.display = "none"
+    })
+
+</script>
+

@@ -1,0 +1,446 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+
+@{
+    ViewBag.Title = "StudentLessThanFifty";
+    List<SelectListItem> lstListItems = new List<SelectListItem>()
+    {
+
+       new SelectListItem() {Text="---Select---",Value="0" },
+        new  SelectListItem() { Text="All",Value="1"},
+        new  SelectListItem() { Text="Boys",Value="2"},
+        new  SelectListItem() { Text="Girls",Value="3"},
+
+    };
+    List<SelectListItem> lstPercentageListItems = new List<SelectListItem>()
+    {
+
+       new SelectListItem() {Text="---Select---",Value="0" },
+        new  SelectListItem() { Text="100%",Value="100"},
+        new  SelectListItem() { Text="75%",Value="75"},
+        new  SelectListItem() { Text="50%",Value="50"},
+        new  SelectListItem() { Text="25%",Value="25"},
+
+
+    };
+
+    List<SelectListItem> lstAboveBelowListItems = new List<SelectListItem>()
+    {
+
+       new SelectListItem() {Text="---Select---",Value="0" },
+        new  SelectListItem() { Text="Above",Value="1"},
+        new  SelectListItem() { Text="Below",Value="2"},
+
+    };
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Examination
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Scored Below % Marks</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<span id="ValidationMSG" style="color:red;font-weight:bold"> </span>
+
+<section class="content">
+    <div class="col-xs-12">
+        <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+        <div class="widget-box">
+            <div class="widget-header widget-header-flat widget-header-small">
+                <h5 class="widget-title ">Student Performance Report - Scored Below % Marks</h5>
+                <div class="widget-toolbar no-border">
+                    <div class="inline action-buttons">
+                        <a class="P2" onclick="GetData()" id="btnViewData2" value="View Data"><span class="btn btn-info btn-minier">View Data</span></a>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="widget-body">
+                <div class="widget-main">
+                    @if (Model.IsCentral)
+                    {
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4">Division</label>
+                                    <div class="col-sm-6">
+                                        @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <label class="col-sm-4">Branch</label>
+                                    <div class="col-sm-6">
+                                        <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                    }
+                    else
+                    {
+                        <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.BranchId" />
+                    }
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-xs-6">
+                                <label class="col-sm-4">Class</label>
+                                <div class="col-sm-6">
+                                    <select id="ClassId" name="ClassId" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label class="col-sm-4">Section</label>
+                                <div class="col-sm-6">
+                                    <select id="SectionId" name="SectionId" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-xs-6">
+                                <label class="col-sm-4">Examination</label>
+                                <div class="col-sm-6">
+                                    <select id="ExaminationId" name="ExaminationId" class="form-control"></select>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label class="col-sm-4">Subjects</label>
+                                <div class="col-sm-6">
+                                    <select id="SubjectId" name="SubjectId" class="form-control"></select>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 control-label no-padding-right">Gender</label>
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("GenderId", new SelectList(lstListItems, "Value", "Text", 0), new { @class = "form-control", id = "GenderId", name = "GenderId" })
+                                </div>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label class="col-sm-4">Percentage</label>
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("Percetnage", new SelectList(lstPercentageListItems, "Value", "Text", 0), new { @class = "form-control", id = "PercetnageId", name = "PercetnageId" })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 control-label no-padding-right">Above / Below</label>
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("AboveId", new SelectList(lstAboveBelowListItems, "Value", "Text", 0), new { @class = "form-control", id = "AboveId", name = "AboveId" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        </div><!-- /.box-header -->
+                    </div>
+                </div>
+    </div>
+    <br />
+    <br />
+    <div id="DataDiv">
+
+    </div>
+</section>
+
+
+<script>
+
+    window.onload = GetClassList()
+
+    $('#DivisionId').change(function () {
+        debugger
+
+        var nDivisionId = $('#DivisionId').val();
+        if (nDivisionId != 0) {
+            $.ajax({
+
+                url: '/AReports/GetStudentStrengthBranchesByDivisionId',
+                data: { DivisionId: nDivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+                    BranchItems.append($("<option>").val("-1").text("-- All --"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+
+                },
+                aync: false
+            });
+        }
+    });
+    function GetExaminations() {
+        debugger
+        var nClassId = $('#ClassId').val();
+        var SubId = $('#BranchId').val();
+        if (nClassId != 0) {
+            $.ajax({
+
+                url: '/AExaminationReports/GetExaminationsByClassNumber',
+                data: { SubId: SubId, ClassId: nClassId },
+                success: function (data) {
+
+                    var ExaminationsItems = $('#ExaminationId');
+
+                    ExaminationsItems.children().remove();
+
+                    ExaminationsItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        ExaminationsItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+                    });
+
+                    $('#ExaminationId').append(ExaminationsItems);
+                },
+                aync: false
+            });
+        }
+    }
+    $('#ClassId').change(function () {
+        $('#ExaminationId').empty();
+
+        var ClassId = $('#ClassId').val();
+
+        if (ClassId < 1) {
+            $('#DataDiv').html("");
+        }
+        else {
+            LoadSectionDropdown();
+            $('#DataDiv').html("");
+        }
+    });
+
+    $('#ExaminationId').change(function () {
+        debugger
+        var nClassId = $('#ClassId').val();
+        if (nClassId != 0) {
+            $.ajax({
+
+                url: '/AExaminationReports/GetSubjectsforClass',
+                data: { nclassId: nClassId },
+                success: function (data) {
+
+                    var SubjectsItems = $('#SubjectId');
+
+                    SubjectsItems.children().remove();
+
+                    SubjectsItems.append($("<option>").val("null").text("--- Select ---"));
+                    SubjectsItems.append($("<option>").val("-1").text("All Subjects"))
+                    $.each(data, function (i, record) {
+                        SubjectsItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+                    });
+
+                    $('#SubjectId').append(SubjectsItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+        var BranchId = $('#BranchId').val();
+        if (BranchId > 0) {
+            GetClassList();
+        }
+    })
+
+    function GetClassList() {
+        var nDivisionId = $('#DivisionId').val();
+        var BranchId = $('#BranchId').val();
+        $.ajax({
+            url: '/AExaminationReports/LoadClassDropDown',
+            success: function (data) {
+                var ClassItems = $('#ClassId');
+                ClassItems.children().remove();
+                ClassItems.append($("<option>").val("null").text("--- Select ---"));
+                $.each(data, function (i, record) {
+                    ClassItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+                });
+                $('#ClassId').append(ClassItems);
+            }
+        });
+    }
+
+    function LoadSectionDropdown() {
+        var SelClassNumber = $("#ClassId").val()
+        var BranchId = document.getElementById("BranchId").value;
+        if (SelClassNumber >= 0) {
+            $.ajax({
+                url: "/AStudent/GetSectionslistByStudentActiveInActive",
+                data: { Classnumber: SelClassNumber, nBranchId: BranchId },
+                success: function (result) {
+                    var SectionList = $("#SectionId")
+                    SectionList.children().remove();
+                    SectionList.append($("<option>").val("-1").text("--Select--"))
+                    SectionList.append($("<option>").val("0").text("All"))
+                    $.each(result, function (e, record) {
+                        SectionList.append($("<option>").val(record.SectionId).text(record.SectionCode))
+                    })
+                    $("#SectionId").append(SectionList)
+                }
+            })
+        }
+        else {
+            document.getElementById("SectionId").value = ""
+
+            $("#SectionId").html("")
+        }
+    }
+
+    $("#SectionId").change(function () {
+        GetExaminations();
+    })
+  
+
+
+    function GetData() {
+        debugger
+        $('#DataDiv').html('')
+        var message = "Please fill the mandatory fields :  ";
+        var Validation = true;
+
+        var DivisionId = $('#DivisionId').val()
+        var BranchId = $('#BranchId').val()
+
+        var ClassId = $('#ClassId').val()
+        var SectionId = $('#SectionId').val()
+        var ExaminationId = $('#ExaminationId').val()
+        var SubjectId = $('#SubjectId').val()
+        var Gender = $('#GenderId').val();
+        var PercetnageId = $('#PercetnageId').val();
+        var AboveId = $('#AboveId').val();
+
+
+        var IsCentral = $('#IsCentral').val();
+        
+        if (IsCentral == "value") {
+            if (DivisionId == "0" || DivisionId == "" || DivisionId == "null" || DivisionId == null) {
+                message = "Division,";
+                Validation = false;
+            }
+            if (BranchId == "0" || BranchId == "" || BranchId == "null" || BranchId == null) {
+                message = "Branch,";
+                Validation = false;
+            }
+        }
+
+
+        if (ClassId == "0" || ClassId == "" || ClassId == "null" || ClassId == null) {
+            message += "Class,";
+            Validation = false;
+        }
+      
+        if (SectionId == "" || SectionId == "-1" || SectionId == "null" || SectionId == null) {
+            message += "Section,";
+            Validation = false;
+        }
+        if (ExaminationId == "0" || ExaminationId == "" || ExaminationId == "null" || ExaminationId == null) {
+            message += "Examination,";
+            Validation = false;
+        }
+        if (SubjectId == "0" || SubjectId == "" || SubjectId == "null" || SubjectId == null) {
+            message += "Subject,";
+            Validation = false;
+        }
+        if (Gender == "" || Gender == null || Gender == "null" || Gender == "0") {
+            message += " Gender,";
+            Validation = false;
+        }
+        if (PercetnageId == "" || PercetnageId == "null" || PercetnageId == null || PercetnageId == "0") {
+            message += " Percentage,";
+            Validation = false;
+        }
+        if (AboveId == "" || AboveId == null || AboveId == "null" || AboveId == "0") {
+            message += " Above or Below,";
+            Validation = false;
+        }
+        document.getElementById('ValidationMSG').innerHTML = message.slice(",", -1);
+
+        var SubjectId = $('#SubjectId').val()
+
+        if (Validation == true) {
+            document.getElementById('ValidationMSG').innerHTML='';
+            $('#imagemodal').show()
+            $.ajax({
+                url: '/AExaminationReports/GetStudentLessThanFifty',
+                data: { ExaminationId: ExaminationId, SubjectId: SubjectId, nBranchId: BranchId, nDivisionId: DivisionId, GenderId: Gender, PercetnageId: PercetnageId,SectionId: SectionId, AboveId : AboveId },
+                success: function (data) {
+                    StudentLessThan50BarGraph();
+                    $('#imagemodal').hide()
+                    $('#DataDiv').html(data)
+                }   
+            });
+        }
+
+    }
+
+</script>
+<script src="~/Scripts/canvasjs.min.js"></script>
+<script>
+
+
+
+
+    function StudentLessThan50BarGraph() {
+
+        debugger
+
+
+        $.getJSON("/AExaminationReports/GetStudentLessThan50BarGraph/", function (data) {
+
+            debugger
+
+            var chart = new CanvasJS.Chart("Graph", {
+                colorSet: "Colors",
+                title: {
+                    text: "Subject Wise Report Based On percentage"
+                },
+                width: 350,
+                data: [{
+                    type: "column",
+                    dataPoints: [
+                    { label: "Total", y: data.StudentCount, color: "#C2365B" },
+                    { label: "Boys", y: data.BoysCount, color: "#369ead" },
+                    { label: "Girls", y: data.GirlsCount, color: "#7f6084" },
+                    ]
+
+                }]
+            });
+            chart.render();
+        });
+
+    }
+
+</script>

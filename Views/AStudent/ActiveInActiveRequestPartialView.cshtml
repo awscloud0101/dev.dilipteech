@@ -1,0 +1,125 @@
+﻿@model  AsteriskBrowserAL.Models.StudentCategoryActiveStudent
+
+@{
+    int sno = 1;
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+<br/>
+<div>
+
+    @if (null != Model)
+    {
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <div class="table-header">
+                               Active InActive Requst
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body table-responsive no-padding">
+
+                                    <div class="hideScrolling">
+                                        <table class="table tbhover table-striped table-bordered dynamic-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        @Html.DisplayName("S.No")
+                                                    </th>
+
+                                                    <th>
+                                                        @Html.DisplayName("Student Name")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Roll Number")
+                                                    </th>
+                                                    @if (bIsCoastal)
+                                                    {
+                                                        <th>
+                                                            @Html.DisplayName("Registration Number")
+                                                        </th>
+                                                    }
+                                                    <th>
+                                                        @Html.DisplayName("Admission Number")
+                                                    </th>
+                                                    <th>
+                                                        @Html.DisplayName("Status")
+                                                    </th>
+
+                                                    <th>
+
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var s in Model.lstStudent)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @sno
+                                                        </td>
+                                                        <td>
+                                                            @s.DisplayName
+                                                        </td>
+                                                        <td>
+                                                            @s.RollNumber
+                                                        </td>
+                                                        @if (bIsCoastal)
+                                                        {
+                                                            <td>
+                                                                @s.OMRNumber
+                                                            </td>
+                                                        }
+                                                        <td>
+                                                            @s.AdmissionNumber
+                                                        </td>
+
+                                                        <td>
+                                                            @if (s.CategoryId == 1)
+                                                            {
+                                                                <span class="label label-success">Active</span>
+                                                            }
+                                                            @if (s.CategoryId == 2)
+                                                            {
+                                                                <span class="label label-danger">In-Active</span>
+                                                            }
+
+                                                        </td>
+
+                                                        <td>
+                                                            @if (s.Status == 1)
+                                                            {
+                                                                if (s.CategoryId == 1)
+                                                                {
+                                                                    @Html.ActionLink("Make In-Active", "ActiveInActiveSendRequest", new { id = s.StudentId, RStatus = 1, nClassNumber = Model.ClassNumber,SectionId=Model.BatchId },new { @class = "P2"})
+                                                                }
+                                                                else if (s.CategoryId == 2)
+                                                                {
+                                                                    @Html.ActionLink("Make Active", "ActiveInActiveSendRequest", new {id = s.StudentId, RStatus = 2, nClassNumber = Model.ClassNumber, SectionId = Model.BatchId }, new { @class = "P2" })
+
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                            sno++;
+                                                }
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold"> Data not available</span>
+    }
+</div>
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })

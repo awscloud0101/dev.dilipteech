@@ -1,0 +1,417 @@
+﻿@model AsteriskBrowserAL.Models.UploadQuestionsData
+
+@{
+    ViewBag.Title = "Upload Questions";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Online Examinations
+        </li>
+        <li class="active">Questions</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+<script src="//cdn.ckeditor.com/4.5.5/standard/ckeditor.js"></script>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <div id="TempVal">
+                @if (null != TempData["Status"])
+                {
+                    <span style="font-weight:bold;color:forestgreen">@Html.Raw(TempData["Status"])</span>
+                }
+                @if (null != TempData["SuccessStatus"])
+                {<span style="font-weight:bold;color:green">@Html.Raw(TempData["SuccessStatus"])</span>
+            }
+                @if (null != TempData["Error"])
+                {
+                    <span style="font-weight:bold;color:red">@Html.Raw(TempData["Error"])</span>
+                }
+            </div>
+            <span id="Validation" style="font-weight:bold;color:red"></span>
+            @using (Html.BeginForm("UploadQuestions", "AOnlineExamination", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(model => model.SubjectId)
+                <input type="hidden" id="SubjectId" name="SubjectId" value="@Model.SubjectId" />
+                <div class="table-header">
+                    Questions Upload
+                    <button class="btn btn-primary " style="float:right;color:forestgreen;" onclick="return SubmitForm()" type="submit">
+                        Save
+                    </button>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <br />
+                <form class="form-horizontal" role="form">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Exam Name")</label>
+
+                        <div class="col-sm-3">
+                            @if (null != Model)
+                            {
+                                if (null != Model.lstonlineexampattern)
+                                {
+                                    @Html.DropDownListFor(model => model.OnlineQuestionPaper_ExaminerId, new SelectList(Model.lstonlineexampattern, "OnlineQuestionPaper_ExaminerId", "BatchId"), "---Select Exam Name---", new { @class = "form-control", id = "OnlineQuestionPaper_ExaminerId", @name = "BatchId" })
+                                }
+                                else
+                                {
+                                    <select id="OnlineQuestionPaper_ExaminerId" class=" form-control">
+                                        <option value="0">---Select Exam Name---</option>
+                                    </select>
+                                }
+                            }
+                            else
+                            {
+                                <select id="OnlineQuestionPaper_ExaminerId" class=" form-control">
+                                    <option value="0">---Select Exam Name---</option>
+                                </select>
+                            }
+                        </div>
+
+                        <span class="col-sm-3" style="font-weight:bold;color:red;" id="ExamNameVal"></span>
+
+                    </div>
+                    <!--<div class="form-group">
+
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Subject")</label>
+
+                    <div class="col-sm-3">-->
+                    @*@Html.DropDownListFor(model => model.SubjectId, new SelectList(Model.lstSubjects, "SubjectId", "SubjectName", Model.SubjectId), "---Select SubjectId---", new { @class = "form-control", id = "Subject" })*@
+                    <!--<select id="Subject" name="SubjectName" class="form-control"></select>
+
+                        </div>
+
+                        <span class="col-sm-3" style="font-weight:bold;color:red;" id="SubjectVal"></span>
+
+                    </div>-->
+                    @*<div class="form-group">
+                            <div class="col-sm-4">
+                                <input type="radio" name="rbType" checked="checked" value="0"><span style="margin-right:2em;">Questions Entry</span>
+                                <input type="radio" name="rbType" value="1" />Questions as Images
+                            </div>
+                        </div>*@
+                    <br />
+                    <div id="QuestionsEntry">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Question")</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control col-sm-5 textlength" rows="7" placeholder="Question" id="Question" name="Question">@Model.Question</textarea>
+                                @*<script type="text/javascript">
+                                        CKEDITOR.replace('Question');
+                                    </script>*@
+                            </div>
+                            <span class="col-sm-3" style="font-weight:bold;color:red;" id="QuestionVal"></span>
+                        </div>
+                        <br />
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Option (1)")</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control col-sm-5 textlength" placeholder="Option One" id="OptionOne" name="OptionOne">@Model.OptionOne</textarea>
+                            </div>
+                            <span class="col-sm-3" style="font-weight:bold;color:red;" id="OptionOneVal"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Option (2)")</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control col-sm-5 textlength" placeholder="Option Two" id="OptionTwo" name="OptionTwo">@Model.OptionTwo</textarea>
+                            </div>
+                            <span class="col-sm-3" style="font-weight:bold;color:red;" id="OptionTwoVal"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Option (3)")</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control col-sm-5 textlength" placeholder="Option Three" id="OptionThree" name="OptionThree">@Model.OptionThree</textarea>
+                            </div>
+                            <span class="col-sm-3" style="font-weight:bold;color:red;" id="OptionThreeVal"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Option (4)")</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control col-sm-5 textlength" placeholder="Option Four" id="OptionFour" name="OptionFour">@Model.OptionFour</textarea>
+                            </div>
+                            <span class="col-sm-3" style="font-weight:bold;color:red;" id="OptionFourVal"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Correct Option")</label>
+                            <div class="col-sm-6">
+                                @*<textarea class="form-control col-sm-5"  placeholder="Answer"  id="Answer" name="Answer" maxlength="1">@Model.Answer</textarea>*@
+                                @Html.TextBoxFor(model => model.Answer, new { @class = "form-control col-sm-5", @maxlength = "1", @id = "Answer", @name = "Answer", placeholder = "Answer", @type = "number" })
+                            </div>
+                            <span class="col-sm-3" style="font-weight:bold;color:red;" id="AnswerVal"></span>
+                        </div>
+                    </div>
+                    <div id="QuestionsUpload" style="display:none">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Upload Questions")</label>
+
+                            <div class="col-sm-3">
+                                <input type="file" accept="image/*" id="UploadQuestions" name="UploadQuestions" multiple="multiple">
+                            </div>
+
+                            <span class="col-sm-3" style="font-weight:bold;color:red;" id="UploadQuestionsVal"></span>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Upload Key")</label>
+
+                            <div class="col-sm-3">
+                                <input type="file" multiple="multiple" accept=".txt" id="UploadKey" name="UploadKey" />
+                            </div>
+
+                            <span class="col-sm-3" style="font-weight:bold;color:red;" id="UploadKeyVal"></span>
+
+                        </div>
+                    </div>
+                    <div class="hr hr-18 dotted hr-double"></div>
+                </form>
+
+
+            }
+        </div>
+        <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+            <p style="position:absolute; top: 50%; left:50%;">
+                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+            </p>e
+        </div>
+    </div>
+
+    <div id="SearchData" class="row">
+    </div>
+
+</section>
+<script type="text/javascript">
+    //$('input[name="rbType"]').click(function radioButton() {
+    //    debugger;
+    //    $("#SearchDiv").html("");
+    //    var rbType = $(this).val();
+    //    if (rbType == 0) {
+    //        $('#QuestionsEntry').show();
+    //        $('#QuestionsUpload').hide();
+    //    }
+    //    if (rbType == 1) {
+    //        $('#QuestionsEntry').hide();
+    //        $('#QuestionsUpload').show();
+    //    }
+    //});
+    $('#OnlineQuestionPaper_ExaminerId').change(function () {
+                                    debugger;
+                                    document.getElementById("ExamNameVal").innerHTML = "";
+                                    document.getElementById("Validation").innerHTML = "";
+                                    document.getElementById("TempVal").style.display = "none"
+        //var Exam = $('#OnlineQuestionPaper_ExaminerId').val();
+        $("#SearchDiv").html("");
+                                    //if (Exam > 0) {
+                                    GetQuestions();
+                                    //}
+                                })
+
+    $('#UploadQuestions').change(function () {
+                                    document.getElementById("UploadQuestionsVal").innerHTML = "";
+                                    document.getElementById("Validation").innerHTML = "";
+                                    document.getElementById("TempVal").style.display = "none"
+    })
+    //$('#Subject').change(function () {
+    //    document.getElementById("SubjectVal").innerHTML = "";
+    //})
+    $('#Question').change(function () {
+                                    document.getElementById("QuestionVal").innerHTML = "";
+                                })
+    $('#Answer').change(function () {
+                                    document.getElementById("AnswerVal").innerHTML = "";
+                                })
+    $('#OptionOne').change(function () {
+                                    document.getElementById("OptionOneVal").innerHTML = "";
+                                })
+    $('#OptionTwo').change(function () {
+                                    document.getElementById("OptionTwoVal").innerHTML = "";
+                                })
+    $('#OptionThree').change(function () {
+                                    document.getElementById("OptionThreeVal").innerHTML = "";
+                                })
+    $('#OptionFour').change(function () {
+                                    document.getElementById("OptionFourVal").innerHTML = "";
+                                })
+
+    function SubmitForm() {
+                                    debugger
+                                    var validatestatus = validateES();
+                                    if (validatestatus == false) {
+                                        return false;
+                                    } else {
+                                        return true;
+                                    }
+                                };
+                                function validateES() {
+                                    debugger;
+                                    var Validation = true;
+                                    var ExamName = $('#OnlineQuestionPaper_ExaminerId').val();
+                                    //var Subject = $('#SubjectId').val();
+                                    //var UploadQuestions = $('#UploadQuestions').val();
+                                    //var Uploadkey = $('#UploadKey').val();
+                                    //var rbType = $('input[name=rbType]:checked').val();
+                                    var Question = $('#Question').val()
+                                    var Answer = $('#Answer').val()
+                                    var Option1 = $('#OptionOne').val()
+                                    var option2 = $('#OptionTwo').val()
+                                    var option3 = $('#OptionThree').val()
+                                    var option4 = $('#OptionFour').val()
+                                    if (ExamName < 1 || ExamName == "") {
+                                        document.getElementById("ExamNameVal").innerHTML = "Please select Exam Name"
+            Validation = false;
+                                    }
+
+                                    //if (Subject == null || Subject =="") {
+                                    //    document.getElementById("SubjectVal").innerHTML = "Please Select Subject"
+                                    //    Validation = false;
+                                    //}
+
+                                    //if (UploadQuestions == "" ) {
+                                    //    document.getElementById("UploadQuestionsVal").innerHTML = "Please Upload the Questions"
+                                    //    Validation = false;
+                                    //}
+                                    //if (Uploadkey == "" ) {
+                                    //    document.getElementById("UploadKeyVal").innerHTML = "Please Upload the key"
+                                    //    Validation = false;
+                                    //}
+                                    // && rbType == 0
+                                    if (Question == "") {
+                                        document.getElementById("QuestionVal").innerHTML = "Please Enter Question"
+                                        Validation = false;
+                                    }
+                                    if (Answer == "") {
+                                        document.getElementById("AnswerVal").innerHTML = "Please Enter Actual Option Of Answer"
+                                        Validation = false;
+                                    }
+                                    if (Option1 == "") {
+                                        document.getElementById("OptionOneVal").innerHTML = "Please Enter Option 1"
+                                        Validation = false;
+                                    }
+                                    if (option2 == "") {
+                                        document.getElementById("OptionTwoVal").innerHTML = "Please Enter Option 2"
+                                        Validation = false;
+                                    }
+                                    if (option3 == "") {
+                                        document.getElementById("OptionThreeVal").innerHTML = "Please Enter Option 3"
+                                        Validation = false;
+                                    }
+                                    if (option4 == "") {
+                                        document.getElementById("OptionFourVal").innerHTML = "Please Enter Option 4"
+                                        Validation = false;
+                                    }
+                                    //if (Validation == true) {
+                                    //    $.ajax({
+                                    //        url: '/TOnlineExamination/IsPaperNameExists',
+                                    //        data: { PaperName: $('#PaperName').val() },
+                                    //        success: function (data) {
+                                    //            if (data != "") {
+                                    //                document.getElementById("Validation").innerHTML = data;
+                                    //                Validation = false;
+                                    //            }
+                                    //            else {
+                                    //                PostFiles();
+                                    //                return false;
+                                    //            }
+                                    //        },
+                                    //        async: false
+                                    //    });
+                                    //}
+
+                                    return Validation;
+                                };
+
+                                //function PostFiles() {
+                                //    var formData = new FormData($('form#data').get(0));
+
+                                //    $('#imagemodel').show();
+
+                                //    $.ajax({
+                                //        url: '/TOnlineExamination/UploadQuestions',
+                                //        type: 'POST',
+                                //        data: formData,
+                                //        success: function (data) {
+                                //            $('#imagemodel').hide();
+                                //            alert(data);
+                                //            document.getElementById("data").reset();
+                                //        },
+                                //        async: false,
+                                //        cache: false,
+                                //        contentType: false,
+                                //        processData: false
+                                //    });
+                                //}
+
+                                //$('#OnlineQuestionPaper_ExaminerId').change(function () {
+                                //    debugger;
+                                //    var ExamNameID = $('#OnlineQuestionPaper_ExaminerId').val();
+                                //    if (ExamNameID != null) {
+                                //        $.ajax({
+                                //            url: '/AOnlineExamination/GetSubjects',
+                                //            data: { ExamNameID: ExamNameID },
+                                //            success: function (data) {
+                                //                var SubjectItems = $('#Subject');
+
+                                //                SubjectItems.children().remove();
+
+                                //                SubjectItems.append($("<option>").val("null").text("--- Select Subject ---"));
+
+                                //                $.each(data, function (i, record) {
+                                //                    SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+                                //                });
+
+                                //                $('#Subject').append(SubjectItems);
+
+
+                                //            },
+                                //            aync: false
+                                //        });
+
+                                //    }
+                                //})
+                                function GetQuestions() {
+                                    debugger;
+        $("#SearchData").html("");
+                                    var ExamNameID = $('#OnlineQuestionPaper_ExaminerId').val();
+                                    if (ExamNameID > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                                            url: '/AOnlineExamination/GetQuestionData',
+                data: { ExamNameID: ExamNameID },
+                success: function (Data) {
+                    $('#imagemodal').hide();
+                    $("#SearchData").html(Data);
+                                            }
+                                        });
+                                    }
+                                }
+</script>
+
+
+
+@*@section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }*@
+
+
+

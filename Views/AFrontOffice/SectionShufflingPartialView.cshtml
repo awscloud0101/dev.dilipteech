@@ -1,0 +1,416 @@
+﻿@model AsteriskBrowserAL.Models.SectionShufflingViewModel
+<br />
+<div class="row">
+    <div class="col-sm-12">
+        <div class="col-sm-6">
+            <div class="widget-box"  style="border-top:3px solid #52A9CD;">
+                <div class="widget-header widget-header-flat" style="background:white;height:40px;padding:10px;">
+                    <p class="box-title col-xs-6">
+                        <select id="SectionOneId" name="SectionOneId" class="form-control"></select>
+                    </p>
+                    <input class="btn btn-info btn-minier " type="button" name="button" id="RightTransfer" style="float:right;" value=">>" />
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @*<div class="box-body table-responsive no-padding">*@
+                        <div class="box-body" style="overflow: auto;  height:300px ">
+                            <div id="TransferClass">
+
+                                @Html.Partial("SectionShufflingTransferClassPartialView", Model.TransferStudents)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6">
+            @*<div class="box">
+                <div class="box-header">
+                    <input class="btn btn-primary col-xs-1 " type="button" name="button" id="LeftTransfer" value="<<" />
+                    <h3 class="box-title col-xs-6 pull-right"><select id="SectionTwoId" name="SectionTwoId" class="form-control"></select></h3>
+                </div>*@<!-- /.box-header -->
+            <div class="widget-box"  style="border-top:3px solid #52A9CD;">
+                <div class="widget-header widget-header-flat widget-header-small" style="background:white;height:40px;padding:10px;">
+                    <p class="box-title col-xs-6">
+                        <select id="SectionTwoId" name="SectionTwoId" class="form-control"></select>
+                    </p>
+
+                    <input class="btn btn-info btn-minier " type="button" name="button" id="LeftTransfer" style="float:right;" value="<<" />
+
+                    @*<h3 class="box-title col-xs-6 pull-right"><select id="SectionTwoId" name="SectionTwoId" class="form-control"></select></h3>*@
+                </div>
+                @*<div class="box-body table-responsive no-padding">
+                    </div>*@
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="box-body" style="overflow: auto;  height:300px ">
+                            <div id="ToBeTransferedClass">
+                                @Html.Partial("SectionShufflingTransferedClassPartialView", Model.TransferedStudents)
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="SelSectionOneStudentId" />
+<input type="hidden" id="SelSectionTwoStudentId" />
+<input type="hidden" id="SelSectionOneRow" />
+<input type="hidden" id="SelSectionTwoRow" />
+
+<input type="hidden" id="SelSectionOneStudents" />
+<input type="hidden" id="SelSectionTwoStudents" />
+
+<script>
+
+
+    //on Class Changed
+    $("#ClassNumberId").change(function () {
+        document.getElementById("ErrorId").innerHTML = "";
+        GetSectionOneDropDown()
+    })
+
+
+    //1st Section Dropdown
+    function GetSectionOneDropDown() {
+        $("#SectionOneId").html("")
+        $("#SectionTwoId").html("")
+        $("#TransferClass").html("")
+        $("#ToBeTransferedClass").html("")
+
+        var ClassNumber = $("#ClassNumberId").val();
+        var SelTransferId = $("#SelTransferId").val();
+        if (ClassNumber > 0) {
+            $.ajax({
+                //  url: '/AFrontOffice/GetSectionDropDown',
+                url: '/AFrontOffice/GetSectionDropDownByClassNumber',
+                data: { nClassNumber: ClassNumber },
+                success: function (Data) {
+                    var SectionDRP = $('#SectionOneId')
+                    SectionDRP.children().remove();
+                    SectionDRP.append($("<option>").val("").text("--Select--"))
+                    $.each(Data, function (i, record) {
+                        SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                    });
+                    $('#SectionOneId').append(SectionDRP);
+                },
+                async: false
+            })
+        }
+
+    }
+
+
+    //Section one Dropdown Changed
+    $("#SectionOneId").change(function () {
+        $('#Validation').html("");
+        document.getElementById("ErrorId").innerHTML = "";
+        document.getElementById("SelSectionOneStudents").value = "";
+        $("#SectionTwoId").html("")
+        $("#ToBeTransferedClass").html("")
+
+        LoadSectionTwoDropdown();
+        GetTransferStudents();
+    })
+
+    //Section two Dropdown Changed
+    $("#SectionTwoId").change(function () {
+        document.getElementById("ErrorId").innerHTML = "";
+        document.getElementById("SelSectionTwoStudents").value = "";
+        GetTransferedStudents();
+    })
+
+    //2nd Section Dropdown
+    function LoadSectionTwoDropdown() {
+        var ClassNumber = $("#ClassNumberId").val();
+        var SelTransferClass = $("#SectionOneId").val();
+        var SelTransferedId = $("#SelTransferedId").val();
+
+        if (SelTransferClass > 0) {
+
+            $.ajax({
+                url: '/AStudent/GetTransferedSectionDropDownBySectionId',
+                data: { nClassNumber: ClassNumber, SelSection: SelTransferClass },
+                success: function (Data) {
+                    var SectionDRP = $('#SectionTwoId')
+                    SectionDRP.children().remove();
+                    SectionDRP.append($("<option>").val("").text("--Select--"))
+                    $.each(Data, function (i, record) {
+                        SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                    });
+                    $('#SectionTwoId').append(SectionDRP);
+                    if (SelTransferedId > 0) {
+                        document.getElementById("SectionTwoId").value = SelTransferedId;
+                        GetTransferedStudents();
+                    }
+                },
+                async: false
+            })
+        }
+    }
+
+
+    //1st Section Students
+    function GetTransferStudents() {
+        var SelTransferClass = $("#SectionOneId").val();
+        if (SelTransferClass > 0) {
+            $("imagemodal").show()
+            $.ajax({
+                url: '/AFrontOffice/GetTransferStudents',
+                data: { SectionId: SelTransferClass },
+                success: function (result) {
+                    $("#TransferClass").html(result)
+                }, async: false,
+                error: function () {
+                    $("imagemodal").hide()
+                }
+            }).done(function () {
+                $("imagemodal").hide()
+            })
+        }
+        else {
+            $("#TransferClass").html("")
+        }
+
+    }
+
+    //2nd Section Students
+    function GetTransferedStudents() {
+        var SelTransferClass = $("#SectionTwoId").val();
+        if (SelTransferClass > 0) {
+            $.ajax({
+                url: '/AFrontOffice/GetTransferedStudents',
+                data: { SectionId: SelTransferClass },
+                success: function (result) {
+                    $("#ToBeTransferedClass").html(result)
+                },
+                error: function () {
+                    $("imagemodal").hide()
+                }
+            }).done(function () {
+                $("imagemodal").hide()
+            })
+
+        }
+        else {
+            $("#ToBeTransferedClass").html("")
+        }
+    }
+
+
+    //Validation
+    function Validation() {
+        var isValid = true;
+        var validation = "Please Select "
+        var SectionOneId = $("#SectionOneId").val();
+        var SectionTwoId = $("#SectionTwoId").val();
+        var ClassNumberId = $("#ClassNumberId").val();
+        if (ClassNumberId < 1) {
+            isValid = false;
+            validation += "Class,"
+        }
+        if (SectionOneId < 1 || SectionTwoId < 1) {
+            isValid = false;
+            validation += "Section,"
+        }
+        if (isValid == false) {
+            document.getElementById("ErrorId").innerHTML = validation;
+        }
+        return isValid;
+
+    }
+
+
+    //on Right Arrows Click event
+    $("#RightTransfer").click(function () {
+        debugger
+
+        var IsValid = true;
+        IsValid = Validation()
+        if (IsValid == true) {
+            TransferRightSideStudents()
+
+        }
+    })
+
+
+    //on Left Arrows Click event
+    $("#LeftTransfer").click(function () {
+        debugger
+
+        var IsValid = true;
+        IsValid = Validation()
+        if (IsValid == true) {
+            TransferLeftSideStudents()
+        }
+    })
+
+
+    //Transfering Section one students
+    function TransferRightSideStudents() {
+        var SectionOneId = $("#SectionOneId").val();
+        var SectionTwoId = $("#SectionTwoId").val();
+        var ClassNumberId = $("#ClassNumberId").val();
+        var SelectedRow = document.getElementById("SelSectionOneRow").value
+        var SelStudent = $("#SelSectionOneStudentId").val();
+        if (SectionOneId > 0 && SectionTwoId > 0 && ClassNumberId > 0 && SelStudent > 0) {
+            document.getElementById("SelSectionOneStudents").value += SelStudent + ","
+            $('#TableTwo tbody').append('<tr>' + SelectedRow + '</tr>');
+            $("#" + SelStudent).closest('tr').remove();
+
+
+            sortTable($('#TableTwo'), 'asc');
+            sortTable($('#TableOne'), 'asc');
+
+            $("#TableOne tr").each(function (index) {
+                if (index != 0) {
+                    $(this).find("td:first").html(index + "");
+                    $(this).find("td:last").html(index + "");
+                }
+            });
+
+            $("#TableTwo tr").each(function (index) {
+                if (index != 0) {
+                    $(this).find("td:first").html(index + "");
+                    $(this).find("td:last").html(index + "");
+
+                }
+            });
+
+        }
+    }
+
+
+    //Transfering Section two students
+    function TransferLeftSideStudents() {
+        var SectionOneId = $("#SectionOneId").val();
+        var SectionTwoId = $("#SectionTwoId").val();
+        var ClassNumberId = $("#ClassNumberId").val();
+        var SelectedRow = document.getElementById("SelSectionTwoRow").value//Selected Row
+        var SelStudent = $("#SelSectionTwoStudentId").val();//Selected StudentId
+
+
+        if (SectionOneId > 0 && SectionTwoId > 0 && ClassNumberId > 0 && SelStudent > 0) {
+
+            document.getElementById("SelSectionTwoStudents").value += SelStudent + ","//Appending Selected Students
+
+            $('#TableOne tbody').append('<tr>' + SelectedRow + '</tr>');//Adding Selected Row to the 1st Section Table
+            $("#" + SelStudent).closest('tr').remove();//Removing Selected Row to the 2st Section Table
+
+            sortTable($('#TableTwo'), 'asc');
+            sortTable($('#TableOne'), 'asc');
+
+
+
+            //Updating the Roll numbers and SNo in Section one Table
+            $("#TableTwo tr").each(function (index) {
+                if (index != 0) {
+                    $(this).find("td:first").html(index + "");
+                    $(this).find("tr:last").html(index + "");
+
+                }
+            });
+
+            //Updating the Roll numbers and SNo in Section two Table
+            $("#TableOne tr").each(function (index) {
+                if (index != 0) {
+                    $(this).find("td:first").html(index + "");
+                    $(this).find("td:last").html(index + "");
+
+                }
+            });
+
+        }
+    }
+
+    function sortTable(table, order) {
+
+        tbody = table.find('tbody');
+
+        tbody.find('tr').sort(function (a, b) {
+
+            return $('td:nth-child(2)', a).text().localeCompare($('td:nth-child(2)', b).text());
+        }).appendTo(tbody);
+    }
+
+
+
+
+    //Updating the Selected Row in 1st Section
+    $(document).on("click", "#TableOne tr", function (e) {
+        var row = $(this).closest('tr').html();
+        var SelectedTrId = $(this).attr('id');
+        $("#TableOne tbody tr").css('background-color', 'white');
+
+        $("#" + SelectedTrId).css('background-color', '#ccc');
+        document.getElementById("SelSectionOneStudentId").value = $(this).attr('id');
+        document.getElementById("SelSectionOneRow").value = row
+    });
+
+
+    //Updating the Selected Row in 2nd Section
+    $(document).on("click", "#TableTwo tr", function (e) {
+        var row = $(this).closest('tr').html();
+        var SelectedTrId = $(this).attr('id');
+        $("#TableTwo tbody tr").css('background-color', 'white');
+
+        $("#" + SelectedTrId).css('background-color', '#ccc');
+        document.getElementById("SelSectionTwoStudentId").value = $(this).attr('id');
+        document.getElementById("SelSectionTwoRow").value = row
+    });
+
+
+
+
+
+
+    $("#Transfer").click(function () {
+        TransferStudent();
+    })
+
+    function TransferStudent() {
+
+        var IsValid = true;
+        IsValid = Validation()
+
+        var SelectedSectionOneStudents = document.getElementById("SelSectionOneStudents").value
+        var SelectedSectionTwoStudents = document.getElementById("SelSectionTwoStudents").value
+        var SectionOneId = $("#SectionOneId").val();
+        var SectionTwoId = $("#SectionTwoId").val();
+
+        if (IsValid == true) {
+            if (SelectedSectionOneStudents != "" || SelectedSectionTwoStudents != "") {
+                $('#imagemodal').show();
+                $.ajax({
+                    url: '/AStudent/ShuffleStudentGMS',
+                    data: { strSectionOneTransferStudents: SelectedSectionOneStudents, strSectionTwoTransferStudents: SelectedSectionTwoStudents, nSectionOneId: SectionOneId, nSectionTwoId: SectionTwoId },
+                    success: function (result) {
+                        $('#Validation').html("Data saved.");
+                        GetSectionOneDropDown();
+                    },
+                    error: function () {
+                        $('#imagemodal').hide();
+                    }
+
+                }).done(function () {
+                    $('#imagemodal').hide();
+                })
+            }
+            else {
+                document.getElementById("ErrorId").innerHTML = "Please shuffle the student(s)";
+            }
+
+
+        }
+    }
+
+
+
+</script>
+

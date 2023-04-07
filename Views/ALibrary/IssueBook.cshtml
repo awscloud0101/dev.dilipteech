@@ -1,0 +1,420 @@
+﻿@model AsteriskBrowserAL.Models.SearchedBookData
+@{
+    ViewBag.Title = "Issue Books";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">IssueBooks</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            @*<h3>@Html.ActionLink("Issue Book", "IssueBook")</h3>*@
+        </div>
+    </div>
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("IssueBook", "ALibrary", FormMethod.Post))
+            {
+                if (null != TempData["IssueBook"])
+                {
+                    <span style="color: red;">@TempData["Issuebook"] </span>
+                }
+
+                <input type="hidden" id="SelClassId" value="@Model.ClassId" />
+                <input type="hidden" id="SelSectionId" value="@Model.SectionId" />
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Issue Books</span>
+
+
+                </div>
+
+
+                <div class="widget-box">
+               
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row" id="ClassSectionDiv">
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Class</label>
+                                        <div class="col-sm-6">
+                                            <select id="ClassId" name="ClassId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                        <div class="col-sm-6">
+                                            <select id="SectionId" name="SectionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br><br>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Book Title</label>
+                                        <div class="col-sm-6">
+                                            @*@Html.DropDownList("MasterBook", null, "--Select --", new { id = "MasterBookId", @class = "form-control select2" })*@
+                                            <input type="text" name="MasterBookId" id="MasterBookId" spellcheck="false" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Bar Code Number</label>@*Accession Number /*@ 
+                                        <div class="col-sm-6">
+                                            <input type="text" name="BookDetailsId" id="BookDetailsId" spellcheck="false" class="form-control" />
+                                            @*@Html.DropDownList("BookDetails", null, "--Select --", new { id = "BookDetailsId", @class = "form-control select2" })*@
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <br />
+                            <span style="color:red">Note: If you want to issue book to student then Please select Class and Section First to proceed.</span>
+                           
+                                
+                            @*<div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Author</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownList("Author", null, "--Select --", new { id = "AuthorId", @class = "form-control select2" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Publication</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownList("Publication", null, "--Select --", new { id = "PublicationId", @class = "form-control select2" })
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>*@
+                        </div>
+                    </div>
+                </div>
+                <br />
+
+                <div id="BookDetailsData"></div>
+
+            }
+
+        </div>
+    </div>
+
+</section>
+
+
+<script type="text/javascript">
+
+    window.onload = GetData()
+
+    function GetData() {
+        debugger
+
+        var ClassId = $('#SelClassId').val();
+        var SectionId = $('#SelSectionId').val();
+        LoadCourseDropdown(ClassId);
+        //GetSectionDropDown(ClassNumber);
+        GetSectionDropDown(ClassId, SectionId);
+       
+        
+    }
+
+
+    function LoadCourseDropdown(ClassId) {
+        debugger
+        $.ajax({
+            url: '/AFrontOffice/GetClassData',
+            success: function (result) {
+                CourseList = $("#ClassId")
+                CourseList.children().remove();
+                CourseList.append($("<option>").val("").text("--Select--"))
+                $.each(result, function (e, record) {
+                    CourseList.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(CourseList)
+                if (ClassId > 0)
+                {
+                    $("#ClassId").val(ClassId);
+                }
+
+            },
+            async: false,
+        })
+    }
+    $("#ClassId").change(function () {
+        debugger
+        $('#Search').html('')
+        $('#Student').val('')
+        $('#SectionId').val('');
+        $('#UserCategoryId').val('').trigger('change.select2');
+        $('#MasterBookId').val('').trigger('change.select2');
+        $('#BookDetailsId').val('').trigger('change.select2');
+        $('#SearchStudent').hide();
+        $('#SearchTeacher').hide();
+        $('#Date').val('');
+        var Date = $('#Date').val()
+        var ClassId = $("#ClassId").val();
+        if (ClassId > 0) {
+            GetSectionDropDown(ClassId);
+        }
+        else {
+        }
+    })
+
+
+    function GetSectionDropDown(ClassNumber,SectionId) {
+
+        $.ajax({
+            url: '/AFrontOffice/GetSectionDropDown',
+            data: { nClassNumber: ClassNumber },
+            success: function (Data) {
+                var SectionDRP = $('#SectionId')
+                SectionDRP.children().remove();
+                SectionDRP.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+                $('#SectionId').append(SectionDRP);
+                if (SectionId > 0)
+                {
+                    $('#SectionId').val(SectionId);
+                }
+                
+            },
+            async: false,
+        })
+    }
+
+</script>
+
+<script>
+    function ResetValues() {
+        debugger
+        //$('#MasterBookId').val(0);
+        //$('#BookDetailsId').val(0);
+        //$('#AuthorId').val(0);
+        //$('#PublicationId').val(0);
+
+        //$('#MasterBookId').val('').trigger('change.select2');
+        //$('#BookDetailsId').val('').trigger('change.select2');
+        //$('#AuthorId').val('').trigger('change.select2');
+        //$('#PublicationId').val('').trigger('change.select2');
+    }
+
+    //$('#MasterBookId').change(function () {
+    //    debugger
+    //    //ResetValues();
+    //    //$('#BookDetailsId').val(0);
+    //    //$('#AuthorId').val(0);
+    //    //$('#PublicationId').val(0);
+    //    //$('#BookDetailsId').val('').trigger('change.select2');
+    //    $('#AuthorId').val('').trigger('change.select2');
+    //    $('#PublicationId').val('').trigger('change.select2');
+    //    GetBookDetails();
+    //})
+
+    $('#PublicationId').change(function () {
+        debugger
+        //ResetValues();
+        //$('#MasterBookId').val(0);
+        //$('#BookDetailsId').val(0);
+        //$('#AuthorId').val(0);
+        //$('#MasterBookId').val('').trigger('change.select2');
+    //    $('#BookDetailsId').val('').trigger('change.select2');
+     //   $('#AuthorId').val('').trigger('change.select2');
+       // GetBookDetails();
+    })
+
+    $('#AuthorId').change(function () {
+        debugger
+        //$('#MasterBookId').val(0);
+        //$('#BookDetailsId').val(0);
+        //$('#PublicationId').val(0);
+
+        //$('#MasterBookId').val('').trigger('change.select2');
+     ////   $('#BookDetailsId').val('').trigger('change.select2');
+      //  $('#PublicationId').val('').trigger('change.select2');
+      //  GetBookDetails();
+    })
+
+    //$('#BookDetailsId').change(function () {
+    //    debugger
+    //    // ResetValues();
+    //    //$('#AuthorId').val(0);
+    //    //$('#MasterBookId').val(0);
+    //    //$('#PublicationId').val(0);
+
+    //    $('#MasterBookId').val('').trigger('change.select2');
+    //    $('#AuthorId').val('').trigger('change.select2');
+    //    $('#PublicationId').val('').trigger('change.select2');
+    //    GetBookDetails();
+    //})
+
+    function GetBookDetails( bookid, bookcode) {
+        debugger
+        $('#BookDetailsData').html("");
+
+        var SectionId = $('#SectionId').val();
+        var ClassId = $('#ClassId').val();
+
+        if (bookid > 0 || bookcode > 0 ) {
+            $.ajax({
+                url: '/ALibrary/GetBooksDetialsToIssue',
+                data: { MasterBookId: bookid, BookDetailsId: bookcode, PublicationId: 0, AuthorId: 0, SectionId: SectionId, ClassId: ClassId },
+                success: function (data) {
+                    $('#BookDetailsData').html(data);
+                }
+
+            })
+        }
+    }
+
+   
+    //$('#MasterBookId').click(function () {
+    //    debugger
+    //    $('#BookDetailsId').val('');
+    //    $('#AuthorId').val('');
+    //    $('#PublicationId').val('');
+    //})
+    //$('#BookDetailsId').click(function () {
+    //    debugger
+    //    $('#MasterBookId').val('');
+    //    $('#AuthorId').val('');
+    //    $('#PublicationId').val('');
+    //})
+    //$('#AuthorId').click(function () {
+    //    debugger
+    //    $('#MasterBookId').val('');
+    //    $('#BookDetailsId').val('');
+    //    $('#PublicationId').val('');
+    //})
+    //$('#PublicationId').click(function () {
+    //    debugger
+    //    $('#MasterBookId').val('');
+    //    $('#BookDetailsId').val('');
+    //    $('#AuthorId').val('');
+    //})
+</script>
+<script type="text/javascript">
+    $("#MasterBookId").autocomplete(
+       {
+           source: function (request, response) {
+
+
+
+               if (request.term.length < 3) {
+                   return;
+               }
+               $("#BookDetailsId").val('')
+               $('#imagemodal').show();
+               $('#BookDetailsData').html('')
+               $.ajax({
+                   url: "/ALibrary/GetAllBooks",
+                   type: "POST",
+                   dataType: "json",
+                   data: {
+                       strVal: request.term
+                   },
+                   success: function (json) {
+                       debugger;
+                       response($.map(json, function (jsondata, id) {
+                           return {
+                               label: jsondata.BookName,
+                               value: jsondata.BookName,
+                               id: jsondata.MasterBookId,
+                           };
+                       }));
+                       $('#imagemodal').hide();
+                   },
+               });
+           },
+           minLength: 1,
+           select: function SelectEvent(event, ui) {
+
+               Bookid = ui.item.id;
+               GetBookDetails(Bookid,0);
+              // (ui.item.value, "BookCode");
+           }
+        });
+
+    $("#BookDetailsId").autocomplete(
+      {
+          source: function (request, response) {
+
+              if (request.term.length < 1) {
+                  return;
+              }
+              $("#MasterBookId").val('');
+              $('#imagemodal').show();
+              $('#BookDetailsData').html('')
+              $.ajax({
+                  url: "/ALibrary/GetBookCodeToIssueBooks",
+                  type: "POST",
+                  dataType: "json",
+                  data: {
+                      strVal: request.term
+                  },
+                  success: function (json) {
+                      debugger;
+                      response($.map(json, function (jsondata, id) {
+                          return {
+                              label: jsondata.BarCode,
+                              value: jsondata.BarCode,
+                              id: jsondata.BookDetailsId,
+                          };
+                      }));
+                      $('#imagemodal').hide();
+                  },
+              });
+          },
+          minLength: 1,
+          select: function SelectEvent(event, ui) {
+
+              BookDetailid = ui.item.id;
+              GetBookDetails(0, BookDetailid);
+              // (ui.item.value, "BookCode");
+          }
+      });
+</script>
+

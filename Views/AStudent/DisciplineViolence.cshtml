@@ -1,0 +1,153 @@
+﻿
+@model IEnumerable<AsteriskBrowserAL.Models.DisciplineViolenceModel>
+
+@{
+    ViewBag.Title = "DisciplineViolence";
+
+    if (ViewBag.IsParent == false) {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else {
+        Layout = "~/Views/Shared/Parent_Layout.cshtml";
+    }
+}
+@if (ViewBag.IsParent == false)
+{
+    @section BreadCrumb{
+        <ul class="breadcrumb">
+            <li>
+                <i class="menu-icon fa fa-list"></i>
+                Academics
+            </li>
+            <li>
+                <i class=""></i>
+                Student
+            </li>
+            <li class="active">Discipline Violation</li>
+        </ul><!-- /.breadcrumb -->
+    }
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+
+<section class="content">
+
+    @if (Model != null)
+    {
+        int nsno = 1;
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="table-header">
+                    Discipline Violation
+                    @if (ViewBag.IsParent == false)
+    {
+                <div class="widget-toolbar no-border">
+                    <div class="inline action-buttons">
+                        <a class="view-header-btn  btn btn-info btn-xs P2" href="@Url.Action("DisciplineViolenceC", "AStudent")" role="button" id="New" style="float:right" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+                    </div>
+                </div>
+}
+                </div><!-- /.box-header -->
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Send By")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Send To")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Subject")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Content")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Date")
+                            </th>
+                            @if (ViewBag.IsParent == false)
+                            {
+                                <th> </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td> @(nsno++) </td>
+                                <td> @item.SentBy </td>
+                                <td> @item.SentTo </td>
+                                <td> @item.Subject </td>
+                                <td> @item.Content </td>
+                                <td> @item.FirstInserted </td>
+                                @if (ViewBag.IsParent == false)
+                                {
+                                    <td>
+                                        <div class="hidden-sm hidden-xs action-buttons">
+                                            <a class="green P2" href="@Url.Action("DisciplineViolenceC", "AStudent", new { DisciplineId = item.Id })">
+                                                <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                            </a>
+                                            <a class="red P2" onclick="btnConfirm(@item.Id)">
+                                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+    }
+    else
+    {
+        <div class="table-header">
+            Holidays
+            <a class="view-header-btn btn btn-info btn-xs P2" style="float:right" href="@Url.Action("DisciplineViolenceC", "AStudent")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+        </div>
+        <span style="color: red;"><b>No Records Found</b></span>
+    }
+
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/AStudent/ValidationDisciplineD',
+                data: { DisciplineId: Value },
+                success: function (data) {
+                    var url = '/AStudent/DisciplineViolenceD?DisciplineId=' + Value;
+                    var title = "Discipline Violence";
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>

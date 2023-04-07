@@ -1,0 +1,295 @@
+﻿@model AsteriskBrowserAL.Models.StaffBiomtricAttendanceReportData
+
+@{
+    ViewBag.Title = "Staff Biomtric Attendance Report";
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Staff
+        </li>
+        <li class="active">Staff Biomtric Attendance Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+   
+
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ExcelBiometrcAttendanceReportDT", "HRBiometric", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                    <input type="hidden" id="SelSubId" value="@Model.SubscriptionId" />
+                    <input type="hidden" id="SelMonth" value="@Model.MonthValue" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Biometric Attendance</span>
+               
+                            <div class="" style="float:right;">
+                                <a class="P2" id="ViewData" value="View Data" name="ViewData" onclick="return submitForm();"><span class="btncustom">View Data</span></a>
+                            </div>
+                    
+
+
+                    </div>
+
+
+                    <div class="widget-box">
+                    
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+
+
+                                @if (Model.IsCentral)
+                                        {
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="col-xs-6">
+                            <label class="col-sm-4">Division</label>
+                            <div class="col-sm-6">
+                                @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <label class="col-sm-4">Branch</label>
+                            <div class="col-sm-6">
+                                <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                                        }
+                            <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4 control-label no-padding-right">@Html.Label("Month")</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.MonthYear, new SelectList(Model.ListMonths, "MonthValue", "MonthName"), "--- Select ---", new { @class = "form-control", @id = "MonthValue" })
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4 control-label no-padding-right">@Html.Label("Department")</label>
+                                            <div class="col-sm-6">
+                                                @Html.DropDownListFor(model => model.DepartmentId, new SelectList(Model.lstDepartments, "DepartmentId", "DepartmentName"), " All ", new { @class = "form-control", @id = "DepartmentId" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                }
+
+                <div id="SearchData"></div>
+
+
+            }
+        </div>
+    </div>
+
+
+
+
+
+           
+                    
+</section>
+
+
+<script type="text/javascript">
+
+    var DisplayValidation = "";
+
+    $(document).ready(function () {
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0)
+        {
+            LoadBranches();
+        }
+
+
+
+
+    });
+
+    $('#BranchId').change(function () {
+        $('#SearchData').html("");
+    });
+
+    $('#MonthValue').change(function () {
+        $('#SearchData').html("");
+    });
+
+    $('#DivisionId').change(function () {
+        $('#SearchData').html("");
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            LoadBranches()
+        }
+    });
+
+    function LoadBranches()
+    {
+        var DivisionId = $('#DivisionId').val();
+
+        $.ajax({
+
+            url: '/Common/GetBranchesByDivisionId',
+            data: { DivisionId: DivisionId },
+            success: function (data) {
+
+                var BranchItems = $('#BranchId');
+
+                BranchItems.children().remove();
+
+                BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+                    BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                });
+
+                $('#BranchId').append(BranchItems);
+
+
+                var SelSubId = $('#SelSubId').val();
+
+                if(SelSubId > 0)
+                {
+                    $('#BranchId').val(SelSubId);
+
+                    var SelMonth = $('#MonthValue').val();
+
+                    if(SelMonth != "")
+                    {
+                        GetData();
+                    }
+
+                }
+
+            },
+            aync: false
+        });
+    }
+
+
+    function submitForm() {
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        var Validation = ValidatePettyCashDaySheet();
+
+        if (Validation == false) {
+
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+            GetData();
+        }
+    }
+
+    function GetData()
+    {
+        var IsCentral = $('#IsCentral').val();
+        if (IsCentral == "value")
+            IsCentral = "true";
+        $.ajax({
+            url: '/HRBiometric/GetBiometricAttendanceReportData',
+            data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), MonthValue: $('#MonthValue').val(), IsCentral: IsCentral, DepartmentId: $('#DepartmentId').val() },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#SearchData').html(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function ValidatePettyCashDaySheet() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+        var CurentMonth = $('#MonthValue').val();
+        if (CurentMonth == "") {
+            valid = false;
+            DisplayValidation += "MonthValue, ";
+        }
+
+        return valid;
+
+    };
+
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+

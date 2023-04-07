@@ -1,0 +1,76 @@
+﻿
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Tally
+        </li>
+        <li class="active">Move To Tally</li>
+    </ul><!-- /.breadcrumb -->
+
+}
+
+<div id="PartialView">
+
+</div>
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <div class="space-6"></div>
+    <p class="bigger-120 bolder center grey">
+        <i class='ace-icon fa fa-hand-o-right blue bigger-120'></i>&nbsp; Data Saved
+    </p>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        Reload();
+    });
+
+    function Reload() {
+        $.ajax({
+            url: '/FOperations/TallyDataPartial',
+            success: function (data) {
+                var IsChecked = $('.check').prop('checked')
+                if (IsChecked != true) {
+                    $('#PartialView').html(data)
+                    setTimeout('Reload()', 3000);
+                }
+            },
+            aync: false
+        });
+    }
+
+    function DataSave() {
+        $('#dValidation').html();
+        $("#dialog-confirm").removeClass('hide').dialog({
+            resizable: false,
+            draggable: false,
+            width: '320',
+            modal: true,
+            title: 'Download',
+            title_html: true,
+            open: function (event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            buttons: [{
+                html: "OK",
+                "class": "btn btn-info btn-minier",
+                click: function () {
+                    $(this).dialog("close");
+                    location.reload();
+                }
+            }]
+        });
+    }
+</script>

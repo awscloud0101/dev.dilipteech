@@ -1,0 +1,233 @@
+﻿@model AsteriskBrowserAL.Models.BiometricStaffAttendance
+
+@{
+    ViewBag.Title = "Staff Biomtric Attendance Report";
+    string MonthName = "";
+
+    if (null != Model)
+    {
+        MonthName = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Model.Month);
+    }
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Reports
+        </li>
+        <li>
+            <i class=""></i>
+            Biometric
+        </li>
+        <li class="active">Staff Biomtric Attendance Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DataTableScripts", "Base")
+
+<section class="content">
+  
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("BiometricStaffInAndOutTimings", "HRBiometric", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+
+                    <div class="table-header">
+            
+                            Biometric Attendance Details
+                            <small style="float:right;" class="textheader">
+                                @Html.ActionLink("Back to details", "BiometrcAttendanceReport") @*new { DivisionId = Model.DivisionId, SubId = Model.SubscriptionId, MonthValue = Model.MonthValue })*@
+                            </small>
+                   
+                    </div><!-- /.page-header -->
+
+
+                          
+
+                    <div class="table-header">
+                       <span>
+                           <b style="color:white">Staff Name :</b> @Model.StaffName  &nbsp;  &nbsp;  &nbsp; &nbsp;
+                           <b style="color:white"> Month & Year : </b>  @(MonthName + " - " + Model.Year)
+                        </span> 
+                    </div>
+
+
+                                <table class="table tbhover table-striped table-bordered dynamic-table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Day
+                                            </th>
+                                            <th>
+                                                In Time
+                                            </th>
+
+                                            <th>Out Time</th>
+                                            <th>Remarks</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @foreach (var item in Model.lstData)
+                                        {
+
+                                            <tr>
+                                                <td>
+                                                    @item.Days
+                                                </td>
+                                                <td>@item.Intime</td>
+                                                <td>@item.OutTime</td>
+                                                <td>@item.LoggedTimings</td>
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+
+
+                }
+
+            }
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    var DisplayValidation = "";
+
+    $('#DivisionId').change(function () {
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    function submitForm() {
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        var Validation = ValidatePettyCashDaySheet();
+
+        if (Validation == false) {
+
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+
+            var IsCentral = $('#IsCentral').val();
+            if (IsCentral == "value")
+                IsCentral = "true";
+            $.ajax({
+                url: '/HRBiometric/GetBiometricAttendanceReportData',
+                data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), MonthValue: $('#MonthValue').val(), IsCentral: IsCentral },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#SearchData').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+    function ValidatePettyCashDaySheet() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+        var CurentMonth = $('#MonthValue').val();
+        if (CurentMonth == "") {
+            valid = false;
+            DisplayValidation += "MonthValue, ";
+        }
+
+        return valid;
+
+    };
+
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

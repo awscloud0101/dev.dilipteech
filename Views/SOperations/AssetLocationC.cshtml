@@ -1,0 +1,227 @@
+﻿@model AsteriskBrowserAL.AssetLocation
+@{
+    ViewBag.Title = "AssetLocationC";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-shopping-cart"></i>
+            Inventory&Assests
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Asset Location</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("AssetLocationC", "SOperations", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <div class="box">
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("AssetLocation")</span>
+
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;"> Asset Location</span>
+                        <div class="" style="float:right;">
+                            <small style="float:right;" class="textheader">
+                                @Html.ActionLink("Back to details", "AssetLocation")
+                            </small>
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+                    <!-- form start -->
+                    <div class="widget-box row" style="padding:10px">
+
+                        <form class="form-horizontal" role="form">
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="box-body">
+
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary(true)
+                                <span style="color: red;">@Html.ValidationMessage("Asset Location")</span>
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Asset Room")</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.AssetRoom, new { @class = "form-control", @id = "AssetRoom", @onchange = "removeError();", placeholder = "Asset Room" })
+                                    </div>
+
+                                    <div class="col-sm-5" style="display:none;" id="vAssetRoom">
+                                        <label style="color:red;font-weight:bold;">Required </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Asset Place")</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.AssetPlace, new { @class = "form-control", @id = "AssetPlace", @onchange = "removeError();", placeholder = "Asset Place" })
+                                    </div>
+
+                                    <div class="col-sm-5" style="display:none;" id="vAssetPlace">
+                                        <label style="color:red;font-weight:bold;"> Required </label>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(model => model.Description, new { @class = "form-control", @id = "Description", @onchange = "removeError();", placeholder = "Description" })
+                                    </div>
+
+                                    <div class="col-sm-5" style="display:none;" id="vDescription">
+                                        <label style="color:red;font-weight:bold;"> Required </label>
+                                    </div>
+                                </div>
+
+                              
+                                <div class=" col-md-9">
+                                    <div class="hr hr-18 dotted hr-double"></div>
+                                    <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                        <i class="ace-icon fa fa-check bigger-50"></i>
+                                        Save
+                                    </button>
+                                    &nbsp; &nbsp; &nbsp;
+                                    <button class="btn btn-sm" type="reset" onclick="return resetAssetLocation();">
+                                        <i class=" ace-icon fa fa-undo bigger-50">
+                                        </i>
+                                        Reset
+                                    </button>
+
+                                </div>
+
+
+                            </div>
+                        </form>
+                    </div>
+
+
+                </div>
+            }
+        </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+<script type="text/javascript">
+    function validateAssetLocation() {
+
+        document.getElementById("count").value = "1";
+        var AssetRoom = document.getElementById("AssetRoom").value;
+        var AssetPlace = document.getElementById("AssetPlace").value;
+        var Description = document.getElementById("Description").value;
+        validate = true;
+
+        if (AssetRoom == "") {
+            document.getElementById("vAssetRoom").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("vAssetRoom").style.display = "none";
+        }
+
+        if (AssetPlace == "") {
+            document.getElementById("vAssetPlace").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("vAssetPlace").style.display = "none";
+        }
+
+        if (Description == "") {
+            document.getElementById("vDescription").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("vDescription").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+        var validatestatus = validateAssetLocation();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function resetAssetLocation() {
+        document.getElementById("count").value = "0";
+        document.getElementById("vAssetRoom").style.display = "none";
+        document.getElementById("vAssetPlace").style.display = "none";
+        document.getElementById("vDescription").style.display = "none";
+
+        document.getElementById("AssetRoom").value = "";
+        document.getElementById("AssetPlace").value = "";
+        document.getElementById("Description").value = "";
+
+        return false;
+    };
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+        var AssetPlace = document.getElementById("AssetPlace").value;
+        var Description = document.getElementById("Description").value;
+        var BookRackNumber = document.getElementById("AssetRoom").value;
+
+        if (count != 0) {
+            if (AssetRoom != "") {
+                document.getElementById("vAssetRoom").style.display = "none";
+            } else {
+                document.getElementById("vAssetRoom").style.display = "inline";
+            }
+
+            if (AssetPlace != "") {
+                document.getElementById("vAssetPlace").style.display = "none";
+            } else {
+                document.getElementById("vAssetPlace").style.display = "inline";
+            }
+
+            if (Description != "") {
+                document.getElementById("vDescription").style.display = "none";
+            } else {
+                document.getElementById("vDescription").style.display = "inline";
+            }
+
+        }
+    };
+    $('#AssetRoom').focus(function () {
+        $('#vAssetRoom').hide();
+    })
+    $('#AssetPlace').focus(function () {
+        $('#vAssetPlace').hide();
+    })
+    $('#Description').focus(function () {
+        $('#vDescription').hide();
+    })
+</script>

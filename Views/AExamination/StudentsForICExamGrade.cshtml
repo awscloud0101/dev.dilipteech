@@ -1,0 +1,90 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (Model.lstICExamCycle.Count() > 0)
+{
+    int nsno = 1;
+    <div class="widget-box">
+        <div class="table-header">
+            Records Found (@Model.lstICExamCycle.Count())
+            <div style="float:right;">
+                <button type="submit" name="Save" class="btn btn-info btn-minier P2" style="margin-top:2px">
+                    <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                </button>
+            </div>
+        </div>
+        <!-- form start -->
+        <div class="widget-body">
+            <div class="widget-body table-responsive no-padding">
+                <div class="hideScrolling">
+                    <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                        <thead>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Roll Number")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Legacy Number")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Score")
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.lstICExamCycle.Count(); i++)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.Hidden("lstICExamCycle.Index", (@i + 10))
+                                        @(nsno++)
+                                    </td>
+                                    <td>
+                                        @Html.Hidden("lstICExamCycle[" + (@i + 10) + "].StudentId", Model.lstICExamCycle.ElementAt(i).StudentId)
+                                        @Html.Hidden("lstICExamCycle[" + (@i + 10) + "].ICExamPaperId", Model.lstICExamCycle.ElementAt(i).ICExamPaperId)
+                                        @Model.lstICExamCycle.ElementAt(i).DisplayName
+                                    </td>
+                                    <td>
+                                        @Model.lstICExamCycle.ElementAt(i).RollNumber
+                                    </td>
+                                    <td>
+                                        @Model.lstICExamCycle.ElementAt(i).LegacyNumber
+                                    </td>
+                                    <td>
+                                        @Html.DropDownList("lstICExamCycle[" + (@i + 10) + "].Marks", new SelectList(Model.lstScholasticGrading, "ScholasticsGradePoint", "ScholasticsGrade", Model.lstICExamCycle.ElementAt(i).Marks), "-- select --", new { @class = "form-control", @style = "width:100px" })
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+}
+else
+{
+    <span style="color: red;"><b>No data to display</b></span>
+}
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+</script>
+

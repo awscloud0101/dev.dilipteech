@@ -1,0 +1,290 @@
+﻿@model AsteriskBrowserAL.Models.CoScholasticsResultsData
+
+@{
+
+    ViewBag.Title = "Student Profile";
+
+}
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="~/script/jquery-2.0.3.js"></script>
+<script src="~/script/jquery-ui.js"></script>
+<script src="~/js/jquery-1.10.2.js"></script>
+<script src="~/js/jquery-ui.js"></script>
+
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Co-Sholastic Results</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("PPTCoSholasticResults", "AExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" id="Status" />
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">PPT Co-Scholastic Results</span>
+
+
+                </div>
+                <div class="widget-box">
+           
+                    <div class="widget-body">
+                        <div class="widget-main">
+
+                            @*<div class="box-header">
+                                    <h3 class="box-title">Co-Scholastic Results</h3>
+                                </div>*@
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                    <div class="col-sm-6">
+                                        <select id="Sectionid" name="Sectionid" class="form-control"></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Examination</label>
+                                    <div class="col-sm-6">
+                                        <select id="ExaminationId" name="ExaminationId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Subjects</label>
+                                    <div class="col-sm-6">
+                                        <select id="SubjectId" name="SubjectId" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ExaminationResults"></div>
+                if (null != Model)
+                {
+                    @*<input type="hidden" name="selBranchId" value="@Model.BranchId" />
+                        <input type="hidden" name="selDivisionId" value="@Model.DivisionId" />*@
+                        <input type="hidden" id="selClassNumber" name="selClassNumber" value="@Model.SectionId" />
+                        <input type="hidden" id="selExamId" name="selExamId" value="@Model.ExamId" />
+                        <input type="hidden" id="SelSubjectId" name="selSubjectId" value="@Model.SubjectId" />
+                }
+            }
+
+        </div>
+
+    </div>
+</section>
+
+
+<script>
+
+    function OnloadData() {
+        LoadClassDropdown();
+    }
+
+    function LoadClassDropdown() {
+        var SelClassId = $("#selClassNumber").val();
+        $.ajax({
+            url: '/AExamination/GetSectionsDropDown',
+            success: function (result) {
+
+                var ClassNumberItems = $("#Sectionid")
+                ClassNumberItems.children().remove();
+                ClassNumberItems.append($("<option>").val("null").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    ClassNumberItems.append($("<option>").val(record.SectionId).text(record.SectionCode))
+                });
+
+                $("#Sectionid").append(ClassNumberItems);
+                var SelClassId = $("#selClassNumber").val();
+                if (SelClassId > 0 && SelClassId != null) {
+                    document.getElementById("Sectionid").value = SelClassId;
+                    GetExaminations();
+                }
+            },
+            async: false
+        })
+    }
+
+    $('#Sectionid').change(function () {
+
+        $('#ExaminationId').empty();
+        $('#SubjectId').empty();
+
+        var Sectionid = $('#Sectionid').val();
+
+        if (Sectionid < 1) {
+            $('#ExaminationResults').html("");
+        }
+        else {
+            GetExaminations();
+            $('#ExaminationResults').html("");
+        }
+    });
+
+    $('#SubjectId').change(function () {
+        var ExamId = $('#ExaminationId').val();
+        var Sectionid = $('#Sectionid').val();
+        var SubjectId = $('#SubjectId').val();
+
+        if (SubjectId > 0 && Sectionid > 0 && ExamId > 0)
+        {
+            GetStudentsExaminationsData();
+        }
+    });
+
+    function GetExaminations() {
+        var Sectionid = $('#Sectionid').val();
+
+        if (Sectionid > 0) {
+            $.ajax({
+
+                url: '/AExamination/GetExaminationsForPPTCoscholasticResultsByClassNumber',
+                data: { Sectionid: Sectionid },
+                success: function (data) {
+
+                    var ExaminationItems = $('#ExaminationId');
+
+                    ExaminationItems.children().remove();
+
+                    ExaminationItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        if (record.IsUnitTest == 1)
+                        {
+                            ExaminationItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+                        }
+                    });
+
+                    $('#ExaminationId').append(ExaminationItems);
+                    debugger
+                    var SelExamination = $("#selExamId").val();
+                    if (SelExamination > 0 && SelExamination != null) {
+                        document.getElementById("ExaminationId").value = SelExamination;
+                        LoadSubjects();
+                    }
+
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    $('#ExaminationId').change(function () {
+        //GetStudentsExaminationsData()
+
+        var ExamId = $('#ExaminationId').val();
+        var Sectionid = $('#Sectionid').val();
+
+        if (ExamId > 0) {
+            LoadSubjects()
+        }
+
+    });
+
+    function LoadSubjects() {
+        var ExamId = $('#ExaminationId').val();
+        var Sectionid = $('#Sectionid').val();
+        if (ExamId > 0) {
+            $.ajax({
+
+                url: '/AExamination/GetSubjectsforPPTCoScholasticResults',
+                data: { SectionId: Sectionid, ExamId: ExamId },
+                success: function (data) {
+
+                    var SubjectItems = $('#SubjectId');
+
+                    SubjectItems.children().remove();
+
+                    SubjectItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data.lst, function (i, record) {
+
+                        SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+
+                    });
+
+                    $('#SubjectId').append(SubjectItems);
+
+                    $('#Status').val(data.Status);
+
+                    var SelSubjectId = $("#SelSubjectId").val();
+                    if (SelSubjectId > 0 && SelSubjectId != null) {
+                        document.getElementById("SubjectId").value = SelSubjectId;
+                        GetStudentsExaminationsData();
+                    }
+                },
+                aync: false
+
+            });
+        }
+    }
+
+    function GetStudentsExaminationsData() {
+
+        var ExamId = $("#ExaminationId").val();
+        var SectionId = $("#Sectionid").val();
+        var SubjectId = $("#SubjectId").val();
+        var Status = $("#Status").val();
+
+        if (ExamId < 0 || SectionId < 0 || SubjectId < 0)
+            return;
+
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AExamination/GetStudentsForPPTCoSholasticResults',
+            data: { SectionId: SectionId, ExamId: ExamId, SubjectId: SubjectId, Status: Status },
+            success: function (Data) {
+                $('#ExaminationResults').html(Data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    window.onload = OnloadData();
+</script>

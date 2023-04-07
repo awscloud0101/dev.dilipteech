@@ -1,0 +1,246 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+
+@{
+    ViewBag.Title = "ICExamGrade";
+}
+
+<link href="~/plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<!-- CSS -->
+<style>
+    .ui-widget-header, .ui-state-default, ui-button {
+        background: #3c8dbc;
+        border: 1px solid #3c8dbc;
+        color: #3c8dbc;
+        font-weight: bold;
+    }
+</style>
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-database"></i>
+            <a href="#">Academics</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Examination
+        </li>
+        <li class="active">IC Exam Grade</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+
+            @if (null != Model)
+            {
+                using (Html.BeginForm("ICExamGrade", "AExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    if (null != TempData["ICExamGrade"])
+                    {
+                        <input type="hidden" id="Status" value="@TempData["ICExamGrade"]" />
+                    }
+                    <span style="color:red;font-weight:bold" id="ValidationMsg"></span>
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                IC Exam Grades
+                            </h5>
+                            <div class="widget-toolbar no-border">
+                                <div class="inline dropdown-hover">
+                                    <div class="inline action-buttons">
+                                        <a class="P2" id="btnViewData" value="View Data" name="ViewData" onclick="return submitForm();"><span class="btn btn-info btn-minier">View Data</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="widget-boby">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                        <div class="col-sm-6">
+                                            @if (null != Model.lstSections)
+                                            {
+                                                @Html.DropDownListFor(model => model.SectionId, new SelectList(Model.lstSections, "SectionId", "SectionCode"), "-- Select --", new { @class = "form-control", @id = "SectionId" })
+                                            }
+                                            else
+                                            {
+                                                <select id="SectionId" name="SectionId" class="form-control"></select>
+                                            }
+
+                                        </div>
+                                    </div>
+                                    @*<div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Category</label>
+                                            <div class="col-sm-6">
+                                                @if (null != Model.lstICCategory)
+                                                {
+                                                    @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.lstICCategory, "CategoryId", "CategoryName"), "-- Select --", new { @class = "form-control", id = "CategoryId" })
+                                                }
+                                                else
+                                                {
+                                                    <select id="CategoryId" name="CategoryId" class="form-control"></select>
+                                                }
+                                            </div>
+                                        </div>*@
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">IC Exam</label>
+                                        <div class="col-sm-6">
+                                            @Html.DropDownListFor(model => model.ICExaminationCycleId, new SelectList(Model.lstICExamCycle, "ICExaminationCycleId", "CycleName"), "-- Select --", new { @class = "form-control", @id = "ICExaminationCycleId" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">IC Exam Papers</label>
+                                        <div class="col-sm-6">
+                                            <select id="SubjectId" name="SubjectId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ExaminationResults"></div>
+                }
+            }
+
+        </div>
+    </div>
+    <div id="ValidationMsg" title="IC Marks Entry" style="display:none"></div>
+    <input type="hidden" id="SelSubjectId" value="@Model.SubjectId" />
+
+</section>
+
+
+<script>
+
+    function OnloadData() {
+
+        var Status = $('#Status').val();
+
+        if (Status != undefined) {
+            dialog(Status);
+        }
+    }
+
+
+    $('#SectionId').change(function () {
+        $('#ExaminationResults').html("");
+    })
+
+    $('#ICExaminationCycleId').change(function () {
+        $('#ExaminationResults').html("");
+        GetSubjects();
+    })
+
+    $('#SubjectId').change(function () {
+        $('#ExaminationResults').html("");
+    });
+
+
+
+
+    function GetSubjects() {
+        debugger
+        var ICExaminationCycleId = $('#ICExaminationCycleId').val();
+        var SectionId = $('#SectionId').val()
+        $('#SubjectId').children().remove();
+        if (ICExaminationCycleId > 0) {
+            $.ajax({
+                url: '/AExamination/GetICSubjectsPapers',
+                data: { SectionId: SectionId, },
+                success: function (data) {
+                    var SubjectItems = $('#SubjectId');
+                    SubjectItems.children().remove();
+                    SubjectItems.append($("<option>").val("").text("--- Select ---"));
+                    $.each(data, function (i, record) {
+                        SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+                    });
+                    $('#SubjectId').append(SubjectItems);
+
+
+                    var SelSubjectId = $('#SelSubjectId').val()
+                    if (parseInt(SelSubjectId) > 0) {
+                        $('#SubjectId').val(SelSubjectId)
+                        GetStudentsExamPapersData()
+                    }
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    function submitForm() {
+        var Validation = "Select ";
+        var ValidationResult = true;
+
+        var SectionId = $("#SectionId").val();
+        var CycleId = $("#ICExaminationCycleId").val();
+        var SubjectId = $("#SubjectId").val();
+
+
+        if (parseInt(SectionId) < 1) {
+            Validation += "Section"
+            ValidationResult = false;
+        }
+        if (parseInt(CycleId) < 1) {
+            Validation += "IC Exam"
+            ValidationResult = false;
+        }
+        if (parseInt(SubjectId) < 1) {
+            Validation += "Subject"
+            ValidationResult = false;
+        }
+
+        if (ValidationResult == true) {
+            document.getElementById("ValidationMsg").innerHTML = ''
+            LoadPartialView(SectionId, CycleId, SubjectId)
+        }
+        else {
+            document.getElementById("ValidationMsg").innerHTML = Validation
+            return ValidationResult;
+        }
+    }
+
+    window.onload = OnloadData()
+
+    function OnloadData() {
+        debugger
+        GetSubjects();
+    }
+
+    function LoadPartialView(SectionId, CycleId, SubjectId) {
+        debugger
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AExamination/GetStudentsForICExamGrade',
+            data: { SectionId: SectionId, CycleId: CycleId, SubjectId: SubjectId },
+            success: function (Data) {
+                $('#ExaminationResults').html(Data);
+            },
+            error: function () {
+                $('#imagemodal').hide();
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+</script>

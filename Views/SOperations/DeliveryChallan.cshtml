@@ -1,0 +1,362 @@
+﻿@model AsteriskBrowserAL.Models.DeliveryChallanData
+
+@{
+    ViewBag.Title = "Delivery Challan";
+    int nSno = 1;
+    int bSno = 1;
+    
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Delivery Challan</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<section class="content">
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("DeliveryChallan", "SOperations", FormMethod.Post))
+            {
+
+                if (null != Model)
+                {
+                    <input type="hidden" name="Kit" value="@Model.Kit" />
+                        <input type="hidden" name="DCNumber" value="@Model.DCNumber" />
+                        <input type="hidden" name="SubscriptionId" value="@Model.SubscriptionId" />
+                        <input type="hidden" name="TransferredTo" value="@Model.TransferredTo" />
+                        <input type="hidden" id="IsPrint" value="@Model.IsPrint" />
+                        <input type="hidden" id="Type" value="@Model.Type" />
+                    if (null != Model.lstTransferData && Model.lstTransferData.Count() > 0)
+                    {
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-header">
+                                    Delivery Challan
+                                    <div style="float:right;">
+                                        <button type="submit" id="New" name="New" onclick="return SubmitForm()" class="btn btn-success btn-xs">
+                                            <i class="ace-icon fa fa-floppy-o bigger-80"></i>
+                                            Print
+                                        </button>
+                                    </div>
+                                </div>
+
+
+
+                                <table class="table table-hover table-striped table-bordered">
+                                    @*<table class="table table-striped table-bordered table-hover" style="font-size:14px;">*@
+                                    <thead>
+                                        <tr>
+                                            <th>@("S.No")</th>
+                                            <th>
+                                                @if (Model.Kit == 1)
+                                    {
+                                    @Html.DisplayName("Kit Name")
+                                    }
+                                    else
+                                    {
+                                    @Html.DisplayName("Item Name")
+                                    }
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Transferred Qty")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Remarks")
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+                                    <tbody>
+
+                                        @for (int i = 0; i < Model.lstTransferData.Count(); i++)
+                        {
+                            <tr>
+                                @Html.Hidden("lstTransferData.Index", (@i))
+                                @Html.Hidden("lstTransferData[" + @i + "].InventoryTransferId", Model.lstTransferData.ElementAt(i).InventoryTransferId)
+                                @Html.Hidden("lstTransferData[" + @i + "].InventoryKitId", Model.lstTransferData.ElementAt(i).InventoryKitId)
+                                @Html.Hidden("lstTransferData[" + @i + "].InventoryItemId", Model.lstTransferData.ElementAt(i).InventoryItemId)
+                                @Html.Hidden("lstTransferData[" + @i + "].ItemName", Model.lstTransferData.ElementAt(i).ItemName)
+                                @Html.Hidden("lstTransferData[" + @i + "].KitName", Model.lstTransferData.ElementAt(i).KitName)
+                                @Html.Hidden("lstTransferData[" + @i + "].Quantity", Model.lstTransferData.ElementAt(i).Quantity)
+
+                                @if (Model.lstTransferData.ElementAt(i).TransferDate.HasValue)
+                                    {
+                                    @Html.Hidden("lstTransferData[" + @i + "].TransferDate", Model.lstTransferData.ElementAt(i).TransferDate.Value)
+                                    }
+                                <td>
+                                    @(nSno++)
+                                </td>
+                                <td>
+                                    @if (Model.Kit == 1)
+                                        {
+                                        @Model.lstTransferData.ElementAt(i).KitName
+                                        }
+                                        else
+                                        {
+                                        @Model.lstTransferData.ElementAt(i).ItemName
+                                        }
+                                </td>
+                                <td>
+                                    @Model.lstTransferData.ElementAt(i).Quantity
+                                </td>
+                                <td>
+                                    @Html.TextBox("lstTransferData[" + @i + "].Remarks", Model.lstTransferData.ElementAt(i).Remarks, new { @class = "form-control textlength", @maxlength = "50", @style = "width:200px" })
+                                </td>
+                            </tr>
+                            }
+                                    </tbody>
+                                </table>
+
+
+
+                            </div>
+                        </div>
+                    }
+                    else
+                    {<span style="color: red;"><b>Data not available</b></span> }
+
+                }
+                else
+                {<span style="color: red;"><b>Data not available</b></span> }
+            }
+
+
+        </div>
+
+    </div>
+</section>
+
+
+
+<body>
+    <div id="mydiv" style="display:none">
+
+        @if (null != Model)
+        {
+            if (null != Model.lstTransferData && Model.lstTransferData.Count() > 0 && Model.InstituteDetails != null)
+            {
+                int Sno = 1;
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <img class="col-xs-11" id="avatar" width="50" height="43" src="@Model.InstituteDetails.InstituteLogo" style="margin-bottom:-1.5em;" />
+                        <b style="font-weight:bold; margin-left:0.3em; font-size:20px; font-family:'Segoe UI'">@Model.InstituteDetails.InstituteName</b>
+                    </div>
+                    <div style="margin-left:3.7em; font-family:'Segoe UI'"><b>@Model.InstituteDetails.InstituteAddress</b></div>
+                    <br />
+
+                    <hr style="width:100%; margin-bottom:-0.5em" />
+                    <hr style="width:100%;" />
+                    <div align="center" style="font:12%; font-family:'Segoe UI'"><b>Delivery Challan (@(Model.DisplayDCNumber +" - "+ (Model.TransferDate.HasValue ? Model.TransferDate.Value.ToString("dd-MMM-yyyy") : "")))</b></div>  @*@DateTime.Now.ToString("dd-MMM-yyyy HH:mm tt")*@
+                    <hr style="width:100%;" />
+
+                        <hr style="width:100%; margin-top:-0.5em" />
+
+                        <div align="left" style="font-weight:bold; margin-left:0.4em; font-family:'Segoe UI'; font-size:14px;"><b>@Model.TransferredTo</b></div>
+                        <hr style="width:100%;" />
+                        <div class="col-xs-12 box-body table-responsive">
+                            <table class="table table-hover" rules="rows" cellpadding="5" style="width:675px; font-size:12px;">
+
+                                <tbody>
+                                    <tr style="font-size:13px; font-family:'Segoe UI'; font-weight:bold; text-align:left;">
+
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @if (Model.Kit == 1)
+                                            {
+                                                @Html.DisplayName("Kit Name")
+                                            }
+                                            else
+                                            {
+                                                @Html.DisplayName("Item Name")
+                                            }
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Transferred Qty")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Remarks")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("SKU Number")
+                                        </th>
+
+                                    </tr>
+                                    @foreach (var item in Model.lstTransferData)
+                                    {
+                                        <tr style="font-family:'Segoe UI';">
+                                            <td>
+                                                @(bSno++)
+                                            </td>
+                                            <td>
+                                                @if (Model.Kit == 1)
+                                                {
+                                                    @item.KitName
+                                                }
+                                                else
+                                                {
+                                                    @item.ItemName
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.Quantity
+                                            </td>
+                                            <td>
+                                                @item.Remarks
+                                            </td>
+                                            <td>
+                                                @item.SKUCode
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    <hr style="width:100%;" />
+
+                    <br/>
+
+                    @if (null != Model.lstBalanceStock && Model.lstBalanceStock.Count() > 0)
+                    {
+                        <div align="left" style="font-weight:bold; margin-left:0.4em; font-family:'Segoe UI'; font-size:14px;"><b>Balance Stock</b></div>
+                        <hr style="width:100%;" />
+                        <div class="col-xs-12 box-body table-responsive">
+                            <table class="table table-hover" rules="rows" cellpadding="5" style="width:675px; font-size:12px;">
+
+                                <tbody>
+                                    <tr style="font-size:13px; font-family:'Segoe UI'; font-weight:bold; text-align:left;">
+
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Kit Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Item Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Actual Qty")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Transferred Qty")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Balance Qty")
+                                        </th>
+
+                                    </tr>
+                                    @foreach (var item in Model.lstBalanceStock)
+                                    {
+                                        <tr style="font-family:'Segoe UI';">
+                                            <td>
+                                                @(Sno++)
+                                            </td>
+                                            <td>
+                                                @item.KitName
+                                            </td>
+                                            <td>
+                                                @item.ItemName
+                                            </td>
+                                            <td>
+                                                @item.ActualQty
+                                            </td>
+                                            <td>
+                                                @item.TransferredQuantity
+                                            </td>
+                                            <td>
+                                                @item.BalanceQuantity
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+    <hr style="width:100%;" />
+                    }
+                  
+
+                  
+                    <br/>
+                    <br/>
+
+                    <table>
+                        <tr style="font-family:'Segoe UI';">
+                            <td style="width:520px"><b>Store Incharge</b></td>
+                            <td><b>Branch Incharge</b></td>
+                        </tr>
+                    </table>
+                </div>
+            }
+        }
+
+
+    </div>
+</body>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        var Print = $('#IsPrint').val();
+
+        if(Print == "value")
+        {
+            PrintElem('#mydiv');
+        }
+
+    });
+
+    function PrintElem(elem) {
+        Popup($(elem).html());
+
+        if ($('#Type').val() == "trans")
+        {
+            window.location.href = '/SOperations/StockTransfer';
+        }
+        else
+        {
+            window.location.href = '/SOperations/BalanceStock';
+        }
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+
+        return true;
+    }
+
+</script>
+
+
+
+

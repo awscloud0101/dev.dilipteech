@@ -1,0 +1,167 @@
+﻿@model AsteriskBrowserAL.Models.HomeWorkData
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">HomeWork Upload</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<div class="row">
+    <div class="col-xs-12">
+
+        <div class="table-header">
+            <span style="font-family:calibri;">Home Work</span>
+            <div class="widget-toolbar no-border">
+                <div class="inline action-buttons">
+                    <a class="view-header-btn  btn btn-info btn-xs P2  " ><i class="fa fa-plus" onclick="return submitForm()" type="submit"> | Add</i></a>
+                </div>
+            </div>
+
+        </div>
+        <div class="widget-box">
+
+        
+            <div class="widget-body">
+                @if (Model != null)
+                {
+                    if (Model.CategoryId == 1 && Model.IsCoordinator != true)
+                    {
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label no-padding-right" for="form-field-1">@Html.Label("Class")</label>
+                                    <div class="col-sm-3">
+                                        @Html.DropDownListFor(model => model.CourseId, new SelectList(Model.lstCourses, "ClassNumber", "ClassNumberDisplay", 0), "---Select---", new { @disabled = "disabled", @class = "form-control", id = "CourseId" })
+                                    </div>
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Section")</label>
+                                    <div class="col-sm-3">
+                                        <select class="form-control" disabled="disabled" id="SectionId" name="SectionId" readonly="readonly"></select>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label no-padding-right" for="form-field-1">@Html.Label("Class")</label>
+                                    <div class="col-sm-3">
+                                        @Html.DropDownListFor(model => model.CourseId, new SelectList(Model.lstCourses, "ClassNumber", "ClassNumberDisplay", 0), "---Select---", new { @class = "form-control", id = "CourseId" })
+                                    </div>
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Section")</label>
+                                    <div class="col-sm-3">
+                                        <select class="form-control" id="SectionId" name="SectionId"></select>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+                    }
+
+                    <input style="display:none" id="SelCourseId" value="@Model.CourseId" />
+                    <input style="display:none" id="SelSection" value="@Model.SectionId" />
+                }
+
+                else
+                {
+                    <input style="display:none" id="SelCourseId" value="0" />
+                    <input style="display:none" id="SelSection" />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div id="SearchDiv">
+
+</div>
+<script>
+    $(document).ready(function () {
+        
+        var SelCourseId = $('#SelCourseId').val();
+        var SelSec = $('#SelSection').val();
+
+        if (SelCourseId > 0) {
+            document.getElementById("SelCourseId").value = SelCourseId;
+            GetSectionDropdown(SelCourseId);
+        }
+    });
+
+    $('#CourseId').change(function () {
+        var CourseId = $('#CourseId').val();
+        $("#SearchDiv").html("");
+        $('#SectionId').empty();
+        GetSectionDropdown(CourseId)
+    })
+
+    function GetSectionDropdown(nClass) {
+     
+        if (null != nClass && nClass > 0) {
+            $.ajax({
+                url: '/AStudent/GetSectionData',
+                data: { nCourseId: nClass },
+                success: function (data) {
+                    var Section = $('#SectionId')
+                    Section.children().remove();
+                    Section.append($("<option>").val("").text("--Select--"))
+                    $.each(data, function (i, record) {
+                        Section.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                    });
+                    $('#SectionId').append(Section);
+                    debugger
+                    var SelSection = $("#SelSection").val();
+                    if (SelSection > 0) {
+                        document.getElementById("SectionId").value = SelSection;
+                        GetHomeWorkDetails();
+                    }
+                }
+            })
+        }
+    }
+    $('#SectionId').change(function () {
+        GetHomeWorkDetails()
+    })
+
+    function submitForm() {
+      
+
+        var CourseId = $('#CourseId').val();
+        var Section = $('#SectionId').val();
+        if (CourseId == "" || Section == "") {
+            document.getElementById("CTCombo").innerHTML = "Please select the Class";
+            return false;
+        }
+
+        else {
+            window.location.href = '/AStudent/HomeWorkC?CourseId=' + CourseId + '&SectionId=' + Section;
+        }
+    };
+
+    function GetHomeWorkDetails() {
+       
+        var CourseId = $('#CourseId').val();
+        var Section = $('#SectionId').val();
+
+        $.ajax({
+            url: '/AStudent/HomeWorkDetails',
+            data: { CourseId: CourseId, SectionId: Section },
+            success: function (data) {
+                $("#SearchDiv").html(data);
+            }
+        })
+    }
+
+
+</script>

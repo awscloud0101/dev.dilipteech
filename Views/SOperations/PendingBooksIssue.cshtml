@@ -1,0 +1,285 @@
+﻿@model AsteriskBrowserAL.Models.StudentSalesData
+@{
+    ViewBag.Title = "Student Sales";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Pendin Books Issue</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+<form id="myForm" method="post">
+    <section class="content">
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                @using (Html.BeginForm("PendingBooksIssue", "SOperations", FormMethod.Post))
+                {
+
+                    if (null != Model)
+                    {
+                        <input type="hidden" id="Status" value="@Model.Status" />
+                    }
+                    else
+                    {
+                        <input type="hidden" id="Status" value="false" />
+                    }
+
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+    <div class="widget-box">
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">
+                Pending Books Issue
+            </h5>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="col-xs-6">
+                            <label class="col-xs-4">Class</label>
+                            <div class="col-xs-6">
+                                <select id="ClassNumber" class="form-control" name="ClassNumber"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <label class="col-xs-4">Student Name</label>
+                            <div class="col-xs-6">
+                                <input type="text" name="StudentName" id="StudentId" spellcheck="false" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+    </div>
+                }
+
+                <div id="ValidationMsg" title="Pending Books" style="display:none"></div>
+                <div id="PendingBooks"></div>
+
+            </div>
+
+        </div>
+    </section>
+</form>
+
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var Status = $('#Status').val();
+
+        if (Status == "value") {
+
+            Content = "Data saved";
+            dialog();
+        }
+
+        LoadClasses();
+    });
+
+
+
+    function LoadClasses() {
+        $.ajax({
+            url: '/FOperations/LoadClasses',
+            success: function (data) {
+
+                var ClassNumberItems = $('#ClassNumber');
+
+                ClassNumberItems.children().remove();
+
+                ClassNumberItems.append($("<option>").val("null").text("--- Select ---"));
+
+                $.each(data, function (i, record) {
+
+                    ClassNumberItems.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+
+                });
+
+                $('#ClassNumber').append(ClassNumberItems);
+            }
+        });
+    }
+
+    function dialog() {
+
+        var $dialog = $('#ValidationMsg')
+                  .html(Content)
+
+        .dialog({
+            autoOpen: false,
+            title: 'Kitting',
+            modal: true,
+            show: "slide",
+            buttons: {
+                "OK": function () {
+                    $dialog.dialog('close');
+                }
+                //Cancel: function () {
+                //    $(this).dialog("close");
+                //}
+            },
+            height: 150
+        });
+
+        $dialog.dialog('open');
+        e.preventDefault();
+        return false;
+
+    }
+
+
+
+    $('#ClassNumber').change(function () {
+
+        var Classnumber = $('#ClassNumber').val();
+
+        if (Classnumber == "" || Classnumber == "null") {
+            EnableDiableControls(false);
+        }
+        else {
+            EnableDisableControls(true);
+        }
+    });
+
+
+    function EnableDisableControls(enable) {
+
+        ResetControls(0);
+
+        if (enable == true) {
+            $("#StudentId").removeAttr("disabled");
+        } else {
+            $("#StudentId").attr("disabled", "disabled");
+        }
+    }
+
+    $("#StudentId").keyup(function (e) {
+        var keycode = e.keyCode;
+        if (keycode == 8 || keycode == 46) {
+            ResetControls(0);
+        };
+    });
+
+    function ResetControls(value) {
+
+        $('#StudentId').val = "";
+
+        if (value != 2) {
+            $('#StudentId').val('');
+        }
+
+        $('#PendingBooks').html("");
+    }
+
+    //auto complete AdmissionNumber
+
+
+    $("#StudentId").autocomplete(
+     {
+         source: function (request, response) {
+
+             debugger
+             ResetControls(2);
+
+             if (request.term.length < 3) {
+                 return;
+             }
+
+             $('#imagemodal').show();
+             var nSectionId = document.getElementById("ClassNumber").value;
+
+             $.ajax({
+                 url: "/FOperations/GetStudentName",
+                 data: { nSectionId: nSectionId, strVal: request.term },
+                 success: function (json) {
+                     response($.map(json, function (data, id) {
+                         return {
+                             label: data.FirstName,
+                             value: data.FirstName,
+                             id: data.StudentId,
+                         };
+                     }));
+
+                     $('#imagemodal').hide();
+                 }
+             });
+         },
+         minLength: 3,
+         select: function SelectEvent(event, ui) {
+             GetPendingBooksByStudentId(ui.item.id);
+         }
+     });
+
+  
+
+    function GetPendingBooksByStudentId(StudentId) {
+
+        var ClassNumber = $('#ClassNumber').val();
+
+        if (ClassNumber != "null") {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/SOperations/GetPendingBooksByStudentId',
+                data: { ClassNumber: ClassNumber, StudentId: StudentId },
+                //beforeSend: function () {
+                //    $('#imagemodal').show();
+                //},
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#PendingBooks').html(data);
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+</script>
+
+
+
+
+
+

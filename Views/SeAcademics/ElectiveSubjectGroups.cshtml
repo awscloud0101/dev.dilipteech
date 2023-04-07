@@ -1,0 +1,91 @@
+﻿@model IEnumerable<AsteriskBrowserAL.ElectiveSubjectsGroups>
+
+@{
+    ViewBag.Title = "ElectiveSubjectGroups";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Elective Groups</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<!--Main Content-->
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("Add Elective Subject Group", "ElectiveSubjectGroupsC")</h3>
+
+        </div>
+    </div>
+    <br />
+    @using (Html.BeginForm("ElectiveSubjectGroups", "SeAcademics", FormMethod.Post))
+    {
+
+        <button class="btn btn-sm btn-primary" type="button" style="min-width: 100px;float: right; margin-top: -3em;margin-right:25%" onclick="location.href='@Url.Action("Subjects", "SeAcademics")'">Subjects</button>
+
+        <div class="box">
+            <div class="box-header">
+                <div class="col-sm-6">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Class")</label>
+                    <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                        @Html.DropDownList("BatchId", null, "--Select Class--", new { @class = "form-control", onchange = "GetElectivSubjectsGrps();" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        if (null != TempData["ElectiveSubjectGroups"])
+        {
+            @Html.Raw(TempData["ElectiveSubjectGroups"])
+        }
+
+        <div>
+            <div id="SearchViewDiv" class="box-body table-responsive no-padding">
+                @Html.Partial("ElectiveSubjectGroupsPartial", Model)
+            </div>
+        </div>
+
+
+    }
+
+</section>
+
+<script type="text/javascript">
+
+    function GetElectivSubjectsGrps() {
+        var Id = $('#BatchId').val();
+        $.ajax({
+            url: '/SeAcademics/ElectiveSubjectGroupsData',
+            data: { BatchId: Id },
+            success: function (Data) {
+
+                $("#SearchViewDiv").html(Data);
+            },
+
+
+        });
+    }
+    window.onload = GetElectivSubjectsGrps;
+</script>
+
+
+
+
+
+

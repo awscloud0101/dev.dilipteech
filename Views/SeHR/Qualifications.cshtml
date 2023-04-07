@@ -1,0 +1,130 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Qualifications>
+
+@{
+    ViewBag.Title = "Qualifications";
+   
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Qulifications</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+<section class="content">  
+
+    @if (null != TempData["Qualifications"])
+    {
+        @Html.Raw(TempData["Qualifications"])
+    }
+    @if (null != Model)
+    {
+        int nsno = 1;
+        <div class="table-header">
+            Qualifications
+            <div style="float:right;margin-right:10px;">
+                <a class="btncustom P2" href="@Url.Action("QualificationsC", "SeHR")" role="button" id="New" name="New">
+               Add</a>
+                </div>
+            </div>
+     
+            <div class="box-body table-responsive no-padding">
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Qualifications")
+                            </th>
+                            <th>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @(nsno++)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    <div>
+                                        <a class="green P2" href="@Url.Action("QualificationsE", "SeHR", new { id = item.QualificationsId })">
+                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                        </a>
+                                        <a class="red P2" onclick="btnConfirm(@item.QualificationsId)">
+                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                        </a>
+                                      
+                                    </div>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+    }
+    else
+    {
+
+        <div class="table-header">
+            Qualifications
+            <a class="view-header-btn btn btn-info btn-xs P2" href="@Url.Action("QualificationsC", "SeHR")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+        </div>
+        <span style="color: red;"><b>   Records Found (0) </b></span>
+      
+    }
+   
+</section>
+
+<script>
+    function btnConfirm(Value) {
+      
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeHR/ValidationForQualificationsD',
+                data: { id: Value },
+                success: function (data) {
+                    var url = '/SeHR/QualificationsD?id=' + Value;
+                    var title = "Qualifications";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+</script>
+
+  
+

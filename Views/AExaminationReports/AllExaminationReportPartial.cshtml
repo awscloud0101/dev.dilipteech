@@ -1,0 +1,142 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ExaminationResultsData>
+
+@{
+    Layout = null;
+    int sno = 1;
+}
+
+<div class="hr hr-18 dotted hr-double"></div>
+@if (null != Model)
+{
+    if (Model.Count() > 0)
+    {
+        <div class="box">
+            <div class="table-header">
+                Records Found (@Model.Count())
+                <div style="float:right;margin-right:0.5em">
+                    <a href="/AExaminationReports/ExaminationReportPrintandPDF" value="PDF"><span class="btn btn-info btn-xs btn-danger">PDF</span></a>
+                    @*<button class="btn btn-info btn-xs btn-success" id="btnExport">Excel </button>*@
+                    <a onclick="PrintElem()" value="Print"><span class="btn btn-info btn-xs btn-warning">Print</span></a>
+                </div>
+            </div>
+
+            <div class="box-body table-responsive no-padding">
+                <table class="table tbhover table-striped table-bordered dynamic-table" id="mytab1" style="font-size:14px;">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Admission Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Student Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Section Name")
+                            </th>
+                            @foreach (var item in Model.FirstOrDefault().lstResults)
+                            {
+                                <th>
+                                    @item.ExamName
+                                </th>
+                            }
+                            <th>
+                                Max Marks
+                            </th>
+                            <th>
+                                Grand Total
+                            </th>
+                            <th>
+                                Average
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @(sno++)
+                                </td>
+                                <td>
+                                    @item.AdmissionNumber
+                                </td>
+                                <td>
+                                    @item.DisplayName
+                                </td>
+                                <td>
+                                    @item.SectionName
+                                </td>
+                                @foreach (var items in item.lstResults)
+                                {
+                                    <td>@items.TotalSum</td>
+                                }
+                                <td>
+                                    @item.lstResults.Sum(s => s.MaxMarksSum)
+                                </td>
+                                <td>
+                                    @item.lstResults.Sum(s => s.TotalSum)
+                                </td>
+                                <td>
+                                    @{
+                                        double TotalMarks = item.lstResults.Sum(s => s.TotalSum);
+                                        double MaxMarks = item.lstResults.Sum(s => s.MaxMarksSum);
+
+                                        double Average = (TotalMarks / MaxMarks) * 100;
+
+                                    }
+                                    @Math.Round(Average, 2)
+                                </td>
+                            </tr>
+                                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+                                        }
+                                        else
+                                        {
+                                            <span style="color:red;font-weight:bold"> Data not available</span>
+                                            }
+
+                                        }
+
+<script>
+
+    function PrintElem() {
+        $.ajax({
+            url: '/AExaminationReports/ExaminationReportPrintandPDF',
+            data: { isPrint: true },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#imagemodal').hide();
+                Popup(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+
+
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>

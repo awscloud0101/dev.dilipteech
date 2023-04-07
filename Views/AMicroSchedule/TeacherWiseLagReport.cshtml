@@ -1,0 +1,304 @@
+﻿
+@model AsteriskBrowserAL.Models.MicroScheduleData
+
+@{
+    ViewBag.Title = "Teacher Wise Lag Report";
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Report
+        </li>
+        <li class="active">Teacher Wise Lag Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+ 
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("ExcelTeacherWiseLagReportDt", "AMicroSchedule", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral.ToString()" name="IsCentral" />
+    <input type="hidden" id="SubscriptionId" value="@Model.BranchId" name="BranchId" />
+
+
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Teacher wise Lag Report</span>
+
+
+                    </div>
+                    <div class="widget-box">
+
+                   
+                        <!-- /.box-header -->
+                        <!-- form start -->
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-3">Division</label>
+                                                <div class="col-xs-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-3">Branch</label>
+                                                <div class="col-xs-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.SubscriptionId" />
+                                }
+                             
+                                                               
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Staff")</label>
+
+                                                <div class="col-sm-6">
+                                                    <select id="StaffId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+                <div id="SearchData"></div>
+
+
+            }
+        </div>
+    </div>
+
+</section>
+<script type="text/javascript">
+    var status = 0;
+    var DisplayValidation = "";
+
+    $(document).ready(function () {
+        debugger
+
+        var IsCentral = $('#IsCentral').val();
+
+
+        if (IsCentral == "False") {
+            var SubscriptionId = $("#BranchId").val();
+            LoadStaffDropdown(SubscriptionId,0);
+        }
+
+    });
+
+    $('#DivisionId').change(function () {
+        var DivisionId = $('#DivisionId').val();
+        $("#BatchId").html("")
+        $("#SelStaffId").html("")
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        if (record.IsCentral != true) {
+                            BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+
+                        }
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    $('#BranchId').change(function () {
+        debugger
+        var BranchId = $("#BranchId").val();
+        var DivisionId = $("#DivisionId").val();
+        $("#SelStaffId").html("")
+
+        if (BranchId > -2) {
+            LoadStaffDropdown(BranchId, DivisionId)
+        }
+        else {
+            var BranchItems = $('#SelClassId');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    })
+
+
+    function LoadStaffDropdown(nBranchId,nDivisionId) {
+        debugger
+     
+        $("#SelStaffId").html("")
+        $.ajax({
+            url: '/AMicroSchedule/StaffDetails',
+            data: { nBranchId: nBranchId, nDivisionId: nDivisionId },
+            success: function (result) {
+                Section = $("#StaffId")
+                Section.children().remove();
+                Section.append($("<option>").val("0").text("--- Select ---"))
+                //Section.append($("<option>").val("0").text("All"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.StaffId).text(record.DisplayName))
+                })
+                $("#StaffId").append(Section)
+
+            },
+            async: false
+        })
+    }
+    $('#StaffId').change(function () {
+        $('#SearchData').html("");
+        debugger
+        if ($("#StaffId").val() > 0) {
+            GetTuterLagReportData();
+        }
+
+    });
+
+
+    function GetTuterLagReportData() {
+        debugger
+        var BranchId = $('#BranchId').val();
+        var Divisionid = $('#DivisionId').val();
+        var IsCentral = $('#IsCentral').val();
+        var StaffId = $('#StaffId').val();
+
+
+        if (IsCentral == "True")
+        {
+            IsCentral = true;
+        }
+        else
+        {
+            IsCentral = false;
+             Divisionid = 0;
+        }
+
+        var valid = Validations();
+        if (valid == true) {
+            $.ajax({
+                url: '/AMicroSchedule/GetTeacherLagReportData',
+                data: { nDivisionId: Divisionid, nBranchId: BranchId, IsCentral: IsCentral, StaffId: StaffId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#SearchData').html(data);
+
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+            $('#SearchData').html("");
+        }
+    }
+
+    function Validations() {
+        var Divisionid = $('#DivisionId').val();
+        var branchId = $('#BranchId').val();
+        var StaffId = $('#StaffId').val();
+        var Iscentral = $('#IsCentral').val();
+        
+        var isvalid = true;
+
+        var ValidationString = "Please Select ";
+        if (Iscentral == "true") {
+            if (Divisionid != 0) {
+                ValidationString += "Division,"
+                isvalid = false
+            }
+            if (branchId != 0) {
+                ValidationString += "Branch,"
+                isvalid = false
+            }
+        }
+        if (StaffId < 0) {
+            ValidationString += "Staff"
+            isvalid = false
+        }
+
+        if (isvalid == false) {
+            document.getElementById("Validation").innerHTML = ValidationString;
+        }
+        return isvalid;
+    }
+
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+
+
+
+
+
+

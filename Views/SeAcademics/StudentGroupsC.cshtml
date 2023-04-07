@@ -1,0 +1,107 @@
+﻿@model AsteriskBrowserAL.Groups
+@{
+    ViewBag.Title = "StudentGroupsC";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Student Groups</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <h3>@Html.ActionLink("<< Student Groups", "StudentGroups")</h3>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- form start -->
+            @using (Html.BeginForm("StudentGroupsC", "SeAcademics", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("Student Groups")</span>
+
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title ">Student Groups</h3>
+
+                        <button class="btn btn-primary pull-right" type="submit" style="width:80px;" onclick="return submitForm();">
+                            Create
+                        </button>
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Group Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.GroupName, new { @class = "form-control col-sm-5 textlength", placeholder = "Group Name", @id = "GroupName", @onchange = "removeError();" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="vGroupName">
+                                <label style="color:red;font-weight:bold;">required </label>
+                            </div>
+                        </div>
+                      
+
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+<script type="text/javascript">
+
+
+    function ValidateStudentGroups() {
+        var validate = true;
+
+        var GroupName = $('#GroupName').val();
+       
+
+        if (GroupName == undefined || GroupName == "" || GroupName.length < 1) {
+            validate = false;
+            $('#vGroupName').show();
+        }
+      
+        return validate;
+    }
+    $('#GroupName').focus(function () {
+        $('#vGroupName').hide();
+    });
+    function submitForm() {
+
+        var validatestatus = ValidateStudentGroups();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+</script>

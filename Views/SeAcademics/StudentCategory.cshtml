@@ -1,0 +1,155 @@
+﻿@model IEnumerable<AsteriskBrowserAL.StudentCategory>
+
+@{
+    ViewBag.Title = "Student Category";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">IC Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+<section class="content">
+
+    <br />
+    <br />
+    @if (null != TempData["StudentCategory"])
+    {
+        @Html.Raw(TempData["StudentCategory"])
+    }
+
+
+    @if (Model != null)
+    {
+        int nsno = 1;
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    Ic Category
+                    <a class="view-header-btn btn btn-info btn-xs P2" style="float:right" href="@Url.Action("StudentCategoryC", "SeAcademics")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+                </div>
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Category Name")
+                            </th>
+
+                            <th></th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                        <tr>
+                            <td>
+                                @(nsno++)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CategoryName)
+                            </td>
+
+                            <td>
+                                <div class="hidden-sm hidden-xs action-buttons">
+                                    <a class="green P2" href="@Url.Action("StudentCategoryE", "SeAcademics", new { id = item.CategoryId })">
+                                        <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                    </a>
+                                    <a class="red P2" onclick="btnConfirm(@item.CategoryId)">
+                                        <i class="ace-icon fa fa-trash-o P2 bigger-130"></i>
+
+                                    </a>
+                                    @*<a class="red" href="@Url.Action("StudentCategoryD","SeAcademics", new { id = item.CategoryId })">
+                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                        </a>*@
+                                </div>
+
+                            </td>
+                        </tr>
+                        }
+
+                    </tbody>
+                </table>
+
+
+
+            </div>
+        </div>
+
+
+                    @Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+    }
+
+    else
+    {
+
+        <div class="table-header">
+            StudentCategory
+            <a class="view-header-btn btn btn-info btn-xs P2" href="@Url.Action("StudentCategoryC", "SeAcademics")" role="button" id="New" name="New"><i class="fa fa-plus-circle P2 bigger-200"></i></a>
+        </div>
+        <span style="color: red;"><b>Records Not Found(0)</b></span>
+    }
+</section>
+
+
+
+
+
+
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SeAcademics/ValidationForStudentCategoryD',
+                data: { id: Value },
+                success: function (data) {
+
+                    var url = '/SeAcademics/StudentCategoryD?id=' + Value;
+                    var title = "IC Category";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+
+
+
+

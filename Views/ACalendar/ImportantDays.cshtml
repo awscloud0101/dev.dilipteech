@@ -1,0 +1,159 @@
+﻿@model IEnumerable<AsteriskBrowserAL.ImportantDays>
+
+@{
+    ViewBag.Title = "ImportantDays";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+      
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Calendar
+        </li>
+        <li class="active">Important Days</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+<section class="content">
+
+    @if (Model != null)
+    {
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    Important Days
+
+                    <!-- /.box-header -->
+                   
+                        <div style="float:right;margin-right:10px;">
+                            <a class="btncustom P2" href="@Url.Action("ImportantDaysC", "ACalendar")" role="button"  id="New" name="New">
+                            Add</a>
+                        </div>
+                  
+                </div>
+                        <div class="hideScrolling">
+                            <table class="table tbhover table-striped table-bordered dynamic-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Important Date")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Description")
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @(nsno++)
+                                            </td>
+                                            <td>
+                                                @if (null == item.ImportantDate)
+                                                {
+
+                                                }
+                                                else
+                                                {
+                                                    @item.ImportantDate.Value.ToString("dd - MMM - yyyy")
+                                                }
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Description)
+                                            </td>
+
+                                            <td>
+                                                <div>
+                                                    <a class="green P2" href="@Url.Action("ImportantDaysE", "ACalendar", new { id = item.ImportantDaysId })">
+                                                        <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                                    </a>
+
+                                                    <a class="red P2" onclick="btnConfirm(@item.ImportantDaysId)">
+                                                        <i class="ace-icon fa fa-trash  bigger-130"></i>
+
+                                                    </a>
+
+                                                    @*</a>
+                            <a class="red" href="@Url.Action("ImportantDays", "ACalendar", new { id = item.ImportantDaysId })">
+                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                            </a>*@
+                                                </div>
+                                            </td>
+
+                                        </tr>
+
+                                    }
+
+                                </tbody>
+
+                            </table>
+                        </div>
+
+
+
+                    </div>
+                </div>
+                }
+
+                else
+                {
+                <div class="table-header">
+                    Important Days
+                    <a class="view-header-btn btn btn-info btn-xs P2" href="@Url.Action("ImportantDaysC", "ACalendar")" role="button" style="float:right" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>
+                </div>
+                <span style="color: red;"><b>There are no Important Days</b></span>
+                }
+</section>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<script>
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/ACalendar/ValidationForImportantDaysD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/ACalendar/ImportantDaysD?id=' + Value;
+                    var title = "Important Days";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+
+
+

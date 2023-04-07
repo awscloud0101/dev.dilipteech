@@ -1,0 +1,346 @@
+﻿@model AsteriskBrowserAL.Models.PettyCashReportViewModel
+@{
+    ViewBag.Title = "Petty cash Report";
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Petty Cash
+        </li>
+        <li class="active">Petty Cash Report</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+ 
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("PettyCashReportExcel", "FPettyCash", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+
+
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Petty Cash Report</span>
+                        <div style="float:right;margin-right:10px;">
+                            <a class="P2" id="ViewData" name="ViewData" onclick="return submitForm();"><span class="btncustom">View Data</span></a>
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+                    <div class="widget-box">
+
+             
+                        <!-- form start -->
+
+
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Division</label>
+                                                <div class="col-sm-6">
+
+                                                    @if (Model.lstDivision != null)
+                                                    {
+                                                        @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                    }
+                                                    else
+                                                    {
+                                                        <select class="form-control" id="DivisionId"></select>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="SubscriptionId"  class="form-control"></select>
+                                                </div>
+                                            </div>
+                                    </div>
+                                                            
+
+                                }
+
+                                <div class="row">
+
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Head</label>
+                                            <div class="col-sm-6">
+
+                                                @if (Model.lstPettyCashHead != null)
+                                                {
+                                                    @Html.DropDownListFor(model => model.HeadId, new SelectList(Model.lstPettyCashHead, "PettyCashHeadId", "Name"), new { @class = "form-control", id = "HeadId" })
+
+                                                }
+                                                else
+                                                {
+                                                    <select class="form-control" id="HeadId"></select>
+                                                }
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">Sub Head</label>
+                                            <div class="col-sm-6">
+                                                <select id="SubHeadId" name="SubHeadId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                
+
+                                <div class="row">
+
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">From Date</label>
+                                            <div class="col-sm-6">
+                                                <div id="datepicker" class="input-group date">
+                                                    <input class="form-control" type="text" id="FromDate" name="FromDate" autocomplete="off" placeholder="From Date" />
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4">To Date</label>
+                                            <div class="col-sm-6">
+                                                <div id="datepicker" class="input-group date">
+                                                    <input class="form-control" type="text" id="ToDate" name="ToDate" autocomplete="off" placeholder="To Date" />
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                                            
+                                                }
+
+                                                <div id="PettyCashDetails"></div>
+                                                }
+                                            </div>
+                                        </div>
+
+</section>
+
+<script type="text/javascript">
+
+    var DisplayValidation = "";
+
+    $('#DivisionId').change(function () {
+
+        var DivisionId = $('#DivisionId').val();
+
+        $('#PettyCashDetails').html('');
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    var BranchItems = $('#BranchId');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+        $('#PettyCashDetails').html('');
+    })
+
+    $('#SubHeadId').change(function () {
+        $('#PettyCashDetails').html('');
+    })
+
+
+    $('#HeadId').change(function () {
+
+        var HeadId = $('#HeadId').val();
+        $('#PettyCashDetails').html('');
+
+        if (HeadId != 0) {
+
+            $.ajax({
+                url: '/FPettyCash/GetSubHeadsByHeadId',
+                data: { HeadId: HeadId },
+                success: function (data) {
+
+                    var SubHeadItems = $('#SubHeadId');
+
+                    SubHeadItems.children().remove();
+
+                    SubHeadItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        SubHeadItems.append($("<option>").val(record.PettyCashSubHeadId).text(record.SubHeadName));
+                    });
+
+                    $('#SubHeadId').append(SubHeadItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+
+    function submitForm() {
+        DisplayValidation = "";
+        DisplayValidation = "Please fill the mandatory fileds : ";
+
+        var Validation = ValidatePettyCash();
+
+        if (Validation == false) {
+
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+            var IsCentral = $('#IsCentral').val();
+
+            if (IsCentral == "value")
+                IsCentral = "true";
+
+            $.ajax({
+
+                url: '/FPettyCash/GetPettyCashReportData',
+                data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val(), HeadId: $('#HeadId').val(), SubHeadId: $('#SubHeadId').val(), FromDate: $('#FromDate').val(), ToDate: $('#ToDate').val(), IsCentral: IsCentral },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#PettyCashDetails').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    }
+
+
+    function ValidatePettyCash() {
+
+        var valid = true;
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            var Division = $('#DivisionId').val();
+
+            if (Division == 0) {
+                valid = false;
+                DisplayValidation += "Division, ";
+            }
+
+            var BranchId = $('#BranchId').val();
+            if (BranchId == null || BranchId == "null" || BranchId == 0) {
+                valid = false;
+                DisplayValidation += "Branch, ";
+            }
+        }
+
+        var HeadId = $('#HeadId').val();
+
+        if (HeadId == 0) {
+            valid = false;
+            DisplayValidation += "Head, ";
+        }
+
+        var SubHeadId = $('#SubHeadId').val();
+        if (SubHeadId == 0 || SubHeadId == "null" || SubHeadId == null) {
+            valid = false;
+            DisplayValidation += "Sub Head, ";
+        }
+
+
+
+        var dtFromDate = $('#FromDate').val();
+        if (dtFromDate == "") {
+            valid = false;
+            DisplayValidation += "From Date, ";
+        }
+
+        var dtToDate = $('#ToDate').val();
+        if (dtToDate == "") {
+            valid = false;
+            DisplayValidation += "To Date, ";
+        }
+
+        return valid;
+
+    };
+
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+

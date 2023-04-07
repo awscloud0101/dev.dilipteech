@@ -1,0 +1,226 @@
+﻿@model AsteriskBrowserAL.Models.PettyCashViewModelData
+@{
+
+    List<IGrouping<string, AsteriskBrowserAL.Models.PettyCashViewModelData>> GroupedData = new List<IGrouping<string, AsteriskBrowserAL.Models.PettyCashViewModelData>>();
+    int sno = 1;
+    double dTotAmount = 0.0;
+
+    if (null != Model)
+    {
+        if (null != Model.FundsWithdrawalReportData && Model.FundsWithdrawalReportData.Count() > 0)
+        {
+            dTotAmount = Model.FundsWithdrawalReportData.Sum(m => m.Amount.Value);
+        }
+        GroupedData = Model.FundsWithdrawalReportData.GroupBy(p => p.BranchName).ToList();
+
+    }
+}
+
+        @if (null != Model)
+        {
+            if (null != Model.FundsWithdrawalReportData && Model.FundsWithdrawalReportData.Count() > 0)
+            {
+
+                <div class="table-header">
+
+                    Records Found (@Model.FundsWithdrawalReportData.Count)
+
+                    <div style="float:right;margin-right:10px;">
+
+                        <button onclick="PrintElem('#mydiv')" class="btncustom">
+
+                           Print
+
+                        </button>
+
+                        <button class="btncustom P2" id="btnExport">
+                            Download
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflowscroll">
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Branch Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Withdraw Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Head Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Amount")
+                                </th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.FundsWithdrawalReportData)
+                                    {
+                            <tr>
+                                <td>
+                                    @(sno++)
+                                </td>
+                                <td>
+                                    @item.BranchName
+                                </td>
+                                <td>
+                                    @item.TransactionDate.Value.ToString("dd - MMM- yyyy")
+                                </td>
+                                <td>
+                                    @item.HeadName
+                                </td>
+                                <td>
+                                    @item.Amount
+                                </td>
+
+
+                            </tr>
+                                    }
+
+                        </tbody>
+                    </table>
+                </div>
+
+            }
+            else
+            {
+                    <div style="color:red;font-weight:bold">Data not available to display</div>
+                    }
+                    }
+                    else
+                    {
+                    <div style="color:red;font-weight:bold">Data not available to display</div>
+                    }
+
+                    @Html.Action("DataTableScripts", "Base")
+
+                    <body>
+                        <div id="mydiv" style="display:none">
+
+                            @if (null != Model)
+                            {
+                                if (null != Model.FundsWithdrawalReportData && Model.FundsWithdrawalReportData.Count() > 0)
+                                {
+                                    int nSno = 1;
+
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <img class="col-xs-11" id="avatar" width="50" height="43" src="@Model.InstituteDetails.InstituteLogo" style="margin-bottom:-1.5em;" />
+                                            <b style="font-weight:bold; margin-left:0.3em; font-size:20px; font-family:'Segoe UI'">@Model.InstituteDetails.InstituteName</b>
+                                        </div>
+                                        <div style="margin-left:3.7em; font-family:'Segoe UI'"><b>@Model.InstituteDetails.InstituteAddress</b></div>
+                                        <br />
+
+                                        <hr style="width:100%; margin-bottom:-0.5em" />
+                                        <hr style="width:100%;" />
+                                        <div align="center" style="font:12%; font-family:'Segoe UI'"><b>Funds Withdrawal Report (@((Model.FromDate.HasValue && Model.ToDate.HasValue) ? (Model.FromDate.Value.ToString("dd-MMM-yyyy") + " - " + Model.ToDate.Value.ToString("dd-MMM-yyyy")) : "")) </b></div>
+                                        <hr style="width:100%;" />
+
+                                        @foreach (var g in GroupedData)
+                                        {
+                                            <hr style="width:100%; margin-top:-0.5em" />
+
+                                            <div align="left" style="font-weight:bold; margin-left:0.4em; font-family:'Segoe UI'; font-size:14px;"><b>@g.Key</b></div>
+                                            <hr style="width:100%;" />
+
+                                            <div class="col-xs-12 box-body table-responsive">
+                                                <table class="table table-hover" rules="rows" cellpadding="5" style="width:675px; font-size:12px;">
+
+                                                    <tbody>
+                                                        <tr style="font-size:13px; font-family:'Segoe UI'; font-weight:bold; text-align:left;">
+
+                                                            <th>
+                                                               S.No.
+                                                            </th>
+                                                            <th>
+                                                                @Html.DisplayName("Branch Name")
+                                                            </th>
+                                                            <th>
+                                                                @Html.DisplayName("Withdraw Date")
+                                                            </th>
+                                                            <th>
+                                                                @Html.DisplayName("Head Name")
+                                                            </th>
+                                                            <th>
+                                                                @Html.DisplayName("Amount")
+                                                            </th>
+
+                                                        </tr>
+                                                        @foreach (var item in g)
+                                                        {
+                                                            <tr style="font-family:'Segoe UI';">
+                                                                <td>
+                                                                    @(nSno++)
+                                                                </td>
+                                                                <td>
+                                                                    @item.BranchName
+                                                                </td>
+                                                                <td>
+                                                                    @item.TransactionDate.ToString()
+                                                                </td>
+                                                                <td>
+                                                                    @item.HeadName
+                                                                </td>
+                                                                <td>
+                                                                    @item.Amount
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        }
+
+
+                                        <hr style="width:100%;" />
+                                        <div align="right" style="font-weight:bold;font-family:'Segoe UI'; font-size:14px;">Total Amount : @AsteriskBrowserAL.Helpers.Utility.ConvertToStringCommas(dTotAmount.ToString()) </div>
+
+                                    </div>
+                                }
+                            }
+
+
+                        </div>
+                    </body>
+
+                    <script type="text/javascript">
+
+                        //$("#btnExport").click(function (e) {
+                        //    ExportToExcel('tbFundsWithDrawalReport');
+                        //});
+
+                        function PrintElem(elem) {
+
+                            Popup($(elem).html());
+                        }
+
+                        function Popup(data) {
+                            var mywindow = window.open('', 'my div', 'height=300,width=600');
+                            mywindow.document.write('<p></p>');
+                            mywindow.document.write(data);
+                            mywindow.document.write('<p></p>');
+
+                            mywindow.document.close();
+                            mywindow.focus();
+
+                            mywindow.print();
+                            mywindow.close();
+                            return true;
+                        }
+                    </script>
+
+
+
+
+
+
+

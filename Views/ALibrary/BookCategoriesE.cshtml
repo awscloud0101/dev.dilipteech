@@ -1,0 +1,204 @@
+﻿@model AsteriskBrowserAL.BookCategory
+
+@{
+    ViewBag.Title = "BookCategoriesC";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Book Category</li>
+    </ol>
+</section>
+<!-- /section:basics/content.breadcrumbs -->
+
+
+<section class="content">
+
+       <br />
+    <span style="color: red;font-weight:bold;" id="valBookCategory">@Html.ValidationMessage("Book Category")</span>
+   @using (Html.BeginForm("BookCategoriesE", "ALibrary", FormMethod.Post, new { @class = "form-horizontal" }))
+   {
+
+
+        <div class="page-header">
+            <br />
+            <h1>
+                Book Category
+                <small style="float:right;">
+                    @Html.ActionLink("Back to details", "BookCategories")
+                </small>
+            </h1>
+        </div><!-- /.page-header -->
+
+    <form class="form-horizontal" role="form">
+        <div class="box">
+
+
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <div class="box-body">
+
+
+                <div class="form-group">
+                    @Html.HiddenFor(model => model.BookCategoryId)
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Category Name")</label>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(model => model.BookCategoryName, new { @class = "form-control", placeholder = "Book Category Name",@maxLength="30", @id = "BookCategoryName", @onchange = "removeError();" })
+                    </div>
+
+                    <div class="col-sm-3" style="display:none;" id="BookCategoryBookCategoryName">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Category Description")</label>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(model => model.BookCategoryDescription, new { @class = "form-control", placeholder = "Book Category Description",@maxLength="30", @id = "BookCategoryDescription", @onchange = "removeError();" })
+                    </div>
+
+                    <div class="col-sm-3" style="display:none;" id="BookCategoryBookCategoryDescription">
+                        <label style="color:red;font-weight:bold;"> Required </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clearfix form-actions">
+                <div class="col-md-offset-3 col-md-9">
+                    <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                        <i class="ace-icon fa fa-check bigger-50"></i>
+                        Save
+                    </button>
+
+                    &nbsp; &nbsp; &nbsp;
+                    <button class="btn btn-sm" type="reset" onclick="return resetBookCategory();">
+                        <i class="ace-icon fa fa-undo bigger-50">
+                        </i>
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+   }
+                        <input type="hidden" id="count" name="count" value="0" />
+
+                        <input type="hidden" id="oldbookDescr" name="oldbookDescr" value="@Model.BookCategoryDescription" />
+                        <input type="hidden" id="oldbookName" name="oldbookName" value="@Model.BookCategoryName" />
+                        <input type="hidden" id="count" name="count" value="0" />
+
+</section>
+
+
+
+<script type="text/javascript">
+    $("#BookCategoryName").keypress(function (e) {
+        debugger
+        var BookCategoryName = $('#BookCategoryName').val();
+
+        if (e.which == 32) {
+            if (BookCategoryName.length == "") {
+                return false;
+            }
+        }
+
+    });
+
+    $('#BookCategoryName').focus(function () {
+        $('#valBookCategory').hide();
+    })
+    $("#BookCategoryDescription").keypress(function (e) {
+        debugger
+        var BookCategoryDescription = $('#BookCategoryDescription').val();
+
+        if (e.which == 32) {
+            if (BookCategoryDescription.length == "") {
+                return false;
+            }
+        }
+
+    });
+    function validateBookCategory() {
+
+        document.getElementById("count").value = "1";
+        var BookCategoryName = document.getElementById("BookCategoryName").value;
+        var BookCategoryDescription = document.getElementById("BookCategoryDescription").value;
+        validate = true;
+
+        if (BookCategoryName == "") {
+            document.getElementById("BookCategoryBookCategoryName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("BookCategoryBookCategoryName").style.display = "none";
+        }
+
+        if (BookCategoryDescription == "") {
+            document.getElementById("BookCategoryBookCategoryDescription").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("BookCategoryBookCategoryDescription").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+        var validatestatus = validateBookCategory();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function resetBookCategory() {
+        document.getElementById("count").value = "0";
+        document.getElementById("BookCategoryBookCategoryName").style.display = "none";
+        document.getElementById("BookCategoryBookCategoryDescription").style.display = "none";
+
+        document.getElementById("BookCategoryName").value = document.getElementById("oldbookName").value;
+        document.getElementById("BookCategoryDescription").value = document.getElementById("oldbookDescr").value;;
+
+        return false;
+    };
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var BookCategoryName = document.getElementById("BookCategoryName").value;
+        var BookCategoryDescription = document.getElementById("BookCategoryDescription").value;
+
+        if (count != 0) {
+            if (BookCategoryName != "") {
+                document.getElementById("BookCategoryBookCategoryName").style.display = "none";
+            } else {
+                document.getElementById("BookCategoryBookCategoryName").style.display = "inline";
+            }
+
+            if (BookCategoryDescription != "") {
+                document.getElementById("BookCategoryBookCategoryDescription").style.display = "none";
+            } else {
+                document.getElementById("BookCategoryBookCategoryDescription").style.display = "inline";
+            }
+
+        }
+    };
+
+</script>
+
+
+

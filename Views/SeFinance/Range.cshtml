@@ -1,0 +1,156 @@
+﻿@model AsteriskBrowserAL.Models.RangeViewData
+@{
+    ViewBag.Title = "Range";
+
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Range</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <span id="error" style="color:red;font-weight:bold"></span>
+            <!-- form start -->
+           
+                <br />
+                <div class="box-header">
+                    @*<button class="btn btn-primary pull-right" type="submit" style="width:80px">Save</button>*@
+                </div><!-- /.box-header -->
+                <br />
+                <div class="box">
+                    <div class="box-header">
+                        <div class="nav-tabs-custom" id="myTab">
+                            <!-- Tabs within a box -->
+                            <ul class="nav nav-tabs pull-right">
+                                <li><a role="button" href="#applictionData" data-toggle="tab">Registration Number Range</a></li>
+                                <li><a href="#templateData" role="button" data-toggle="tab">Template Number Range</a></li>
+
+                                <li class="active"><a href="#manuvaldata" role="button" data-toggle="tab">Manual Receipt Number</a></li>
+                            </ul>
+                            <br />
+                            <br />
+                            <div class="tab-content no-padding">
+                                <!-- Morris chart - Sales -->
+                                <div class="chart tab-pane active" id="manuvaldata" title="Manual" style="position: relative; height: 300px;">
+                                    @Html.Partial("ManualRangePartialView", Model)
+                                </div>
+
+                                <div class="chart tab-pane" id="applictionData" title="Appliction" style="position: relative; height: 300px;">
+                                    @Html.Partial("ApplicationRangePartialView", Model)
+                                </div>
+                                <div class="chart tab-pane" id="templateData" title="Template" style="position: relative; height: 300px;">
+                                    @Html.Partial("TemplateRangePartialView", Model)
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+         
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+
+    var Selectedtab = 0;
+    $(function () {
+        $("#tabs").tabs();
+        GetmanuvalRange();
+        GetApplicationNumberRange();
+        GettemplateNumberRange();
+    });
+
+    function GetmanuvalRange() {
+        var contentRange = $('#manuvaldata').val();
+        if (contentRange != null) {
+            $.ajax({
+                url: '/SeFinance/ManualRange',
+                data: { contentRange: contentRange, },
+                success: function (result) {
+                    $("#manuvaldata").html(result);
+                }
+            })
+        }
+    }
+    function GetApplicationNumberRange() {
+        var ApplictionRange = $('#applictionData').val();
+        $.ajax({
+            url: '/SeFinance/ApplicationRange',
+            data: { ApplictionRange: ApplictionRange, },
+            success: function (result) {
+                $("#applictionData").html(result);
+            }
+        })
+    }
+    function GettemplateNumberRange() {
+        var temaplateRange = $('#templateData').val();
+        $.ajax({
+            url: '/SeFinance/TemplateRange',
+            data: { temaplateRange: temaplateRange, },
+            success: function (result) {
+                $("#templateData").html(result);
+            }
+        })
+    }
+
+   
+
+    $('#myTab a').click(function (e) {
+        $('#tabType').val($(this).text())      
+       e.preventDefault();
+        $(this).tab('show');
+    });
+
+    // store the currently selected tab in the hash value
+    $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
+        var id = $(e.target).attr("href").substr(1);
+        alert(id)
+        window.location.hash = id;
+             
+    });
+
+    // on load of the page: switch to the currently selected tab
+    var hash = window.location.hash;
+    $('#myTab a[href="' + hash + '"]').tab('show');
+
+    
+    
+  //var selected_tab = 1;
+  //  $(function () {
+  //      var tabs = $("#tabs").tab({
+  //          select: function (e, i) {
+  //              selected_tab = i.index;
+  //          }
+  //      });
+  //      selected_tab = $("[id$=selected_tab]").val() != "" ? parseInt($("[id$=selected_tab]").val()) : 0;
+  //      tabs.tab('show', selected_tab);
+  //      $("form").submit(function () {
+  //          $("[id$=selected_tab]").val(selected_tab);
+  //      });
+  //  });
+ 
+   
+</script>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

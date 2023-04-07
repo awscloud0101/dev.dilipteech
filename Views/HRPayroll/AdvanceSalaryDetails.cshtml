@@ -1,0 +1,140 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.AdvanceSalaryData>
+    @{
+        ViewBag.Title = "AdvanceSalaryDetails";
+        int Sno = 1;
+        int nDivision = 0;
+        int nBranch = 0;
+        if(null != Model)
+        {
+            var Division = Model.FirstOrDefault();
+            if(Division != null)
+            {
+                nDivision = Division.DivisionId;
+                nBranch = Division.BranchId;
+            }
+        }
+    }
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Payrolls
+        </li>
+        <li class="active">Advance Salary Details</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+    <section class="content">
+        <div class="row">
+            <div class=col-xs-12>
+                @if (null != Model)
+                {
+                    <h3>@Html.ActionLink("<< Advance Salary Details", "AdvanceSalary", new { nDivisionId = nDivision, nBranchId = nBranch })</h3>
+                }
+                else
+                {
+                    <h3>@Html.ActionLink("<< Advance Salary Details", "AdvanceSalary")</h3>
+                }
+            </div>
+        </div>
+
+    @if (null != Model && Model.Count() > 0)
+    {
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Advance Salary Details</h3>
+                    </div><!-- /.box-header -->
+
+                    <div style="overflow:auto; height:350px;">
+                        <div class="box-body">
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead>
+                                    <tr style="height:50px;">
+                                        <th>
+                                           S.No.
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Name")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Employee Number")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Amount")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Advance Date")
+                                        </th>
+                                        @*<th>
+                                        </th>*@
+                                    </tr>
+
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                                {
+                                                <tr>
+                                                    <td>
+                                                        @(Sno++)
+                                                    </td>
+                                                    <td>
+                                                        @item.DisplayName
+                                                    </td>
+                                                    <td>
+                                                        @item.AdmissionNumber
+                                                    </td>
+                                                    <td>
+                                                        @item.Amount
+                                                    </td>
+                                                    <td>
+                                                        @if (item.AdvanceDate.HasValue)
+                                                        {
+                                                            @item.AdvanceDate.Value.ToString("dd-MMM-yyyy")
+                                                        }
+                                                    </td>
+                                                    @*<td>
+                                                        <a onclick="RecoverSalary(@item.AdvanceSalaryId)"><i>Recover</i></a>
+                                                    </td>*@
+                                                </tr>
+                                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <label style="color:red;">Data not available</label>
+    }
+
+</section>
+
+<script type="text/javascript">
+    function RecoverSalary(nAdvanceSalaryId) {
+        $.ajax({
+            url: '/HRPayroll/RecoverSalaryAdvance',
+            data: { nAdvanceSalaryId: nAdvanceSalaryId },
+            success: function (data) {
+
+            },
+            error: function () {
+
+            }
+
+        })
+    }
+</script>

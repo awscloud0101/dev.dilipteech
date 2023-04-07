@@ -1,0 +1,132 @@
+﻿@model List<AsteriskBrowserAL.Models.ChequeBounceViewModel>
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (Model != null && Model.Count > 0)
+{
+    int nsno = 1;
+
+    <div class="table-header">
+        Records Found (@Model.Count())
+    </div>
+
+    <table class="table tbhover table-striped table-bordered dynamic-table">
+
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Payment Date")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Student Name")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Receipt No")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Template No")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Manual Receipt No")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Debit Amount")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Cheque No")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Cheque Date")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Bank Name")
+                </th>
+                <th>
+                </th>
+                <th>
+                </th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @(nsno++)
+                    </td>
+                    <td>
+                        @item.TransactionDate.ToString("dd-MMM-yyyy hh:mm tt")
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StudentName)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReceiptNo)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TemplateNo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DisplayManualReceiptNo)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DebitAmount)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DisplayChequeNo)
+                    </td>
+
+                    <td>
+                        @item.ChequeDate.ToString("dd-MMM-yyyy hh:mm tt")
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BankName)
+                    </td>
+
+                    <td>
+                        @if (string.IsNullOrWhiteSpace(item.PenaltyAmountDescription))
+                        {
+                            @Html.ActionLink("Add", "ChequeDetails", new { ChequeNo = item.DisplayChequeNo, SearchchequeNo = item.SearchedData, BankId = item.BankId },new { Class="P2"})
+                        }
+                        else
+                        {
+                            @Html.ActionLink("Update", "ChequeDetails", new { ChequeNo = item.DisplayChequeNo, SearchchequeNo = item.SearchedData , BankId = item.BankId }, new { Class = "P2" })
+                        }
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PenaltyAmountDescription)
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+}
+else
+{
+    <span style="color:red;font-weight:bold">Data is not available</span>
+}
+@Html.Action("DataTableScripts", "Base")

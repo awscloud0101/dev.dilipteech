@@ -1,0 +1,172 @@
+﻿@model AsteriskBrowserAL.Models.MissingReceiptReportData
+@{
+    List<IGrouping<string, AsteriskBrowserAL.Models.MissingReceiptReportData>> GroupedData = new List<IGrouping<string, AsteriskBrowserAL.Models.MissingReceiptReportData>>();
+    int sno = 1;
+    if (null != Model)
+    {
+        if (null != Model && Model.MissingReceiptDetailsData.Count() > 0)
+        {
+            GroupedData = Model.MissingReceiptDetailsData.GroupBy(p => p.BranchName).ToList();
+        }
+    }
+}
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+
+
+        @if (null != Model)
+        {
+            if (null != Model.MissingReceiptDetailsData && Model.MissingReceiptDetailsData.Count() > 0)
+            {
+    <div class="table-header">
+        Records Found (@Model.MissingReceiptDetailsData.Count)
+                    <div style="float:right;margin-right:10px;">
+
+                        <button class="btncustom P2" id="btnExport">
+                            Print
+                        </button>
+
+                    </div>
+        </div>
+                
+                    
+                            <div class="overflowscroll">
+
+                                <table class="table tbhover table-striped table-bordered dynamic-table" id="MissingReceiptData" style="font-size:14px;">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                S.No.
+                                            </th>
+                                            @if (Model.IsCentral)
+                                            {
+                                                <th>
+                                                    @Html.DisplayName("Branch Name")
+                                                </th>
+                                            }
+
+                                            @if (Model.MissingReceiptDetailsData.FirstOrDefault().IsManual == true)
+                                            {
+                                                <th>
+                                                    @Html.DisplayName("Manual Receipt Number")
+                                                </th>
+                                            }
+                                            @if (Model.MissingReceiptDetailsData.FirstOrDefault().IsManual == false)
+                                            {
+                                                <th>
+                                                    @Html.DisplayName("Template Receipt Number")
+                                                </th>
+                                            }
+                                            <th>
+                                                @Html.DisplayName("Remarks")
+                                            </th>
+
+                                            <th>
+                                                @Html.DisplayName("Missing Date")
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.MissingReceiptDetailsData)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @(sno++)
+                                                </td>
+                                                @if (Model.IsCentral)
+                                                {
+                                                    <td>
+                                                        @item.BranchName
+                                                    </td>
+                                                }
+
+                                                @if (item.IsManual == true)
+                                                {
+                                                    <td>
+                                                        @item.ReceiptNumber
+                                                    </td>
+                                                }
+                                                @if (item.IsManual == false)
+                                                {
+                                                    <td>
+                                                        @item.ReceiptNumber
+                                                    </td>
+                                                }
+                                                <td>
+                                                    @item.Remarks
+                                                </td>
+                                                <td>
+                                                    @item.MissingDate.Value.ToString("dd - MMM - yyyy")
+                                                </td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                    
+              
+
+            }
+            else
+            {
+                <div style="color:red;font-weight:bold">Data not available to display</div>
+            }
+        }
+        else
+        {
+            <div style="color:red;font-weight:bold">Data not available to display</div>
+        }
+
+        @Html.Action("DataTableScripts", "Base")
+
+<script>
+
+    function submitform() {
+        $.ajax({
+            url: '/AReports/MissingReceiptReport',
+            data: {},
+            success: function (result) {
+            }
+        })
+    };
+
+    $('#btnExport').click(function () {
+        ExportToExcel("MissingReceiptData")
+    });
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+
+
+
+
+
+
+
+

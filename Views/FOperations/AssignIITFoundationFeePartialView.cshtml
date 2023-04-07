@@ -1,0 +1,156 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentAdmissionData>
+
+@{
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+}
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+
+
+
+@if (Model != null && Model.Count() > 0)
+{
+
+    if (Model.Count() > 0)
+    {
+        int Sno = 1;
+
+
+        <div class="col-xs-6">
+            <span style="color:red;font-weight:bold" id="Validation"></span>
+            <span style="color:red;font-weight:bold" id="MessageData"></span>
+            <div class="table-header">
+                UnAssign Students
+                <div style="float:right;">
+                    &nbsp;&nbsp;   &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;      &nbsp;&nbsp;   &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;
+                    <a name="button" class="btn btn-info btn-minier P2" onclick="SaveStudent()" id="Save">
+                        Assign
+                    </a>
+                </div>
+            </div>
+            <div>
+                <input type="text" id="SearchOne" placeholder="Search" class="form-control input-sm" />
+            </div>
+            <div style="overflow:auto;height:300px">
+                <table id="PlayerTable"  class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            <th>
+                                <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                            </th>
+
+                            @if (bIsCoastal)
+                            {
+                                <th>
+                                    @Html.DisplayName("Registration Number")
+                                </th>
+                            }
+
+                            <th>
+                                @Html.DisplayName("Student Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Roll Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Section")
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @for (int i = 0; i < Model.Count(); i++)
+                        {
+                            if (Model.ElementAt(i).isChecked != true)
+                            {
+                                <tr>
+                                    <td>
+                                        @(Sno++)
+                                    </td>
+                                    <td>
+                                        @Html.Hidden("Student.Index", (@i + 10))
+                                        @Html.Hidden("Student[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                                        @Html.Hidden("Student[" + (@i + 10) + "].FirstName", Model.ElementAt(i).FirstName)
+                                        @Html.Hidden("Student[" + (@i + 10) + "].SectionId", Model.ElementAt(i).SectionId, new { @id = "nSectionId" })
+                                        @Html.Hidden("Student[" + (@i + 10) + "].SectionName", Model.ElementAt(i).SectionName)
+
+
+                                        @Html.CheckBox("Student[" + (@i + 10) + "].isChecked", Model.ElementAt(i).isChecked, new { @id = "Check", @name = "Check", @Value = Model.ElementAt(i).StudentId, @onclick = "RemoveVal()" })
+                                        @Html.Hidden("Student[" + (@i + 10) + "].isChecked", Model.ElementAt(i).isChecked)
+                                    </td>
+
+                                    @if (bIsCoastal)
+                                    {
+                                        <td>
+                                            @Model.ElementAt(i).OMRNumber
+                                        </td>
+                                    }
+                                    <td>
+                                        @Model.ElementAt(i).FirstName
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).RollNumber
+                                    </td>
+
+                                    <td>
+                                        @Model.ElementAt(i).SectionName
+                                        @Html.Hidden("Student[" + (@i + 10) + "].SectionName", Model.ElementAt(i).SectionName)
+                                    </td>
+
+                                </tr>
+                            }
+
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+
+
+        </div>
+
+    }
+    else
+    {
+        <span style="color: red;"><b>Data not available</b></span>
+    }
+
+
+
+    <div class="col-xs-6">
+        <span style="color:red;font-weight:bold" id="Message"></span>
+        <div class="table-header">
+            All Students
+            @if (null != Model && Model.Count > 0)
+            {
+
+                <input type="hidden" value="@Model.FirstOrDefault().PlanId" id="TransportPlanId" />
+            }
+            else
+            {
+                <input type="hidden" value="0" id="TransportPlanId" />
+            }
+
+        </div>
+        <div>
+            <input type="text" id="SearchTwo" placeholder="Search" class="form-control input-sm" />
+        </div>
+        <div style="overflow:auto;height:300px" id="AssignStudentListData">
+        </div>
+
+
+        <input type="hidden" id="ClassId" name="SelClassId" class="form-control" />
+    </div>
+}
+else
+{
+    <span style="color: red;"><b>Data not available</b></span>
+}
+
+@Html.Action("DataTableScripts", "Base")

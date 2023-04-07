@@ -1,0 +1,284 @@
+﻿@model  AsteriskBrowserAL.Models.MoneySpentCorrection
+@{
+    Layout = null;
+    int Sno = 1;
+    int RequestType = 0;
+    if (Model.lstData.Count() > 0)
+    {
+        RequestType = Model.lstData.FirstOrDefault().RequestType.GetValueOrDefault();
+    }
+}
+
+
+@if (null != Model)
+{
+    if (null != Model.lstData)
+    {
+        if (Model.lstData.Count() > 0)
+        {
+            <input type="hidden" id="SelBarnch" value="@Model.BranchId" />
+            <input type="hidden" id="SelDivision" value="@Model.BranchId" />
+            <span id="DemoValidation" style="color:red;font-weight:bold;display:none"> *Enter Remarks and Amount</span>
+            <span id="DemoValidation1" style="color:red;font-weight:bold;display:none"> *Select Cash Card</span>
+            <div class="table-header">
+                Records Found(@Model.lstData.Count)
+                <div class="widget-toolbar no-border">
+                    @if (RequestType == 0)
+                    {
+                        <div class="inline action-buttons">
+                            <a><span class="btn btn-info btn-minier P2" id="Approve" name="Approve" style="margin-bottom:8px;float:right">Transfer</span></a>
+
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="table-main">
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("Sno")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Head Name")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Sub Head Name")
+                            </th>
+                            @if (RequestType == 0)
+                            {
+                                <th>
+                                    @Html.DisplayName("Cash Card")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Approve Amount")
+                                </th>
+
+                            }
+                            else
+                            {
+                                <th>
+                                    @Html.DisplayName("Request Date")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Request Amount")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Request Remarks")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Last Month Spent Amount")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Regular/Special")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Change Request Amount")
+                                </th>
+                            }
+                            @if (RequestType == 0)
+                            {
+                                <th>
+                                    <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                                </th>
+                            }
+                            else
+                            {
+                                <th>Edit</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.lstData)
+                        {
+                            <tr>
+                                @Html.Hidden("lstData[" + (Sno + 10) + "].NewAmount", item.NewAmount)
+                                @Html.Hidden("lstData[" + (Sno + 10) + "].NewPaidTo", item.NewPaidTo)
+                                <td>
+                                    @Sno
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BranchName)
+                                </td>
+                                @if (RequestType == 1)
+                                {
+                                    <td>
+                                        @Html.DropDownList("lstData[" + (Sno + 10) + "].PettyCashHeadId", new SelectList(ViewBag.PettyCashHead, "PettyCashHeadId", "Name", item.PettyCashHeadId), "-- Select --", new { @id = "PettyCashHeadId_" + Sno, @class = "form-control", @style = "width:250px;" })
+                                    </td>
+                                    <td>
+                                        @Html.DropDownList("lstData[" + (Sno + 10) + "].PettyCashSubHeadId", new SelectList(ViewBag.PettyCashSubHead, "PettyCashSubHeadId", "SubHeadName", item.pettyCashSubHeadId), "-- Select --", new { @id = "pettyCashSubHeadIdId_" + Sno, @class = "form-control", @style = "width:250px;" })
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.TransactionDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.OldAmount)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Remarks)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.LastMonthSpentAmount)
+                                    </td>
+                                    <td>
+                                        @Html.TextBox("lstData[" + (Sno + 10) + "].RegularRemarks", item.RegularRemarks, new { @id = "Regular_" + Sno, @name = "Regular", @required = "required" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBox("lstData[" + (Sno + 10) + "].NewAmount", item.RequestProcessAmount, new { @id = "Amount_" + Sno, @name = "Amount", @required = "required", autocomplete = "off", @class = "form-control txtboxNum", onkeypress = "return isNumberKey(event)" })
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-info btn-minier btn-success" onclick="ChangeStatus(0,@item.PettyCashCorrectionId,@Sno)">Approve</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <button class="btn btn-info btn-minier btn-success" onclick="ChangeStatus(2,@item.PettyCashCorrectionId,@Sno)">Reject</button>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.NewSubHeadName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.OldSubHeadName)
+                                    </td>
+                                    <td>
+                                        @Html.DropDownList("lstData[" + (Sno + 10) + "].CashCardId", new SelectList(item.lstCashCards, "CashCardId", "CardNumber", item.CashCardId), "-- Select --", new { @id = "CashCardId_" + Sno, @class = "form-control", @style = "width:250px;" })
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.NewAmount)
+                                    </td>
+                                    <td>
+                                        @{
+                                            string StudentDet = item.PettyCashCorrectionId.ToString() + "-" + @Sno;
+
+                                        }
+                                        @Html.CheckBox("lstData[" + (Sno + 10) + "].IsChecked", new { @value = StudentDet, @id = "Check" })
+                                    </td>
+                                            }
+
+                            </tr>
+                                                Sno++;
+                                            }
+                    </tbody>
+                </table>
+
+            </div>
+            @Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+                                            }
+                                            else
+                                            {
+                                                <span style="color: red;"><b>Data is not available</b></span>
+                                                    }
+
+                                                }
+                                            }
+
+
+
+
+<script>
+    $('.Amount').focus(function () {
+        $('#DemoValidation1').hide()
+    })
+    function ChangeStatus(Status, BudgetRequestId, Id) {
+        debugger
+        var Amount = $('#Amount_' + Id).val();
+        var HeadId = $('#PettyCashHeadId_' + Id).val();
+        var SubHeadId = $('#pettyCashSubHeadIdId_' + Id).val();
+        var Regular = $('#Regular_' + Id).val();
+        if (Amount != "") {
+            $.ajax({
+                url: '/FBudgets/RequestAmountChange',
+                data: { BudgetRequestId: BudgetRequestId, Amount: Amount, HeadId: HeadId, SubHeadId: SubHeadId, Regular: Regular, Status: Status },
+                success: function (data) {
+                    if (data == "True") {
+                        var DivisionId = $('#DivisionId').val()
+                        var BranchId = $('#BranchId').val()
+                        GetData(DivisionId, BranchId)
+                    }
+                    //else {
+                    //    $('#DemoValidation').show()
+                    //}
+                    //Popup(data)
+                }
+            })
+        }
+        else {
+            $('#DemoValidation').show()
+        }
+    }
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+    $("#Approve").click(function () {
+        debugger
+        var Ids = "";
+        var result = $('#Check:checked');
+        $.each(result, function (i, result) {
+            var splits = result.value.split("-");
+            var CashCardId = $('#CashCardId_' + splits[1]).val();;
+            if (CashCardId != "" && CashCardId > 0)
+                {
+                Ids += splits[0] + "-" + CashCardId + ",";
+            }
+            else {
+                $('#DemoValidation1').show()
+            }
+        });
+
+        if (Ids != "") {
+            UpdateRequestStatus(Ids, 0);
+        }
+    })
+
+    function UpdateRequestStatus(Ids, IsApproval) {
+        var DivisionId = $('#DivisionId').val();
+        var branchId = $('#BranchId').val();
+        var status = $('#CboStatus').val();
+        var MonthYear = $('#MonthYear').val();
+        var IsCentral = $("#IsCentral").val();
+        if (IsCentral == "False") {
+            DivisionId = -1;
+            branchId = -1;
+        }
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/FBudgets/TransferBudget',
+            data: { StudentStatusId: Ids, IsApproval: IsApproval, nDivisionId: DivisionId, nBranchId: branchId, nstatus: status, MonthYear: MonthYear },
+            success: function (result) {
+                $('#imagemodal').hide();
+                $('#PartialDivision').html(result);
+            }
+        })
+    }
+
+</script>
+

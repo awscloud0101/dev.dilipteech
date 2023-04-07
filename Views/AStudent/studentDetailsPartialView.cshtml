@@ -1,0 +1,205 @@
+﻿@model AsteriskBrowserAL.Models.StudentModel
+@{
+    ViewBag.Title = "StudentPartialView";
+    int Sno = 1;
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+    Double Due = 0;
+    if (Model.StudentData.Count() > 0)
+    {
+        Due = Model.StudentData.Sum(s => s.Due);
+    }
+}
+
+    <div class="table-header">
+
+        Total Due(@Due)
+        @*<div style="float:right;margin-right:10px;">
+            <button type="submit" name="Export to excel" class="btncustom P2">
+                Download
+            </button>
+        </div>
+        <div class="col-xs-6 " style="float:right">
+            <label class="col-sm-5 control-label no-padding-right" for="form-field-1"></label>
+            <div class="col-xs-3">
+                <label><input type="radio" id="StatusA" name="Status" value="1" checked="checked" />Active</label>
+            </div>
+            <div class="col-xs-3">
+                <label><input type="radio" id="StatusI" name="Status" value="2" /> In-Active</label>
+            </div>
+        </div>*@
+    </div>
+
+@if (null != Model && null != Model.StudentData && Model.StudentData.Count() > 0)
+{
+    <div style="overflow:auto;height:100%">
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                        S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Admission Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("School Admission Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Due")
+                    </th>
+                    
+                    @if (bIsCoastal)
+                    {
+                        <th>
+                            @Html.DisplayName("Registration Number")
+                        </th>
+                    }
+                    @*<th>
+                           @Html.DisplayName("Legacy Number")
+                        </th>*@
+                    <th>
+                        @Html.DisplayName("Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Date Of Birth")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Class")
+                    </th>
+                    <th>
+                        @Html.DisplayName("IsHostel")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Father Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Mother Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Father Mobile No")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Mother Mobile No")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Address")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Admission Date")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Institute")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Aadhar No")
+                    </th>
+                    <th>
+
+                    </th>
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (var item in Model.StudentData)
+                {
+                    <tr>
+                        <td>
+                            @Sno
+                        </td>
+                        <td>
+                            @Html.ActionLink(item.AdmissionNumber, "StudentDetailsD", new { StudentId = item.StudentId, ClassId = Model.SelClassId, Studentname = Model.SelName, AdmissionNo = Model.SelAdmissionNo, FatherName = Model.SelFatherName, DatabasePath = item.DatabasePath, DivisionId = @Model.SelDivision, BranchId = @Model.SelBarnch, Status = @Model.SelStatus, SubscriptionId = item.SubscriptionId }, new { Class = "P2" })
+
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AccreditationNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Due)
+                        </td>
+                       
+                        @if (bIsCoastal)
+                        {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.OMRNumber)
+                            </td>
+                        }
+                        @*<td>
+                                @Html.DisplayFor(modelItem => item.AccreditationNumber)
+                            </td>*@
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FirstName)
+                        </td>
+                        <td>
+                            @if (item.DateofBirth.HasValue)
+                            {
+                                @item.DateofBirth.Value.ToString("dd-MMM-yyyy")
+
+                            }
+                            else
+                            {
+
+
+                            }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClassName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Hostel)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FatherName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MotherName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MobileNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MotherMobileNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AddressLineOne)
+                        </td>
+
+                        <td>
+                            @if (item.AdmissionDate.HasValue)
+                            {
+                                @item.AdmissionDate.Value.ToString("dd-MMM-yyyy")
+
+                            }
+                            else
+                            {
+
+
+                            }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Institute)
+                        </td>
+                        <td>@item.AadharCardNo</td>
+                        <td>
+                            @Html.ActionLink("Profile", "StudentDetailsD", new { StudentId = item.StudentId, ClassId = Model.SelClassId, Studentname = Model.SelName, AdmissionNo = Model.SelAdmissionNo, FatherName = Model.SelFatherName, DatabasePath = item.DatabasePath, DivisionId = @Model.SelDivision, BranchId = @Model.SelBarnch, Status = @Model.SelStatus, SubscriptionId = item.SubscriptionId }, new { Class = "P2" })
+                            @if (Model.IsCentral == false)
+                            {
+                                <text> |</text> @Html.ActionLink("Edit", "StudentDetailsE", new { id = item.StudentId, ClassId = Model.SelClassId, Studentname = Model.SelName, AdmissionNo = item.SelAdmissionNo, FatherName = item.SelFatherName, DatabasePath = item.DatabasePath, DivisionId = Model.SelDivision, BranchId = Model.SelBarnch, Status = Model.SelClassId }, new
+{@*Class = "P2"*@})
+                                @*<text> |</text>  @Html.ActionLink("FeePayments", "FeePayments", "FOperations", new { AdmissionNo = item.AdmissionNumber }, new { Class = "P2" })*@
+                            }
+                        </td>
+                    </tr>
+                    Sno++;
+                }
+            </tbody>
+        </table>
+    </div>
+    @Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+}
+else
+{
+    <input type="hidden" id="noData" value="1" />
+    <span style="color: red;"><b>Data is not available</b></span>
+}
+

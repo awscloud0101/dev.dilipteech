@@ -1,0 +1,635 @@
+﻿@model AsteriskBrowserAL.Models.InstituteDataViewModel
+@{
+    ViewBag.Title = "Edit";
+
+
+
+    List<SelectListItem> GradeSystem = new List<SelectListItem>()
+{
+new SelectListItem()
+{
+    Text = "--Select System--",
+    Value = "-1"
+},
+
+new SelectListItem()
+{
+    Text = "CCE",
+    Value = "1"
+},
+
+new SelectListItem()
+{
+    Text = "Normal",
+    Value = "0"
+}
+
+};
+
+
+    List<SelectListItem> Hours = new List<SelectListItem>()
+{
+new SelectListItem(){Text = "--Hours--", Value = "-1"},
+new SelectListItem(){Text = "00", Value = "00"},
+new SelectListItem(){Text = "01", Value = "01"},
+new SelectListItem(){Text = "02", Value = "02"},
+new SelectListItem(){Text = "03", Value = "03"},
+new SelectListItem(){Text = "04", Value = "04"},
+new SelectListItem(){Text = "05", Value = "05"},
+new SelectListItem(){Text = "06", Value = "06"},
+new SelectListItem(){Text = "07", Value = "07"},
+new SelectListItem(){Text = "08", Value = "08"},
+new SelectListItem(){Text = "09", Value = "09"},
+new SelectListItem(){Text = "10", Value = "10"},
+new SelectListItem(){Text = "11", Value = "11"},
+new SelectListItem(){Text = "12", Value = "12"},
+new SelectListItem(){Text = "13", Value = "13"},
+new SelectListItem(){Text = "14", Value = "14"},
+new SelectListItem(){Text = "15", Value = "15"},
+new SelectListItem(){Text = "16", Value = "16"},
+new SelectListItem(){Text = "17", Value = "17"},
+new SelectListItem(){Text = "18", Value = "18"},
+new SelectListItem(){Text = "19", Value = "19"},
+new SelectListItem(){Text = "20", Value = "20"},
+new SelectListItem(){Text = "21", Value = "21"},
+new SelectListItem(){Text = "22", Value = "22"},
+new SelectListItem(){Text = "23", Value = "23"}
+};
+
+    List<SelectListItem> Minutes = new List<SelectListItem>()
+{
+new SelectListItem(){Text = "--Minutes--", Value = "-1"},
+new SelectListItem(){Text = "00", Value = "00"},
+new SelectListItem(){Text = "05", Value = "05"},
+new SelectListItem(){Text = "10", Value = "10"},
+new SelectListItem(){Text = "15", Value = "15"},
+new SelectListItem(){Text = "20", Value = "20"},
+new SelectListItem(){Text = "25", Value = "25"},
+new SelectListItem(){Text = "30", Value = "30"},
+new SelectListItem(){Text = "35", Value = "35"},
+new SelectListItem(){Text = "40", Value = "40"},
+new SelectListItem(){Text = "45", Value = "45"},
+new SelectListItem(){Text = "50", Value = "50"},
+new SelectListItem(){Text = "55", Value = "55"},
+};
+}
+
+@using AsteriskBrowserAL.Helpers
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<!-- daterange picker -->
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Settings
+        </li>
+        <li>
+            <i class=""></i>
+            General
+        </li>
+        <li class="active">System</li>
+    </ul><!-- /.breadcrumb -->
+
+}
+
+<section class="content">
+
+
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="row">
+                <div class="col-xs-12">
+
+                    @using (Html.BeginForm("Index", "SeGeneral", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+                    {
+                        <span style="color:green;font-weight:bold;display:none" id="Saved">@Html.ValidationMessage("Institute")</span>
+                        <div class="table-header">
+                            System
+                            <div style="float:right;margin-right:5px;">
+
+                                <button type="submit" name="Save" class="btncustom" id="subbtn">
+
+
+                                    <strong style="font-family:Calibri;padding-left:5px;">Save</strong>
+                                </button>
+                            </div>
+
+
+
+                        </div>
+                        <div class="widget-box">
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    @Html.AntiForgeryToken()
+                                    <span style="color:red;font-weight:bold" id="DateVal"></span>
+                                    <span style="color:red;font-weight:bold" id="DayVal"></span>
+
+                                    <table class="table table-striped table-bordered table-hover table-responsive">
+                                        <tbody>
+
+
+
+                                            <div class="col-sm-12">
+
+                                                <style>
+                                                    .form-group {
+                                                        padding: 0px;
+                                                        margin: 4px;
+                                                    }
+                                                </style>
+
+                                                <div class="col-sm-8">
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5">@Html.Label("Institute Name")</label>
+                                                        <input type="hidden" name="InstituteId" value="@Model.InstituteId" />
+                                                        <div class="col-sm-7">
+                                                            <div class="col-sm-12">
+                                                                @Html.TextBoxFor(model => model.InstituteName, new { autocomplete = "off", @class = "form-control textlength", placeholder = "Institute Name", @id = "InstituteName", @onchange = "removeError();" })
+
+                                                                <label style="color:red;font-weight:bold;display:none;" id="InstituteNameVal">Required </label>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5">@Html.Label("Institute Phone")</label>
+
+                                                        <div class="col-sm-7">
+                                                            <div class="col-sm-12">
+                                                                @Html.TextBoxFor(model => model.InstitutePhone, new { @class = "form-control", placeholder = "Institute Phone", @id = "InstitutePhone" })
+                                                                <label style="color:red;font-weight:bold;display:none;" id="InstitutePhoneVal">Required </label>
+
+
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5">@Html.Label("Alternate Institute Number")</label>
+                                                        <div class="col-sm-7">
+                                                            <div class="col-sm-12">
+                                                                @Html.TextBoxFor(model => model.AlternateMobile, new { autocomplete = "off", @class = "form-control", placeholder = "Alternate Institute Number", @id = "InstitutePhone1" })
+                                                                <label style="color:red;font-weight:bold;display:none;" id="AlternateInstitutePhoneVal">Required </label>
+
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5">@Html.Label("Institute Address")</label>
+
+                                                        <div class="col-sm-7">
+                                                            <div class="col-sm-12">
+                                                                @Html.TextAreaFor(model => model.InstituteAddress, new { @class = "form-control textlength ", placeholder = "Institute Address", @id = "InstituteAddress", @onchange = "removeError();" })
+                                                                <label style="color:red;font-weight:bold;display:none;" id="InstituteAddressVal">Required </label>
+
+
+                                                            </div>
+
+                                                        </div>
+
+
+                                                    </div>
+
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5">@Html.Label("Academic Year Duration")</label>
+
+                                                        <div class="col-sm-7">
+                                                            <div class="col-sm-12">
+                                                                <div class="input-group date" style="width:100%">
+                                                                    @Html.TextBoxFor(model => model.Academicyear, new { autocomplete = "off", @class = "form-control pull", placeholder = "Acaedmic year", @id = "daterange", @name = "strAcademicYear" })
+                                                                    @*<input type="text" class="form-control pull-right" id="daterange" name="strAcademicYear" autocomplete="off" />*@
+                                                                    <div class="input-group-addon">
+                                                                        <i class="fa fa-calendar"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <label style="color:red;font-weight:bold;display:none;" id="AcademicYearVal">Required </label>
+                                                            </div>
+
+                                                        </div>
+
+
+
+
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5" for="form-field-1">@Html.Label("Financial Year")</label>
+                                                        <div class="col-sm-7">
+                                                            <div class="col-sm-12">
+                                                                <input type="text" class="form-control" disabled="disabled" value="@Utility.GetAcademicYear()" />
+                                                                <label style="color:red;font-weight:bold;display:none;" id="FinancialYearVal">Required </label>
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        @*<div class="col-sm-6" style="display:none;" id="ReasonVal">
+                                                                <label style="color:red;font-weight:bold;"> Mention reason for change </label>
+                                                            </div>*@
+
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5">@Html.Label("Grading System")</label>
+
+                                                        <div class="col-sm-7">
+                                                            <div class="col-sm-12">
+                                                                @Html.DropDownList("GradeSystem", new SelectList(GradeSystem, "Value", "Text", Model.GradeSystem), new { @class = "form-control selectstyled", @id = "GradeSystem", placeholder = "GradeSystem", onchange = "removeError();" })
+                                                                <label style="color:red;font-weight:bold;display:none;" id="GradeSystemVal">Required </label>
+
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5">@Html.Label("Head of the Institute")</label>
+
+                                                        <div class="col-sm-7">
+                                                            <div class="col-sm-12">
+                                                                @Html.TextBoxFor(model => model.HeadOfInstitute, new { autocomplete = "off", @class = "form-control textlength", placeholder = "HeadOfInstitute", @id = "HeadOfInstitute", @onchange = "removeError();" })
+                                                                <label style="color:red;font-weight:bold;display:none;" id="HeadOfInstituteVal">Required </label>
+
+                                                            </div>
+
+                                                        </div>
+
+
+
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5">@Html.Label("Attendance Cut off Time")</label>
+
+                                                        <div class="col-sm-7">
+                                                            @if (string.IsNullOrWhiteSpace(Model.AttendanceCutoffTime))
+                                                            {
+                                                                <div class="col-sm-6">
+                                                                    @Html.DropDownList("Hours", new SelectList(Hours, "Value", "Text", new { @class = "form-control selectstyled", @style = "width:100px" }))
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    @Html.DropDownList("Minutes", new SelectList(Minutes, "Value", "Text", new { @class = "form-control selectstyled", @style = "width:100px" }))
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="col-sm-6">
+                                                                    @Html.DropDownList("Hours", new SelectList(Hours, "Value", "Text", Model.AttendanceCutoffTime.Substring(0, 2)), new { @class = "form-control", @style = "width:100px" })
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    @Html.DropDownList("Minutes", new SelectList(Minutes, "Value", "Text", Model.AttendanceCutoffTime.Substring(3, 2)), new { @class = "form-control", @style = "width:100px" })
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            @Html.ValidationMessageFor(model => model.AttendanceCutoffTime)
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 ">@Html.Label("Attendance Freezing Day")</label>
+
+                                                        <div class="col-sm-7">
+                                                            <div class="col-sm-12">
+                                                                @Html.TextBoxFor(model => model.AttendanceFreezingDay, new { @class = "form-control", placeholder = "AttendanceFreezingDay", @id = "AttendanceFreezingDay", @onchange = "removeError();" })
+                                                                <label style="color:red;font-weight:bold;display:none;" id="AttendanceFreezingDayVal">Required </label>
+
+                                                            </div>
+                                                        </div>
+
+
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="col-sm-12" style="border:1px solid #f3f3f3;padding:20px;" align="right">
+                                                        <div class="form-group">
+                                                            @Html.HiddenFor(model => model.InstituteLogoImage)
+                                                            <label class="col-sm-8 control-label" style="font-weight:bold;">@Html.Label("Institute Photo")</label>
+                                                            <br /> <hr />
+                                                            @*@if (null != ViewBag.IsPhotoAvailable)
+                                                                {
+                                                                    if (ViewBag.IsPhotoAvailable)
+                                                                    {
+                                                                        <img id="image1" class="editable img-responsive" width="100" height="150" src="@ViewBag.ImageData" />
+                                                                        <input type="file" name="InstitutePhoto" id="1" accept="image/x-png, image/jpeg" onchange="readURL(this, 1);" />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <img class="editable img-responsive" id="image1" width="100" height="150" src="~/Content/images/NoPhoto.jpg" />
+                                                                        <input type="file" name="InstitutePhoto" id="1" accept="image/x-png, image/jpeg" onchange="readURL(this, 1);" />
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <img class="editable img-responsive" id="image1" width="100" height="150" src="~/Content/images/NoPhoto.jpg" />
+                                                                    <input type="file" name="InstitutePhoto" id="1" accept="image/x-png, image/jpeg" onchange="readURL(this, 1);" />
+                                                                }*@
+
+                                                            <img class="editable img-responsive" id="image1" width="250" height="200" src="~/Content/images/CampusWhiz_png.png" />
+
+                                                            <br />
+                                                            <hr />
+
+                                                            <input type="file" name="InstitutePhoto" id="1" accept="image/x-png, image/jpeg" onchange="readURL(this, 1);" class="choose" style="padding-left:10px;" />
+
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+
+
+                                            </div>
+
+
+                                        </tbody>
+
+
+                                    </table>
+
+
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+<script type="text/javascript">
+    function readURL(input, number) {
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#image' + number)
+                    .attr('src', e.target.result)
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+
+    }
+
+    @*</script>
+
+
+<script type="text/javascript">*@
+
+	$(document).ready(function () {
+		debugger
+        var SuccessMsg = $("#Saved").text();
+        if(SuccessMsg != null && SuccessMsg != "" && SuccessMsg != " ")
+        {
+            var url = '/SeGeneral/Index';
+            var title = "Institute";
+            OpenDialog(SuccessMsg, url, title)
+        }
+    })
+
+    $('#InstitutePhone').keypress(function (e) {
+        $("#InstitutePhone").attr('maxlength', '10');
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+
+    $('#InstitutePhone1').keypress(function (e) {
+        $("#InstitutePhone1").attr('maxlength', '10');
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+
+    $('#AttendanceFreezingDay').keypress(function (e) {
+        $("#AttendanceFreezingDay").attr('maxlength', '2');
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+    function validateInstitute() {
+		debugger
+        document.getElementById("count").value = "1";
+
+        var insName = $('#InstituteName').val();
+        var insAdd = $('#InstituteAddress').val();
+        var phone = $('#InstitutePhone').val();
+        var phone1 = $('#InstitutePhone1').val();
+        var daterange = $('#daterange').val();
+        var Financialdaterange = $('#Financial').val();
+        var GradeSystem = $('#GradeSystem').val();
+        var HeadOfInstitute = $('#HeadOfInstitute').val();
+        var AttendanceFreezingDay = $('#AttendanceFreezingDay').val();
+
+        validate = true;
+
+        //Institute name validation
+        if (insName == "") {
+            document.getElementById("InstituteNameVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("InstituteNameVal").style.display = "none";
+        }
+
+        //Institute Address validation
+        if (insAdd == "") {
+            document.getElementById("InstituteAddressVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("InstituteAddressVal").style.display = "none";
+        }
+
+        //Institute Phone number validation
+        if (phone == "") {
+            document.getElementById("InstitutePhoneVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("InstitutePhoneVal").style.display = "none";
+        }
+
+        //Institute alternate phone validation
+        if (phone1 == "") {
+            document.getElementById("AlternateInstitutePhoneVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("AlternateInstitutePhoneVal").style.display = "none";
+        }
+
+        //Daterange validation
+        if (daterange == "null" || daterange =="") {
+            document.getElementById("AcademicYearVal").style.display = "inline";
+            validate = false;
+		} else {
+            document.getElementById("AcademicYearVal").style.display = "none";
+        }
+
+        //Financialdaterange validation
+        if (Financialdaterange == "" || Financialdaterange == "null") {
+            document.getElementById('FinancialYearVal').style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById('FinancialYearVal').style.display = "none";
+        }
+
+        //GradeSystem validation
+        if (GradeSystem =="" || GradeSystem == "null") {
+            document.getElementById('GradeSystemVal').style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById('GradeSystemVal').style.display = "none";
+        }
+
+        //HeadOfInstituteVal validation
+        if (HeadOfInstituteVal == "" || HeadOfInstituteVal == "null") {
+            document.getElementById("HeadOfInstituteVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("HeadOfInstituteVal").style.display = "none";
+        }
+
+        //AttendanceFreezingDayVal Validation
+        if (AttendanceFreezingDay == "" || AttendanceFreezingDay =="null") {
+            document.getElementById("AttendanceFreezingDayVal").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("AttendanceFreezingDayVal").style.display = "none";
+        }
+
+
+        return validate;
+    };
+
+
+	$('#subbtn').click(function () {
+		var validatestatus = validateInstitute();
+		debugger
+		if (validatestatus == false) {
+			return false;
+		} else {
+			return true;
+		}
+	})
+  //  function submitForm() {
+		//debugger
+		//var validatestatus = validateInstitute();
+		//debugger
+  //      if (validatestatus == false) {
+  //          return false;
+  //      } else {
+  //          return true;
+  //      }
+  //  };
+
+
+    $('#InstituteName').focus(function () {
+        $('#InstituteNameVal').hide();
+    });
+
+    $('#InstituteAddress').focus(function () {
+        $('#InstituteAddressVal').hide();
+    });
+
+    $('#InstitutePhone').focus(function () {
+        $('#InstitutePhoneVal').hide();
+    });
+
+    $('#InstitutePhone1').focus(function () {
+        $('#AlternateInstitutePhoneVal').hide();
+    });
+    $('#daterange').focus(function () {
+        $('#AcademicYearVal').hide();
+    });
+
+    $('#Financial').focus(function () {
+        $('#FinancialYearVal').hide();
+    });
+
+    $('#GradeSystem').focus(function () {
+        $('#GradeSystemVal').hide();
+    });
+
+    $('#HeadOfInstitute').focus(function () {
+        $('#HeadOfInstituteVal').hide();
+    });
+
+    $('#AttendanceFreezingDay').focus(function () {
+        $('#AttendanceFreezingDayVal').hide();
+    });
+
+    $('#Financial').daterangepicker();
+
+
+    //Timepicker
+    $('#timepicker').timepicker({
+        showMeridian: false,
+        minuteStep: 1,
+        showSeconds: true,
+    });
+
+
+
+
+
+</script>
+
+
+
+
+
+
+

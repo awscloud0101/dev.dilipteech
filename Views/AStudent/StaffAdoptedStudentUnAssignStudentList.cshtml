@@ -1,0 +1,413 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffAdoptedStudentDataModel>
+
+@{
+    int sno = 1;
+}
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="col-sm-6">
+        <span style="color:red;font-weight:bold" id="Validation"></span>
+        <span style="color:red;font-weight:bold" id="MessageData"></span>
+        <div class="table-header">
+            UnAssign Student
+            <div style="float:right;">
+                <input type="hidden" value="@Model.FirstOrDefault().ClassNumberId" id="ClassNumberId" />
+                <input type="hidden" value="@Model.FirstOrDefault().StaffId" id="StaffId" />
+
+                <a name="button" class="btn btn-info btn-minier P2" style="float:right;" id="Assign" value="Assign">
+                    <i class="ace-icon fa fa-plus-square bigger-200"></i>
+                </a>
+                <input type="text" id="SearchOne" placeholder="All Students-Search" class="form-control col-sm-4" style="width:160px;" />
+            </div><!-- /.box-header -->
+        </div>
+            <div class="widget-box table-responsive no-padding">
+                <div class="widget-boby" style="overflow: auto;  height:400px ">
+                    <table class="table table-hover" id="TableOne" style="font-size:14px;">
+                        <tbody>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    <input type="checkbox" id="SelectAssignall" />   @Html.DisplayName("Select")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Roll Number")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Legacy Number")
+                                </th>
+
+                            </tr>
+                            @for (int i = 0; i < Model.Count(); i++)
+                            {
+
+                                <tr id="@Model.ElementAt(i).StudentId">
+                                    <td>
+                                        @(sno++)
+                                    </td>
+                                    <td>
+
+                                        <input type="checkbox" id="CheckA" name="CheckA" value=@Model.ElementAt(i).StudentId />
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).StudentName
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).RollNumber
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).LegacyNumber
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+       
+    </div>
+
+    <div class="col-sm-6">
+        <div class="table-header">
+            Assign Students
+            <div style="float:right;">
+                <a name="button" class="btn btn-info btn-minier P2" style="float:right;" id="Remove" value="Remove">
+                    <i class="ace-icon fa fa-minus-square bigger-200"></i>
+                </a>&nbsp;&nbsp;
+                <input type="text" id="SearchTwo" placeholder="Assign Student-Search" class="form-control col-xs-5" style="width:160px;" />
+            </div><!-- /.box-header -->
+        </div>
+            <div class="widget-box table-responsive no-padding">
+                <div class="widget-boby" style="overflow: auto;  height:400px ">
+                    <div id="StudentList">
+                    </div>
+                </div>
+            </div>
+       
+    </div>
+}
+
+
+<input type="hidden" id="AssStudent" />
+<input type="hidden" id="RemStudent" />
+
+
+
+<script>
+
+    $("#StaffId").change(function () {
+        var Staffid = $('#StaffId').val();
+      if(Staffid > 0){
+          StaffAssignStudentListData();
+        }
+        else {
+            $('#StudentList').html("")
+        }
+    })
+  
+
+    $('#SelectAssignall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #CheckA').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #CheckA').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+    
+    $('#ClassNumber').change(function () {
+        var ClassNumberId = $('#ClassNumber').val();
+        if (ClassNumberId > 0) {
+            GetClassUnAssignStudentList();
+        }
+
+        else {
+            $("#UnAssingStudentList").html("")
+        }
+    })
+
+    
+
+    function GetClassUnAssignStudentList() {
+        var ClassNumberId = $('#ClassNumber').val();
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AStudent/GetClassWiseStudentList',
+            data: { nClassNumber: ClassNumberId },
+            success: function (result) {
+                $('#imagemodal').hide();
+                $("#UnAssingStudentList").html(result)
+            }
+        })
+    }
+
+    //Student And Program Search
+    $('#SearchOne').keyup(function () {
+        searchTable($(this).val(), 'TableOne');
+    });
+
+    $('#SearchTwo').keyup(function () {
+        searchTable($(this).val(), 'TableTwo');
+    });
+
+    function searchTable(inputVal) {
+        var i = 1;
+        var table = document.getElementById(TableId);
+
+        tablerow = "";
+        table.find('tr').each(function (index, row) {
+            var allCells = $(row).find('td');
+
+            if (allCells.length != 0) {
+                var found = false;
+                allCells.each(function (index, td) {
+                    var regExp = new RegExp(inputVal, 'i');
+                    if (regExp.test($(td).text())) {
+                        found = true;
+                        return false;
+                    }
+                });
+                if (found == true) {
+                    $(row).show();
+                    $(row).find("td:first").html(parseInt(i));
+                    i = i + 1;
+
+                    var rowcells = $(row).find('td');
+
+                    tablerow += "<tr style='font-family:'''Segoe UI''';'>";
+
+                    rowcells.each(function (index, td) {
+                        tablerow += "<td>" + $(td).text() + "</td>"
+                    });
+                    tablerow += "</tr>"
+                }
+                else $(row).hide(row);
+            }
+        });
+
+    }
+
+    function searchTable(inputVal, TableId) {
+        var i = 1;
+        var table = $('#' + TableId);
+
+        table.find('tr').each(function (index, row) {
+            var allCells = $(row).find('td');
+
+            if (allCells.length != 0) {
+                var found = false;
+                allCells.each(function (index, td) {
+                    var regExp = new RegExp(inputVal, 'i');
+                    if (regExp.test($(td).text())) {
+                        found = true;
+                        return false;
+                    }
+                });
+                if (found == true) {
+                    $(row).show();
+                    $(row).find("td:first").html(parseInt(i));
+                    i = i + 1;
+                }
+                else $(row).hide(row);
+            }
+        });
+    }
+
+
+    $('#Assign').click(function () {
+        debugger
+        DisplayValidation = "";
+        DisplayValidation = "Please Select : ";
+        var Validation = ValidateAssignStudent();
+        if (Validation == false) {
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+            document.getElementById("SaveVal").innerHTML = ""
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+            document.getElementById("SaveVal").innerHTML = "Data saved"
+            AssignStudentList();
+            GetClassUnAssignStudentList();
+
+        }
+    })
+
+
+    $('#Remove').click(function () {
+        debugger
+
+        DisplayValidation = "";
+        DisplayValidation = "Please Select : ";
+        var Validation = RemoveData();
+        if (Validation == false) {
+            document.getElementById("Validation").innerHTML = DisplayValidation;
+            document.getElementById("SaveVal").innerHTML = ""
+        }
+        else {
+            document.getElementById("Validation").innerHTML = "";
+            RemoveData();
+            GetClassUnAssignStudentList();
+            StaffAssignStudentListData();
+            document.getElementById("SaveVal").innerHTML = "Data saved"
+        }
+
+    })
+    function AssignStudentList() {
+        var AssStudent = $("#AssStudent").val();
+        var RemStudent = $("#RemStudent").val();
+        var Ids = " ";
+        var CheckedVal = $('#CheckA:checked')
+
+        $.each(CheckedVal, function (i, result) {
+            var cValue = result.value + ""
+            var n = RemStudent.indexOf(cValue);
+            if (n > 0) {
+                RemStudent = RemStudent.replace(cValue, "")
+            }
+            Ids += cValue + ","
+        });
+
+        if (Ids != " ") {
+            document.getElementById("MessageData").innerHTML = ""
+            var ClassNumberId = $("#ClassNumberId").val()
+            var StaffId = $("#StaffId").val()
+
+            document.getElementById("RemStudent").value = RemStudent
+            document.getElementById("AssStudent").value += Ids
+
+            var AssignedStudent = $("#AssStudent").val();
+            var RemovedStudent = $("#RemStudent").val();
+            $.ajax({
+                url: "/AStudent/UpdateStaffAdopetedStudentList",
+                data: { nClassNumberId: ClassNumberId, AssignedStudent: AssignedStudent, RemovingStudent: RemovedStudent, nStaffId: StaffId },
+                success: function (Data) {                 
+                    StaffAssignStudentListData();
+                }
+            })
+        }
+        else{
+            document.getElementById("MessageData").innerHTML = "Please select any Student"
+        }
+    }
+
+
+    function StaffAssignStudentListData() {
+        var Staffid = $('#StaffId').val();    
+            $('#imagemodal').show();
+            document.getElementById("Validation").innerHTML = "";
+            $.ajax({
+                url: '/AStudent/GetAssignStaffStudentList',
+                data: { nStaffId: Staffid },
+                success: function (data) {
+                    $('#imagemodal').hide();
+                    $('#StudentList').html(data)
+                }
+
+            });
+        }
+
+    function RemoveData() {
+        debugger
+        var AssStudent = $("#AssStudent").val();
+        var RemStudent = $("#RemStudent").val();
+        var Ids = " ";
+
+        var CheckedVal = $('#CheckR:not(:checked)')
+
+        $.each(CheckedVal, function (i, result) {
+            var cValue = result.value + ""
+            var found = AssStudent.indexOf(cValue);
+
+            if (found > 0) {
+
+                AssStudent = AssStudent.replace(cValue, "");
+            }
+            Ids += cValue + ","
+        });
+
+
+        if (Ids != " ") {
+            document.getElementById("MessageData").innerHTML = ""
+            var ClassNumberId = $("#ClassNumberId").val()
+            var StaffId = $("#StaffId").val()
+            document.getElementById("AssStudent").value = AssStudent
+            document.getElementById("RemStudent").value += Ids
+
+            var AssignedStudent = $("#AssStudent").val();
+            var RemovedStudent = $("#RemStudent").val();
+            $.ajax({
+                url: "/AStudent/UpdateStaffAdopetedStudentList",
+                data: { nClassNumberId: ClassNumberId, AssignedStudent: AssignedStudent, RemovingStudent: RemovedStudent, nStaffId: StaffId },
+                success: function (Data) {                   
+                    $("#StudentList").html(Data);                   
+                }
+            })
+        }
+        else {
+            document.getElementById("MessageData").innerHTML = "Please select any Student"
+        }
+    }
+
+    function ValidateAssignStaff() {
+
+      
+    };
+
+    function ValidateAssignStudent()
+    {
+        debugger
+
+        var valid = true;
+
+       
+        var StaffId = $("#StaffId").val()
+
+        if (StaffId == 0) {
+            valid = false;
+            DisplayValidation += "Staff, ";
+        }
+
+        var AssStudent = $("#AssStudent").val();
+        var RemStudent = $("#RemStudent").val();
+        var Ids = " ";
+        var CheckedVal = $('#CheckA:checked')
+
+        $.each(CheckedVal, function (i, result) {
+            var cValue = result.value + ""
+            var n = RemStudent.indexOf(cValue);
+            if (n > 0) {
+                RemStudent = RemStudent.replace(cValue, "")
+            }
+            Ids += cValue + ","
+        });
+
+
+        if (Ids== " ") {
+            valid = false;
+            DisplayValidation += "Student";
+        } else {
+            valid = true;
+        } 
+
+        return valid;
+    }
+
+
+</script>
+
+
+
+
+
+

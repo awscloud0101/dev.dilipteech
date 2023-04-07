@@ -1,0 +1,386 @@
+﻿@model AsteriskBrowserAL.Subjects
+
+@{
+    ViewBag.Title = "SubjectsE";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Subjects</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<style>
+    
+</style>
+
+
+
+<section class="content">
+
+    @using (Html.BeginForm("SubjectsE", "SeAcademics", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        <div class="row">
+            <div class="col-xs-12">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <span style="color: red;">@Html.ValidationMessage("Subjects")</span>
+
+    <div class="table-header">
+
+        Subjects
+        <small style="float:right;" class="textheader">
+            @Html.ActionLink("Back to details", "Subjects")
+        </small>
+
+    </div>
+    @Html.HiddenFor(model => model.SubjectId)
+
+                <div class="widget-box row"  style="padding:10px;">
+                  
+
+                        <form class="form-horizontal" role="form" >
+
+                            @if (ViewBag.selectd_BatchId > 0)
+                            {
+
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Subject Name")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.SubjectName, new { autocomplete = "off", @class = "form-control col-sm-5", placeholder = "Subject Name", @id = "SubjectName", @onchange = "removeError();" })
+                                            </div>
+                                            <div class="col-sm-1" style="display:none;" id="desSubjectName">
+                                                <label style="color:red;font-weight:bold;"> Please Enter  Subject Name </label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Code")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.SubjectCode, new { autocomplete = "off", @class = "form-control col-sm-5", placeholder = "Code", @id = "Code", @onchange = "removeError();" })
+                                            </div>
+                                            <div class="col-sm-1" style="display:none;" id="desCode">
+                                                <label style="color:red;font-weight:bold;"> Please Enter Code </label>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Weekly")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.MaxWeeklyClasses, new { autocomplete = "off", @class = "form-control col-sm-5", @type = "number", @min = "0", placeholder = "Weekly", @id = "Weekly", @onchange = "removeError();" })
+                                            </div>
+                                            <div class="col-sm-1" style="display:none;" id="desWeekly">
+                                                <label style="color:red;font-weight:bold;"> Please Enter  Weekly Name </label>
+                                            </div>
+                                            @*<div class="col-sm-3">
+                                        <span style="color: red;font-weight: bold;">@Html.ValidationMessage("MaxWeeklyClasses")</span>
+                                    </div>*@
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.TextBoxFor(model => model.SubDescription, new { autocomplete = "off", @class = "form-control col-sm-5", placeholder = "Description", @id = "SubDescription", @onchange = "removeError();" })
+                                            </div>
+                                            <div class="col-sm-1" style="display:none;" id="desDescription">
+                                                <label style="color:red;font-weight:bold;"> Please Enter  Description</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+
+
+                                </div>
+                                <div class=" col-sm-9" >
+
+                                    <div class="hr hr-18 dotted hr-double"></div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="col-sm-1 control-label no-padding-right"></label>
+
+                                            <div class="col-sm-10">
+                                                <div class="col-sm-3">
+                                                    @Html.CheckBoxFor(model => model.IsNoExam.Value, new { Name = "IsNoExam", @class = "checkbox" })
+                                                    <input name="IsNoExam" type="hidden" value="false" />
+                                                </div>
+
+
+                                                <span class="lbl bigger-110">NoExam</span>
+                                            </div>
+
+                                            <div class="col-sm-1">
+                                                <span style="color: red;font-weight: bold;">@Html.ValidationMessage("NoExam")</span>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="col-sm-1 control-label no-padding-right"></label>
+
+                                            <div class="col-sm-10">
+                                                <div class="col-sm-3">
+                                                    @Html.CheckBoxFor(model => model.IsCoCurricular.Value, new { Name = "IsCoCurricular", @class = "checkbox" })
+                                                    <input name="IsCoCurricular" type="hidden" value="false" />
+                                                </div>
+
+                                                <span class="lbl bigger-120">Is for grading</span>
+                                            </div>
+
+                                            <div class="col-sm-1">
+                                                <span style="color: red;font-weight: bold;">@Html.ValidationMessage("IsCoCurricular")</span>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="col-sm-4">
+
+                                        <div class="form-group">
+                                            <label class="col-sm-1 control-label no-padding-right"></label>
+
+                                            <div class="col-sm-10">
+                                                <div class="col-sm-3">
+                                                    @Html.CheckBoxFor(model => model.IsElective.Value, new { Name = "IsElective", @class = "checkbox" })
+                                                    <input name="IsCoCurricular" type="hidden" value="false" />
+                                                </div>
+
+                                                <span class="lbl bigger-120">Is for IsElective</span>
+                                            </div>
+
+                                            <div class="col-sm-1">
+                                                <span style="color: red;font-weight: bold;">@Html.ValidationMessage("IsElective")</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="hr hr-18 dotted hr-double"></div>
+                                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                @*<div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right"></label>
+                            <div class="col-sm-5">
+                                <div class="col-sm-1">
+                                    @if (Model.IsElective.HasValue)
+                                    {
+                                        <input name="IsElective" type="hidden" value="true" checked />
+                                        <input class="checkbox" name="IsElective" type="checkbox" value="true" checked />
+
+                                    }
+                                    else
+                                    {
+                                        <input name="IsElective" type="hidden" value="false" />
+                                        <input class="checkbox" name="IsElective" value="false" type="checkbox" />
+
+                                    }
+                                </div>
+
+                                @Html.CheckBoxFor(model => model.IsElective.Value, new { Name = "IsElective" })
+                                <span class="lbl bigger-110">Is Elective</span>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <span style="color: red;font-weight: bold;">@Html.ValidationMessage("IsElective")</span>
+                            </div>
+                        </div>*@
+
+
+
+                             
+                                <div class="col-sm-9" align="left">
+                                    <div class="hr hr-18 dotted hr-double"></div>
+                                    <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                        <i class="ace-icon fa fa-check bigger-50"></i>
+                                        Save
+                                    </button>
+                                    &nbsp; &nbsp; &nbsp;
+                                    <button class="btn btn-sm" type="reset">
+                                        <i class="ace-icon fa fa-undo bigger-50"></i>
+                                        Reset
+                                    </button>
+                                </div>
+                                <br />
+
+                            }
+                        </form>
+
+
+                    
+                </div>
+
+
+
+            </div>
+        </div>
+
+    }
+
+
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+
+
+<script type="text/javascript">
+    function validateStudentSubjects() {
+    debugger
+        document.getElementById("count").value = "1";
+        var SubjectName = document.getElementById("SubjectName").value;
+        var SubjectCode = document.getElementById("Code").value;
+        var MaxWeeklyClasses = document.getElementById("Weekly").value;
+        var SubDescription = document.getElementById("SubDescription").value;
+        var ISElectiove = document.getElementById("IsElective").value;
+
+        validate = true;
+
+        if (SubjectName == "") {
+            document.getElementById("desSubjectName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desSubjectName").style.display = "none";
+        }
+        if (SubjectCode == "") {
+            document.getElementById("desCode").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desCode").style.display = "none";
+        }
+        if (MaxWeeklyClasses == "") {
+            document.getElementById("desWeekly").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desWeekly").style.display = "none";
+        }
+        if (SubDescription == "") {
+            document.getElementById("desDescription").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("desDescription").style.display = "none";
+        }
+        return validate;
+    };
+
+    function submitForm() {
+      
+        var validatestatus = validateStudentSubjects();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var SubjectName = document.getElementById("SubjectName").value;
+
+        var SubjectCode = document.getElementById("Code").value;
+
+        var MaxWeeklyClasses = document.getElementById("Weekly").value;
+
+        var SubDescription = document.getElementById("SubDescription").value;
+
+
+
+        if (count != 0) {
+            if (SubjectName != "") {
+                document.getElementById("desSubjectName").style.display = "none";
+            } else {
+                document.getElementById("desSubjectName").style.display = "inline";
+            }
+            if (count != 0) {
+                if (SubjectCode != "") {
+                    document.getElementById("desCode").style.display = "none";
+                } else {
+                    document.getElementById("desCode").style.display = "inline";
+                }
+                if (count != 0) {
+                    if (MaxWeeklyClasses != "") {
+                        document.getElementById("desWeekly").style.display = "none";
+                    } else {
+                        document.getElementById("desWeekly").style.display = "inline";
+                    }
+                }
+                if (count != 0) {
+                    if (SubDescription != "") {
+                        document.getElementById("desDescription").style.display = "none";
+                    } else {
+                        document.getElementById("desDescription").style.display = "inline";
+                    }
+                }
+            }
+        };
+        $('#Code').click(function () {
+            document.getElementById('desCode').style.display = "none"
+        })
+        $('#SubjectName').click(function () {
+            document.getElementById('desSubjectName').style.display = "none"
+        })
+
+        $('#Weekly').click(function () {
+            document.getElementById('desWeekly').style.display = "none"
+        })
+        $('#SubDescription').click(function () {
+            document.getElementById('desDescription').style.display = "none"
+        })
+    }
+</script>
+
+
+
+
+
+
+

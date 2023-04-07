@@ -1,0 +1,59 @@
+﻿@model AsteriskBrowserAL.Models.StockReportData
+
+@{
+    ViewBag.Title = "Stock Report";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Stock Report - Book Wise</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ExcelStockReportBookWiseDT", "SReports", FormMethod.Post))
+            {
+                <div id="StockReportData"></div>
+            }
+        </div>
+    </div>
+</section>
+
+
+<script>
+
+    $(document).ready(function () {
+        GetStockReportData();
+    });
+
+    function GetStockReportData() {
+
+        $.ajax({
+
+            url: '/SReports/GetStockReportBookWise',
+            data: { SearchBy: $('#Search').val() },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#StockReportData').html(data);
+            }
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+</script>
+

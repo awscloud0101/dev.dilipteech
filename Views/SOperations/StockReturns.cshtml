@@ -1,0 +1,294 @@
+﻿@model AsteriskBrowserAL.Models.StudentSalesData
+@{
+    ViewBag.Title = "Stock returns";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Stock returns</li>
+    </ul><!-- /.breadcrumb -->
+}
+<br />
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<form id="myForm" method="post">
+    <section class="content">
+        @*@if (null != TempData["Status"])
+            {
+                <span style="color:forestgreen">@Html.Raw(TempData["Status"])</span>
+            }*@
+
+        <div class="row">
+            <div class="col-xs-12">
+                @using (Html.BeginForm("StockReturns", "SOperations", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-xs-12">
+
+                            <div class="widget-box">
+                                <div class="widget-header widget-header-flat widget-header-small">
+                                    <h5 class="widget-title">
+                                        Stock Returns
+                                    </h5>
+
+                                    <div class="widget-toolbar no-border">
+                                        <div class="inline dropdown-hover">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <div class="col-sm-6">
+
+                                                    <input type="radio" name="rbReceivedType" checked="checked" value="Kit"><span style="margin-right:2em;">Kit</span>
+                                                    <input type="radio" name="rbReceivedType" value="Item" />Item
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <span id="Valid" style="color:red;"></span>
+                    <div class="hr hr-18 dotted hr-double"></div>
+
+                    <div id="Items"></div>
+
+                    <div id="Kits"></div>
+
+                }
+
+
+
+            </div>
+        </div>
+    </section>
+
+
+    <div id="DataTableScripts"></div>
+
+</form>
+
+
+<script>
+
+    var rbReceivedType = "";
+
+    $(document).ready(function () {
+        GetDataOnrbClick();
+    });
+
+    $('input[name="rbReceivedType"]').click(function radioButton() {
+        rbReceivedType = $(this).val();
+        GetDataOnrbClick();
+    });
+
+    function GetDataOnrbClick() {
+        rbReceivedType = $('input[name=rbReceivedType]:checked').val();
+
+        $('#Kits').html("");
+        $('#DataTableScripts').html("");
+        $('#Items').html("");
+        $('#divKitItems').html("");
+
+        if (rbReceivedType == "Kit") {
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+
+                url: '/SOperations/GetKitsForStockReturns',
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    ClassDataTableScripts();
+                    $('#Kits').html(Data);
+
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+        }
+        else {
+            $.ajax({
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                },
+                url: '/SOperations/GetItemsForStockReturns',
+                data: { rbType: rbReceivedType },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    ClassDataTableScripts();
+                    $('#Items').html(Data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide()
+            });
+        }
+    }
+
+    function ClassDataTableScripts() {
+        $.ajax({
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            },
+            url: '/Base/DataTableScripts',
+            data: { IsPaging: false },
+            success: function (Data) {
+                $('#DataTableScripts').html(Data);
+            }
+        });
+    }
+
+
+    $(document).on("click", "#tbKit tbody tr td #lnkReturn", function (e) {
+
+        debugger
+        document.getElementById("validation").innerHTML = "";
+
+        var ReturnQty = $(this).closest('tr').find('#ReturnQty').val();
+        var KitId = $(this).closest('tr').find('#KitId').val();
+
+        if (parseInt(ReturnQty) < 1) {
+            document.getElementById("validation").innerHTML = "Please enter return quantity";
+        }
+        else {
+            window.location.href = "/SOperations/KitItemsForStockReturns?KitId=" + KitId + "&KitQtyToReturn=" + ReturnQty;
+           // PopulateKitItems(KitId, ReturnQty);
+        }
+
+    });
+
+    function PopulateKitItems(KitId, ReturnQty) {
+        $('#imagemodal').show();
+
+        $.ajax
+         ({
+             error: function (jqXHR, textStatus, errorThrown) {
+                 alert(errorThrown);
+                 $('#imagemodal').hide();
+             },
+
+             url: '/SOperations/KitItemsForStockReturns/',
+             data: { KitId: KitId, KitQtyToReturn: ReturnQty },
+             success: function (data) {
+
+                 debugger
+
+                 $('#divKitItems').html('');
+                 $('#divKitItems').html(data);
+                 $('#imagemodal').hide();
+                 KitItemsDialogue();
+             }
+
+         }).done(function () {
+             $('#imagemodal').hide();
+         });
+    }
+
+    function KitItemsDialogue() {
+        var $dialog = $('#divKitItems')
+
+       .dialog({
+           resizable: false,
+           draggable: false,
+           width: '700',
+           modal: true,
+           title: 'Kit Items',
+           open: function (event, ui) {
+               $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+           },
+           title_html: true,
+           buttons: [
+               {
+                   html: "Return",
+                   "class": "btn btn-danger btn-minier",
+                   click: function () {
+
+                       debugger
+
+                       var valid = ValidateForm();
+
+                       if (valid == false) {
+                           document.getElementById('error').innerHTML = "Item return quantity should be greater than zero"
+                       }
+                       else {
+                           $(this).dialog("close");
+                           $('#myForm').submit();
+                       }
+                   }
+               }
+               ,
+               {
+                   html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                   "class": "btn btn-minier",
+                   click: function () {
+                       $(this).dialog("close");
+                   }
+               }
+           ]
+       });
+    }
+
+
+    function SubmitForm() {
+        var valid = ValidateForm();
+
+        if (valid == false) {
+            document.getElementById('error').innerHTML = "Item return quantity should be greater than zero";
+            return false;
+        }
+        else {
+            $('#myForm').submit();
+        }
+    }
+
+
+    function ValidateForm() {
+
+        debugger
+
+        document.getElementById('error').innerHTML = "";
+
+        var val = 0;
+
+        $('#tbKitItems tbody tr').each(function () {
+
+            var returnQty = $(this).find('#ItemReturnQty').val();
+
+            if (parseInt(returnQty) > 0) {
+                val = parseInt(val) + 1;
+            }
+        });
+
+
+        if (parseInt(val) < 1) { return false; }
+
+        return true;
+    }
+
+</script>
+

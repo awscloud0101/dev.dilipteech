@@ -1,0 +1,177 @@
+﻿@model AsteriskBrowserAL.Models.StockReportData
+
+@if (null != Model)
+{
+    if (null != Model.lstStock && Model.lstStock.Count() > 0)
+    {
+        int nsno = 1;
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="table-header">
+                    Records Found (@Model.lstStock.Count)
+
+                    <div style="float:right">
+
+                        <button type="submit" class="btn btn-info btn-xs P2">
+                            <i class="ace-icon fa fa-share bigger-180"></i>
+
+                        </button>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div style="overflow:auto;height:500px;">
+                        <table class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                       S.No.
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("SKU Code")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Item Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Publisher")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Opening Stock")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Purchases")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Stock Issued To Branches")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Stock Returns From Branches")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Stock Returns To Vendors")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Obsolete Stock")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Saleable Closing Stock")
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.lstStock)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(nsno++)
+                                        </td>
+                                        <td>
+                                            @item.SKUCode
+                                        </td>
+                                        <td>
+                                            @item.ItemName
+                                        </td>
+                                        <td>
+                                            @item.SubCatgeoryName
+                                        </td>
+                                        <td>
+                                            @item.OpeningStock
+                                        </td>
+                                        <td>
+                                            @item.Quantity
+                                        </td>
+                                        <td>
+                                            @item.ItemTransferredQty
+                                        </td>
+                                        <td>
+                                            @item.ItemReturnQty
+                                        </td>
+                                        <td>
+                                            @item.ReturnedStockToVendor
+                                        </td>
+                                        <td>
+                                            @item.ObsoleteStock
+                                        </td>
+                                        <td>
+                                            @item.BalanceStockInStore
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+    }
+    else
+    {
+        <span style="color: red;"><b>No items to display</b></span>
+    }
+}
+else
+{
+    <span style="color: red;"><b>No items to display</b></span>
+}
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+<script>
+    var tablerow = "";
+
+    function PrintElem(elem) {
+
+        if (tablerow == "") {
+            var table = $('#tblData');
+
+            table.find('tr').each(function (index, row) {
+
+                var rowcells = $(row).find('td');
+
+                if (rowcells.length != 0) {
+                    tablerow += "<tr style='font-family:'''Segoe UI''';'>";
+
+                    rowcells.each(function (index, td) {
+                        tablerow += "<td>" + $(td).text() + "</td>"
+                    });
+
+                    tablerow += "</tr>"
+                }
+            });
+            $('#PrintDetails').html(tablerow);
+        }
+        else {
+            $('#PrintDetails').html(tablerow);
+        }
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+
+
+
+
+</script>

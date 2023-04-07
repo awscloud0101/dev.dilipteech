@@ -1,0 +1,91 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StaffRegistrationViewModel>
+@{
+    ViewBag.Title = "Interviewer";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Interviewer</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<br/>
+<section class="content">
+    @*<div class="hr hr-18 dotted hr-double"></div>*@
+     <div class="widget-box">
+         <div class="widget-header widget-header-flat widget-header-small">
+             <h5 class="widget-title">
+                  Set Interviewer
+             </h5>
+
+             <div class="widget-toolbar no-border">
+                 <div class="inline dropdown-hover">
+                 </div>
+                 </div>
+             </div>
+             <div class="widget-body">
+                 <div class="widget-main">
+                     <div class="row">
+                         <div class="col-xs-12">
+                             <div class="col-xs-6">
+                                 <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Department")</label>
+                                 <div class="col-sm-6">
+                                     @Html.DropDownList("Departments", null, "-- Select --", new { @class = "form-control", id = "DepartmentId" })
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+
+                 </div>
+             </div>
+         </div>
+
+        @*<div id="Interviewers" class="row">
+            @{Html.RenderPartial("InterviewersPartialView");}
+        </div>*@
+
+        <div id="InterviewerGrid" class="row"></div>
+
+        <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+            <p style="position:absolute; top: 50%; left:50%;">
+                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+            </p>
+        </div>
+</section>
+
+<script type="text/javascript">
+
+    $('#DepartmentId').change(function () {
+        var DepartmentId = $('#DepartmentId').val();
+        if (DepartmentId == "") {
+            $('#Interviewers').show();
+            $('#InterviewerGrid').hide();
+        }
+        if (DepartmentId > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/SeHR/GetStaffByDepartmentId',
+                data: { DepartmentId: DepartmentId },
+                success: function (data) {
+                    $('#Interviewers').hide();
+                    $('#InterviewerGrid').html(data);
+                    $('#imagemodal').hide();
+                },
+                aync: false
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+    });
+</script>

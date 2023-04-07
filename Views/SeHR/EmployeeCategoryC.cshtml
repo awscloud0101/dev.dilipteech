@@ -1,0 +1,214 @@
+﻿@model AsteriskBrowserAL.EmployeeCategory
+
+@{
+    ViewBag.Title = "Create Employee";
+}
+
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Employee Category</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<section class="content">
+    
+  
+   
+        <div class="col-xs-12 widget-box">
+            <!-- form start -->
+            @using (Html.BeginForm("EmployeeCategoryC", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("EmployeeCategory")</span>
+
+
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Employee Category</span>
+                    <small style="float:right;" class="textheader"> 
+                        @Html.ActionLink("Back to details", "EmployeeCategory")
+                    </small>
+
+                </div>
+
+                <br/>
+
+                <div class="box">
+              
+                    <form class="form-horizontal" role="form">
+                       
+
+                            <div class="col-sm-12">
+                                <div class="col-sm-5">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Category Name")</label>
+
+                                        <div class="col-sm-8">
+                                            @Html.TextBoxFor(model => model.CategoryName, new { @class = "form-control col-sm-5 textlength", placeholder = "CategoryName", @id = "CategoryName", @onchange = "removeError();" })
+                                        </div>
+
+                                        <div class="col-sm-6" style="display:none;" id="categoryname">
+                                            <label style="color:red;font-weight:bold;"> Please Enter  Category Name </label>
+                                        </div>
+                                        @*<div class="col-sm-3">
+                <span style="color: red;font-weight: bold;">@Html.ValidationMessage("CategoryName")</span>
+            </div>*@
+                                    </div>
+                                </div>
+                                <div class="col-sm-5">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label("Prefix")</label>
+
+                                        <div class="col-sm-8">
+                                            @Html.TextBoxFor(model => model.Prefix, new { @class = "form-control col-sm-5 textlength", placeholder = "Prefix", @maxlength = "10", @id = "Prefix", @onchange = "removeError();" })
+                                        </div>
+
+
+                                        <div class="col-sm-6" style="display:none;" id="prefix">
+                                            <label style="color:red;font-weight:bold;"> Please Enter  Prefix </label>
+                                        </div>
+                                        @*<div class="col-sm-3">
+                <span style="color: red;font-weight: bold;">@Html.ValidationMessage("Prefix")</span>
+            </div>*@
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right"></label>
+
+                                        <div class="col-sm-9">
+                                            @Html.CheckBoxFor(model => model.Status)
+                                            <span class="lbl bigger-110">Is Active</span>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            @Html.ValidationMessageFor(model => model.Status)
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                
+
+                                
+                                <br />
+                               
+                                <div class="col-md-9" style="margin-bottom:20px;">
+                                    <div class="hr hr-18 dotted hr-double"></div>
+                                    <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                        <i class="ace-icon fa fa-check bigger-50"></i>
+                                        Save
+                                    </button>
+                                    &nbsp; &nbsp; &nbsp;
+                                    <button class="btn btn-sm" type="reset">
+                                        <i class="ace-icon fa fa-undo bigger-50"></i>
+                                        Reset
+                                    </button>
+                                </div>
+
+                            </div>
+</form>
+
+
+</div>
+                
+       
+            }
+
+        </div>
+
+        <input type="hidden" id="count" name="count" value="0" />
+    </section>
+
+    <script type="text/javascript">
+        function validateEmployeeCategory() {
+
+            document.getElementById("count").value = "1";
+            var CategoryName = document.getElementById("CategoryName").value;
+            var Prefix = document.getElementById("Prefix").value;
+
+            validate = true;
+
+            if (CategoryName == "") {
+                document.getElementById("categoryname").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("categoryname").style.display = "none";
+            }
+
+            if (Prefix == "") {
+                document.getElementById("prefix").style.display = "inline";
+                validate = false;
+            } else {
+                document.getElementById("prefix").style.display = "none";
+            }
+
+
+            return validate;
+        };
+
+        function submitForm() {
+
+            var validatestatus = validateEmployeeCategory();
+            if (validatestatus == false) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+
+        function removeError() {
+
+            var count = document.getElementById("count").value;
+
+            var CategoryName = document.getElementById("CategoryName").value;
+            var Prefix = document.getElementById("Prefix").value;
+
+
+            if (count != 0) {
+                if (CategoryName != "") {
+                    document.getElementById("categoryname").style.display = "none";
+                } else {
+                    document.getElementById("categoryname").style.display = "inline";
+                }
+
+                if (Prefix != "") {
+                    document.getElementById("prefix").style.display = "none";
+                } else {
+                    document.getElementById("prefix").style.display = "inline";
+                }
+
+
+            }
+        };
+
+        $('#CategoryName').click(function () {
+            document.getElementById('categoryname').style.display = "none"
+        })
+
+
+        $('#Prefix').click(function () {
+            document.getElementById('prefix').style.display = "none"
+        })
+
+    </script>

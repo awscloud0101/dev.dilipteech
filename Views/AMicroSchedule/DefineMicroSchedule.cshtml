@@ -1,0 +1,355 @@
+﻿@model AsteriskBrowserAL.Models.MicroScheduleData
+
+@{
+    ViewBag.Title = "Define Micro Schedule";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Micro Schedule
+        </li>
+        <li class="active">Define Micro Plan</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+    @using (Html.BeginForm("DefineMicroSchedule", "AMicroSchedule", FormMethod.Post))
+    {
+        @Html.ValidationMessage("DefineMicroSchedule")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+
+
+        <div class="table-header">
+
+                Define Micro Plan
+        
+         
+                <div  style="float:right;margin-right:10px;">
+                    <a class="btncustom P2" id="NewSyllabus" name="New" style="display:none;">
+                    Add</a> &nbsp;
+                </div>
+           
+
+        </div>
+
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+           
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                <div class="row">
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+
+                                            <div class="col-sm-6">
+                                                <select class="form-control" id="SubscriptionId"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                            <div class="col-sm-6">
+                                                <select class="form-control" id="ClassNumberId"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Exam")</label>
+
+                                            <div class="col-sm-6">
+                                                <select id="ExamId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Subject")</label>
+
+                                            <div class="col-sm-6">
+                                                <select id="SubjectId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="SearchData" class="row">
+        </div>
+
+
+        if (null != Model)
+        {
+            <input style="display:none" id="SelBranch" value="@Model.SubscriptionId" />
+            <input style="display:none" id="SelClassNumber" value="@Model.ClassNumber" />
+            <input style="display:none" id="SelExam" value="@Model.ExamId" />
+            <input style="display:none" id="SelSubject" value="@Model.SubjectId" />
+        }
+        else
+        {
+
+            <input style="display:none" id="SelBranch" value="0" />
+            <input style="display:none" id="SelClassNumber" value="0" />
+            <input style="display:none" id="SelExam" value="0" />
+            <input style="display:none" id="SelSubject" value="0" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        debugger
+        //var SelClass = $('#SelBranch').val();
+        //var SelTerm = $('#SelClassNumber').val();
+        //var SelSubId = $('#SelExam').val();
+        //var SelSubId = $('#SelSubject').val();
+
+        //if (SelBranch > 0 && SelClassNumber > 0 && SelExam > 0  && SelSubject > 0) {
+        //    GetSyllabusSchedules();
+        //}
+
+        LoadBranchDropdown()
+    });
+
+
+
+    function LoadBranchDropdown() {       
+            $.ajax({
+                url: '/AMicroSchedule/GetBranchesByDivisionDefineSchedule',
+                data: { DivisionId: 0, IsAll: true },
+                success: function (result) {
+                    Branch = $("#SubscriptionId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#SubscriptionId").append(Branch)
+
+                },
+                async: false
+            })
+        
+
+    }
+
+
+    $("#SubscriptionId").change(function () {
+        var BranchId = $("#SubscriptionId").val();
+        $("#ClassNumberId").html("")
+        $("#ExamId").html("")
+        $("#SubjectId").html("")
+        $("#SearchData").html("");
+        document.getElementById("NewSyllabus").style.display = "none"
+
+        if (BranchId > -2) {
+            LoadClassDropdown();
+
+        }
+    })
+
+
+    function LoadClassDropdown() {
+        var SelClassId = $("#SelClassId").val();
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                Section = $("#ClassNumberId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassNumberId").append(Section)
+                //if (SelClassId > 0) {
+                //    document.getElementById("ClassNumberId").value = SelClassId;
+                //    GetStudentData();
+                //}
+
+            },
+            async: false
+        })
+    }
+
+
+    $('#NewSyllabus').click(function () {
+
+        var Branch = $('#SubscriptionId').val();
+        var ClassNumber = $('#ClassNumberId').val();
+        var Exam = $('#ExamId').val();
+        var Subject = $('#SubjectId').val();
+
+       
+            var SubscriptionId = $('#SubscriptionId').val();
+            //window.location.href = "/AMicroSchedule/ExamSchedulesC?ClassNumber=" + ClassNumber + "&TermNumber=" + TermNumber + "&SubId=" + SubscriptionId;
+            window.location.href = "/AMicroSchedule/DefineMicroScheduleC?Branch=" + SubscriptionId + "&ClassNumber=" + ClassNumber + "&Exam=" + Exam + "&Subject=" + Subject;
+
+    });
+
+    $('#ClassNumberId').change(function () {
+        debugger
+        $("#ExamId").html("")
+        $("#SubjectId").html("")
+        $("#SearchData").html("");
+        document.getElementById("NewSyllabus").style.display = "none"
+
+
+        if ($("#ClassNumberId").val() > 0) {
+            GetExaminations();
+
+        }
+
+    });
+
+
+
+
+    function GetExaminations() {
+        var ClassNumberid = $('#ClassNumberId').val();
+        var BranchsId = $('#SubscriptionId').val();
+
+        if (ClassNumberid > 0) {
+            $.ajax({
+                url: '/AMicroSchedule/GetExaminationsByClassNumberBranchWise',
+                data: { nClassNumberId: ClassNumberid, SubscriptionId: BranchsId },
+                success: function (data) {
+
+                    var ExaminationItems = $('#ExamId');
+
+                    ExaminationItems.children().remove();
+
+                    ExaminationItems.append($("<option>").val("0").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        ExaminationItems.append($("<option>").val(record.ExamId).text(record.ExamCode));
+
+                    });
+
+                    $('#ExamId').append(ExaminationItems);
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    $("#ExamId").change(function () {
+
+        var Examid = $("#ExamId").val()
+        $("#SubjectId").html("")
+        $("#SearchData").html("");
+        document.getElementById("NewSyllabus").style.display = "none"
+
+        if (Examid > 0) {
+            GetSubjects();
+
+        }
+    })
+
+
+    function GetSubjects() {
+      
+        var ClassNumberid = $('#ClassNumberId').val();
+
+        if (ClassNumberid > 0) {
+            $.ajax({
+
+                url: '/AMicroSchedule/GetSubjects',
+                data: { nClassNumberId: ClassNumberid },
+                success: function (data) {
+
+                    var SubjectItems = $('#SubjectId');
+
+                    SubjectItems.children().remove();
+
+                    SubjectItems.append($("<option>").val("").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        SubjectItems.append($("<option>").val(record.SubjectId).text(record.SubjectName));
+
+                    });
+
+                    $('#SubjectId').append(SubjectItems);
+                },
+                aync: false
+            });
+        }
+    }
+
+
+    $("#SubjectId").change(function () {
+        $("#SearchData").html("");
+        var Subjectid = $("#SubjectId").val();
+        document.getElementById("NewSyllabus").style.display = "none"
+
+        if(Subjectid > 0)
+        {
+            document.getElementById("NewSyllabus").style.display = "inline"
+            GetSyllabusSchedules()
+            
+        }
+    })
+
+
+    function GetSyllabusSchedules() {
+
+        var Branch = $('#SubscriptionId').val();
+        var ClassNumber = $('#ClassNumberId').val();
+        var Exam = $('#ExamId').val();
+        var Subject = $('#SubjectId').val();
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/AMicroSchedule/GetSyllebusSchedulesData',
+            data: { ClassNumber: ClassNumber, SubscriptionId: Branch, ExamId: Exam, SubjectId: Subject },           
+            success: function (data) {
+                $('#imagemodal').hide();
+                $('#SearchData').html(data);
+            }
+        })
+    }
+
+</script>
+
+
+
+
+
+

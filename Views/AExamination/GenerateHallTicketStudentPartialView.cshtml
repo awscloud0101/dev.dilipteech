@@ -1,0 +1,81 @@
+﻿@model List<AsteriskBrowserAL.Models.HallTicket>
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (null != Model && Model.Count() > 0)
+{
+    int nsno = 1;
+
+    <div class="table-header">
+        Records found (@Model.Count())
+        <div style="float:right">
+            <a class="btn btn-info btn-xs" role="button" id="Generate" name="Generate">Generate</a>
+        </div>
+    </div>
+
+    <div>
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student Name")
+                    </th>
+                    <th>
+                        <input class="checkbox" type="checkbox" id="Selectall" />
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count(); i++)
+                            {
+                <tr>
+                    <td>
+                        @Html.Hidden("lstStudentsToGenerateHTs.Index", (@i + 10))
+                        @(nsno++)
+                    </td>
+                    <td>
+                        @Html.Hidden("lstStudentsToGenerateHTs[" + (@i + 10) + "].StudentId", Model.ElementAt(i).StudentId)
+                        @Html.Hidden("lstStudentsToGenerateHTs[" + (@i + 10) + "].StudentName", Model.ElementAt(i).StudentName)
+                        @Html.Hidden("lstStudentsToGenerateHTs[" + (@i + 10) + "].ParentId", Model.ElementAt(i).ParentId)
+                        @Html.Hidden("lstStudentsToGenerateHTs[" + (@i + 10) + "].AdmissionNumber", Model.ElementAt(i).AdmissionNumber)
+                        @Model.ElementAt(i).DisplayName
+                    </td>
+
+                    <td>
+                        @Html.CheckBox("lstStudentsToGenerateHTs[" + (@i + 10) + "].IsForHallTicket", Model.ElementAt(i).IsForHallTicket, new { id = "Check", @class="checkbox" })
+                    </td>
+                </tr>
+                            }
+            </tbody>
+        </table>
+    </div>
+
+}
+else
+{
+        <span style="color: red;"><b>No sudents available to display</b></span>
+        }
+
+        <script>
+            $('#Selectall').change(function () {
+                if ($(this).prop('checked')) {
+                    $('tbody tr td #Check').each(function () {
+                        $(this).prop('checked', true);
+                    });
+                } else {
+                    $('tbody tr td #Check').each(function () {
+                        $(this).prop('checked', false);
+                    });
+                }
+            });
+
+            $('#Generate').click(function () {
+                $('#myForm').submit();
+            })
+
+        </script>

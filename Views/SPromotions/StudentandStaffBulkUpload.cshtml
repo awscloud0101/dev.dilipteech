@@ -1,0 +1,438 @@
+﻿@model AsteriskBrowserAL.Models.ConcessionUploadModel
+@{
+    ViewBag.Title = "Concession Upload";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Upload Data</li>
+    </ul>
+}
+
+
+<section class="content">
+    <br />
+
+    @using (Html.BeginForm("Download_Bulk", "SPromotions", FormMethod.Post, new { id = "formConcession", enctype = "multipart/form-data" }))
+    {
+        if (TempData["Message"] != null)
+        {
+            <div></div>
+            <span style="color:green;font-weight:bold">@TempData["Message"].ToString()</span>
+        }
+
+        <div class="row">
+            <div class="col-xs-12">
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+
+                        <div class="widget-title">
+                            <div>
+                                <h5 class="col-xs-3">
+                                    Student and Staff data Upload
+                                </h5>
+
+                                <div class="col-xs-6">
+
+                                    <table>
+                                        <tr>
+                                            <td style="color:black">
+                                                <input type="radio" id="rbDownload" name="Type" /> Download Format
+                                                <input type="radio" id="rbUpload" style="margin : 10px" name="Type" /> Upload
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div><!-- /.box-header -->
+
+                    <div class="widget-body" id="divWidgetBody" style="display:none">
+
+                        <div class="widget-main">
+
+                            <div class="row" id="divDownload">
+                                <input type="hidden" name="TypeName" id="SelType" />
+
+                                <input type="hidden" name="IsCentral" id="IsCentral" value="@Model.IsCentral" />
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                                <div class="col-sm-6">
+                                                    <select id="CboDivision" name="DivisionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="CboBranch" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="space-4"></div>
+
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Type</label>
+                                            <div class="col-xs-6">
+                                                <select id="CboType" class="form-control">
+                                                    <option value="-1">--Select--</option>
+                                                    <option value="0">Student</option>
+                                                    <option value="1">Staff</option>
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-6"></div>
+
+                                <div class="col-xs-12" style="text-align:center">
+                                    <div class="inline action-buttons">
+                                        <a class="btn btn-info btn-minier" id="btnDownload">Download</a>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row" id="divUpload" style="display:none">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Type</label>
+                                            <div class="col-xs-6">
+                                                <select id="CboUploadType" class="form-control">
+                                                    <option value="-1">--Select--</option>
+                                                    <option value="0">Student First Name</option>
+                                                    <option value="1">Student Last Name</option>
+                                                    <option value="9">Student Aadhar No</option>
+                                                    <option value="2">Father Name</option>
+                                                    <option value="3">Father Mobile Number</option>
+                                                    <option value="4">Mother Name</option>
+                                                    <option value="5">Mother Mobile Number</option>
+                                                    <option value="6">Employee First Name</option>
+                                                    <option value="7">Employee Last Name</option>
+                                                    <option value="8">Employee Mobile Number</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-6"></div>
+                                <div class="hr hr-18 dotted hr-double"></div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="col-xs-6">
+                                            <input style="margin-left:10px" type="file" id="File" name="UploadedFile" />
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="inline action-buttons">
+                                                <a class="btn btn-info btn-minier" id="btnPreview">Preview</a>
+                                            </div>
+                                            <div class="inline action-buttons">
+                                                <a class="btn btn-info btn-minier" id="btnCancel">Cancel</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="divExcelView"> </div>
+            </div>
+        </div>
+    }
+
+</section>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        $('#divDownload').hide();
+        $('#divUpload').hide();
+        $('#divWidgetBody').hide();
+
+        LoadDivisions();
+    });
+
+
+    $('#rbDownload').click(function () {
+
+        $('#Validation').html('');
+
+        $('#divWidgetBody').show();
+        $('#divDownload').show();
+        $('#divUpload').hide();
+    });
+
+
+    $('#rbUpload').click(function () {
+
+        $('#Validation').html('');
+        $('#divWidgetBody').show();
+        $('#divDownload').hide();
+        $('#divUpload').show();
+    });
+
+    $('#btnCancel').click(function () {
+        $('File').val('');
+        $('#divExcelView').html('');
+    });
+
+
+    function LoadDivisions() {
+
+        $.ajax({
+            url: '/Common/GetDivisions_MinusAll',
+            data: { IsAll: true },
+            success: function (data) {
+                var ObjDivision = $('#CboDivision');
+
+                ObjDivision.children().remove();
+
+                $.each(data, function (i, record) {
+                    ObjDivision.append($("<option>").val(record.DivisionId).text(record.DivisionName));
+                });
+
+                $('#CboDivision').append(ObjDivision);
+            },
+            aync: false
+        });
+
+    }
+
+    $('#CboDivision').change(function () {
+
+        $('#Validation').html('');
+
+        document.getElementById("Validation").innerHTML = ""
+
+        var DivisionId = $('#CboDivision').val();
+
+
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId, IsAll: true },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    });
+
+
+    $("#CboBranch").change(function () {
+
+        document.getElementById("Validation").innerHTML = ""
+
+        $('#dvStudents').html("");
+    })
+
+    $('#btnDownload').click(function () {
+        DownloadFile();
+    });
+
+    function DownloadFile() {
+
+        debugger
+
+        var bValid = Validate_DownloadData();
+
+        if (bValid == false)
+            return;
+
+        var TypeName = $("#CboType option:selected").text();
+
+        $('#SelType').val(TypeName);
+        $('#formConcession').submit();
+    }
+
+    function Validate_DownloadData() {
+
+        var DivisionId = $('#CboDivision').val();
+        var SubscriptionId = $('#CboBranch').val();
+        var Type = $('#CboType').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            if (DivisionId == "null" || DivisionId <= 0 && DivisionId != -1) {
+                Message += "Division";
+                isValid = false;
+            }
+
+            if (SubscriptionId == "null" || SubscriptionId <= 0 && SubscriptionId != -1) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Branch";
+                isValid = false;
+            }
+        }
+
+
+        if (Type < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Type";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+        }
+
+        return isValid;
+
+    }
+
+    $('#btnPreview').click(function () {
+        PerformPreview();
+    });
+
+    function PerformPreview() {
+
+        var Type = $('#CboUploadType').val();
+
+        if (Type < 0) {
+            $('#Validation').html('Please select type');
+            return;
+        }
+
+        var files = $("#File").get(0).files;
+
+        if (files.length < 0) {
+            $('#Validation').html('Please upload a file');
+            return;
+        }
+
+        var extension = $("#File").val().split('.').pop().toUpperCase();
+        if (extension != "XLSX") {
+            $('#Validation').html('Please upload a downloaded excel file');
+            return;
+        }
+
+        var formData = new FormData();
+        var totalFiles = document.getElementById("File").files.length;
+
+        for (var i = 0; i < totalFiles; i++) {
+            var file = document.getElementById("File").files[i];
+            formData.append("FileUpload", file);
+        }
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/SPromotions/PreviewUploadedFile',
+            data: formData,
+            type: "POST",
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                $('#imagemodal').hide();
+                $("#divExcelView").html(data);
+            },
+            async: false,
+            error: function (er) { $('#imagemodal').hide(); }
+
+        });
+    }
+
+    function Validate_Upload() {
+
+        var Type = $('#CboType').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            if (DivisionId == "null" || DivisionId <= 0 && DivisionId != -1) {
+                Message += "Division";
+                isValid = false;
+            }
+
+            if (SubscriptionId == "null" || SubscriptionId <= 0 && SubscriptionId != -1) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Branch";
+                isValid = false;
+            }
+        }
+
+
+        if (Type < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Type";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+        }
+
+        return isValid;
+    }
+
+</script>

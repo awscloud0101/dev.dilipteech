@@ -1,0 +1,217 @@
+﻿@model List<AsteriskBrowserAL.Models.GeneralData>
+@{
+    ViewBag.Title = "Installments";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Installments</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<!--Main Content-->
+<section class="content">
+
+
+    <div class="row">
+        <div class=col-xs-12>
+
+            @using (Html.BeginForm("NumberofInstallments", "SeFinance", FormMethod.Post))
+            {
+
+                if (!string.IsNullOrWhiteSpace(Convert.ToString(TempData["Error"])))
+                {
+                    <span id="Validation" style="color:red;font-weight:bold">@TempData["Error"].ToString()</span>
+                }
+
+                <input type="hidden" id="SelAyId" value="@ViewBag.AcademicYearId" />
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Installments
+                    </span>
+                </div>
+                    <div class="widget-box">
+                     
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 ">Academic Year</label>
+                                            <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                <select id="CboAcademicYear" name="AcademicYearId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         
+                        </div>
+                    </div>
+
+                    if (Model != null)
+                    {
+                    <br />
+                    <span id="Validation" style="color:red;font-weight:bold"></span>
+
+                    <div class="row" id="dvInstallments">
+                        <div class="col-xs-12">
+                            <div class="table-header">
+                                Records Found (2)
+                                <div style="float:right;margin-right:10px;">
+                                    <button type="submit" class="btncustom P2" onclick="return submitForm();">
+                                      Save
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table tbhover table-striped table-bordered">
+                                <thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Count(); i++)
+                                    {
+                                        <tr>
+                                            @Html.Hidden("FeeInstallmentsList.Index", (@i + 10))
+                                            @Html.Hidden("FeeInstallmentsList[" + (@i + 10) + "].FeePercentageCategoryId", Model.ElementAt(i).FeePercentageCategoryId)
+                                            <td>
+                                                Fee Installments
+                                            </td>
+
+                                            <td>
+                                                @if (Model.ElementAt(i).NumberofFeeInstallmentCount != 0)
+                                                {
+                                                    @Html.TextBox("FeeInstallmentsList[" + (@i + 10) + "].NumberofFeeInstallmentCount", Model.ElementAt(i).NumberofFeeInstallmentCount, new { @class = "txtboxNum form-control", id = "feeCount", @disabled = "disabled", style = "width:100px" })
+                                                }
+                                                else
+                                                {
+                                                    @Html.TextBox("FeeInstallmentsList[" + (@i + 10) + "].NumberofFeeInstallmentCount", Model.ElementAt(i).NumberofFeeInstallmentCount, new { @class = "txtboxNum form-control", id = "feeCount", style = "width:100px" })
+                                                }
+
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                Transport Installments
+                                            </td>
+
+                                            <td>
+                                                @if (Model.ElementAt(i).NumberofTransInstallmentCount != 0)
+                                                {
+                                                    @Html.TextBox("FeeInstallmentsList[" + (@i + 10) + "].NumberofTransInstallmentCount", Model.ElementAt(i).NumberofTransInstallmentCount, new { @class = "txtboxNum form-control", id = "transCount", @disabled = "disabled", style = "width:100px" })
+                                                }
+                                                else
+                                                {
+                                                    @Html.TextBox("FeeInstallmentsList[" + (@i + 10) + "].NumberofTransInstallmentCount", Model.ElementAt(i).NumberofTransInstallmentCount, new { @class = "txtboxNum form-control", id = "transCount", style = "width:100px" })
+                                                }
+
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                    }
+                    }
+                </div>
+    </div>
+
+</section>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        LoadAcademicYearCombo();
+    });
+
+
+    function LoadAcademicYearCombo() {
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                $('#imagemodal').hide();
+
+                var ObjAyYear = $("#CboAcademicYear")
+                ObjAyYear.children().remove();
+                ObjAyYear.append($("<option>").val(-1).text("--Select--"))
+
+                $.each(result, function (i, elm) {
+                    ObjAyYear.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(ObjAyYear)
+
+                if ($('#SelAyId').val() > 0) {
+                    $('#CboAcademicYear').val($('#SelAyId').val());
+                }
+
+            },
+            async: false
+        })
+
+    }
+
+    $('#CboAcademicYear').change(function () {
+        PopulateData();
+    });
+
+    function PopulateData() {
+        if ($('#CboAcademicYear').val() < 1) {
+
+            if ($('#dvInstallments') != "undefined")
+                $('#dvInstallments').html('');
+
+            return;
+        }
+
+        window.location.href = '/SeFinance/NumberofInstallments?AcademicYearId=' + $('#CboAcademicYear').val();
+    }
+
+
+    function submitForm() {
+        var validPercentage = ValidationsNumberofInstallments();
+        if (validPercentage == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+    function ValidationsNumberofInstallments() {
+        var validation = true;
+        var feecountlist = $('#feeCount').val();
+        var TransCountlist = $('#transCount').val();
+
+        if (feecountlist == 0 || TransCountlist == 0) {
+            document.getElementById("Validation").innerHTML = "Please enter installments"
+            validation = false;
+        }
+        else {
+            document.getElementById("Validation").innerHTML = ""
+            validation = true;
+        }
+
+        return validation;
+    }
+</script>
+

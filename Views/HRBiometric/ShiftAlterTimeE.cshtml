@@ -1,0 +1,319 @@
+﻿@model AsteriskBrowserAL.Models.ShiftAlterTimeViewData
+
+@{
+    ViewBag.Title = "Edit Shift Alter Time";
+
+    List<SelectListItem> Hours = new List<SelectListItem>()
+    {
+        new SelectListItem(){Text = "--Hours--", Value = "-1"},
+        new SelectListItem(){Text = "00", Value = "00"},
+        new SelectListItem(){Text = "01", Value = "01"},
+        new SelectListItem(){Text = "02", Value = "02"},
+        new SelectListItem(){Text = "03", Value = "03"},
+        new SelectListItem(){Text = "04", Value = "04"},
+        new SelectListItem(){Text = "05", Value = "05"},
+        new SelectListItem(){Text = "06", Value = "06"},
+        new SelectListItem(){Text = "07", Value = "07"},
+        new SelectListItem(){Text = "08", Value = "08"},
+        new SelectListItem(){Text = "09", Value = "09"},
+        new SelectListItem(){Text = "10", Value = "10"},
+        new SelectListItem(){Text = "11", Value = "11"},
+        new SelectListItem(){Text = "12", Value = "12"},
+        new SelectListItem(){Text = "13", Value = "13"},
+        new SelectListItem(){Text = "14", Value = "14"},
+        new SelectListItem(){Text = "15", Value = "15"},
+        new SelectListItem(){Text = "16", Value = "16"},
+        new SelectListItem(){Text = "17", Value = "17"},
+        new SelectListItem(){Text = "18", Value = "18"},
+        new SelectListItem(){Text = "19", Value = "19"},
+        new SelectListItem(){Text = "20", Value = "20"},
+        new SelectListItem(){Text = "21", Value = "21"},
+        new SelectListItem(){Text = "22", Value = "22"},
+        new SelectListItem(){Text = "23", Value = "23"}
+    };
+
+    List<SelectListItem> Minutes = new List<SelectListItem>()
+    {
+        new SelectListItem(){Text = "--Minutes--", Value = "-1"},
+        new SelectListItem(){Text = "00", Value = "00"},
+        new SelectListItem(){Text = "05", Value = "05"},
+        new SelectListItem(){Text = "10", Value = "10"},
+        new SelectListItem(){Text = "15", Value = "15"},
+        new SelectListItem(){Text = "20", Value = "20"},
+        new SelectListItem(){Text = "25", Value = "25"},
+        new SelectListItem(){Text = "30", Value = "30"},
+        new SelectListItem(){Text = "35", Value = "35"},
+        new SelectListItem(){Text = "40", Value = "40"},
+        new SelectListItem(){Text = "45", Value = "45"},
+        new SelectListItem(){Text = "50", Value = "50"},
+        new SelectListItem(){Text = "55", Value = "55"},
+    };
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Biometric
+        </li>
+        <li>
+            <i class=""></i>
+            Staff
+        </li>
+        <li class="active">Shift Alter Time</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content">
+
+    @if (null != Model)
+    {
+        <div class="row">
+            <div class=col-xs-3>
+                <h3>@Html.ActionLink("<< Shift Alter Timings", "ShiftAlterTime", new { ShiftsId = Model.ShiftsId })</h3>
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+
+                    <!-- form start -->
+                    @using (Html.BeginForm("ShiftAlterTimeE", "HRBiometric", FormMethod.Post, new { @class = "form-horizontal" }))
+                    {
+                        <div class="box-header">
+                            <h3 class="box-title">Shift Alter Timings</h3>
+                            <br />
+                            <br />
+                            <button class="btn btn-primary" style="width:80px" type="submit" onclick="return submitForm();">
+                                Save
+                            </button>
+                        </div><!-- /.box-header -->
+                        @Html.HiddenFor(model => model.ShiftsId, new { id = "ShiftsId" })
+    @Html.HiddenFor(model => model.Weekday)
+    @Html.HiddenFor(model => model.EmployeeNumber)
+                        @Html.ValidationSummary(true)
+                        <span style="color: red;">@Html.ValidationMessage("Shift Alter Timings")</span>
+
+    <div class="box-body">
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Name")</label>
+
+            <div class="col-sm-5">
+                <div class="col-sm-6">
+                    @Html.TextBoxFor(model => model.EmployeeName, new { @readonly="readonly",@class = "form-control", @id = "EmployeeName", placeholder = "Period Name", @style = "width:210px" })
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <span style="color:red;font-weight:bold" id="EmployeeNameVal"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Alter In Time")</label>
+
+            <div class="col-sm-5">
+                @if (string.IsNullOrWhiteSpace(Model.ExtendInTime))
+                                {
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ExtendInTimeHours, new SelectList(Hours, "Value", "Text", new {@id="ExtendInTimeHours", @class = "form-control", @style = "width:100px" }))
+                                </div>
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ExtendInTimeMinutes, new SelectList(Minutes, "Value", "Text", new { @id = "ExtendInTimeMinutes", @class = "form-control", @style = "width:100px" }))
+                                </div>
+                                }
+                                else
+                                {
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ExtendInTimeHours, new SelectList(Hours, "Value", "Text", Model.ExtendInTime.Substring(0, 2)), new { @class = "form-control", @style = "width:100px" })
+                                </div>
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ExtendInTimeMinutes, new SelectList(Minutes, "Value", "Text", Model.ExtendInTime.Substring(3, 2)), new { @class = "form-control", @style = "width:100px" })
+                                </div>
+                                }
+
+            </div>
+
+            <div class="col-sm-3">
+                <span style="color:red;font-weight:bold" id="InTimeVal"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Alter Out Time")</label>
+
+            <div class="col-sm-5">
+                @if (string.IsNullOrWhiteSpace(Model.ExtendOutTime))
+                                {
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ExtendOutTimeHours, new SelectList(Hours, "Value", "Text", new { @id = "ExtendOutTimeHours", @class = "form-control", @style = "width:100px" }))
+                                </div>
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ExtendOutTimeMinutes, new SelectList(Minutes, "Value", "Text", new { @id = "ExtendOutTimeMinutes", @class = "form-control", @style = "width:100px" }))
+                                </div>
+                                }
+                                else
+                                {
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ExtendOutTimeHours, new SelectList(Hours, "Value", "Text", Model.ExtendOutTime.Substring(0, 2)), new { @id = "ExtendOutTimeHours", @class = "form-control", @style = "width:100px" })
+                                </div>
+                                <div class="col-sm-3">
+                                    @Html.DropDownListFor(model => model.ExtendOutTimeMinutes, new SelectList(Minutes, "Value", "Text", Model.ExtendOutTime.Substring(3, 2)), new { @id = "ExtendOutTimeMinutes", @class = "form-control", @style = "width:100px" })
+                                </div>
+                                }
+
+            </div>
+
+            <div class="col-sm-3">
+                <span style="color:red;font-weight:bold" id="OutTimeVal"></span>
+            </div>
+        </div>
+    </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    }
+
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script type="text/javascript">
+
+    function submitForm()
+    {
+        var validatestatus = validateSA();
+
+        if (validatestatus == false){
+            return false
+        }
+        else {
+            return true;
+        }
+    }
+
+    function validateSA() {
+        validate = true;
+
+        var ExtendInTimeHours = $('#ExtendInTimeHours').val();
+        var ExtendInTimeMinutes = $('#ExtendInTimeMinutes').val();
+        var ExtendOutTimeHours = $('#ExtendOutTimeHours').val();
+        var ExtendOutTimeMinutes = $('#ExtendOutTimeMinutes').val();
+
+        if (ExtendInTimeHours < 0 && ExtendInTimeMinutes < 0) {
+            validate = false;
+            document.getElementById("InTimeVal").innerHTML = "Please select Both hours and Minutes";
+        }
+
+        if (ExtendOutTimeHours < 0 && ExtendOutTimeMinutes < 0) {
+            validate = false;
+            document.getElementById("OutTimeVal").innerHTML = "Please select Both hours and Minutes";
+        }
+
+        if (ExtendInTimeHours != -1) {
+            if (ExtendInTimeMinutes == -1) {
+                validate = false;
+                document.getElementById("InTimeVal").innerHTML = "Please select Minutes";
+            }
+        }
+
+        if (ExtendOutTimeHours != -1) {
+            if (ExtendOutTimeMinutes == -1) {
+                validate = false;
+                document.getElementById("OutTimeVal").innerHTML = "Please select Minutes";
+            }
+        }
+
+        if (ExtendInTimeMinutes != -1) {
+            if (ExtendInTimeHours == -1) {
+                validate = false;
+                document.getElementById("InTimeVal").innerHTML = "Please select Hours";
+            }
+        }
+
+        if (ExtendOutTimeMinutes != -1) {
+            if (ExtendOutTimeHours == -1) {
+                validate = false;
+                document.getElementById("OutTimeVal").innerHTML = "Please select Hours";
+            }
+        }
+
+        if (ExtendInTimeHours != -1 && ExtendInTimeMinutes != -1 && ExtendOutTimeHours != -1 && ExtendOutTimeMinutes != -1)
+        {
+            if(ExtendInTimeHours == ExtendOutTimeHours && ExtendInTimeMinutes == ExtendOutTimeMinutes)
+            {
+                validate = false;
+                document.getElementById("InTimeVal").innerHTML = "In Time and out time are equal";
+            }
+        }
+
+        if (validate == true)
+        {
+            var validation = ValidateShiftAlterTimings();
+            return validation;
+        }
+        else
+        {
+            return false;
+        }
+
+        function ValidateShiftAlterTimings()
+        {
+            var validation = true;
+
+            jQuery.ajax({
+                url: '/MStaff/ValidateShiftAlterTimings',
+                data: { ExtendInTimeHours: ExtendInTimeHours, ExtendInTimeMinutes: ExtendInTimeMinutes, ExtendOutTimeHours: ExtendOutTimeHours, ExtendOutTimeMinutes: ExtendOutTimeMinutes },
+                success: function (data) {
+                    if (data.TimeVal != "") {
+                        document.getElementById("OutTimeVal").innerHTML = data.TimeVal;
+                        validation = false;
+                    }
+                    else {
+                        validation = true;
+                    }
+                },
+                async: false
+
+            });
+
+            return validation;
+        }
+    }
+
+    $("#ExtendInTimeHours").change(function () {
+        document.getElementById("InTimeVal").innerHTML = "";
+    });
+
+    $("#ExtendInTimeMinutes").change(function () {
+        document.getElementById("InTimeVal").innerHTML = "";
+    });
+
+    $("#ExtendOutTimeHours").change(function () {
+        document.getElementById("OutTimeVal").innerHTML = "";
+    });
+
+    $("#ExtendOutTimeMinutes").change(function () {
+        document.getElementById("OutTimeVal").innerHTML = "";
+    });
+
+
+</script>
+
+

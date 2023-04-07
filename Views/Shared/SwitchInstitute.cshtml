@@ -1,0 +1,133 @@
+﻿@using (Html.BeginForm("Index", "Settings", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+
+    <div class="row">
+        <span style="font-size:18px;" class="blue">&nbsp; Switch Institute</span>
+
+        <div class="action-buttons pull-right">
+            <a class="blue" onclick="SetdbDropDown();" id="Switch" name="Switch"><i class="fa fa-arrow-circle-right bigger-200"></i></a>
+        </div>
+
+    </div>
+    <br />
+
+    <span id="ErrorID" style="color:red; font-weight:bold;"></span>
+
+                                    <div class="row">
+                                        <div class="form-group has-feedback">
+                                            <label class="col-sm-4">&nbsp; Year</label>
+                                            <div class="col-sm-8">
+                                                <select id="year" name="year" class="form-control" required="required"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group has-feedback">
+                                            <label class="col-sm-4">&nbsp; Institute</label>
+                                            <div class="col-sm-8">
+                                                <select id="DataBasePath" name="DataBasePath" class="form-control" required="required"></select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+}
+
+<script>
+    function SetdbDropDown() {
+
+        var DropdownId = $("#DataBasePath").val();
+        var year = $("#year").val();
+        if (year != "" && year != null && year != "null") {
+            if (DropdownId != "" && DropdownId != null && DropdownId != "null") {
+                window.location.href = '/Settings/ChangeDatabase?DataBasePath=' + DropdownId;
+
+            }
+            else {
+                document.getElementById("ErrorID").innerHTML = "Please select Institute"
+            }
+        }
+        else {
+            document.getElementById("ErrorID").innerHTML = "Please select year"
+        }
+
+    }
+
+
+    function GetYearDropDown() {
+        $.ajax({
+            url: "/Account/GetYearDrpDwn",
+            success: function (data) {
+                var yearItems = $('#year')
+                yearItems.children().remove();
+                yearItems.append($("<option>").val("null").text("--Select Year--"))
+                $.each(data.Year, function (i, record) {
+                    yearItems.append($("<option>").val(record).text(record));
+                });
+                $('#year').append(yearItems);
+                $.ajax({
+                    url: "/Account/GetUserSubscriptionData",
+                    success: function (data) {
+
+                        document.getElementById('year').value = data.AcademicYear
+                        GetSubscriptionDropDown()
+
+                    },
+                    async: false
+
+                });
+                $.ajax({
+                    url: "/Account/GetUserSubscriptionData",
+                    success: function (data) {
+
+                        document.getElementById('DataBasePath').value = data.DataBasePath
+                    },
+                    async: false
+                });
+            }
+        });
+    }
+
+
+    $('#year').change(function () {
+        document.getElementById("ErrorID").innerHTML = ""
+        GetSubscriptionDropDown()
+    })
+
+    function GetSubscriptionDropDown() {
+
+        var year = $('#year').val();
+        if (year != "" && year != null && year != "null") {
+            $.ajax({
+                url: "/Account/GetSubscription",
+                data: { year: year },
+                success: function (data) {
+                    if (data != "") {
+                        var SubItems = $('#DataBasePath')
+                        SubItems.children().remove();
+                        SubItems.append($("<option>").val("null").text("--Select--"))
+                        $.each(data.Subscriptions, function (i, record) {
+                            SubItems.append($("<option>").val(record.DataBasePath).text(record.Institute));
+                        });
+                        $('#DataBasePath').append(SubItems);
+
+                    }
+
+                },
+                async: false
+
+            });
+        }
+        else {
+            $('#DataBasePath').html("")
+        }
+
+    }
+    $('#DataBasePath').change(function () {
+        document.getElementById("ErrorID").innerHTML = ""
+    })
+    window.onload = GetYearDropDown();
+
+</script>

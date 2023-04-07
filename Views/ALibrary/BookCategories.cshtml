@@ -1,0 +1,158 @@
+﻿@model List<AsteriskBrowserAL.BookCategory>
+
+@{
+    ViewBag.Title = "BookCategories";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+           Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Book Categories</li>
+    </ul><!-- /.breadcrumb -->
+}
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+
+<section class="content">
+
+ 
+
+   @if (null != Model && Model.Count() > 0)
+   {
+       //if (Model.Count() > 0)
+       //{
+       int Sno = 1;
+            <div class="table-header">
+                Book Categories
+               
+                <div style="float:right">
+                    <a class="btn btn-info btn-xs" href="@Url.Action("ExcelSheetForBookCategory", "ALibrary")" role="button" id="New" name="New" style="margin-left:10px;"><i class="ace-icon fa fa-download"> | Download</i></a>
+                </div>
+                <div style="float:right">
+                    <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("BookCategoriesC", "ALibrary")" role="button" id="New" name="New"><i class="fa fa-plus"> | Add</i></a>
+                </div>
+           </div>
+         <div class="box-body table-responsive no-padding">
+             <table id="dynamic-table" class="table table-hover table-bordered table-striped nowrap dynamic-table" style="font-size:14px;">
+                 <thead>
+                     <tr>
+                         <th>
+                             @Html.DisplayName("SNo")
+                         </th>
+                         <th>
+                             @Html.DisplayName("Book Category Name")
+                         </th>
+                         <th>
+                             @Html.DisplayName("Book Category Description")
+                         </th>
+                         <td></td>
+                     </tr>
+                 </thead>
+                 <tbody>
+                     @foreach (var item in Model)
+                     {
+                         <tr>
+                             <td>@Sno</td>
+                             <td>
+                                 @Html.DisplayFor(modelItem => item.BookCategoryName)
+                             </td>
+                             <td>
+                                 @Html.DisplayFor(modelItem => item.BookCategoryDescription)
+                             </td>
+
+                             <td>
+                                 <div class="hidden-sm hidden-xs action-buttons">
+                                     <a class="green" href="@Url.Action("BookCategoriesE", "ALibrary", new { id = item.BookCategoryId })">
+                                         <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                     </a>
+                                     <a class="red" onclick="btnConfirm(@item.BookCategoryId)">
+                                         <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                     </a>
+                                 </div>
+                             </td>
+                         </tr>
+                         Sno++;
+                     }
+                 </tbody>
+             </table>
+
+
+
+            </div>
+
+
+        }
+
+        @*else
+         {
+             <div class="table-header">
+                 Employee Contribution
+                 <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("BookCategoriesC", "ALibrary")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+             </div>
+             <span style="color: red;"><b>No records found </b></span>
+        }
+    }*@
+   else
+   {
+    <div class="table-header">
+        Book Categories
+        <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("BookCategoriesC", "ALibrary")" role="button" id="New" name="New" style="float:right"><i class="fa fa-plus-circle bigger-180"></i></a>
+    </div>
+            <span style="color: red;"><b>No records found </b></span>
+   }
+</section>
+
+<script>
+
+    function btnConfirm(Value) {
+        debugger
+        if (Value > 0) {
+            $.ajax({
+                url: '/ALibrary/ValidationForBookCategoriesD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/ALibrary/BookCategoriesD?id=' + Value;
+                    var title = "Book Categories";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+    
+</script>
+@Html.Action("DataTableScripts", "Base")
+
+
+
+
+
+
+
+
+
+
+
+

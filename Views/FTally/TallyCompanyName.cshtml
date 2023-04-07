@@ -1,0 +1,229 @@
+﻿@model AsteriskBrowserAL.Models.CentralPrefixViewModel
+@{
+    ViewBag.Title = "Fee Due List";
+    int sno = 1;
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Tally
+        </li>
+        <li class="active">Company Name</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <br />
+            @using (Html.BeginForm("TallyCompanyName", "FTally", FormMethod.Post))
+            {
+                if (Model != null)
+                {
+                    <span id="Validation" style="color:red;font-weight:bold"></span>
+
+                    @*<span id="error" style="color:red;font-weight:bold"></span>*@
+                    <!-- form start -->
+
+                    <div class="hr hr-18 dotted hr-double"></div>
+
+                    <div class="table-header">
+                        <div style="float:right;">
+                            <button type="submit" class="btn btn-info btn-xs P2">
+                                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-header">
+                        Records Found (@Model.AllBranchPrefix.Count())
+                    </div>
+                    <div style="overflow:auto;height:400px">
+
+                        <table class="table tbhover table-striped table-bordered dynamic-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("Sno")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Branch")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Company Name")
+                                    </th>
+                                   
+                                </tr>
+                            </thead>
+                            <tbody style="overflow: auto; height: 300px; ">
+
+                                @for (int i = 0; i < Model.AllBranchPrefix.Count(); i++)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.Hidden("AllBranchPrefix.Index", (@i + 10))
+                                            @sno
+                                            @Html.Hidden("AllBranchPrefix[" + (@i + 10) + "].SubscriptionId", Model.AllBranchPrefix.ElementAt(i).SubscriptionId)
+                                            @Html.Hidden("AllBranchPrefix[" + (@i + 10) + "].BranchName", Model.AllBranchPrefix.ElementAt(i).BranchName)
+                                            @Html.Hidden("AllBranchPrefix[" + (@i + 10) + "].BranchAllPrefixId", Model.AllBranchPrefix.ElementAt(i).BranchAllPrefixId)
+                                        </td>
+                                        <td>
+                                            @Model.AllBranchPrefix.ElementAt(i).BranchName
+
+
+                                        </td>
+                                        <td>
+                                            @Html.TextBox("AllBranchPrefix[" + (@i + 10) + "].BranchCode", Model.AllBranchPrefix.ElementAt(i).BranchCode, new { @class = "form-control", style = "width:250px" })
+                                            @Html.Hidden("AllBranchPrefix[" + (@i + 10) + "].BranchCode", Model.AllBranchPrefix.ElementAt(i).BranchCode)
+
+                                        </td>
+
+                                    </tr>
+                                    sno++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    <br />
+                }
+            }
+        </div>
+    </div>
+</section>
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+<script>
+
+    $('.number').keypress(function (e) {
+        $(".number").attr('maxlength', '13');
+        var a = [];
+        var k = e.which;
+
+        for (i = 48; i < 58; i++)
+            a.push(i);
+
+        if (!($.inArray(k, a) >= 0))
+            e.preventDefault();
+    });
+
+
+
+    function submitForm() {
+        debugger
+        var validation = true;
+        validation = Validate()
+        return validation;
+    }
+
+    function Validate() {
+        var FeePrefix = $("#FeePrefix").val();
+        var VoucherPefix = $("#VoucherPefix").val();
+        var Challan = $("#Challan").val();
+        var Manual = $("#Manual").val();
+        var Special = $("#Special").val();
+        var Student = $("#Student").val();
+
+        var isvalid = true
+
+        validation = "Please fill the mandatory fields :"
+        if (FeePrefix == "" || FeePrefix == null || FeePrefix == "null") {
+
+            validation += " Fee Reciept,"
+            isvalid = false;
+        }
+
+        if (VoucherPefix == "" || VoucherPefix == null || VoucherPefix == "null") {
+
+            validation += " Vocher,"
+            isvalid = false;
+
+        }
+
+        if (Challan == "" || Challan == null || Challan == "null") {
+
+            validation += " Delivery Challan,"
+            isvalid = false;
+
+        }
+
+        if (Manual == "" || Manual == null || Manual == "null") {
+            validation += " Manual Reciept,"
+            isvalid = false;
+
+        }
+        if (Special == "" || Special == null || Special == "null") {
+
+            validation += " Special Reciept,"
+            isvalid = false;
+
+        }
+
+        if (Student == "" || Student == null || Student == "null") {
+            validation += " Student Sale Reciept,"
+            isvalid = false;
+
+        }
+
+        $.ajax({
+
+            url: '/SeFinance/PrefixValidation',
+
+            data: { FeePrefix: FeePrefix, VoucherPefix: VoucherPefix, Challan: Challan, Manual: Manual, Special: Special, Student :Student  },
+
+            success: function (result) {
+
+                if (result == "true") {
+
+                }
+
+                else {
+
+                    PersonalInfoVal += " Age is not eligible, "
+
+                    isvalid = false;
+
+                }
+
+            }, async: false,
+
+        })
+
+
+        return isvalid
+    }
+
+
+    $("#FeePrefix").click(function () {
+        document.getElementById("Validation").innerHTML = ""
+    })
+
+    $("#VoucherPefix").click(function () {
+        document.getElementById("Validation").innerHTML = ""
+    })
+
+    $("#Challan").click(function () {
+        document.getElementById("Validation").innerHTML = ""
+    })
+
+    $("#Manual").click(function () {
+        document.getElementById("Validation").innerHTML = ""
+    })
+
+    $("#Special").click(function () {
+        document.getElementById("Validation").innerHTML = ""
+    })
+
+    $("#Student").click(function () {
+        document.getElementById("Validation").innerHTML = ""
+    })
+</script>
+
+

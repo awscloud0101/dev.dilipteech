@@ -1,0 +1,348 @@
+﻿@model AsteriskBrowserAL.Models.AttendanceData
+
+@{
+    ViewBag.Title = "AttendanceRegister";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Enrollment
+        </li>
+        <li class="active">Attendance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Attendance", "HREnrollment", FormMethod.Post))
+            {
+                <span id="MessageId" style="color: red;"></span>
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("AttendanceRegister")</span>
+    <div class="widget-box">
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">
+                Attendance Register
+            </h5>
+            <div class="widget-toolbar no-border">
+                <div class="inline action-buttons">
+                    <a Class="P2" id="ViewData" value="ViewData" name="New" onclick="return Search();"><span class="btn btn-info btn-minier">View Data</span></a>
+                </div>
+            </div>
+        </div>
+        @*<div class="box">*@
+        @*<div class="box-header">
+                <h3 class="box-title">Attendance Register</h3>
+            </div>*@
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Division</label>
+                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                            @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.ListDivision, "DivisionId", "DivisionName"), "--- Select ---", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Branch</label>
+
+                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                            @if (Model.ListBranch != null)
+                            {
+                                @Html.DropDownListFor(model => model.BranchId, new SelectList(Model.ListBranch, "SubscriptionId", "Institute"), "--- Select ---", new { @class = "form-control" })
+                            }
+                            else
+                            {
+                                @Html.DropDownListFor(model => model.BranchId, new SelectList(""), "--- Select ---", new { @class = "form-control" })
+                            }
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <br />
+                    <div class="col-sm-6">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Department</label>
+                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                            @if (Model.ListDepartment != null)
+                            {
+                                @Html.DropDownListFor(model => model.DepartmentId, new SelectList(Model.ListDepartment, "DepartmentId", "DepartmentName"), "--- Select ---", new { @class = "form-control" })
+                            }
+                            else
+                            {
+                                @Html.DropDownListFor(model => model.DepartmentId, new SelectList(""), "--- Select ---", new { @class = "form-control" })
+                            }
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        @if (null != Model)
+                        {
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+
+                                <div class="col-sm-6">
+                                    <div id="datepicker" class="input-group date">
+                                        <input class="form-control" type="text" id="SelectDateId" name="SelectDate" value="@Model.AttendanceDate.ToShortDateString()" placeholder="Select Date" autocomplete="off" />
+                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Select Date")</label>
+
+                                <div class="col-sm-6">
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="SelectDateId" name="SelectDate" autocomplete="off" placeholder="Select S Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (null != Model)
+                    {
+                        <input type="hidden" id="ModelCategoryId" name="DepartmentId" value="@Model.DepartmentId" />
+                        <input type="hidden" id="ModelDivisionId" name="DivisionId" value="@Model.DivisionId" />
+                        <input type="hidden" id="ModelBranchId" name="BranchId" value="@Model.BranchId" />
+
+                    }
+                    else
+                    {
+                        <input type="hidden" id="ModelCategoryId" name="DepartmentId" />
+                        <input type="hidden" id="ModelDivisionId" name="DivisionId" />
+                        <input type="hidden" id="ModelBranchId" name="BranchId" />
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+                <br />
+                <div id="SearchViewDiv">
+                    @Html.Partial("StaffAttendancePartial", Model)
+                </div>
+            }
+        </div>
+    </div>
+
+</section>
+
+
+
+
+
+<script>
+    var dateval = "";
+    var CategoryId = "";
+    var BranchId = "";
+
+    //window.onload = OnLoadData();
+    function OnLoadData() {
+        $('#SearchViewDiv').show();
+
+        var Division = $('#ModelDivisionId').val();
+        if (Division > 0)
+            LoadBranch(Division);
+        var Branch = $('#ModelBranchId').val();
+
+        if (Branch > 0)
+            GetDepartmentDrpDwn();
+        var Department = $('#ModelCategoryId').val();
+
+        //if (Department > 0) {
+        //    GetAttendanceData(Branch);
+
+        //}
+
+    }
+
+    //function GetBatchDropDwn() {
+    //    var CategoryIdFromModel = $("#DepartmentId").val();
+    //    dateval = $("#SelectDateId").val();
+    //    var datesplit = new Array();
+    //    datesplit = dateval.split('/')
+
+    //    if (datesplit[2]=="0001") {
+    //        document.getElementById("SelectDateId").value = ""
+    //    }
+    //    $.ajax({
+    //        url: "/HREnrollment/EmployeeCategoryList",
+    //        success: function (data) {
+    //            var CategoryItems = $('#CategoryId')
+    //            CategoryItems.children().remove();
+    //            CategoryItems.append($("<option>").val("").text("--Select Category--"))
+
+    //            $.each(data, function (i, record) {
+    //                CategoryItems.append($("<option>").val(record.EmployeeCategoryId).text(record.CategoryName));
+    //            });
+    //            $('#CategoryId').append(CategoryItems);
+    //            if (CategoryIdFromModel != "" && CategoryIdFromModel > 0) {
+    //                document.getElementById("CategoryId").value = CategoryIdFromModel;
+    //            }
+    //        }
+    //    });
+    //}
+
+    $('#DepartmentId').change(function () {
+        $('#SearchViewDiv').html('');
+        BranchId = $('#BranchId').val();
+        GetAttendanceData(BranchId);
+    });
+    $('#SelectDateId').change(function () {
+        $('#SearchViewDiv').html('');
+
+        BranchId = $('#BranchId').val();
+        GetAttendanceData(BranchId);
+    });
+
+    function GetDepartmentDrpDwn() {
+        $.ajax({
+            url: '/HREnrollment/GetDepartmentDrp',
+            success: function (Data) {
+                var Department = $('#DepartmentId')
+                Department.children().remove();
+                Department.append($("<option>").val("").text("--- Select ---"))
+                $.each(Data, function (i, record) {
+                    Department.append($("<option>").val(record.DepartmentId).text(record.DepartmentName));
+                });
+                $('#DepartmentId').append(Department);
+                var Department = $('#ModelCategoryId').val();
+
+                if (Department > 0) {
+                    $('#DepartmentId').val(Department);
+                }
+            },
+            async: false
+        })
+    };
+
+    function GetAttendanceData(BranchId) {
+        dateval = $("#SelectDateId").val();
+        CategoryId = $("#DepartmentId").val();
+        if (CategoryId != "") {
+            if (dateval != "") {
+                $.ajax({
+                    url: "/HREnrollment/DateValidation",
+                    data: { Date: dateval },
+                    success: function (Data) {
+                        if (Data != "" && Data == "Y") {
+                            document.getElementById("MessageId").innerHTML = "Selected date is later than today date"
+                            var val = $('#MessageId').val();
+                        }
+                        else {
+                            $.ajax({
+                                url: "/HREnrollment/IsHolidayForAjax",
+                                data: { Sel_Date: dateval },
+                                success: function (data) {
+                                    if (data != "" && data == "Y") {
+                                        document.getElementById("MessageId").innerHTML = "Selected date is a Holiday"
+                                    }
+                                    else {
+                                        $.ajax({
+                                            url: "/HREnrollment/IsAttendanceApproved",
+                                            data: { CategoryId: CategoryId, Date: dateval, BranchId: BranchId },
+                                            success: function (Data) {
+                                                if (data != "" && data == "y") {
+                                                    document.getElementById("MessageId").innerHTML = "Attendance Freezed to selected Date"
+                                                }
+                                                else {
+                                                    $.ajax({
+                                                        url: "/HREnrollment/GetStaffForAttendance",
+                                                        data: { CategoryId: CategoryId, Date: dateval, BranchId: BranchId },
+                                                        success: function (Data) {
+                                                            $("#SearchViewDiv").html(Data);
+                                                        }
+                                                    })
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+
+                            });
+                        }
+
+
+                    }
+                });
+            }
+        }
+        $("#SearchViewDiv").html("");
+
+    }
+
+    $('#DivisionId').change(function () {
+        $('#SearchViewDiv').html('');
+
+        $('#BranchId').empty();
+        $('#BranchId').append($("<option>").val("null").text("--- Select ---"));
+        
+        var DivisionId = $('#DivisionId').val();
+        if (DivisionId != 0) {
+            LoadBranch(DivisionId);
+        }
+    });
+
+    $('#BranchId').change(function () {
+        $('#SearchViewDiv').html('');
+
+        GetDepartmentDrpDwn();
+    });
+
+    function LoadBranch(DivisionId) {
+        $.ajax({
+            url: '/HREnrollment/GetBranchesByDivisionId',
+            data: { DivisionId: DivisionId },
+            success: function (data) {
+                var BranchItems = $('#BranchId');
+                $.each(data, function (i, record) {
+                    BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                });
+                $('#BranchId').append(BranchItems);
+              
+                var Branch = $('#ModelBranchId').val();
+                if (Branch > -1)
+                    $('#BranchId').val(Branch);
+                else
+                    $('#BranchId').val(null);
+
+            },
+            aync: false
+        });
+    }
+
+
+    function getFormattedDate(input) {
+        var pattern = /(.*?)\/(.*?)\/(.*?)$/;
+        var result = input.replace(pattern, function (match, p1, p2, p3) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return (p2 < 10 ? "0" + p2 : p2) + " - " + months[(p1 - 1)] + " - " + p3;
+        });
+        return result;
+    }
+  
+</script>

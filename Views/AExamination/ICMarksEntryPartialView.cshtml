@@ -1,0 +1,170 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+
+@{
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> lstExamPapers = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+    if (null != Model && Model.lstExamResults.Count() > 0)
+    {
+        var data = Model.lstExamResults.FirstOrDefault();
+
+        if (null != data)
+        {
+            lstExamPapers = data.lstExamResultsPaperWise.ToList();
+        }
+    }
+
+    int nMaxMarks = 0;
+
+    string UserRole = AsteriskBrowserAL.Helpers.Utility.GetUserRole();
+    bool bIsCostal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+
+}
+
+<div class="hr hr-18 dotted hr-double"></div>
+@if (lstExamPapers.Count() > 0)
+{
+    if (null != Model && null != Model.lstExamResults && Model.lstExamResults.Count() > 0)
+    {
+        int nsno = 1;
+
+        <div class="table-header">
+            Examination Marks
+            <div style="float:right;">
+                <button name="Save" type="submit" class="btn btn-info btn-xs P2" id="save">
+                    <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                </button>
+            </div>           
+        </div>
+        <div>
+            <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+
+                <thead>
+                    <tr>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Student Name")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Roll Number")
+                        </th>
+                        @if (bIsCostal)
+                                    {
+                        <th>
+                            @Html.DisplayName("Registration Number")
+                        </th>
+                                    }
+                        <th>
+                            @Html.DisplayName("Legacy Number")
+                        </th>
+                        @if (null != lstExamPapers)
+                                    {
+                                        foreach (var type in lstExamPapers)
+                                        {
+                        <th>
+                            @Html.DisplayName("Max Marks")
+                        </th>
+
+                        <th>
+                            @type.PaperName
+                        </th>
+                                        }
+                                    }
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    @for (int i = 0; i < Model.lstExamResults.Count(); i++)
+                                {
+                    <tr>
+                        <td>
+                            @Html.Hidden("lstExamResults.Index", (@i + 10))
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @Html.Hidden("lstExamResults[" + (@i + 10) + "].StudentId", Model.lstExamResults.ElementAt(i).StudentId)
+                            @Model.lstExamResults.ElementAt(i).DisplayName
+                        </td>
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).RollNumber
+                        </td>
+                        @if (bIsCostal)
+                                        {
+                                    <td>
+                                        @Model.lstExamResults.ElementAt(i).OMRNumber
+                                    </td>
+                                        }
+                        <td>
+                            @Model.lstExamResults.ElementAt(i).LegacyNumber
+                        </td>
+
+                        @if (Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Count() > 0 && Model.lstExamResults.ElementAt(i).IsVisible == true)
+                                        {
+                                            for (int j = 0; j < Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Count(); j++)
+                                            {
+                                                nMaxMarks = Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks.HasValue ? Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks.Value : 0;
+                                    @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].MaxMarks", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks)
+                                    <td>
+                                        @Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks
+                                    </td>
+                                    <td>
+                                        @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].ExaminationPaperId", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).ExaminationPaperId)
+                                        @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].PaperName", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).PaperName)
+
+                                        @Html.TextBox("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].DisplayMarksScored", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored, new { @class = "form-control textlength", @maxlength = "5", @min = "0", onkeypress = "return isNumberKey(event)", @max = nMaxMarks, @style = "width:50px" })
+
+                                    </td>
+                            }
+                        }
+                        else
+                        {
+                            for (int j = 0; j < Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.Count(); j++)
+                            {
+                                nMaxMarks = Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks.HasValue ? Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks.Value : 0;
+                                @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].MaxMarks", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks)
+                                <td>
+                                    @Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).MaxMarks
+                                </td>
+                                    <td>
+                                        @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].ExaminationPaperId", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).ExaminationPaperId)
+                                        @Html.Hidden("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].PaperName", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).PaperName)
+
+                                        @Html.TextBox("lstExamResults[" + (@i + 10) + "].lstExamResultsPaperWise[" + j + "].DisplayMarksScored", Model.lstExamResults.ElementAt(i).lstExamResultsPaperWise.ElementAt(j).DisplayMarksScored, new { @class = "form-control textlength", @readonly = "readonly", @maxlength = "5", @min = "0", onkeypress = "return isNumberKey(event)", @max = nMaxMarks, @style = "width:50px" })
+
+                                    </td>
+                            }
+                        }
+                    </tr>
+                                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <span style="color: red;"><b>No exam papers available to display</b></span>
+    }
+}
+else
+{
+    <span style="color: red;"><b>No exam papers available to display</b></span>
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true }
+)
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+

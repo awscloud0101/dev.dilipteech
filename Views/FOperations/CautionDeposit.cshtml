@@ -1,0 +1,167 @@
+﻿@model AsteriskBrowserAL.Models.CautionDepositDataModel
+@{
+    ViewBag.Title = "Caution Deposit";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Caution Deposit</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+<br />
+<br />
+<section class="content">
+
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("CautionDeposit", "FOperations", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <span style="color: red;">@Html.ValidationMessage("Caution Deposit")</span>
+                <div class="table-header">
+
+                    <span style="font-family:calibri;">Caution Deposite</span>
+                </div>
+                <div class="widget-box">
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Section")</label>
+                                        <div class="col-sm-3">
+                                            @if (null != Model.lstSection)
+                                            {
+                                                @Html.DropDownListFor(model => model.SectionId, new SelectList(Model.lstSection, "SectionId", "SectionCode"), "--- Select Batch ---", new { @id = "SectionId", @class = "form-control", onchange = "GetCautionDepositData()" })
+                                            }
+                                            else
+                                            {
+                                                <select><option>--- Select Batch ---</option></select>
+                                            }
+
+                                        </div>
+
+                                        <label class="col-sm-3 control-label no-padding-right">@Html.Label("Search Student")</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" id="Student" class="form-control" placeholder="Search Student" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+                @*<div id="Data" style="display:none">
+
+                    </div>*@
+                <div id="SearchData" class="row">
+                    @Html.Partial("CautionDepositPartialView", Model)
+                </div>
+            }
+        </div>
+    </div>
+
+</section>
+
+
+<script>
+    function GetCautionDepositData() {
+        var SectionId = $('#SectionId').val();
+        //alert(BatchId + 'BatchId');
+        var Save = localStorage.getItem('Save');
+        //alert(Save);
+        //alert(BatchId);
+        debugger
+        if (SectionId > 0) {
+            $.ajax({
+                url: '/FOperations/GetCautionDepositData',
+                data: { SectionId: SectionId, StuedentId: "" },
+                success: function (Data) {
+                    //alert(Data);
+                    document.getElementById("Data").style.display = "inline";
+                    //alert(Data);
+                    $('#SearchData').html(Data);
+
+                }
+            });
+
+        }
+
+    }
+
+
+    $("#Student").autocomplete({
+
+        source: function (request, response) {
+            var SectionId = $('#SectionId').val();
+            debugger
+            $.ajax({
+                url: "/FOperations/GetCautionDepositData",
+                data: { SectionId: SectionId, Student: request.term },
+                success: function (Data) {
+                    //document.getElementById("Data").style.display = "inline";
+                    //alert(Data);
+                    $('#SearchData').html(Data);
+                },
+            });
+        },
+
+    });
+
+    $("#Student").keyup(function () {
+        if (!this.value) {
+            var SectionId = $('#SectionId').val();
+            debugger
+            $.ajax({
+                url: "/FOperations/GetCautionDepositData",
+                data: { SectionId: SectionId, Student: this.value },
+                success: function (Data) {
+                    document.getElementById("Data").style.display = "inline";
+                    $('#SearchData').html(Data);
+                },
+            })
+        }
+    });
+
+
+    window.onload = GetCautionDepositData();
+
+    $("#SectionId").change(function () {
+        var SectionId = $('#SectionId').val();
+        debugger
+        $.ajax({
+            url: "/FOperations/GetCautionDepositData",
+            data: { SectionId: SectionId, Student: "" },
+            success: function (Data) {
+                $('#SearchData').html(Data);
+            },
+        });
+    })
+</script>
+

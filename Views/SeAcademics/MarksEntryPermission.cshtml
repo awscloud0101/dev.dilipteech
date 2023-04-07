@@ -1,0 +1,179 @@
+﻿`@model List<AsteriskBrowserAL.Models.MarksEntryPermissionData>
+@{
+    ViewBag.Title = "Marks Entry Permission";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Marks Entry Permission</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+</style>
+
+<!--Main Content-->
+<section class="content">
+
+ 
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("MarksEntryPermission", "SeAcademics", FormMethod.Post))
+            {
+                if (null != TempData["MarksEntryPermission"])
+                {
+ 
+
+
+
+                    <p align="center">
+                        <span class="savedinfo">
+
+
+
+                            <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                            <br />
+                         @Html.Raw(TempData["MarksEntryPermission"])
+                            <br />
+
+                            <span class="cls1 btncustom">Close</span>
+                            <script>
+
+                                $(document).ready(function () {
+                                    $(".cls1").click(function () {
+
+                                        $(".savedinfo").css("display", "none")
+                                    });
+
+                                });
+
+                            </script>
+                        </span>
+                    </p>
+
+                }
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    <span id="Validation" style="color:red;font-weight:bold"></span>
+
+
+
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Marks Entry Permission</span>
+                        <div  style="float:right;margin-right:10px;">
+                            <button type="submit" name="Save" value="Save" class="btncustom P2">
+
+                              Save
+                            </button>  </div>
+
+                    </div>
+
+
+
+
+
+
+
+
+                    <div class="widget-box">
+                 
+                        <div class="widget-body">
+                            <div class="widget-main">
+                               
+                                       
+                                        <div class="form-group">
+                                            <label class="col-sm-3"><span style="color:red;">*E</span>nter Regular Days</label>
+                                            <div class="col-sm-3">
+                                                <input class="form-control col-sm-4" id="regular" name="regular" min="0" maxlength="3" />
+                                            </div>
+                                            <div>
+                                                <span class="input-group-btn">
+                                                    <button type="button" id="RegularSet" name="RegularSet" value="Set" onclick="RegularSet()" class="btncustom ">
+                                                        Set
+                                                    </button>
+                                                </span>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                                   
+
+                                </div>
+    <div id="SearchData">
+        @Html.Partial("MarksEntryPermissionPartialView", Model)
+    </div>
+                }
+                else
+                {
+                                <span style="color: red;"><b>Data is not available</b></span>
+                                }
+
+                                <br />
+                                }
+                            </div>
+                        </div>
+</section>
+
+
+<script type="text/javascript">
+
+
+    $("#RegularSet").click(function () {
+        var RegularDays = $('#RegularSet').val();
+        var Regular = $('#regular').val();
+
+        if (Regular == null || Regular <= 0 || Regular == "") {
+            document.getElementById("Validation").innerHTML = " Please enter Regular Days"
+        }
+        else {
+            document.getElementById("Validation").innerHTML = ""
+        }
+
+        if (Regular != null) {
+            $.ajax({
+                url: '/SeAcademics/GetRegularDays',
+                data: { Regular: Regular },
+                success: function (result) {
+                    $("#SearchData").html(result);
+                }
+            })
+        }
+        else {
+        }
+    })
+
+    $("#regular").keypress(function (e) {
+        //if the letter is not digit then display error and don't type anything
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            //display error message
+            return false;
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+

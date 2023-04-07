@@ -1,0 +1,155 @@
+﻿@model List<AsteriskBrowserAL.Models.PettyCashSubHeadsData>
+@{
+    ViewBag.Title = "PettyCashSubHeads";
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Petty Cash Sub Heads</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+    hideScrolling:hover {
+        overflow: auto;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+            <h3><a role="button">New</a> </h3>
+        </div>
+    </div>
+    <br />
+    @using (Html.BeginForm("PettyCashSubHeadS", "SeFinance", FormMethod.Post))
+    {
+        if (null != TempData["PettyCashSubHeads"])
+        {
+            @Html.Raw(TempData["PettyCashSubHeads"])
+        }
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+                        <h5 class="widget-title">
+                            Petty Cash Head
+                        </h5>
+                        <div class="widget-toolbar no-border">
+                            <div class="inline">
+                                <a class="P2" href="@Url.Action("PettyCashSubHeadS", "SeFinance")" style="color:#811761;" onclick="return submitForm()"><i class="fa fa-plus-circle bigger-200"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Head Name")</label>
+                                            <div class="col-sm-3">
+                                                @Html.DropDownList("PettyCashHeadId", null, "--Select--", new { onchange = "GetData()", @class = "form-control " })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="widget-box">
+                                        <div class="widget-header widget-header-flat widget-header-small">
+                                            <h5 class="widget-title">
+                                                Petty Cash Sub Head
+                                            </h5>
+                                        </div>
+                                        <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        @Html.DisplayName("SubHead Name")
+                                                    </th>
+
+                                                    <th>
+                                                        @Html.DisplayName("Description")
+                                                    </th>
+
+
+                                                    <th></th>
+                                                </tr>
+
+                                            </thead>
+                                            <tbody id="tbody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    </section>
+
+<script>
+
+
+    function GetData() {
+        var PettyCashHeadId = $('#PettyCashHeadId').val();
+
+        if ((PettyCashHeadId > 0) && (PettyCashHeadId != "") && (PettyCashHeadId!=null))
+        {
+            $.ajax({
+
+                url: '/SeFinance/PettyCashHeadData',
+                data: { PettyCashHeadId: PettyCashHeadId },
+                success: function (data) {
+                }
+            });
+        }
+    };
+
+    window.onload = GetData;
+ function btnConfirm(Value) {
+
+     if (Value > 0) {
+         $.ajax({
+             url: '/SeFinance/ValidationForPettyCashSubHeadHeadD',
+             data: { Id: Value },
+             success: function (data) {
+
+                 var url = '/SeFinance/PettyCashSubHeadD?id=' + Value;
+                 var title = "Petty Cash Sub Heads";
+
+                 OpenDialog(data, url, title);
+             },
+             async: false
+         });
+     }
+ }
+ </script>
+
+
+
+

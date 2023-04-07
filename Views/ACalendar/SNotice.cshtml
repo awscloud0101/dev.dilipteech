@@ -1,0 +1,147 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Notices>
+
+@{
+	ViewBag.Title = "Notices";
+}
+
+@section BreadCrumb{
+
+	<ul class="breadcrumb">
+		<li>
+			<i class="menu-icon fa fa-list"></i>
+			Academics
+		</li>
+		<li>
+			<i class=""></i>
+			Calendar
+		</li>
+		<li class="active">Notices</li>
+	</ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<section class="content">
+	<br />
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="widget-box">
+				<div class="widget-header widget-header-flat widget-header-small">
+					<h5 class="widget-title">
+						Notice
+					</h5>
+					<div class="widget-toolbar no-border">
+						<div class="inline dropdown-hover">
+						</div>
+					</div>
+				</div>
+				<div class="widget-body">
+					<div class="widget-main">
+						<div class="row">
+							<div class="col-xs-12">
+								<div class="col-sm-6">
+									<label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+									<div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+										<div id="datepicker" class="input-group date">
+											@if (ViewBag.StartDate != null)
+											{
+												<input class="form-control" type="text" id="StartDate" name="StartDate" autocomplete="off" value="@ViewBag.StartDate.ToShortDateString()" placeholder="Select Date" />
+											}
+											else
+											{
+												<input class="form-control" type="text" id="StartDate" name="StartDate" autocomplete="off" placeholder="Select Date" />
+											}
+											<span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+										</div>
+
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br />
+	@if (null != Model)
+	{
+		int nsno = 1;
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="table-header">
+					Notices/circular					
+				</div><!-- /.box-header -->
+				<table class="table tbhover table-striped table-bordered dynamic-table">
+					<thead>
+						<tr>
+							<th>
+								@Html.DisplayName("SNo")
+							</th>
+							<th>
+								@Html.DisplayName("Description")
+							</th>
+							<th>
+								@Html.DisplayName("Start Date")
+							</th>
+							<th>
+								@Html.DisplayName("End Date")
+							</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+
+						@foreach (var item in Model)
+						{
+							<tr>
+								<td>
+									@(nsno++)
+								</td>
+								<td>
+									@Html.Raw(@item.Discription)
+								</td>
+								<td>
+									@if (item.NoticeDate.HasValue)
+									{
+										@item.NoticeDate.Value.ToString("dd-MMM-yyyy")
+									}
+								</td>
+								<td>
+									@if (item.NoticeEndDate.HasValue)
+									{
+										@item.NoticeEndDate.Value.ToString("dd-MMM-yyyy")
+									}
+								</td>
+								<td>
+									<div class="hidden-sm hidden-xs action-buttons">										
+										<a class="blue" href="@Url.Action("NoticeDet", "ACalendar", new { id = item.NoticeId })">
+											<i class="ace-icon fa fa-info-circle bigger-130"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+						}
+					</tbody>
+
+
+				</table>
+			</div>
+		</div>
+		@Html.Action("DataTableScripts", "Base")
+
+	}
+	else
+	{		
+		<br />
+		<span style="color: red;"><b>There are no News to Display</b></span>
+	}
+</section>
+
+<script>
+
+	$('#StartDate').change(function () {
+
+		window.location.href = "/ACalendar/Notice?StartDate=" + $('#StartDate').val();
+	})
+</script>

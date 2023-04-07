@@ -1,0 +1,131 @@
+﻿@model List<AsteriskBrowserAL.Models.StudentPresentDaysViewModel>
+
+@{
+
+    bool bIsCoastal = AsteriskBrowserAL.Helpers.Utility.IsCoastal();
+    int nsno = 1;
+}
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+@if (null != Model && Model.Count() > 0)
+{
+
+    <div class="row">
+        <div class="col-xs-12">
+            <span id="Valid" style="color:red;"></span>
+            <div class="table-header">
+                Records Found (@Model.Count())
+                <div style="float:right;margin-right:10px">
+                    <button name="Save" class="btncustom P2" onclick="return submitform()"  type="submit" >
+                        Save
+                    </button>                   
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+            <input type="hidden" name="ClassNumber" id="nSectionId" />
+            <input type="hidden" name="nMonthId" id="nMonthId" />
+            <div class="box-body table-responsive no-padding">
+                <div class="hideScrolling">
+                    <table id="tab1" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                        <thead>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student Name")
+                                </th>
+                                <th>
+                                @Html.DisplayName("Roll Number")
+                            </th> 
+                                @if (bIsCoastal)
+                                {
+                                    <th>
+                                        @Html.DisplayName("Registration Number")
+                                    </th>
+                                }                  
+                            <th>
+                                    @Html.DisplayName("Number of Working Days")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Present Days")
+                                </th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Count(); i++)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @(nsno++)
+                                        @Html.Hidden("StudentPresentdaysList.Index", (@i))
+                                        @Html.Hidden("StudentPresentdaysList[" + (@i) + "].StudentId", Model.ElementAt(i).StudentId)
+                                        @Html.Hidden("StudentPresentdaysList[" + (@i) + "].StudentPresentdaysId", Model.ElementAt(i).StudentPresentdaysId)
+                                        @Html.Hidden("StudentPresentdaysList[" + (@i) + "].NoOfWorkingDays", Model.ElementAt(i).NoOfWorkingDays)
+                                    </td>
+                                    <td>
+                                        @Model.ElementAt(i).StudentName
+                                    </td>
+                                    <td>
+                                    @Model.ElementAt(i).RollNumber
+                                </td>  
+                                @if (bIsCoastal)
+                                {
+                                    <td>
+                                        @Model.ElementAt(i).OMRNumber
+                                    </td>
+                                }                         
+                                <td>
+                                        @Model.ElementAt(i).NoOfWorkingDays
+                                     
+                                    </td>
+                                    <td>
+                                        <input type="hidden" value="@Model.ElementAt(i).StudentName" class="StudentName" />
+                                        <input type="hidden" value="@Model.ElementAt(i).NoOfWorkingDays" class="NoOfWorkingDays" />
+
+                                        @Html.TextBox("StudentPresentdaysList[" + (@i) + "].Presentdays", Model.ElementAt(i).Presentdays, new { @class = "form-control textlength Presentdays", onkeypress = "return isNumberKey(event)", @style = "width:140px" })
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+      
+}
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<script>
+ 
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode
+
+            if (charCode == 46 || charCode == 65)
+                return true;
+
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+
+            return true;
+        }
+</script>
+

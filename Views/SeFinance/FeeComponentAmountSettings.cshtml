@@ -1,0 +1,446 @@
+﻿@model AsteriskBrowserAL.Models.FeeComponentSettings
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Fee Component</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+  
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("FeeComponentAmountSettings", "SeFinance", FormMethod.Post))
+            {
+                <span id="ErrorId" style="color:red;font-weight:bold"></span>
+            <!-- form start -->
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(true)
+                <input type="hidden" id="SelFeecomponentId" value="@Model.FeeComponentId" />
+                <input type="hidden" id="SelClassId" value="@Model.ClassId" />
+                <input type="hidden" id="SelBranchId" value="@Model.BranchId" />
+                <input type="hidden" id="SelAcademicYearId" value="@Model.AcademicYearId" />
+
+
+     
+
+                <div class="table-header">
+                    <span style="font-family:calibri;">Fee Component Amount</span>
+                    <div  style="float:right;margin-right:10px;">
+                        @*   <a href="/SeFinance/FeeComponents"><span class="btn btn-info btn-minier">Fee Components</span></a>*@
+                        <a class="P2" id="CompId"><span class="btncustom">Fee Components</span></a>
+                    </div>
+
+                </div>
+
+
+
+
+
+                <div class="widget-box">
+              
+
+                    <div class="widget-body" style="padding:10px;">
+                      
+                       
+
+                        <div class="widget-main">
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 ">Academic Year</label>
+                                <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                    <select id="CboAcademicYear" name="AcademicYearId" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 ">Fee Component</label>
+                                <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                    <select id="FeeComponentId" name="FeeComponentId" class="form-control"></select>
+                                </div>
+                            </div>
+
+
+                          
+                   
+                      
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 ">Branch</label>
+                                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                            <select id="BranchId" name="BranchId" class="form-control"></select>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 ">Class</label>
+                                        <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                            <select id="ClassId" name="ClassId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        
+                            <div class="row">
+                                <div class="col-sm-12" align="center">
+                                   
+                                    <div class="col-sm-3">
+
+                                    </div>
+                                  
+                                    <div class="col-sm-6" id="AmountDisplay" style="display:none;" align="center">
+                                        <hr />
+                                        <label class="col-sm-4" style="line-height:1;">Amount</label>
+                                        <div class="col-sm-5 control-label no-padding-right" for="form-field-1">
+                                            <input class="form-control" id="Amount" name="Amount" />
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <span class="input-group-btn">
+
+                                                <button type="button" id="Set" name="Set" value="Set" onclick="Set()" class="btncustom">
+                                                    Set
+                                                </button>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-3"></div>
+                                        <hr />
+                                    </div>
+                               
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                 
+                </div>
+                <div id="SearchDiv">
+
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        LoadAcademicYearCombo();
+    });
+
+
+    function LoadAcademicYearCombo() {
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                $('#imagemodal').hide();
+
+                var ObjAyYear = $("#CboAcademicYear")
+                ObjAyYear.children().remove();
+                ObjAyYear.append($("<option>").val(-1).text("--Select--"))
+
+                $.each(result, function (i, elm) {
+                    ObjAyYear.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(ObjAyYear)
+
+                if ($('#SelAcademicYearId').val() > 0) {
+                    $('#CboAcademicYear').val($('#SelAcademicYearId').val());
+                    PerformAcademicYearChange();
+                }
+
+            },
+            async: false
+        })
+
+    }
+
+    $('#CboAcademicYear').change(function () {
+        PerformAcademicYearChange();
+    });
+
+    function PerformAcademicYearChange() {
+        ResetControls();
+        LoadFeeComponentCombo();
+    }
+
+    function ResetControls() {
+
+        $("#FeeComponentId").children().remove();
+
+        $("#BranchId").children().remove();
+
+        $("#ClassId").children().remove();
+
+        $("AmountDisplay").hide();
+
+        $("#SearchDiv").html('');
+    }
+
+    function LoadBranchDropdown() {
+
+        var SelBranchId = $("#SelBranchId").val()
+
+        var isall = true;
+
+        $.ajax({
+            url: '/Common/GetBranchesByDivision',
+            data: { DivisionId: 0, IsAll: isall },
+            success: function (result) {
+                Branch = $("#BranchId")
+                Branch.children().remove();
+                $.each(result, function (i, elm) {
+                    if (elm.IsCentral != true) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    }
+                })
+
+                $("#BranchId").append(Branch)
+
+                if (SelBranchId >= 0) {
+                    document.getElementById("BranchId").value = SelBranchId;
+                    PerformBranchChange(SelBranchId);
+                }
+
+            },
+            async: false
+        })
+    }
+
+    $("#BranchId").change(function () {
+
+        var Branchid = $("#BranchId").val()
+        $("#SearchDiv").html('')
+
+        PerformBranchChange(Branchid);
+
+    })
+
+    function PerformBranchChange(Branchid) {
+
+        if (Branchid != -1) {
+            LoadClassDropdown()
+        }
+        else {
+            $("#ClassId").val("");
+            document.getElementById("Amount").value = 0;
+            document.getElementById("AmountDisplay").style.display = "none"
+        }
+    }
+
+
+    function LoadClassDropdown() {
+
+        var SelClassId = $("#SelClassId").val();
+
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                Section = $("#ClassId")
+                Section.children().remove();
+                Section.append($("<option>").val("-1").text("--Select--"))
+                Section.append($("<option>").val("0").text("All"))
+
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+
+                $("#ClassId").append(Section)
+
+                if (SelClassId >= 0) {
+                    document.getElementById("ClassId").value = SelClassId;
+                    PerformClassNumberChange();
+                }
+
+            },
+            async: false
+        })
+    }
+
+    $("#ClassId").change(function () {
+
+        PerformClassNumberChange();
+    })
+
+    function PerformClassNumberChange() {
+        var Classid = $("#ClassId").val();
+        $("#SearchDiv").html('');
+
+        if (Classid != -1) {
+            document.getElementById("AmountDisplay").style.display = "inline"
+            GetFeeComponents();
+
+
+        }
+        else {
+            document.getElementById("Amount").value = 0;
+            document.getElementById("AmountDisplay").style.display = "none"
+
+        }
+    }
+
+
+    function LoadFeeComponentCombo() {
+
+        var SelComponentId = $('#SelFeecomponentId').val();
+
+        var nAcademicyearId = $('#CboAcademicYear').val();
+
+
+        $.ajax({
+            url: '/SeFinance/GetFeeComponents',
+            data: { AcademicyearId: nAcademicyearId },
+            success: function (result) {
+                FeeComponent = $("#FeeComponentId")
+                FeeComponent.children().remove();
+                FeeComponent.append($("<option>").val("").text("--Select--"))
+                $.each(result, function (e, record) {
+                    FeeComponent.append($("<option>").val(record.FeeComponentId).text(record.Name))
+                })
+
+                $("#FeeComponentId").append(FeeComponent)
+
+                if (SelComponentId > 0) {
+                    $('#FeeComponentId').val(SelComponentId);
+                    LoadBranchDropdown()
+                }
+            }
+        })
+    }
+
+
+    $("#FeeComponentId").change(function () {
+        document.getElementById("ErrorId").innerHTML = ""
+
+        var FeeComponent = $("#FeeComponentId").val()
+
+        if (FeeComponent > 0) {
+            LoadBranchDropdown()
+        }
+        else {
+
+            $("#BranchId").html("");
+            $("#ClassId").html("");
+            $("#SearchDiv").html("")
+        }
+
+    })
+
+
+    $("#Set").click(function () {
+        var Amount = $("#ComponentAmount").val();
+        SetAmountForComponents()
+
+    })
+
+    function GetFeeComponents() {
+
+        var FeeComponentId = $("#FeeComponentId").val();
+        var BranchId = $("#BranchId").val();
+        var ClassId = $("#ClassId").val();
+
+        if (FeeComponentId > 0 && BranchId > -1 && ClassId > -1) {
+
+            $('#imagemodal').show();
+
+            $.ajax({
+                url: '/SeFinance/GetFeeComponentsByClass_V2',
+                data: { ComponentId: FeeComponentId, Amount: 0, BranchId: BranchId, ClassId: ClassId, bIsSet: false },
+                success: function (result) {
+
+                    $("#SearchDiv").html(result)
+                },
+                error: function () {
+                    alert("Error");
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            $("#SearchDiv").html('')
+        }
+    }
+
+
+    function SetAmountForComponents() {
+
+        var FeeComponentId = $("#FeeComponentId").val();
+        var BranchId = $("#BranchId").val();
+        var ClassId = $("#ClassId").val();
+
+        var Amount = $("#Amount").val();
+
+        if (FeeComponentId > 0) {
+
+            $.ajax({
+                url: '/SeFinance/GetFeeComponentsByClass_V2',
+                data: { ComponentId: FeeComponentId, Amount: Amount, BranchId: BranchId, ClassId: ClassId, bIsSet: true },
+                success: function (result) {
+
+                    $("#SearchDiv").html(result)
+
+                    if (BranchId == 0 && ClassId == 0) {
+                        $("#ComponentTable").find("input, button").attr("disabled", true);
+                    }
+
+                }
+            })
+        }
+        else {
+            $("#SearchDiv").html("")
+        }
+    }
+
+    function Submit() {
+        var isvalid = true;
+        var FeeComponentId = $("#FeeComponentId").val();
+
+        if (FeeComponentId > 0) {
+
+        }
+        else {
+            document.getElementById("ErrorId").innerHTML = "Please select fee component"
+            isvalid = false
+        }
+        return isvalid;
+    }
+    $('#CompId').click(function () {
+        var AcademicYearId = $('#CboAcademicYear').val();
+
+        if (AcademicYearId < 1) {
+            document.getElementById("ErrorId").innerHTML = "Please select Academic Year"
+        }
+        else {
+            window.location.href = "/SeFinance/FeeComponents?AcademicYearId=" + AcademicYearId
+        }
+
+    });
+
+
+</script>
+
+
+
+
+

@@ -1,0 +1,485 @@
+﻿@model AsteriskBrowserAL.Models.ConcessionUploadModel
+@{
+    ViewBag.Title = "Concession Upload";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Concession Upload</li>
+    </ul>
+}
+
+
+<section class="content">
+
+
+    @using (Html.BeginForm("Download_Bulk_Concession", "FOperations", FormMethod.Post, new { id = "formConcession", enctype = "multipart/form-data" }))
+    {
+        if (TempData["Message"] != null)
+        {
+            <div></div>
+            <span style="color:green;font-weight:bold">@TempData["Message"].ToString()</span>
+        }
+
+        <div class="row">
+            <div class="col-sm-12">
+                <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                <div class="table-header col-sm-12">
+
+                    <div class="col-sm-6">
+
+                  
+                    <span style="font-family:calibri;">Concession Upload</span>
+                 </div>
+                    <div class="col-sm-6">
+
+                        <table>
+                            <tr>
+                                <td style="color:white;font-size:15px;">
+                                    <input type="radio" id="rbDownload" name="Type" /> Download Format
+                                    <input type="radio" id="rbUpload" style="margin : 10px" name="Type" /> Upload
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                    </div>
+      
+
+                    <div class="widget-box" style="padding:10px;">
+
+
+                        <div class="" id="divWidgetBody" style="display:none">
+
+                            <div class="widget-main"  style="padding-top:30px;">
+
+                                <div class="row" id="divDownload">
+                                    <input type="hidden" name="TypeName" id="SelType" />
+
+                                    <input type="hidden" name="IsCentral" id="IsCentral" value="@Model.IsCentral" />
+
+                                    @if (Model.IsCentral)
+                                    {
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                                    <div class="col-sm-6">
+                                                        <select id="CboDivision" name="DivisionId" class="form-control"></select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-6">
+                                                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                                    <div class="col-sm-6">
+                                                        <select id="CboBranch" name="SubscriptionId" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                 
+
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Class</label>
+                                                <div class="col-sm-6">
+                                                    <select id="CboClass" name="ClassId" class="form-control"></select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Type</label>
+                                                <div class="col-sm-6">
+                                                    <select id="CboType" class="form-control">
+                                                        <option value="-1">--Select--</option>
+                                                        <option value="0">Tution Fee</option>
+                                                        <option value="1">Transport Fee</option>
+                                                        <option value="2">Admission</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-9" style="text-align:left">
+
+                                        <div class="hr hr-18 dotted hr-double"></div>
+                                        <div class="">
+                                            <a class="btncustom P2" id="btnDownload">Download</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row" id="divUpload" style="display:none">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Type</label>
+                                                <div class="col-sm-6">
+                                                    <select id="CboUploadType" class="form-control">
+                                                        <option value="-1">--Select--</option>
+                                                        <option value="0">Tution Fee</option>
+                                                        <option value="1">Transport Fee</option>
+                                                        <option value="2">Admission</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                   
+                                    
+
+                                    <div class="row">
+                              
+                                        <div class="col-sm-9">
+                                            <div class="hr hr-18 dotted hr-double"></div>
+                                            <div class="col-sm-6">
+                                                <input style="margin-left:10px" type="file" id="File" name="UploadedFile" class="choose"/>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <div class="">
+                                                    <a class="btncustom P2" id="btnPreview">Preview</a>
+                                      
+                                            
+                                                    <a class="btncustom P2" id="btnCancel">Cancel</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div id="divExcelView"> </div>
+                </div>
+        </div>
+    }
+
+</section>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        $('#divDownload').hide();
+        $('#divUpload').hide();
+        $('#divWidgetBody').hide();
+
+        LoadDivisions();
+        LoadClasses();
+    });
+
+
+    $('#rbDownload').click(function () {
+
+        $('#Validation').html('');
+
+        $('#divWidgetBody').show();
+        $('#divDownload').show();
+        $('#divUpload').hide();
+    });
+
+
+    $('#rbUpload').click(function () {
+
+        $('#Validation').html('');
+        $('#divWidgetBody').show();
+        $('#divDownload').hide();
+        $('#divUpload').show();
+    });
+
+    $('#btnCancel').click(function () {
+        $('File').val('');
+        $('#divExcelView').html('');
+    });
+
+
+    function LoadDivisions() {
+
+        $.ajax({
+            url: '/Common/GetDivisions_MinusAll',
+            data: { IsAll: true },
+            success: function (data) {
+                var ObjDivision = $('#CboDivision');
+
+                ObjDivision.children().remove();
+
+                $.each(data, function (i, record) {
+                    ObjDivision.append($("<option>").val(record.DivisionId).text(record.DivisionName));
+                });
+
+                $('#CboDivision').append(ObjDivision);
+            },
+            aync: false
+        });
+
+    }
+
+    function LoadClasses() {
+        $.ajax({
+
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#imagemodal').hide();
+            },
+
+            url: '/Common/GetClassNumbers/',
+            success: function (data) {
+
+
+                var objClass = $('#CboClass');
+                objClass.children().remove();
+
+                objClass.append($("<option>").val("-1").text("--- Select ---"));
+                objClass.append($("<option>").val("0").text("All"));
+
+                $.each(data, function (i, record) {
+                    objClass.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay));
+                });
+
+                $('#CboClass').append(objClass);
+            },
+            async: false
+
+        });
+    }
+
+
+    $('#CboDivision').change(function () {
+
+        $('#Validation').html('');
+
+        document.getElementById("Validation").innerHTML = ""
+
+        var DivisionId = $('#CboDivision').val();
+
+
+        if (DivisionId != 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId, IsAll: true },
+                success: function (data) {
+                    var BranchItems = $('#CboBranch');
+
+                    BranchItems.children().remove();
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+                        BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                    });
+
+                    $('#CboBranch').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+        else {
+            var BranchItems = $('#CboBranch');
+            BranchItems.children().remove();
+            BranchItems.append($("<option>").val(0).text(""));
+        }
+    });
+
+
+    $("#CboBranch").change(function () {
+
+        document.getElementById("Validation").innerHTML = ""
+
+        $('#dvStudents').html("");
+    })
+
+    $('#btnDownload').click(function () {
+        DownloadFile();
+    });
+
+    function DownloadFile() {
+
+        debugger
+
+        var bValid = Validate_DownloadData();
+
+        if (bValid == false)
+            return;
+
+        var TypeName = $("#CboType option:selected").text();
+
+        $('#SelType').val(TypeName);
+        $('#formConcession').submit();
+    }
+
+    function Validate_DownloadData() {
+
+        var DivisionId = $('#CboDivision').val();
+        var SubscriptionId = $('#CboBranch').val();
+        var Type = $('#CboType').val();
+        var ClassId = $('#CboClass').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            if (DivisionId == "null" || DivisionId <= 0 && DivisionId != -1) {
+                Message += "Division";
+                isValid = false;
+            }
+
+            if (SubscriptionId == "null" || SubscriptionId <= 0 && SubscriptionId != -1) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Branch";
+                isValid = false;
+            }
+        }
+
+        if (ClassId < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Class";
+            isValid = false;
+        }
+
+
+        if (Type < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Type";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+        }
+
+        return isValid;
+
+    }
+
+    $('#btnPreview').click(function () {
+        PerformPreview();
+    });
+
+    function PerformPreview() {
+
+        var Type = $('#CboUploadType').val();
+
+        if (Type < 0) {
+            $('#Validation').html('Please select type');
+            return;
+        }
+
+        var files = $("#File").get(0).files;
+
+        if (files.length < 0) {
+            $('#Validation').html('Please upload a file');
+            return;
+        }
+
+        var extension = $("#File").val().split('.').pop().toUpperCase();
+        if (extension != "XLSX") {
+            $('#Validation').html('Please upload a downloaded excel file');
+            return;
+        }
+
+        var formData = new FormData();
+        var totalFiles = document.getElementById("File").files.length;
+
+        for (var i = 0; i < totalFiles; i++) {
+            var file = document.getElementById("File").files[i];
+            formData.append("FileUpload", file);
+        }
+
+        $('#imagemodal').show();
+
+        $.ajax({
+            url: '/Foperations/PreviewUploadedFile',
+            data: formData,
+            type: "POST",
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                $('#imagemodal').hide();
+                $("#divExcelView").html(data);
+            },
+            async: false,
+            error: function (er) { $('#imagemodal').hide(); }
+
+        });
+    }
+
+    function Validate_Upload() {
+
+        var Type = $('#CboType').val();
+
+        var isValid = true;
+        var Message = "Please fill the mandatory fields :  ";
+
+        var IsCentral = $('#IsCentral').val();
+
+        if (IsCentral == "value") {
+            if (DivisionId == "null" || DivisionId <= 0 && DivisionId != -1) {
+                Message += "Division";
+                isValid = false;
+            }
+
+            if (SubscriptionId == "null" || SubscriptionId <= 0 && SubscriptionId != -1) {
+                if (!isValid)
+                    Message += ",";
+
+                Message += " Branch";
+                isValid = false;
+            }
+        }
+
+        if (ClassId < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Class";
+            isValid = false;
+        }
+
+
+        if (Type < 0) {
+            if (!isValid)
+                Message += ",";
+
+            Message += " Type";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            document.getElementById("Validation").innerHTML = Message;
+        }
+
+        return isValid;
+    }
+
+</script>

@@ -1,0 +1,83 @@
+﻿@model AsteriskBrowserAL.Models.EventsData
+@{
+
+    int nSno = 1;
+    List<SelectListItem> ItemsSeclection = new List<SelectListItem> {
+        new SelectListItem(){Text = "Completed",Value = "1"},
+        new SelectListItem(){Text = "Not Completed",Value = "2"}
+        };
+}
+
+
+@using (Html.BeginForm("EventStatus", "ACalendar", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+
+    if (Model.lstEventsData.Count()>0)
+    {
+    <div class="table-header">
+        Event Status
+        <div style="float:right;">
+            <button type="submit" name="save" id="save" class="btn btn-info btn-xs P2">
+                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+            </button>
+        </div>
+    </div><!-- /.box-header -->
+    <table class="table tbhover table-striped table-bordered dynamic-table">
+
+        <tr>
+            <th>
+               S.No.
+            </th>
+            <th>
+                @Html.DisplayName("Event Name")
+            </th>
+            <th>
+                @Html.DisplayName("Event Date")
+            </th>
+            <th>
+                @Html.DisplayName("Subject")
+            </th>
+            <th>
+                @Html.DisplayName("Status")
+            </th>
+        </tr>
+        @for (int i = 0; i < Model.lstEventsData.Count(); i++)
+        {
+        <tr>
+            <td>
+                @Html.Hidden("lstData.Index", (@i + 10))
+                @(nSno++)
+            </td>
+            <td>
+                @Model.lstEventsData.ElementAt(i).EventName
+            </td>
+            <td>
+                @Model.lstEventsData.ElementAt(i).StartDate.Value.ToString("dd-MM-yyyy")
+            </td>
+            <td>
+                @Model.lstEventsData.ElementAt(i).Subject
+            </td>
+
+            <td>
+                @Html.Hidden("lstData[" + (@i + 10) + "].EventId", Model.lstEventsData.ElementAt(i).EventId)
+                @Html.DropDownList("lstData[" + (@i + 10) + "].EventStatus", new SelectList(ItemsSeclection, "Value", "Text", Model.lstEventsData.ElementAt(i).EventStatus), "---Select---", new { @class = "form-control", name = "EventStatus" })
+            </td>
+        </tr>
+
+        }
+
+
+    </table>
+    }else
+    {
+        <span id="NoDataMsg" style="color:red;font-size:14px">No Events to display</span>
+    }
+    if (null != Model)
+    {
+        <input type="hidden" id="StaffId" name="StaffId" value="@Model.StaffId" />
+    }
+    else
+    {
+        <input type="hidden" id="StaffId" name="StaffId" />
+    }
+}

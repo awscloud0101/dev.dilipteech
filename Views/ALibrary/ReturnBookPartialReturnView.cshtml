@@ -1,0 +1,180 @@
+﻿@model AsteriskBrowserAL.Models.ReturnBookViewModel
+@{
+    ViewBag.Title = "ReturnBookPartialReturnView";
+}
+
+<div id="NoRecordsDiv" style="display:none;">
+    <span style="color:red;font-weight:bold">No Records Found To Display</span>
+</div>
+<div>
+    <div class="row">
+        <div class="col-xs-12">
+        </div>
+    </div>
+</div>
+
+<br />
+<br />
+<form class="form-horizontal">
+    <div id="Records" style="display:none;">
+        <div class="col-xs-12">
+            <div class="pull right" style="margin-left:85%;font-weight:bold">
+                @Html.ActionLink("Back To Return Book", "ReturnBook",new { BookDetailsId = Model.BookDetailsId, PublicationId = Model.PublicationId, UserCategoryId = Model.UserCategoryId,  SectionId = Model.SectionId, DeptId = Model.DeptId, AuthorId = Model.AuthorId })
+            </div>
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        Book User Details
+                    </h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @Html.HiddenFor(model => model.BarCode,new { @id= "BarCode" ,@name= "BarCode" })                  
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Accession Number")</label>
+
+                                    <div class="col-sm-3">
+                                        <input id="BookCode" type="text" Enabled="true" class="form-control" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("User Name")</label>
+
+                                    <div class="col-sm-3">
+                                        <input id="UserName" type="text" Enabled="true" class="form-control" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Name")</label>
+
+                                    <div class="col-sm-3">
+                                        <input id="MasterBookName" type="text" Enabled="true" class="form-control" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("ISBN")</label>
+
+                                    <div class="col-sm-3">
+                                        <input id="ISBN" type="text" Enabled="true" class="form-control" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Author")</label>
+
+                                    <div class="col-sm-3">
+                                        <input id="Author" type="text" Enabled="true" class="form-control" disabled />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Publication")</label>
+
+                                    <div class="col-sm-3">
+                                        <input id="Publication" type="text" Enabled="true" class="form-control" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Issue Date")</label>
+
+                                    <div class="col-sm-3">
+                                        <input id="IssueDate" type="text" Enabled="true" class="form-control" disabled />
+                                    </div>
+                                </div>
+
+                               <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Return Date")</label>
+
+                                    <div class="col-sm-3">
+                                        
+                                        <input id="ReturnDate" type="text" Enabled="true" class="form-control" disabled />
+                                        <hidden id="BookIssueDetailsId" name="BookIssueDetailsId"></hidden>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Returned Date")</label>
+
+                                    <div class="col-sm-3">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="BookReturnedDate" name="BookReturnedDate" autocomplete="off" value="@DateTime.Today.ToShortDateString()" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-offset-3 col-md-9">
+                               
+                                <input style="margin-left:8%" class="btn btn-success btn-sm" name="ReturnBook" id="ReturnBook" value="Return Book" type="submit" onclick="javascript: returnbook(1);" />
+                                @*<input class="btn btn-success btn-sm" name="Lost" id="Lost" style="width:101px" value="Lost" type="submit" onclick="javascript: returnbook(0);" />*@
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</form>
+
+
+<script>
+
+    window.onload = GetbarCode();
+
+        function GetbarCode() {
+            debugger
+            var BarCod = $('#BarCode').val();
+            $.ajax({
+                url: '/ALibrary/GetBarCodeBooksdata',
+                data: { BarCode: BarCod },
+                success: function (data) {
+                    if (data == "") {
+                        $("#Records").hide();
+                        $("#NoRecordsDiv").show();
+                    }
+                    else {
+                        $("#Records").show();
+                        $("#NoRecordsDiv").hide();
+                        $.each(data, function (i, data) {
+
+                            $("#BookCode").val(data.BookCode);
+                            $("#UserName").val(data.UserName);
+                            $("#MasterBookName").val(data.MasterBookName);
+                            $("#ISBN").val(data.ISBN);
+                            $("#Author").val(data.Author);
+                            $("#Publication").val(data.Publication);
+                            $("#IssueDate").val(data.DisplayIssueDate);
+                            $("#ReturnDate").val(data.DisplayReturnDate);
+                            $("#BookIssueDetailsId").val(data.BookIssueDetailsId);
+
+                        });
+                    }
+
+                }
+            })
+        }
+        function returnbook(id) {
+            debugger
+
+            var BookIssueDetailsId = $("#BookIssueDetailsId").val();
+            var BookReturnedDate = $('#BookReturnedDate').val();
+            $.ajax({
+                url: '/ALibrary/ReturnBookReturn',
+                data: { BookIssueDetailsId: BookIssueDetailsId, Status: id, BookReturnedDate : BookReturnedDate},
+                success: function (data) {
+                    if (data == "true") {
+                        window.location.href = "/ALibrary/ReturnBook";
+                    }
+                    else {
+                        alert('Error In Updation');
+                    }
+
+                }
+            })
+        }
+</script>

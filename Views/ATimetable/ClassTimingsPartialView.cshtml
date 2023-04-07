@@ -1,0 +1,102 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ClassTimingsViewData>
+@{
+    ViewBag.Title = "ClassTimingsPartialView";
+    int nSno = 1;
+
+}
+
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            @if (null != Model && Model.Count() > 0)
+            {
+    
+    <div class="table-header">
+        Records Found (@Model.Count())
+    </div>
+                
+                            <div class="overflowscroll">
+                                <table class="table tbhover table-striped table-bordered dynamic-table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                S.No.
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Name")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Start Time")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("End Time")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Is Break")
+                                            </th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @(nSno++)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.ItemName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.ItemStartTime)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.ItemEndTime)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.IsBreak)
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <a class="green" href="@Url.Action("ClassTimingsE", "ATimetable", new { id = item.ClassTimingsId, nBranchId = item.SelBranchId, nDivisionId = item.SelDivision })">
+                                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                                        </a>
+
+                                                        <a class="red" onclick="btnConfirm(@item.ClassTimingsId)">
+                                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                                @*<td>
+                            @Html.ActionLink("Edit", "ClassTimingsE", new { id = item.ClassTimingsId, BatchId = item.BatchId }) |
+                            @Html.ActionLink("Delete", "ClassTimingsD", new { id = item.ClassTimingsId, BatchId = item.ClassNumber })
+                        </td>*@
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+            }
+            else
+            {
+                <span style="font-weight:bold;color:red">Data not available to display</span>
+            }
+        </div>
+    </div>
+</section>

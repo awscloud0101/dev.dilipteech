@@ -1,0 +1,197 @@
+﻿@model List<AsteriskBrowserAL.Models.ConcessionSettingData>
+@{
+    ViewBag.Title = "Concession Settings";
+    DateTime dateformate = new DateTime();
+    int sno = 1;
+}
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Finance
+        </li>
+        <li class="active">Concessions</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+<style>
+    .red {
+        color: red;
+    }
+</style>
+
+<!--Main Content-->
+<section class="content">
+    <div class="row">
+        <div class=col-xs-12>
+            <br/>
+            @using (Html.BeginForm("Concessions", "SeFinance", FormMethod.Post))
+            {
+                if (Model != null && Model.Count() > 0)
+                {
+  <span id="Validation" style="color:red;font-weight:bold"></span>
+    <div class="widget-box">
+        <div class="widget-header widget-header-flat widget-header-small">
+            <h5 class="widget-title">
+                Concession Settings
+            </h5>
+            <div class="widget-toolbar no-border">
+                        <div style="float:right;">
+                            <button type="submit" class="btn btn-info btn-xs P2">
+                                <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                            </button>
+                </div>
+            </div>
+        </div>
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="row">
+                    <div class=col-xs-12>
+                        <div class="col-sm-6">
+                            <label class="col-sm-5"><span class="red">*S</span>tart Date</label>
+                            <div class="col-sm-6">
+                                <div id="datepicker" style="width:235px;" class=" input-group date">
+                                    <div id="datepicker" class="input-group date">
+                                        <input class="form-control" type="text" id="StartDate" name="StartDate" value="@Model.FirstOrDefault().StartDate.ToShortDateString()" d data-date-format="dd/mm/yyyy" placeholder="Select Start Date" autocomplete="off" />
+                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="col-sm-6">
+                            <label class="col-sm-5"><span class="red">*E</span>nter Regular Days</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" id="regular" name="regular" min="0" maxlength="3" />
+                            </div>
+                            <div class="col-sm-1">
+                                <input type="button" id="RegularSet" name="RegularSet" value="Set" class="btn btn-success btn-sm" />     
+                                @*<span class="glyphicon glyphicon-log-in" id="RegularSet" name="RegularSet" value="Set"></span>*@
+                                @*<button class="btn btn-success" id="RegularSet" name="RegularSet" value="Set">
+                        Set
+                    </button>*@
+                                           
+                            
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div id="SearchData">
+            @Html.Partial("ConcessionPartialView", Model)
+        </div>
+        }
+        else
+        {
+        <span style="color: red;"><b>Data is not available</b></span>
+        }
+  
+        }
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+
+    $("#RegularSet").click(function () {
+        var RegularDays = $('#RegularSet').val();
+        var Regular = $('#regular').val();
+        var startdate = $('#StartDate').val();
+       
+        if (Regular == null || Regular <= 0 || Regular == "")
+        {
+            document.getElementById("Validation").innerHTML = " Please enter regular days"
+        }
+        else {
+            document.getElementById("Validation").innerHTML = ""
+        }
+
+        if (Regular != null && startdate != null) {
+            $.ajax({
+                url: '/SeFinance/GetSettingsData',
+                data: { Regular: Regular, startdate: startdate ,},
+                success: function (result) {
+
+                    $("#SearchData").html(result);
+                }
+            })
+        }
+        else {
+        }
+    })
+  
+    //function submitForm()
+    //{
+    //    var validPercentage = ValidationsforConcession();
+    //    if (validPercentage == false) {
+    //        return false;
+    //    } else {
+    //        return true;
+    //    }
+    //}
+
+
+    //function ValidationsforConcession() {       
+    //    var validation = true
+    //    var result = $('.CheckBox:checked');
+    //    $.each(result, function (i, result) {          
+    //        var Names = $('.' + result).attr('name')         
+    //       var  IsSpeacialVal = $("#" + Names + "").val()           
+    //        if (IsSpeacialVal == 0) {
+    //            validation = false;
+    //        }
+    //        if (IsSpeacialVal > 0) {
+    //            validation = true;
+    //        }
+
+    //    });
+
+    //    if (validation == false) {
+    //        $("#" + result.value + "").val(0)
+    //        validation = false;
+    //    }
+    //    if (validation == true) {
+    //        $("#" + result.value + "").val()
+    //        validation = true;
+    //    }
+
+
+    //    return validation;
+    //}
+
+
+    $("#regular").keypress(function (e) {
+        //if the letter is not digit then display error and don't type anything
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            //display error message
+            return false;
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+
+

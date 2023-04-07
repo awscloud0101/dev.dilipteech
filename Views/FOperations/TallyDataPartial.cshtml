@@ -1,0 +1,197 @@
+﻿
+@model AsteriskBrowserAL.Models.TallySettingsModel
+
+@{
+    Layout = null;
+    int PSno = 1;
+    int NPSno = 1;
+}
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color:green;font-weight:bold" id="Saved">@Html.ValidationMessage("Institute")</span>
+            <div class="table-header">
+                ERP Records
+                <div style="float:right;">
+                    <button type="submit" onclick="return Post()" class="btn btn-info btn-xs">
+                        <i class="ace-icon fa fa-floppy-o bigger-180"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="widget-box">
+                <div class="widget-body">
+                    <div style="width:100%;overflow:auto;height:400px">
+                        <table class="table table-responsive table-bordered table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sno</th>
+                                    <th>StudentName</th>
+                                    <th>Address</th>
+                                    <th>Fee Particular</th>
+                                    <th>Amount</th>
+                                    <th> Total Amount</th>
+                                    <th>Process</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var _record in Model.NotProcessed.GroupBy(s => s.ReceiptNo))
+                                {
+                                    <tr>
+                                        <td align="center">
+                                            @NPSno
+                                        </td>
+                                        <td align="left" style="width:200px">
+                                            @_record.FirstOrDefault().studentName
+                                        </td>
+                                        <td align="left" style="width:250px">
+                                            @_record.FirstOrDefault().AddressLineOne <br />
+                                            @_record.FirstOrDefault().AddressLineTwo
+                                        </td>
+                                        <td align="center">
+                                            <table class="table table-bordered">
+                                                @foreach (var FeeParticular in _record)
+                                                {
+                                                    <tr>
+                                                        <td align="center">@FeeParticular.FeeParticular</td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </td>
+                                        <td align="center">
+                                            <table class="table table-bordered">
+                                                @foreach (var Amount in _record)
+                                                {
+                                                    <tr>
+                                                        <td align="center">
+                                                            @Amount.Amount
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </td>
+                                        <td align="center">
+                                            @_record.Sum(s => s.Amount)
+                                        </td>
+                                        <td align="center">
+                                            @if (_record.FirstOrDefault().IsReady == true)
+                                            {
+                                                <input type="checkbox" value="@_record.Key" id="Check_@NPSno" class="check" style="display:none" />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" value="@_record.Key" id="Check_@NPSno" class="check" />
+                                            }
+                                        </td>
+                                    </tr>
+                                    NPSno++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color:green;font-weight:bold" id="Saved">@Html.ValidationMessage("Institute")</span>
+            <div class="table-header">
+                Tally Records
+            </div>
+            <div class="widget-box">
+                <div class="widget-body">
+                    <div style="width:100%;overflow:auto;height:400px">
+                        <table class="table table-responsive table-bordered table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sno</th>
+                                    <th>StudentName</th>
+                                    <th>Address</th>
+                                    <th>Fee Particular</th>
+                                    <th>Amount</th>
+                                    <th> Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var _record in Model.Processed.GroupBy(s => s.ReceiptNo))
+                                {
+                                    <tr>
+                                        <td align="center">
+                                            @PSno
+                                        </td>
+                                        <td align="left" style="width:200px">
+                                            @_record.FirstOrDefault().studentName
+                                        </td>
+                                        <td align="left" style="width:250px">
+                                            @_record.FirstOrDefault().AddressLineOne <br />
+                                            @_record.FirstOrDefault().AddressLineTwo
+                                        </td>
+                                        <td align="center">
+                                            <table class="table table-bordered">
+                                                @foreach (var FeeParticular in _record)
+                                                {
+                                                    <tr>
+                                                        <td align="center">@FeeParticular.FeeParticular</td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </td>
+                                        <td align="center">
+                                            <table class="table table-bordered">
+                                                @foreach (var Amount in _record)
+                                                {
+                                                    <tr>
+                                                        <td align="center">
+                                                            @Amount.Amount
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </td>
+                                        <td align="center">
+                                            @_record.Sum(s => s.Amount)
+                                        </td>
+                                    </tr>
+                                    PSno++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function Post() {
+        var Students = []
+        var count = @NPSno;
+        for (var i = 1; i < count; i++) {
+            var IsChecked = $('#Check_'+i+'').prop('checked')
+            if(IsChecked == true){
+                var value = $('#Check_'+i+'').val()
+                Students.push(value)
+            }
+        }
+        if(Students.length > 0){
+            $.ajax({
+                url: '/FOperations/UpdateTallyProcess',
+                type:'post',
+                data: { Students : Students},
+                success: function (data) {
+                    debugger
+                    DataSave();
+                },
+                aync: false
+            });
+        }
+    }
+
+
+
+    
+</script>

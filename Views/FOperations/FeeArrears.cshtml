@@ -1,0 +1,201 @@
+﻿@model AsteriskBrowserAL.Models.DiscountViewModel
+
+@{
+    ViewBag.Title = "Fee Arrears";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Fee Arrears</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+ 
+    @using (Html.BeginForm("FeeArrears", "FOperations", FormMethod.Post))
+    {
+        if (null != TempData["FeeArrears"])
+        {
+            <span style="color:green;font-weight:bold;" class="Validation">@Html.Raw(TempData["FeeArrears"])</span>
+        }
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    <span style="font-family:calibri;"> Fee Arrears</span>
+
+
+                    </div>
+                    <div class="widget-box">
+                 
+
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="box-body">
+                                    <div class="row">
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Branch")</label>
+
+                                                <div class="col-sm-6">
+                                                    <select class="form-control" id="SubscriptionId"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right">@Html.Label("Class")</label>
+
+                                                <div class="col-sm-6">
+                                                    <select class="form-control" id="ClassNumberId"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        <div id="SearchData">
+        </div>
+
+
+        if (null != Model)
+        {
+            <input style="display:none" id="SelBranch" value="@Model.SubscriptionId" />
+            <input style="display:none" id="SelClassNumber" value="@Model.CourseId" />
+        }
+        else
+        {
+
+            <input style="display:none" id="SelBranch" value="0" />
+            <input style="display:none" id="SelClassNumber" value="0" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        debugger
+        LoadBranchDropdown()
+       
+    });
+
+    function LoadBranchDropdown() {
+            $.ajax({
+                url: '/AMicroSchedule/GetBranchesByDivisionDefineSchedule',
+                data: { DivisionId: 0, IsAll: true },
+                success: function (result) {
+                    Branch = $("#SubscriptionId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        if(elm.SubscriptionId !=0){
+                            Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                        }
+                    })
+                    $("#SubscriptionId").append(Branch)
+
+                },
+                async: false
+            })
+
+
+    }
+
+
+    $("#SubscriptionId").change(function () {
+        var BranchId = $("#SubscriptionId").val();
+        $("#ClassNumberId").html("")
+        $("#SearchData").html("");
+        $("#Validation").html("");
+        if (BranchId > -2) {
+            LoadClassDropdown();
+
+        }
+    })
+
+
+    function LoadClassDropdown() {
+        var SelClassId = $("#SelClassId").val();
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                Section = $("#ClassNumberId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                Section.append($("<option>").val("0").text("All"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassNumberId").append(Section)
+
+            },
+            async: false
+        })
+    }
+
+
+    $('#ClassNumberId').change(function () {
+        debugger
+        $("#SearchData").html("");
+        $("#Validation").html("");
+        if ($("#ClassNumberId").val() >= 0) {
+            GetStudentList();
+
+        }
+
+    });
+    function GetStudentList() {
+        var SubscriptionId = $('#SubscriptionId').val();
+        var ClassNumberId = $('#ClassNumberId').val();
+        if (SubscriptionId > 0 && ClassNumberId >= 0) {
+            $.ajax({
+                url: '/FOperations/GetStudentsByClass',
+                data: { nSubscriptionId: SubscriptionId, nClassNumberId: ClassNumberId },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (Data) {
+                    $("#SearchData").html(Data);
+                },
+
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+
+        }
+        else {
+            $("#SearchData").html("");
+        }
+    }
+   
+</script>
+
+
+
+
+
+
+
+
+

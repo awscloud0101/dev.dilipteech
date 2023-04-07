@@ -1,0 +1,328 @@
+﻿@model AsteriskBrowserAL.Models.StaffStatusViewModel
+
+@{
+
+    ViewBag.Title = "Active InActive Approval";
+
+}
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-group"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Active/InActive Approval</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+        </div>
+    </div>
+ 
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm())
+            {
+                <span id="RemarksValidation" style="color:red;font-weight:bold"></span>
+                <span id="Status" style="color:green;font-weight:bold"></span>
+                <span id="Validation" style="color:red;font-weight:bold"></span>
+                <div class="table-header">
+                    <span style="font-family:calibri;">Staff Active-InActive Approval / Reject</span>
+
+                    <div style="float:right;margin-right:10px;">
+
+                        <div id="buttonId" style="display:none">
+                            <a name="Approve" id="Approve" value="Approve"><span class="btncustom">Approve</span></a>
+                            <a name="Reject" id="Reject" value="Reject"><span class="btncustom">Reject</span></a>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="widget-box">
+
+            
+                        <input type="hidden" id="IsCentral" value="@Model.isCentral.ToString()" />
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+
+                                @if (Model.isCentral == true)
+                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Division</label>
+                                                <div class="col-sm-6">
+                                                    <select class="form-control" id="DivisionId"></select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-sm-4">Branch</label>
+                                                <div class="col-sm-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="row">
+                                        <div id="SearchDivHead" style="display:none">
+                                            @*<div class="box">
+                                                <div class="box-body">
+                                                    <div class="box-header">*@
+                                            <h3 class="box-title col-sm-8"></h3>
+
+                                            <div class="col-xs-4 pull-right">
+
+                                                <input type="radio" id="StatusAll" name="Status" value="0" checked="checked"><b> &nbsp;All  &nbsp;</b>
+
+                                                <input type="radio" id="StatusA" name="Status" value="1"><b> &nbsp;Active  &nbsp;</b>
+
+                                                <input type="radio" id="StatusI" name="Status" value="2"><b> &nbsp; In-Active&nbsp;</b>
+                                            </div>
+
+
+                                            @*</div>*@<!-- /.box-header -->
+
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div id="SearchDiv">
+
+                        @*</div>
+                            </div>*@
+                    </div>
+
+                    }
+
+                </div>
+    </div>
+  
+    <input type="hidden" id="SyblingCoutStudents" />
+</section>
+
+
+<script>
+
+
+    function onloadLoadData() {
+        var IsCentral = $("#IsCentral").val()
+        if (IsCentral == "True") {
+            LoadDivisionDropdown();
+
+        }       
+    }
+
+    window.onload = onloadLoadData();
+
+    function LoadDivisionDropdown() {
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+                //var SelDivisionId = $("#SelDivisionId").val();
+                //if (SelDivisionId >= 0) {
+                //    document.getElementById("DivisionId").value = SelDivisionId;
+                //    LoadBranchDropdown();
+                //}
+
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        var Division = $("#DivisionId").val();
+        if (Division >= 0) {
+            LoadBranchDropdown();
+
+        }
+        else {
+            document.getElementById("BranchId").value = "";
+            document.getElementById("SearchDivHead").style.display = "none"
+            document.getElementById("buttonId").style.display = "none"
+
+            $("#BranchId").html("")
+            $("#SearchDiv").html("")
+        }
+    })
+
+    $("#BranchId").change(function () {
+        var BranchId = document.getElementById("BranchId").value;      
+        if (BranchId >= 0) {
+            document.getElementById("buttonId").style.display = "inline"
+            GetStaffApprovalList();
+        }
+        else {
+            document.getElementById("SearchDivHead").style.display = "none"
+
+            $('#SearchDiv').html("");
+
+        }
+
+
+    })
+
+
+    $("#StatusAll").click(function () {
+        GetStaffApprovalList();
+    })
+
+    $("#StatusI").click(function () {
+        GetStaffApprovalList();
+    })
+
+    $("#StatusA").click(function () {
+        GetStaffApprovalList();
+    })
+
+
+
+    function LoadBranchDropdown() {
+        var DivisionId = $("#DivisionId").val()
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: true },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                    //var SelBranchid = $("#SelBranchId").val();
+                    //if (SelBranchid >= 0) {
+                    //    document.getElementById("BranchId").value = SelBranchid
+                    //    LoadClassDropdown()
+                    //}
+                },
+                async: false
+            })
+        }
+        else {
+            document.getElementById("BranchId").value = ""
+            $("#BranchId").html("")
+            $("#SearchDiv").html("")
+        }
+    }
+
+
+
+ 
+
+    function GetStaffApprovalList() {
+        var DivisionId = $('#DivisionId').val();
+        var branchId = $('#BranchId').val();
+      
+        var Status = $("input[name=Status]:checked").val()
+        var IsCentral = $("#IsCentral").val()
+
+ 
+            if (IsCentral == "False") {
+                var DivisionId = 0;
+                var branchId = 0;
+
+
+            }
+            $("#imagemodal").show()
+            $.ajax({
+                url: '/HROperations/GetStaffForApproval',
+                data: { nDivisionId: DivisionId, nBranchId: branchId,  nstatus: Status, isCentral: IsCentral },
+                success: function (data) {
+                    $('#imagemodal').hide();
+
+                    document.getElementById("SearchDivHead").style.display = "inline"
+
+                    $('#SearchDiv').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            })
+        
+
+    }
+
+
+
+
+    $("#Approve").click(function () {
+        debugger
+        var Ids = " ";
+        var result = $('#Check:checked');
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+        });
+
+        if (Ids != " ") {
+            UpdateStaffStatus(Ids, true);
+        }
+    })
+
+
+    $("#Reject").click(function () {
+        var Ids = " ";
+        var result = $('#Check:checked');
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+        });
+
+        if (Ids != " ") {
+            UpdateStaffStatus(Ids, false);
+        }
+    })
+
+
+
+    function UpdateStaffStatus(Ids, IsApproval) {
+        var DivisionId = $('#DivisionId').val();
+        var branchId = $('#BranchId').val();
+     
+        var IsCentral = $("#IsCentral").val();
+        if (IsCentral == "False") {
+            DivisionId = -1;
+            branchId = -1;
+        }
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/HROperations/UpdateStaffStatus',
+            data: { StaffStatusId: Ids, IsApproval: IsApproval, nDivisionId: DivisionId, nBranchId: branchId, nstatus: status, IsCentral: IsCentral },
+            success: function (result) {
+                document.getElementById("SearchDivHead").style.display = "inline"
+                $('#imagemodal').hide();
+                $('#SearchDiv').html(result);
+            }
+        })
+    }
+
+
+</script>

@@ -1,0 +1,320 @@
+﻿@model List<AsteriskBrowserAL.Models.StaffAttendanceRegister>
+@{
+    int Sno = 1;
+}
+
+<link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<!-- CSS -->
+<style>
+    .ui-widget-header, .ui-state-default, ui-button {
+        background: #3c8dbc;
+        border: 1px solid #3c8dbc;
+        color: #3c8dbc;
+        font-weight: bold;
+    }
+
+
+    .table-fixed thead {
+        width: 97%;
+    }
+
+    .table-fixed tbody {
+        height: 230px;
+        overflow-y: auto;
+        width: 100%;
+    }
+
+    .table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
+        display: block;
+    }
+
+        .table-fixed tbody td, .table-fixed thead > tr > th {
+            float: left;
+            border-bottom-width: 0;
+        }
+</style>
+
+
+@if (null != Model && Model.Count() > 0)
+{
+    <span id="Validation" style="color:red;font-weight:bold"></span>
+
+        <div class="table-header">
+            Staff Attendance Register
+            <div style="float:right;margin-right:10px">
+                <button type="button" value="P" style="width:30px;font-weight:bold" class="btncustom" id="P"><span style="margin-left:-5px;">P </span></button>
+                <button type="button" value="A" style="width:30px;font-weight:bold" class="btncustom" id="A"><span style="margin-left:-5px;">A </span></button>
+                <button type="button" value="I" style="width:30px;font-weight:bold" class="btncustom" id="I"><span style="margin-left:-5px;">I</span> </button>
+                <button type="button" value="LT" style="width:30px;font-weight:bold;" class="btncustom" id="LT"><span style="margin-left:-5px;">LT</span></button>
+                <button type="button" value="LC" style="width:30px;font-weight:bold" class="btncustom" id="LC"><span style="margin-left:-5px;">LC </span></button>
+                <button type="button" value="EL" style="width:30px;font-weight:bold" class="btncustom" id="EL"><span style="margin-left:-5px;"> EL </span> </button>
+                <button type="button" value="WO" style="width:30px;font-weight:bold;text-align:center" class="btncustom" id="WO"><span style="margin-left:-10px;">WO </span></button>
+                <button type="button" value="H" style="width:30px;font-weight:bold" class="btncustom" id="H"><span style="margin-left:-5px;">H</span></button>
+                <button class="btncustom P2" style="margin-top:2px" type="submit" onclick="return SubmitForm()" id="Save" value="Save">
+                   Save
+                </button>
+            </div>
+        </div>
+
+        <div class="overflowscroll">
+            <table id="AttendanceTable" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayName("Select")
+                        </th>
+                        <th>
+                           S.No.
+                        </th>
+                        <th>
+                            @Html.DisplayName("Staff")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Status")
+                        </th>
+                        <th>
+                            @Html.DisplayName("In Time")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Out Time")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Remarks")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                        {
+                    <tr>
+                        <td>
+                            @Html.Hidden("SelStaffId", Model.ElementAt(i).StaffId)
+                            @Html.Hidden("IsManual", Model.ElementAt(i).IsManual)
+                            @Html.Hidden("AtttendanceList.Index", (@i + 10))
+                            @Html.Hidden("AtttendanceList[" + (@i + 10) + "].selectedDate", Model.ElementAt(i).AttendanceDate)
+                            @Html.Hidden("AtttendanceList[" + (@i + 10) + "].StaffId", Model.ElementAt(i).StaffId)
+                            @Html.Hidden("AtttendanceList[" + (@i + 10) + "].PrevoiusStatus", Model.ElementAt(i).AttendanceStatus, new { @id = "PrevoiusStatus" })
+                            @Html.Hidden("AtttendanceList[" + (@i + 10) + "].AbsentType", Model.ElementAt(i).AbsentType)
+                            @Html.CheckBox("AtttendanceList[" + (@i + 10) + "].IsChecked", Model.ElementAt(i).IsChecked, new { @id = "Check", @name = "Check", @value = Model.ElementAt(i).StaffId })
+                            @Html.Hidden("AtttendanceList[" + (@i + 10) + "].Remarks", Model.ElementAt(i).Remarks)
+                        </td>
+                        <td>
+                            @Sno
+                        </td>
+
+                        <td>
+                            @Model.ElementAt(i).Name
+                            @Html.Hidden("AtttendanceList[" + (@i + 10) + "].Name", Model.ElementAt(i).Name)
+                        </td>
+                        <td align="center">
+                            <div  style="width:30px;font-weight:bold;" class="btncustom AttendanceStatus"><span style="margin-left:-8px;">@Model.ElementAt(i).AttendanceStatus</span></div>
+
+
+
+                            @Html.Hidden("AtttendanceList[" + (@i + 10) + "].AttendanceStatus", Model.ElementAt(i).AttendanceStatus, new { @Class = "form-Control HiddenStatus" })
+                        </td>
+
+                        <td>
+                            @Model.ElementAt(i).InTime
+                        </td>
+                        <td>
+                            @Model.ElementAt(i).OutTime
+                        </td>
+
+                        <td>
+                            @Html.TextBox("AtttendanceList[" + (@i + 10) + "].AttendanceRemarks", Model.ElementAt(i).AttendanceRemarks, new { @Class = "form-Control", @id = "Remarks" })
+                        </td>
+                    </tr>
+                            Sno++;
+                        }
+                </tbody>
+            </table>
+        </div>
+}
+else
+{
+            <span style="color: red;"><b>Data not available</b></span>
+            }
+
+
+            @Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+            <script>
+                $(document).ready(function () {
+                    document.getElementById("Validation").innerHTML = "";
+
+                    $("#AttendanceTable tr").each(function (index) {
+                        if (index != 0) {
+
+                            var IsManual = $(this).find("#IsManual").val();
+
+                            if (IsManual == "True") {
+                                $(this).find(".AttendanceStatus").css('background-color', '#56BFBF');
+                            }
+                        }
+                    });
+                })
+
+                function SubmitForm() {
+                    var val = true;
+
+                    $("#AttendanceTable tr").each(function (index) {
+                        if (index != 0) {
+                            debugger
+                            var PrevoiusStatus = $(this).find("#PrevoiusStatus").val();
+                            var PresentStatus = $(this).find(".HiddenStatus").val();
+
+                            if (PrevoiusStatus != PresentStatus) {
+                                var SelRemarks = $(this).find("#Remarks").val();
+
+                                if (SelRemarks == "") {
+
+                                    //document.getElementById("Validation").innerHTML = "Enter remarks for the status changed staff";
+                                    //val = false;
+                                    //return false;
+                                }
+                            }
+                        }
+                    });
+
+                    if (val == false) {
+                        return false;
+                    }
+
+                    return val;
+                }
+
+                function UnCheckStudents() {
+                    $('tbody tr td #Check').each(function () {
+                        $(this).prop('checked', false);
+                    });
+                }
+
+                function ChangeStatus(Status) {
+                    document.getElementById("Validation").innerHTML = "";
+
+                    var result = $('#Check:checked');
+                    debugger
+                    var val = CheckRemarks(result, Status);
+
+                    //if (val == false)
+                    //    return;
+
+                    SetStatus(result, Status);
+                    UnCheckStudents();
+                }
+
+
+
+                $('#P').click(function () {
+                    ChangeStatus("P");
+                })
+
+                $('#A').click(function () {
+                    ChangeStatus("A");
+                })
+
+                $('#I').click(function () {
+                    ChangeStatus("I");
+                })
+
+                $('#LC').click(function () {
+                    ChangeStatus("LC");
+                })
+
+                $('#LT').click(function () {
+                    ChangeStatus("LT");
+                })
+
+                $('#EL').click(function () {
+                    ChangeStatus("EL");
+                })
+
+                $('#WO').click(function () {
+                    ChangeStatus("WO");
+                })
+
+                $('#H').click(function () {
+                    ChangeStatus("H");
+                })
+
+
+                function CheckRemarks(result, Status) {
+
+                    var val = true;
+                    $.each(result, function (i, data) {
+
+                        $("#AttendanceTable tr").each(function (index) {
+                            if (index != 0) {
+
+                                var StaffId = $(this).find("#SelStaffId").val();
+
+                                if (StaffId == data.value) {
+                                    debugger
+                                    var PrevoiusStatus = $(this).find("#PrevoiusStatus").val();
+
+                                    if (PrevoiusStatus != Status) {
+                                        var SelRemarks = $(this).find("#Remarks").val();
+
+                                        if (SelRemarks == "") {
+
+                                            //document.getElementById("Validation").innerHTML = "Enter remarks for selected staff";
+                                            val = false;
+                                            return false;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        if (val == false) {
+                            return false;
+                        }
+                    })
+
+                    return val;
+                }
+
+                function SetStatus(result, Status) {
+
+                    var val = true;
+                    $.each(result, function (i, data) {
+
+                        $("#AttendanceTable tr").each(function (index) {
+                            if (index != 0) {
+                                var StaffId = $(this).find("#SelStaffId").val();
+
+                                if (StaffId == data.value) {
+
+                                    var PresentStatus = $(this).find(".AttendanceStatus").val();
+
+                                    if (PresentStatus != Status) {
+                                        $(this).find(".AttendanceStatus").html(Status)
+
+                                        $(this).find(".HiddenStatus").val(Status)
+
+                                        var PrevoiusStatus = $(this).find("#PrevoiusStatus").val();
+
+                                        if (PrevoiusStatus != Status) {
+                                            $(this).find(".AttendanceStatus").css('background-color', '#E27419');
+                                        }
+                                        else {
+                                            $(this).find("#Remarks").val("");
+
+                                            $(this).find(".AttendanceStatus").css('background-color', 'white');
+                                        }
+                                    }
+                                }
+
+                            }
+                        });
+
+                        if (val == false) {
+                            return false;
+                        }
+                    })
+
+                    return val;
+                }
+
+            </script>

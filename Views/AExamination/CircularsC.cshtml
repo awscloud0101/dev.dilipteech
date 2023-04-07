@@ -1,0 +1,196 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationPapersData
+
+@{
+    ViewBag.Title = "Create Circulars";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Circulars</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+@Html.Action("DatePickerScripts", "Base")
+<section class="content">
+    <div class="row">
+        @*<div class=col-xs-12>
+                <h3>@Html.ActionLink("<< Exam Schedule Details", "ExamSchedules", new { ClassNumber = Model.ClassNumber, TermNumber = Model.TermNumber, SubscriptionId = Model.SubscriptionId }) </h3>
+            </div>*@
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <span style="color:red;" id="Validation"></span>
+            <div class="box">
+                @using (Html.BeginForm("CircularsC", "AExamination", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+                {
+
+                    @Html.HiddenFor(model => model.ClassNumber)
+
+                    @Html.HiddenFor(model => model.ExaminationPapersId)
+                    @Html.HiddenFor(model => model.SubscriptionId)
+
+                    <input type="hidden" id="SelSubId" value="@Model.SubscriptionId" />
+                    <input type="hidden" id="SelClass" value="@Model.ClassNumber" />
+
+                    <input type="hidden" id="SelContentindexId" value="@Model.ExaminationPapersId" />
+
+                    <div class="page-header">
+
+                        <h1>
+                            Circulars
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "Circulars", new { ClassNumber = @Model.ClassNumber, BranchId = @Model.BatchId })
+                            </small>
+                        </h1>
+                    </div>
+
+
+                    <div class="box-body">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Circular Type")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.ExamCode, new { @class = "form-control textlength", placeholder = "Circular Type", @id = "ExamCode" })
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESExamCode">
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Circular Name")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.ExamName, new { @class = "form-control textlength", placeholder = "Circular Name", @id = "ExamName" })
+                            </div>
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESExamName">
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" name="Date" id="Date" autocomplete="off" placeholder="Select Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESDate">
+                            </span>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Upload Documents</label>
+                            <div class="col-sm-3">
+                                <input type="file" name="FileUpload" id="FileUpload" />
+
+                                @*<input type="submit" name="Submit" id="Submit" value="Upload" />*@
+                            </div>
+                        </div>
+
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                        <br />
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+
+    function submitForm() {
+        var validatestatus = validateES();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function validateES() {
+
+        var validate = true;
+        var ExamCode = document.getElementById("ExamCode").value;
+        var ExamName = document.getElementById("ExamName").value;
+        var Date = document.getElementById("Date").value;
+        if (ExamCode == "") {
+            document.getElementById("ESExamCode").innerHTML = "Please enter Circular Type";
+            validate = false;
+        }
+        if (ExamName == "") {
+            document.getElementById("ESExamName").innerHTML = "Please enter Circular Name";
+            validate = false;
+        }
+        if (Date == "") {
+            document.getElementById("ESDate").innerHTML = "Please Select  Date";
+            validate = false;
+        }
+
+        return validate;
+    };
+
+    $('#Date').change(function () {
+        document.getElementById("ESDate").innerHTML = "";
+    });
+    $('#ExamCode').focus(function () {
+        document.getElementById("ESExamCode").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+    $('#ExamName').focus(function () {
+        document.getElementById("ESExamName").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+    $('#Date').focus(function () {
+        document.getElementById("ESDate").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+</script>
+

@@ -1,0 +1,102 @@
+﻿@model AsteriskBrowserAL.Models.FeeComponetAmount_V2
+@{
+    ViewBag.Title = "Fee Component Amount Settings";
+
+    int sno = 1;
+
+
+}
+
+<!--Main Content-->
+@if (Model != null && Model.lstFeeAmounts.Count() > 0)
+{
+ 
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="table-header">
+                Records Found (@Model.lstFeeAmounts.Count())
+                <div style="float:right;margin-right:10px;">
+                    <button type="submit" name="Save" class="btncustom P2">
+                       Save
+                    </button>
+                </div>
+            </div>
+            <div>
+                <table id="ComponentTable" class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch")
+                            </th>
+
+                            @foreach (var obj in Model.lstFeeAmounts.FirstOrDefault().ListClassAndAmount)
+                            {
+                                <th>
+                                    @obj.ClassNumberDisplay
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (int i = 0; i < Model.lstFeeAmounts.Count(); i++)
+                        {
+
+                            <tr>
+                                <td>
+                                    @Html.Hidden("FeeComponentList.Index", (@i))
+                                    @(sno++)
+                                </td>
+                                <td>
+                                    @Model.lstFeeAmounts.ElementAt(i).BranchName
+                                    @Html.Hidden("FeeComponentList[" + (@i) + "].BranchName", Model.lstFeeAmounts.ElementAt(i).BranchName)
+                                    @Html.Hidden("FeeComponentList[" + (@i) + "].SubscriptionId", Model.lstFeeAmounts.ElementAt(i).SubscriptionId)
+                                </td>
+
+                                @for (int j = 0; j < Model.lstFeeAmounts.ElementAt(i).ListClassAndAmount.Count(); j++)
+                                {
+                                    <td>
+                                        @if (Model.SubscriptionId == 0 && Model.ClassNumber == 0)
+                                        {
+                                            @Html.TextBox("FeeComponentList[" + (@i) + "].ListClassAndAmount[" + (@j) + "].FeeAmount", Model.lstFeeAmounts.ElementAt(i).ListClassAndAmount.ElementAt(j).FeeAmount, new { @class = "textlength txtboxNum", @readonly = "readonly", @id = "nrAmount", @min = "0", @Maxlength = "7", @style = "width:120px" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBox("FeeComponentList[" + (@i) + "].ListClassAndAmount[" + (@j) + "].FeeAmount", Model.lstFeeAmounts.ElementAt(i).ListClassAndAmount.ElementAt(j).FeeAmount, new { @class = "textlength txtboxNum", @id = "nrAmount", @min = "0", @Maxlength = "7", @style = "width:120px" })
+                                        }
+
+                                        @Html.Hidden("FeeComponentList[" + (@i) + "].ListClassAndAmount[" + (@j) + "].FeeAmountId", Model.lstFeeAmounts.ElementAt(i).ListClassAndAmount.ElementAt(j).FeeAmountId)
+                                        @Html.Hidden("FeeComponentList[" + (@i) + "].ListClassAndAmount[" + (@j) + "].ClassNumber", Model.lstFeeAmounts.ElementAt(i).ListClassAndAmount.ElementAt(j).ClassNumber)
+                                    </td>
+
+                                }
+
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <span style="color:red">Data is not available</span>
+}
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, allowScroll = true })
+<script type="text/javascript">
+
+    $('#plan1').keyup(function () {
+        document.getElementById("Validation").innerHTML = ""
+    });
+
+    function submitForm() {
+        return true;
+    };
+
+</script>

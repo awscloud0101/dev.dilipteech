@@ -1,0 +1,155 @@
+﻿@model AsteriskBrowserAL.Models.StaffStatusViewModel
+@{
+    
+    List<IGrouping<string, AsteriskBrowserAL.Models.StaffStatusViewModel>> GroupedData = new List<IGrouping<string, AsteriskBrowserAL.Models.StaffStatusViewModel>>();
+    int sno = 1;
+    if (null != Model)
+    {
+        if (null != Model.StaffStatusDetails && Model.StaffStatusDetails.Count() > 0)
+        {
+
+        }
+        GroupedData = Model.StaffStatusDetails.GroupBy(p => p.BranchName).ToList();
+    }
+    
+}
+
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+
+
+@if (null != Model)
+{
+    if (Model.StaffStatusDetails != null && Model.StaffStatusDetails.Count() > 0)
+    {
+        <div class="table-header">
+            Records Found (@Model.StaffStatusDetails.Count())
+
+        </div>
+
+                    <div class="overflowscroll">
+                        <table class="table tbhover table-striped table-bordered dynamic-table" id="mytab1" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        S.No.
+                                    </th>
+                                    <th>
+                                        <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                                    </th>
+
+                                    <th style="min-width:139px">
+                                        @Html.DisplayName("Branch Name")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Staff Name")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Request Sent Date")
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayName("Request Reason")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Request Status")
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.StaffStatusDetails.Count(); i++)
+                                {
+                                    <tr>
+                                        @Html.Hidden("StaffActiveList.Index", (@i))
+                                        @Html.Hidden("StaffActiveList[" + (@i) + "].StaffStatusId", Model.StaffStatusDetails.ElementAt(i).StaffStatusId)
+                                        @Html.Hidden("StaffActiveList[" + (@i) + "].StaffId", Model.StaffStatusDetails.ElementAt(i).StaffId)
+                                        @Html.Hidden("StaffActiveList[" + (@i) + "].SubscriptionId", Model.StaffStatusDetails.ElementAt(i).SubscriptionId)
+                                        <td>
+                                            @(sno++)
+                                        </td>
+                                        <td>
+                                            @{
+                                                string StaffDet = Model.StaffStatusDetails.ElementAt(i).SubscriptionId + "-" + Model.StaffStatusDetails.ElementAt(i).StaffStatusId;
+
+                                            }
+                                            @Html.CheckBox("StaffActiveList[" + (@i) + "].IsChecked", Model.StaffStatusDetails.ElementAt(i).IsChecked, new { @value = StaffDet, @id = "Check" })
+                                        </td>
+
+
+                                        <td>
+                                            @Model.StaffStatusDetails.ElementAt(i).BranchName
+                                        </td>
+                                        <td>
+                                            @Model.StaffStatusDetails.ElementAt(i).StaffName
+                                        </td>
+
+                                        <td>
+                                            @Model.StaffStatusDetails.ElementAt(i).RequestSentDate.Value.ToString("dd - MMM - yyyy")
+                                        </td>
+                                        <td>
+                                            @Model.StaffStatusDetails.ElementAt(i).RequestReason
+                                        </td>
+                                        <td>
+                                            @if (Model.StaffStatusDetails.ElementAt(i).RequestStatus == 1)
+                                            {
+                                                <span class="label label-success">Active</span>
+                                            }
+                                            @if (Model.StaffStatusDetails.ElementAt(i).RequestStatus == 2)
+                                            {
+                                                <span class="label label-danger">In-Active</span>
+                                            }
+                                        </td>
+
+
+                                    </tr>
+
+                                                }
+
+
+                            </tbody>
+                        </table>
+                    </div>
+
+              
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold"> Data not available</span>
+    }
+    @Html.Action("DataTableScripts", "Base")
+}
+
+
+<script>
+
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+
+</script>

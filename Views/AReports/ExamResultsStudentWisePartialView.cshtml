@@ -1,0 +1,280 @@
+﻿@model AsteriskBrowserAL.Models.ExaminationResultsData
+@{
+    ViewBag.Title = "Exam Results";
+}
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (null != Model)
+{
+    var results = Model.lstExamResultsPaperWise;
+
+    if (null != results && results.Count() > 0)
+    {
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    Examination Results
+                </div>
+
+                <table class="table tbhover table-striped table-bordered dynamic-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("Paper Name")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Max Marks")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Pass marks")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Marks Scored")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Topper Marks")
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in results)
+                    {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PaperName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.MaxMarks)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PassMarks)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DisplayMarksScored)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TopperMarks)
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-xs-6">
+                <div id="columnchart_material" style="width: 500px;overflow:auto; height: 500px;"></div>
+            </div>
+        </div>
+    }
+    else
+    {<span style="color: red;"><b>Data not available</b></span> }
+}
+else
+{<span style="color: red;"><b>Data not available</b></span> }
+
+<style>
+    div.google-visualization-tooltip {
+        /*transform: rotate(30deg);*/
+        font-size: 8px;
+    }
+</style>
+
+@*<div id="chartContainer" style="height:400px; width:700px;">*@
+@*</div>*@
+
+<br />
+@Html.Action("DataTableScripts", "Base")
+
+<script type="text/javascript">
+    google.load('visualization', '1.0',
+    { packages: ['corechart', 'bar', 'table'], callback: drawChart });
+    function drawChart() {
+        var Results = @Html.Raw(Json.Encode(Model.lstExamResultsPaperWise));
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Paper Name');
+        data.addColumn('number', 'Student Marks');
+        data.addColumn('number', 'Topper Marks');
+        data.addColumn('number', 'Max Marks');
+        $.each(Results, function (i, record) {
+            data.addRow([record.PaperName, parseInt(record.DisplayMarksScored,10), parseInt(record.TopperMarks,10), parseInt(record.MaxMarks,10)]);
+        });
+
+        var options = {
+            chart: {
+                title: 'Student Performance',
+                //subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+            },
+            tooltip: { isHtml: true },
+            bars: 'vertical',
+            vAxis: {format: 'decimal'},
+            height: 250,
+            colors: ['#1b9e77', '#d95f02', '#7570b3']
+        };
+
+         var chart = new google.charts.Bar(document.getElementById('chart_div'));
+          chart.draw(data, options);
+    }
+
+</script>
+
+
+@*<script>
+
+        $(document).ready(function () {
+
+            var Results = @Html.Raw(Json.Encode(Model));
+
+
+        var chart = new CanvasJS.Chart("chartContainer");
+
+        chart.options.axisY = { prefix: "", suffix: "" };
+        chart.options.title = { text: "Examination Results Student-Wise" };
+
+        var series1 = { //dataSeries - first quarter
+            type: "column",
+            name: "Student Marks",
+            showInLegend: true,
+            color : "#f39c12"
+        };
+
+        var series2 = { //dataSeries - second quarter
+            type: "column",
+            name: "Topper Marks",
+            showInLegend: true,
+            color : "#00c0ef"
+        };
+
+        var series3 = { //dataSeries - second quarter
+            type: "column",
+            name: "Max Marks",
+            showInLegend: true,
+            color : "#00a65a"
+        };
+
+        chart.options.data = [];
+        chart.options.data.push(series1);
+        chart.options.data.push(series2);
+        chart.options.data.push(series3);
+
+        series1.dataPoints =[];
+        series2.dataPoints = [];
+        series3.dataPoints = [];
+
+        $.each(Results, function (i, record) {
+            series1.dataPoints.push({
+
+                label: record.Subject,
+                y: parseInt(record.MarksScored, 10),
+                color: "#f39c12",
+
+            });
+        });
+
+        $.each(Results, function (i, record) {
+            series2.dataPoints.push({
+
+                label: record.Subject,
+                y: parseInt(record.TopperMarks, 10),
+                color: "#00c0ef",
+
+            });
+        });
+
+        $.each(Results, function (i, record) {
+            series3.dataPoints.push({
+
+                label: record.Subject,
+                y: parseInt(record.MaxMarks, 10),
+                color: "#00a65a",
+
+            });
+        });
+
+        chart.render();
+        });
+
+    </script>*@
+
+
+@*<script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var Results = @Html.Raw(Json.Encode(Model));
+
+            var dps1 = [];
+            var dps2 = [];
+            var dps3 = [];
+
+            $.each(Results, function (i, record) {
+
+                dps1.push({
+                    label: record.Subject,
+                    y: parseInt(record.MarksScored, 10),
+                    color: "#f39c12" ,
+                });
+            });
+
+            $.each(Results, function (i, record) {
+
+                dps2.push({
+                    label: record.Subject,
+                    y: parseInt(record.TopperMarks, 10),
+                    color: "#00c0ef" ,
+                });
+            });
+
+            $.each(Results, function (i, record) {
+
+                dps3.push({
+                    label: record.Subject,
+                    y: parseInt(record.MaxMarks, 10),
+                    color: "#00a65a" ,
+                });
+            });
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                //title: {
+                //    text: "Ticket Status"
+                //},
+                colorSet: "greenShades",
+                axisY: {
+                    suffix: " "
+                },
+                legend: {
+                    verticalAlign: 'bottom',
+                    horizontalAlign: "center"
+                },
+                data: [
+                {
+                    type: "column",
+                    bevelEnabled: false,
+                    indexLabel: "{y}",
+                    dataPoints: dps1
+                },
+                  {
+                      type: "column",
+                      bevelEnabled: false,
+                      indexLabel: "{y}",
+                      dataPoints: dps2
+                  },
+                    {
+                        type: "column",
+                        bevelEnabled: false,
+                        indexLabel: "{y}",
+                        dataPoints: dps3
+                    }
+                ]
+            });
+
+            chart.render();
+        });
+    </script>*@
+
+

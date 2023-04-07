@@ -1,0 +1,266 @@
+﻿@model AsteriskBrowserAL.Models.YearWiseParticularsData
+
+@{
+    ViewBag.Title = "YearWiseParticulars";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            Finance
+        </li>
+        <li>
+            <i class=""></i>
+            DCCR
+        </li>
+        <li class="active">Year Wise Particulars</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+
+    @using (Html.BeginForm("YearWiseParticulars", "DCCR", FormMethod.Post))
+    {
+        @Html.ValidationMessage("YearWiseParticulars")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+
+        <div class="table-header">
+            <span style="font-family:calibri;">Year Wise Particulars</span>
+            <div class="" style="float:right;margin-right:10px;">
+                <a class="btncustom P2" id="New" name="New">
+               Add</a>
+       </div>
+
+        </div>
+
+
+
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+         
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                <div class="row">
+
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Financial Year</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboFinancialYear" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Grouped Particulars</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboGroupedParticular" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+
+           
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right">@Html.Label("Transcation Type")</label>
+
+                                        <div class="col-sm-6">
+                                            <select id="TranscationType" class="form-control">
+                                                <option value="-1">--Select--</option>
+                                                <option value="0">Tution Fee</option>
+                                                <option value="1">Transport Fee</option>
+                                                <option value="2">Fee Component</option>
+                                                <option value="3">Sales</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div id="SearchData row" >
+        </div>
+
+
+        if (null != Model)
+        {
+            <input style="display:none" id="SelYear" value="@Model.FinancialYearId" />
+            <input style="display:none" id="SelGroupParticular" value="@Model.GroupedParticularId" />
+            @*<input style="display:none" id="SelTransaction" value="@Model.id" />*@
+        }
+        else
+        {
+
+            <input style="display:none" id="SelYear" value="0" />
+            <input style="display:none" id="SelGroupParticular" value="0" />
+            <input style="display:none" id="SelExam" value="0" />
+        }
+
+
+    }
+</section>
+
+<script type="text/javascript">
+    window.onload = LoadData();
+
+    function LoadData() {
+        debugger
+        
+        LoadFinanceCombo();
+        LoadGroupedParticularCombo();
+
+        $("#SearchData").html("");
+        var Year = $('#CboFinancialYear').val();
+        var GroupParticular = $('#CboGroupedParticular').val();
+        var Transaction = $('#TranscationType').val();
+
+        if (Year > 0 && GroupParticular > 0 && Transaction >= 0) {
+            GetYearWiseParticulars();
+        }
+    }
+
+    function LoadGroupedParticularCombo() {
+
+        $.ajax({
+            url: '/DCCR/GetGroupedParituclars',
+            success: function (data) {
+                var HeadItems = $('#CboGroupedParticular');
+
+                HeadItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    if (record.GroupedParticularId != 0) {
+                        HeadItems.append($("<option>").val(record.GroupedParticularId).text(record.ParticularName));
+                    }
+                });
+
+                $('#CboGroupedParticular').append(HeadItems);
+            },
+            aync: false
+        });
+
+    }
+
+
+    function LoadFinanceCombo() {
+        $.ajax({
+            url: '/DCCR/GetFinacialYears',
+            success: function (data) {
+                var HeadItems = $('#CboFinancialYear');
+
+                HeadItems.children().remove();
+
+                $.each(data, function (i, record) {
+                    HeadItems.append($("<option>").val(record.FinancialYearId).text(record.YearValue));
+                });
+
+                $('#CboFinancialYear').append(HeadItems);
+            },
+            aync: false
+        });
+
+    }
+
+    $('#New').click(function () {
+
+        debugger
+        var Year = $('#CboFinancialYear').val();
+        var GroupParticular = $('#CboGroupedParticular').val();
+        var Transaction = $('#TranscationType').val();
+
+        if (Year > 0 && GroupParticular > 0 && Transaction >= 0)
+
+            {
+        window.location.href = "/DCCR/YearWiseParticularsC?Year=" + Year + "&GroupParticular=" + GroupParticular + "&Transaction=" + Transaction;
+        }
+        else 
+            document.getElementById("Validation").innerHTML = "Please Select fields";
+    });
+
+    $("#TranscationType").change(function () {
+        debugger
+        $("#SearchData").html("");
+
+        var Year = $('#CboFinancialYear').val();
+        var GroupParticular = $('#CboGroupedParticular').val();
+        var Transaction = $('#TranscationType').val();
+
+        if (Year > 0 && GroupParticular > 0 && Transaction >= 0) {
+            document.getElementById("Validation").innerHTML = "";
+            GetYearWiseParticulars();
+        }
+        else
+            document.getElementById("Validation").innerHTML = "Please Select fields";
+    });
+
+    $("#CboGroupedParticular").change(function () {
+        $("#SearchData").html("");
+
+        var Year = $('#CboFinancialYear').val();
+        var GroupParticular = $('#CboGroupedParticular').val();
+        var Transaction = $('#TranscationType').val();
+
+        if (Year > 0 && GroupParticular > 0 && Transaction >= 0) {
+            document.getElementById("Validation").innerHTML = "";
+            GetYearWiseParticulars();
+        }
+        else
+            document.getElementById("Validation").innerHTML = "Please Select fields";
+    });
+
+    $("#CboFinancialYear").change(function () {
+
+        $("#SearchData").html("");
+
+        var Year = $('#CboFinancialYear').val();
+        var GroupParticular = $('#CboGroupedParticular').val();
+        var Transaction = $('#TranscationType').val();
+
+        if (Year > 0 && GroupParticular > 0 && Transaction >= 0) {
+            document.getElementById("Validation").innerHTML = "";
+            GetYearWiseParticulars();
+        }
+        else
+            document.getElementById("Validation").innerHTML = "Please Select fields";
+    });
+
+    function GetYearWiseParticulars() {
+
+        var Year = $('#CboFinancialYear').val();
+        var GroupParticular = $('#CboGroupedParticular').val();
+        var Transaction = $('#TranscationType').val();
+
+        $('#imagemodal').show();
+        $.ajax({
+            url: '/DCCR/GetYearWiseParticularsData',
+            data: { Year: Year, GroupParticular: GroupParticular, Transaction: Transaction},
+            success: function (data) {
+                $('#imagemodal').hide();
+                $('#SearchData').html(data);
+            }
+        })
+    }
+
+</script>
+
+
+
+
+
+
+

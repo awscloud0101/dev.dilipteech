@@ -1,0 +1,201 @@
+﻿@model MailSettings
+@{
+    ViewBag.Title = "Mail Configuration";
+
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            SMS&Mail
+        </li>
+        <li class="active">Mail Configuration</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+<section class="content">
+    <br />
+    <br />
+    <div class="=row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("MailConfiguration", "SeSMSMail", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" name="MailSettingsId" value="@Model.MailSettingsId" />
+                }
+
+                if (null != TempData["Message"])
+                {
+                    <span style="color:green;font-weight:bold;">@Html.Raw(TempData["Message"])</span>
+                }
+                <div class="widget-box">
+                    <div class="widget-header widget-header-flat widget-header-small">
+
+                        <h5 class="widget-title"> Mail Configuration</h5>
+
+                        <div class="widget-toolbar no-border">
+
+                            <div class="inline action-buttons">
+                                <div style="float:right;">
+                                    <button class="btn btn-info btn-xs" style="margin-top:2px" onclick="return submitForm();" type="submit" name="Buttontype">
+                                        Save
+                                    </button>
+                                  s                    
+                                </div>
+                            </div>                           
+                          </div>
+                        </div>
+                            <div class="widget-body">
+                                <div class="widget-main">
+
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("SMTP Server")</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.MailId, new { @class = "form-control col-sm-5 textlength", @id = "MId", @maxlength = "75", PlaceHolder = "SMTP Server" })
+                                        </div>
+                                        <div class="col=sm-3" style="display:none;" id="ValidationMailId">
+                                            <label style="color:red; font-weight:bold;">Required</label>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("User Name")</label>
+
+
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.UserName, new { @class = "form-control col-sm-5 textlength", @id = "UId", @maxlength = "75", PlaceHolder = "User Name" })
+                                        </div>
+                                        <div class="col=sm-3" style="display:none;" id="ValidationUserId">
+                                            <label style="color:red; font-weight:bold;">Required</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding" for="form-field-1">@Html.Label("Password")</label>
+                                        <div class="col-sm-3">
+                                            @Html.PasswordFor(model => model.Password, new { @class = "form-control textlength", @id = "PId", @MaxLength = "15", PlaceHolder = "Password", autocomplete = "off", value = @Model.Password })
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="ValidationPassWord">
+                                            <label style="color:red;font-weight:bold;">Required</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding" for="form-field-1">@Html.Label("Port Number")</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextBoxFor(model => model.Port, new { @class = "form-control col-sm-5 textlength", @id = "PortId", @MaxLength = "7", PlaceHolder = "Port Number" })
+                                        </div>
+                                        <div class="col-sm-3" style="display:none;" id="validationPortNumber">
+                                            <label style="color:red;font-weight:bold;">Required</label>
+                                        </div>
+                                    </div>
+                                  
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Message")</label>
+                                        <div class="col-sm-3">
+                                            @Html.TextAreaFor(model=>model.UserName, new { @class = "form-control textlength", @id = "Message", placeholder = "Message" })
+
+                                        
+                                        </div>
+
+                                        <div class="col-sm-3" style="display:none;" id="vMessage">
+                                            <label style="color:red;font-weight:bold;">Required</label>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+    </div>
+</section>
+
+
+
+<script type="text/javascript">
+
+    function ValidateControls() {
+
+
+        var Mail = document.getElementById("MId").value;
+
+        var UserName = document.getElementById("UId").value;
+
+        var MailPassWord = document.getElementById("PId").value;
+
+        var MailPortNumber = document.getElementById("PortId").value;
+
+        validate = true;
+
+        if (Mail == "") {
+            document.getElementById("ValidationMailId").style.display = "inline";
+            validate = false;
+        }
+
+
+        if (UserName == "") {
+            document.getElementById("ValidationUserId").style.display = "inline";
+            validate = false;
+        }
+
+
+        if (MailPassWord == "") {
+            document.getElementById("ValidationPassWord").style.display = "inline";
+            validate = false;
+        }
+
+
+        if (MailPortNumber == "") {
+            document.getElementById("validationPortNumber").style.display = "inline";
+            validate = false;
+        }
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = ValidateControls();
+        if (validatestatus == false) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+
+    $('#MId').click(function () {
+        document.getElementById('ValidationMailId').style.display = "none"
+    })
+    $('#PId').click(function () {
+        document.getElementById('ValidationPassWord').style.display = "none"
+    })
+
+    $('#PortId').click(function () {
+        document.getElementById('validationPortNumber').style.display = "none"
+    })
+
+    $('#UId').click(function () {
+        document.getElementById('ValidationUserId').style.display = "none"
+    })
+
+
+</script>

@@ -1,0 +1,193 @@
+﻿@model AsteriskBrowserAL.Models.StaffHolidaysData
+
+@{
+    ViewBag.Title = "Exam Schedules";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+           HR
+        </li>
+        <li>
+            <i class=""></i>
+            Leave Management
+        </li>
+        <li class="active">Staff Holidays</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<section class="content">
+    <br />
+    @using (Html.BeginForm("SaveStaffHolidays", "HRLeaveManagement", FormMethod.Post))
+    {
+        @Html.ValidationMessage("StaffHolidays")
+
+        <span style="font-weight:bold;color:red" id="Validation"></span>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="table-header">
+                        <span style="font-family:calibri;">Staff Holiday</span>
+                    </div>
+
+                    <input type="hidden" value="@Model.MonthDate" id="selMonthdtae" />
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right">@Html.Label("Month")</label>
+
+                                            <div class="col-sm-6">
+                                                @Html.DropDownList("MonthId", new SelectList(Model.lstmonths, "MonthValue", "MonthName"), "-- Select --", new { @class = "form-control", @id = "MonthId", @name = "MonthId" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+		<br/>
+        <div id="SearchData" class="row">
+        </div>
+
+
+        @*if (null != Model)
+        {
+            <input style="display:none" id="SelSubId" value="@Model.SubscriptionId" />
+        }
+        else
+        {
+            <input style="display:none" id="SelSubId" value="0" />
+        }*@
+
+
+    }
+</section>
+
+<script type="text/javascript">
+	window.onload = onloaddata();
+	function onloaddata()
+	{
+		debugger
+		if ($('#selMonthdtae').val() != null && $('#selMonthdtae').val()!="") {
+            $('#MonthId').val($('#selMonthdtae').val());
+            $('#imagemodal').show();
+			$.ajax({
+				url: '/HRLeaveManagement/GetHolidaysByMonths',
+				data: { MonthId: $('#MonthId').val() },
+				success: function (data) {
+                    $('#SearchData').html(data);
+                    $('#imagemodal').hide();
+
+				},
+                async: false
+            }).done(function () {
+                $('#imagemodal').hide();
+
+            });
+
+		}
+	}
+    //$(document).ready(function () {
+    //    debugger
+    //    var SelSubId = $('#SelSubId').val();
+
+    //    if (SelSubId >= 0 ) {
+    //        GetStaffHolidays();
+    //    }
+    //});
+
+    //$('#NewExamination').click(function () {
+
+    //    var SubscriptionId = $('#SelSubId').val();
+
+    //    if (SubscriptionId < 0) {
+    //        document.getElementById("Validation").innerHTML = "Please select Branch";
+    //        return false;
+    //    }
+    //    else {
+    //        var SubscriptionId = $('#SubscriptionId').val();
+    //        window.location.href = "/HRLeaveManagement/StaffHolidaysC?SubId=" + SubscriptionId;
+    //    }
+
+    //});
+
+    //$('#SubscriptionId').change(function () {
+    //    GetStaffHolidays();
+    //});
+
+    //function GetStaffHolidays() {
+    //    debugger
+    //    $("#SearchData").html("");
+    //    var SubscriptionId = $('#SubscriptionId').val();
+    //    $('#imagemodal').show();
+    //    $.ajax({
+    //        url: '/HRLeaveManagement/GetGetStaffHolidaysData',
+    //        data: { SubscriptionId: SubscriptionId },
+    //        success: function (Data) {
+    //            $('#imagemodal').hide();
+    //            $("#SearchData").html(Data);
+    //        }
+    //    });
+    //}
+
+    //function btnConfirm(Value) {
+    //    if (Value > 0) {
+    //        $.ajax({
+    //            url: '/HRLeaveManagement/ValidationForExamSchedulesD',
+    //            data: { id: Value },
+    //            success: function (data) {
+    //                var url = '/HRLeaveManagement/ExamSchedulesD?id=' + Value;
+    //                var title = "StaffHolidays";
+
+    //                OpenDialog(data, url, title);
+    //            },
+    //            async: false
+    //        });
+    //    }
+    //}
+
+	$('#MonthId').change(function () {
+		debugger
+		var MonthId = $('#MonthId').val();
+        if (MonthId != null && MonthId != "") {
+            $('#imagemodal').show();
+
+			debugger
+			$.ajax({
+                url: '/HRLeaveManagement/GetHolidaysByMonths',
+				data: { MonthId: MonthId },
+                success: function (data) {
+                    $('#SearchData').html(data);
+                    $('#imagemodal').hide();
+                },
+                async: false
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+
+		}
+	})
+
+</script>
+
+
+
+
+
+
+

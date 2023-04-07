@@ -1,0 +1,233 @@
+﻿@model AsteriskBrowserAL.Models.TimeTableViewModel
+
+
+<script src="~/assets/js/Drag.js"></script>
+<link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/demo/demo.css">
+
+<style>
+    body {
+       
+        padding: 0px;
+     
+        margin: 0;
+    }
+</style>
+
+<div id="dialogScripts"></div>
+
+
+@section BreadCrumb{
+
+   &nbsp; <ul class="breadcrumb">
+
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Time Table
+        </li>
+        <li class="active">Period-Teacher Allocation</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+<section class="content">
+ 
+    <div class="row">
+        <div class="col-xs-12">
+            <span id="SaveVal" style="font-weight:bold;color:green"></span>
+            <div class="table-header">
+                <span style="font-family:calibri;">Period-Teacher Allocation</span>
+
+
+            </div>
+            <div class="widget-box">
+   
+
+
+                <div class="widget-body">
+                    <div class="widget-main">
+
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Class</label>
+                                <div class="col-sm-6">
+                                    <select id="ClassId" name="ClassId" class="form-control"></select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                <div class="col-sm-6">
+                                    <select id="SectionId" name="SectionId" class="form-control"></select>
+                                </div>
+                            </div>
+
+                           
+
+                         
+
+                        </div>
+
+                        <div class="row">
+                            <br />
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Week</label>
+                                <div class="col-sm-6" style="font:12px arial;">
+                                    <select id="WeekNumberId" name="WeekNumberId" class="form-control"></select>
+                                </div>
+                            </div>
+
+                        
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <br />
+            <div id="SearchDiv">
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+
+
+<script>
+    function OnloadFunction() {
+        LoadClassDropdown();
+    }
+
+
+    function LoadClassDropdown() {
+
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                classData = $("#ClassId")
+                classData.children().remove();
+                classData.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    classData.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(classData)
+
+
+            },
+            async: false
+        })
+    }
+
+
+    function GetSectionDropDown() {
+        var ClassNumber = $("#ClassId").val();
+        $.ajax({
+            url: '/AFrontOffice/GetSectionDropDown',
+            data: { nClassNumber: ClassNumber },
+            success: function (Data) {
+                var SectionDRP = $('#SectionId')
+                SectionDRP.children().remove();
+                SectionDRP.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+                $('#SectionId').append(SectionDRP);
+            }
+        })
+    }
+
+
+    $("#ClassId").change(function () {
+        document.getElementById("SaveVal").innerHTML = ""
+        $('#SectionId').html("")
+        $("#WeekNumberId").html("");
+        $("#SearchDiv").html("")
+
+        var ClassId = $("#ClassId").val();
+        if (ClassId > 0) {
+            GetSectionDropDown();
+        }
+    })
+
+    $("#SectionId").change(function () {
+        document.getElementById("SaveVal").innerHTML = ""
+        $("#WeekNumberId").html("");
+
+        $("#SearchDiv").html("")
+        var SectionId = $("#SectionId").val();
+        if (SectionId > 0) {
+            LoadWeeksData()
+        }
+    })
+
+    function LoadWeeksData() {
+        $.ajax({
+            url: '/ATimetable/LoadWeeksData',
+            success: function (result) {
+                Section = $("#WeekNumberId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.WeekDaysId).text(record.WeekName))
+                })
+
+                $("#WeekNumberId").append(Section)
+
+            },
+            async: false
+        })
+    }
+
+    $("#WeekNumberId").change(function () {
+        document.getElementById("SaveVal").innerHTML = ""
+
+        var WeekNumberId = $("#WeekNumberId").val();
+        $("#SearchDiv").html("")
+        if (WeekNumberId > 0) {
+            GetTimeTableData()
+
+        }
+    })
+
+    function GetTimeTableData() {
+        var ClassNumber = $("#ClassId").val();
+        var WeekNumber = $("#WeekNumberId").val();
+        var SectionId = $("#SectionId").val();
+        $("#imagemodal").show();
+
+        $.ajax({
+            url: '/ATimetable/GetTimetableForClass',
+            data: { nClassNumber: ClassNumber, nSectionId: SectionId, WeekId: WeekNumber },
+            success: function (Result) {
+                $("#imagemodal").hide();
+
+                $("#SearchDiv").html(Result)
+            },
+
+        })
+    }
+
+    window.onload = OnloadFunction();
+
+
+
+</script>
+
+
+
+
+
+
+
+

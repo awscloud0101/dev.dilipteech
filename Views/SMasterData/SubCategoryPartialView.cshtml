@@ -1,0 +1,210 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.SubCategoryViewModel>
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+@*<div id="Content">
+    <div class='widget-header'><h4 class='smaller'><i class='ace-icon fa fa-exclamation-triangle red'></i> Empty the recycle bin?</h4></div>
+</div>*@
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+
+@if (null != Model && Model.Count() > 0)
+{
+
+    int nsno = 1;
+    <div class="table-header">
+        Records Found (@Model.Count())
+    </div>
+        <!-- form start -->
+    <table class="table tbhover table-striped table-bordered dynamic-table">
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                <th>
+                    @Html.DisplayName("Category")
+                </th>
+                <th>
+                    @Html.DisplayName("Code")
+                </th>
+                <th>
+                    @Html.DisplayName("Sub Category")
+                </th>
+                <th>
+                    @Html.DisplayName("Max Stock")
+                </th>
+                <th>
+                    @Html.DisplayName("Min Stock")
+                </th>
+
+                <th></th>
+            </tr>
+
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @(nsno++)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CategoryName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubCategoryName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MaxStock)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MinStock)
+                    </td>
+
+                    <td>
+                        <div class="hidden-sm hidden-xs action-buttons">
+                            <a class="green P2" href="@Url.Action("SubCategoryE", "SMasterData", new { id = item.InventorySubCategoryId })">
+                                <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                            </a>
+                            <a class="red P2" onclick="btnConfirm(@item.InventorySubCategoryId)">
+                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+else
+{
+    <span style="color: red;"><b>Data not available</b></span>
+}
+
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+
+    function btnConfirm(Value) {
+
+        debugger
+
+        if (Value > 0) {
+            $.ajax({
+                url: '/SMasterData/ValidationForSubCategoryD',
+                data: { Id: Value },
+                success: function (data) {
+
+                    var url = '/SMasterData/SubCategoryD?id=' + Value;
+                    var title = "Sub Category";
+
+                    OpenDialog(data, url, title);
+                },
+                async: false
+            });
+        }
+    }
+
+</script>
+
+
+
+
+@*<div id="dialog">
+
+</div>
+
+<script>
+
+    var dialogContent = "";
+
+    function btnConfirm(Value) {
+        if (Value > 0) {
+            $.ajax({
+                url: '/SMasterData/ValidationForSubCategoryD',
+                data: { Id: Value },
+                success: function (data) {
+                    if (data != "") {
+                        //document.getElementById('Validation').innerHTML = data;
+                        var $dialog = $('#dialog').html(data);
+
+                        $dialog.dialog({
+                            modal: true,
+                            draggable: false,
+                            resizable: false,
+                            position: ['center', 'center'],
+                            title: "Sub Category",
+                            show: 'blind',
+                            hide: 'blind',
+                            width: 400,
+                            dialogClass: 'ui-dialog-osx',
+                            buttons: {
+                                "OK": function () {
+                                    debugger
+                                    $dialog.dialog('close');
+                                }
+                            }
+                        });
+                    }
+                    else {
+
+                        var $dialog = $('#dialog').html("Are you sure want to delete?");
+                        $dialog.dialog({
+                            modal: true,
+                            draggable: false,
+                            resizable: false,
+                            position: ['center', 'center'],
+                            title: "Sub Category",
+                            show: 'blind',
+                            hide: 'blind',
+                            width: 400,
+                            dialogClass: 'ui-dialog-osx',
+                            buttons: {
+                                "Cancel": function () {
+                                    debugger
+                                    $dialog.dialog('close');
+                                },
+                                "Confirm": function () {
+                                    debugger
+                                    window.location.href = '/SMasterData/SubCategoryD?id' + Value;
+                                }
+                            },
+                        });
+                    }
+                },
+                async: false
+            })
+        }
+    }
+
+</script>
+
+<style>
+    .ui-dialog-osx {
+        -moz-border-radius: 0 0 8px 8px;
+        -webkit-border-radius: 0 0 8px 8px;
+        border-radius: 0 0 8px 8px;
+        border-width: 0 8px 8px 8px;
+    }
+
+    .ui-widget-overlay {
+        opacity: .70;
+    }
+</style>*@

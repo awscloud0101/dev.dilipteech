@@ -1,0 +1,160 @@
+﻿@model AsteriskBrowserAL.Models.KittingViewModel
+@{
+    ViewBag.Title = "StockReportKitWise";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Stores
+        </li>
+        <li>
+            <i class=""></i>
+            Reports
+        </li>
+        <li class="active">Stock Report Kit Wise</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class=col-xs-12>
+            @using (Html.BeginForm("StockReportKitWise", "SReports", FormMethod.Post))
+            {
+                if (null != Model)
+                {
+                    <input type="hidden" id="IsCentral" value="@Model.IsCentral" name="IsCentral" />
+                    <span style="color:red;font-weight:bold" id="Validation"></span>
+
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5 class="widget-title">
+                                Stock Report Kit Wise
+                            </h5>
+                        </div>
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+
+                                @if (Model.IsCentral)
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">Division</label>
+                                                <div class="col-xs-6">
+                                                    @Html.DropDownListFor(model => model.DivisionId, new SelectList(Model.lstDivision, "DivisionId", "DivisionName"), new { @class = "form-control", id = "DivisionId" })
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <label class="col-xs-4">Branch</label>
+                                                <div class="col-xs-6">
+                                                    <select id="BranchId" name="SubscriptionId" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="BranchId" name="SubscriptionId" value="@Model.SubscriptionId" />
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="KitsData"></div>
+
+                }
+
+
+            }
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    $('#DivisionId').change(function () {
+
+        $('#KitsData').html("");
+
+        var BranchItems = $('#BranchId');
+
+        BranchItems.children().remove();
+
+        var DivisionId = $('#DivisionId').val();
+
+        if (DivisionId != 0) {
+            $.ajax({
+
+                url: '/Common/GetBranchesByDivisionId',
+                data: { DivisionId: DivisionId },
+                success: function (data) {
+
+                    BranchItems.append($("<option>").val("null").text("--- Select ---"));
+
+                    $.each(data, function (i, record) {
+
+                        if (record.IsCentral != true)
+                        {
+                            BranchItems.append($("<option>").val(record.SubscriptionId).text(record.Institute));
+                        }
+                    });
+
+                    $('#BranchId').append(BranchItems);
+                },
+                aync: false
+            });
+        }
+    });
+
+    $('#BranchId').change(function () {
+
+        $('#KitsData').html("");
+
+        var branchId = $(this).val();
+
+        if (branchId > 0)
+        {
+            submitForm();
+        }
+    });
+
+    $(document).ready(function () {
+        if ($('#IsCentral').val() != "value") {
+            submitForm();
+        }
+    });
+
+    function submitForm() {
+
+        debugger
+
+        $('#KitsData').html("");
+
+            $.ajax({
+                url: '/SReports/GetStocReportKitWiseData',
+                data: { DivisionId: $('#DivisionId').val(), BranchId: $('#BranchId').val() },
+                beforeSend: function () {
+                    $('#imagemodal').show();
+                },
+                success: function (data) {
+                    $('#imagemodal').hide();
+
+                    $('#KitsData').html(data);
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+    }
+
+</script>

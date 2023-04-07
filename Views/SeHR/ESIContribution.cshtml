@@ -1,0 +1,87 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.BranchViewModel>
+@{
+    ViewBag.Title = "ESIContribution";
+}
+
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-gears"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">ESI Contribution</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+@if (TempData["Validation"] != null)
+{
+    <span style="color:green;font-weight:bold" id="validationMsg">@TempData["Validation"]</span>
+}
+<section>
+
+    @using (Html.BeginForm("ESIContribution", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        int j = 1;
+        <div class="table-header">
+            ESI Contribution
+            <div style="float:right;margin-right:10px;">
+                <button type="submit" name="Save" id="Save" class="btncustom P2">
+                    Save
+                </button>
+            </div>
+        </div>
+        <table class="table tbhover table-striped table-bordered nowrap dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                        S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Branch Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Employee Contribution")
+                    </th>
+                </tr>
+            </thead>
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                <tr>
+                    <td>
+                        @Html.Hidden("lstbranchdetails.Index", (@i + 10))
+                        @(j++)
+                    </td>
+                    <td>
+                        @Html.Hidden("lstbranchdetails.Index", (@i))
+                        @Html.Hidden("lstbranchdetails[" + (@i) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                        @Html.Hidden("lstbranchdetails[" + (@i) + "].ESIContributionId", Model.ElementAt(i).ESIContributionId)
+                        @Model.ElementAt(i).Institute
+                    </td>
+                    <td>
+                        @Html.CheckBox("lstbranchdetails[" + (@i) + "].IsESI", Model.ElementAt(i).IsESI, new { @id = "Check" })
+                    </td>
+                </tr>
+
+            }
+        </table>
+    }
+
+
+</section>
+
+@Html.Action("DataTableScripts", "Base")
+
+<script>
+    $('#Check').click(function () {
+        $('#validationMsg').hide()
+    })
+</script>

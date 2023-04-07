@@ -1,0 +1,99 @@
+﻿@model List<AsteriskBrowserAL.Models.PlayersData>
+
+@if ((null != Model))
+{
+
+    if (Model.Count() > 0)
+    {
+
+     
+        <div class="table-header">
+            Records Found (@Model.Count())
+
+            <div style="float:right;margin-right:10px;">
+                <button onclick="SaveSelectedtStaff()" class="btncustom" style="min-width:100px" type="button" name="Save" id="Save" value="Save">
+                    Assign
+                </button>
+            </div>
+        </div>
+
+        <div style="overflow:auto;height:300px">
+            <table id="PlayerTable" class="table table-striped table-bordered table-hover dynamic-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="Selectall" />   @Html.DisplayName("Select")
+                        </th>
+                        @*<th >
+                                @Html.DisplayName("Employee Number")
+                            </th>*@
+
+                        <th>
+                            @Html.DisplayName("Name")
+                        </th>
+                        @*<th >
+                                @Html.DisplayName("Branch")
+                            </th>*@
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        <tr>
+                            <td>
+                                @Html.Hidden("PlayerData.Index", (@i + 10))
+                                @Html.Hidden("PlayerData[" + (@i + 10) + "].EmployeeNumber", Model.ElementAt(i).EmployeeNumber)
+                                @Html.Hidden("PlayerData[" + (@i + 10) + "].EmployeeName", Model.ElementAt(i).EmployeeName)
+                                @Html.Hidden("PlayerData[" + (@i + 10) + "].SubscriptionId", Model.ElementAt(i).SubscriptionId)
+                                @Html.Hidden("PlayerData[" + (@i + 10) + "].StaffId", Model.ElementAt(i).StaffId)
+
+
+                                @Html.CheckBox("PlayerData[" + (@i + 10) + "].isCheck", Model.ElementAt(i).isCheck, new { @id = "Check", @name = "Check", @Value = Model.ElementAt(i).StaffId })
+                                @Html.Hidden("PlayerData[" + (@i + 10) + "].isCheck", Model.ElementAt(i).isCheck)
+                            </td>
+                            @*<td >
+                                    @Model.ElementAt(i).EmployeeNumber
+                                </td>*@
+
+                            <td>
+                                @Model.ElementAt(i).EmployeeName
+                            </td>
+
+                            @*<td>
+                                    @Model.ElementAt(i).BranchName
+                                    @Html.Hidden("PlayerData[" + (@i + 10) + "].BranchName", Model.ElementAt(i).BranchName)
+                                </td>*@
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+
+    }
+    else
+    {
+        <span style="color: red;"><b>Data not available</b></span>
+    }
+}
+
+
+
+<script>
+    $('#Selectall').change(function () {
+        if ($(this).prop('checked')) {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', true);
+            });
+        } else {
+            $('tbody tr td #Check').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+</script>
+

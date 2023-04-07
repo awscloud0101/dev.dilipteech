@@ -1,0 +1,207 @@
+﻿@model List<AsteriskBrowserAL.Models.BankDepositViewModel>
+@{
+    ViewBag.Title = "Bank Deposit";
+}
+
+
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+@if (Model != null)
+{
+    if (Model.Count() < 1)
+    {
+        <span style="color:red;font-weight:bold">Data is not available</span>
+    }
+    else
+    {
+        int nsno = 1;
+
+        <div class="table-header">
+            Records Found (@Model.Count())
+            <div style="float:right;">
+                <button type="button" class="btn btn-info btn-xs P2" id="btnExport" value="Export to excel">
+                    <i class="ace-icon fa fa-share bigger-180"></i>
+                </button>
+
+            </div>
+        </div>
+
+        <table id="tbBankDepositData" class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Deposit Date")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Bank Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Person Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Cash Amount")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Cheque Amount")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Remarks")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Status")
+                    </th>
+                    <th></th>
+                    <th></th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @item.LastUpdated.ToString("dd-MMM-yyyy hh:mm tt")
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BankName)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Personname)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CashAmount)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ChequeAmount)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Remarks)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DisplayStatus)
+                        </td>
+
+
+                        <td>
+                            @if (item.Actionstatus != 0 && item.IsDeleted == false)
+                            {
+                                @Html.ActionLink("Request", "BankDepositRequest", new { id = item.BankDepositId, FromDate = item.FromDate, ToDate = item.ToDate })
+                            }
+                            else if (item.IsDeleted == false)
+                            {
+                                @Html.ActionLink("Details", "BankDepositDetails", new { id = item.BankDepositId, FromDate = item.FromDate, ToDate = item.ToDate })
+
+                            }
+                            else
+                            {
+
+                            }
+                        </td>
+
+                        <td>
+                            @if (item.Actionstatus != 0 && item.IsDeleted == false)
+                            {
+                                @Html.ActionLink("Cancel", "BankDepositCancel", new { id = item.BankDepositId, FromDate = item.FromDate, ToDate = item.ToDate })
+                            }
+                            else
+                            {
+                            }
+
+                        </td>
+
+
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <br />
+
+        <div class="well">
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <h4 class="blue">Cash Grand Total :  </h4>
+                        </td>
+                        <td>
+                            @if (Model != null)
+                            {
+                                <h5>  &nbsp; @Model.Sum(t => t.CashAmount)</h5>
+                            }
+                            else
+                            {
+                                <h5>  &nbsp; 0</h5>
+                            }
+                        </td>
+                        <td></td>
+                        <td>
+                            <h4 class="blue" style="padding-left:100px">Cheque Grand Total :  </h4>
+
+                        </td>
+                        <td>
+                            @if (Model != null)
+                            {
+                                <h5> &nbsp; @Model.Sum(t => t.ChequeAmount)</h5>
+                            }
+                            else
+                            {
+                                <h5>  &nbsp; 0</h5>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+
+
+
+
+
+
+    }
+}
+
+@Html.Action("DataTableScripts", "Base")
+
+
+<script>
+    $("#btnExport").click(function (e) {
+        ExportToExcel('tbBankDepositData');
+    });
+
+
+
+    //    var table = $('#tbBankDepositData').DataTable({
+    //    "sScrollY": "200px",
+    //    "bPaginate": false
+
+    //});
+
+    //    $(window).bind('resize', function () {
+    //        //table.fnAdjustColumnSizing();
+    //        table.columns.adjust().draw();
+    //    });
+
+
+</script>

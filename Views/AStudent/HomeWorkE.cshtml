@@ -1,0 +1,378 @@
+﻿@model AsteriskBrowserAL.Models.HomeWorkData
+@{
+    ViewBag.Title = "Home Work";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Home Work</li>
+    </ul><!-- /.breadcrumb -->
+}
+@Html.Action("DatePickerScripts", "Base")
+
+<script src="//cdn.ckeditor.com/4.5.5/standard/ckeditor.js"></script>
+
+<section class="content">
+
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            <span style="color:red;" id="Validation"></span>
+            @using (Html.BeginForm("HomeWorkE", "AStudent", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.HiddenFor(model => model.HomeWorkId)
+                if (Model.StaffId > 0)
+                {
+                    <input type="hidden" id="StaffId" name="StaffId" value="@Model.StaffId">
+                }
+                else
+                {
+                    <input type="hidden" id="StaffId" name="StaffId">
+                }
+                <input type="hidden" id="nSectionId" name="SectionId" value="@Model.SectionId" />
+                <input type="hidden" id="nCourseId" name="CourseId" value="@Model.CourseId" />
+                <div class="page-header">
+                    <h1>
+                        Home Work
+                        <small style="float:right;">
+                            @Html.ActionLink("Back to details", "HomeWork", new { nCourseId = Model.CourseId, nSectionId = Model.SectionId })
+                        </small>
+                    </h1>
+                </div>
+
+                <!-- form start -->
+
+                <form class="form-horizontal" role="form">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Home work title")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.Title, new { @class = "form-control textlength", placeholder = "Title Name", @id = "Title" })
+                        </div>
+
+                        <span class="col-sm-3" style="color:red;font-weight:bold;display:none" id="ESTitlename">
+                            <label style="color:red;font-weight:bold"> Required </label>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Referred Staff")</label>
+
+                        <div class="col-sm-3">
+                            @Html.DropDownListFor(model => model.StaffId, new SelectList(Model.lstStaff, "StaffId", "FirstName"), new { @class = "form-control textlength", placeholder = "Staff Name", @id = "StaffId", @disabled = "disabled" })
+                        </div>
+
+                        <span class="col-sm-3" style="color:red;font-weight:bold;display:none" id="ESStaffname">
+                            <label style="color:red;font-weight:bold"> Required </label>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("From Date")</label>
+                        @if (null != Model.FromDate)
+                        {
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" name="FromDate" id="FromDate" value="@Model.FromDate.ToShortDateString()" autocomplete="off" placeholder="Select From Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" name="FromDate" id="FromDate" autocomplete="off" placeholder="Select From Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+
+
+                        <span class="col-sm-3" id="ESFromDate" style="color:red;font-weight:bold;display:none">
+                            <label style="color:red;font-weight:bold"> Required </label>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("To Date")</label>
+                        @if (null != Model.FromDate)
+                        {
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" name="ToDate" id="ToDate" value="@Model.ToDate.ToShortDateString()" autocomplete="off" placeholder="Select To Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                            <input class="form-control" type="text" name="ToDate" id="ToDate" autocomplete="off" placeholder="Select To Date" />
+                                            <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <span class="col-sm-3" id="ESToDate" style="color:red;font-weight:bold;display:none">
+                            <label style="color:red;font-weight:bold"> Required </label>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+
+                        <div class="col-sm-6">
+
+                            @if (Model != null)
+                            {
+                                <textarea class="form-control col-sm-5 textlength" placeholder="Discription" id="Discription" name="Discription">@Model.Discription</textarea>
+                                <script type="text/javascript">
+                                    CKEDITOR.replace('Discription');
+                                </script>
+                            }
+                            else
+                            {
+                                <textarea class="form-control col-sm-5 textlength" placeholder="Discription" id="Discription" name="Discription"></textarea>
+                                <script type="text/javascript">
+                                    CKEDITOR.replace('Discription');
+                                </script>
+                            }
+                        </div>
+
+                        <div class="col-sm-3" style="display:none" id="vDiscription">
+                            <label style="color:red;font-weight:bold"> Required </label>
+                        </div>
+
+                    </div>
+                    @*<div class="row">
+                        <div class="col-sm-12">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Upload File")</label>
+                            <div class="form-group">
+                                <a href="javascript:void(0)" id="upload" class="btn-sm btn btn-info">
+                                    <i class="fa fa-cloud-upload fa-fw"></i>
+                                    Upload
+                                </a>
+                                <input id="UploadFile" type="file" name="UploadFile" style="display:none" onchange="readURL(this);"/>
+                                <input id="filename" style="display:none" type="text" readonly="readonly" />
+                                <input type="hidden" id="PhotoStatus" />
+                            </div>
+                            <span class="col-sm-3" id="VUploadFile" style="color:red;font-weight:bold;display:none">
+                                *Required
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"></label>
+                            <div class="col-sm-9">
+                                <span>
+                                    @if (Model.AttachmentName != null)
+                                    {
+                                        <img src="@Model.AttachmentName" width="100" height="100" id="DisplayImage" />
+                                        <input type="hidden" value="@Model.AttachmentName" id="hiddenAttachmentVal" />
+                                    }
+                                    else
+                                    {
+                                        <img width="100" height="100" id="DisplayImage" />
+                                    }
+
+                                </span>
+                            </div>
+                        </div>
+                    </div>*@
+                    <div class="hr hr-18 dotted hr-double"></div>
+
+                    <div class="col-md-offset-3 col-md-9">
+                        <button class="btn btn-success btn-sm" name="Save" id="Save" type="submit">
+                            <i class="ace-icon fa fa-check bigger-50"></i>
+                            Save
+                        </button>
+
+                        &nbsp; &nbsp; &nbsp;
+                        <button class="btn btn-sm" type="reset">
+                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+
+    </div>
+</section>
+
+<script>
+    function readURL(input) {
+        debugger
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#DisplayImage')
+                    .attr('src', e.target.result)
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#upload").click(function () {
+        $("#UploadFile").trigger('click');
+    });
+
+    $("#UploadFile").change(function () {
+        debugger
+        var filename = $("#UploadFile").val();
+        var lastIndex = filename.lastIndexOf("\\");
+        if (lastIndex >= 0) {
+            filename = filename.substring(lastIndex + 1);
+        }
+        document.getElementById('filename').value = filename; 
+        document.getElementById('PhotoStatus').value = "1";
+        $('#filename').show()
+    });
+
+
+
+    function FtpUpload() {
+        debugger
+        if ($('#hiddenAttachmentVal').val() != '' || $('#hiddenAttachmentVal').val() != null || $('#hiddenAttachmentVal').val() != undefined) {
+            var fileurl = $('#hiddenAttachmentVal').val();
+            $.ajax({
+                url: '/Common/deleteftpfile',
+                data: { fileurl: fileurl },
+                success: function (result) {
+                },
+                async: false
+            });
+
+            var dpimg = $('#UploadFile').val();
+            var fileUpload2 = $("#UploadFile").get(0);
+            var files2 = fileUpload2.files;
+            var fileData = new FormData();
+            for (var i = 0; i < files2.length; i++) {
+                fileData.append('HomeWork_' + files2[i].name, files2[i]);
+            }
+            $.ajax({
+                url: '/AStudent/UploadFilesMultiple',
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: fileData,
+                success: function (result) {
+                }
+            });
+        }
+    }
+
+    $('#Save').click(function () {
+        debugger
+        var result = submitForm()
+        debugger
+        if (result == false) {
+            return false;
+        }
+        else {
+            var PhotoStatus = $('#PhotoStatus').val()
+            if (PhotoStatus == "1") {
+                FtpUpload()
+            }
+        }
+
+    })
+    function submitForm() {
+        debugger
+        var validate = true;
+        var Description = CKEDITOR.instances.Discription.getData();
+
+        CKEDITOR.on('instanceReady', function (evt) {
+            var editor = evt.editor;
+            editor.on('focus', function (e) {
+            });
+        });
+        var Title = $('#Title').val();
+        var Referredby = $('#StaffId').val();
+        var Fromdate = $('#FromDate').val();
+        var Todate = $('#ToDate').val();
+
+        debugger
+
+        if (Description == undefined || Description == "" || Description.length < 1) {
+            document.getElementById("vDiscription").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("vDiscription").style.display = "none";
+        }
+
+        if (Title == undefined || Title == "" || Title.length < 1) {
+            document.getElementById("ESTitlename").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ESTitlename").style.display = "none";
+        }
+
+        if (Referredby == undefined || Referredby == "" || Referredby.length < 1) {
+            document.getElementById("ESStaffname").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ESStaffname").style.display = "none";
+        }
+
+        if (Fromdate == undefined || Fromdate == "" || Fromdate.length < 1) {
+            document.getElementById("ESFromDate").style.display = "inline";
+            validate = false;
+
+        } else {
+            document.getElementById("ESFromDate").style.display = "none";
+        }
+
+        if (Fromdate != "" && Todate != "") {
+            Fromdate = new Date(Fromdate);
+            Todate = new Date(Todate);
+            if (Todate < Fromdate) {
+                document.getElementById("Validation").innerHTML = "To date should be greater than from date";
+                validate = false;
+            }
+        }
+
+        if (Todate == undefined || Todate == "" || Todate.length < 1) {
+            document.getElementById("ESToDate").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("ESToDate").style.display = "none";
+        }
+
+       
+
+        return validate;
+    }
+
+
+
+
+</script>

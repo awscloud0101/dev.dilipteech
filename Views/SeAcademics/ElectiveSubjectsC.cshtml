@@ -1,0 +1,136 @@
+﻿@model AsteriskBrowserAL.Models.ElectiveSubjectsStudentViewData
+
+@{
+    ViewBag.Title = "ElectiveSubjectsC";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            Academics
+        </li>
+        <li class="active">Elective Subjects</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<!--Main Content-->
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-4>
+            <h3>@Html.ActionLink("<< Elective Subjects Details", "ElectiveSubjectsGroupsDet", new { id = ViewBag.Selected_GroupId, BatchId = ViewBag.Selected_BatchId })</h3>
+        </div>
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- form start -->
+                @using (Html.BeginForm("ElectiveSubjectsC", "SeAcademics", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    if (null != TempData["ElectiveSubjects"])
+                    {
+                        @Html.Raw(TempData["ElectiveSubjects"])
+                    }
+                    <div class="box-header">
+                        <h3 class="box-title ">Elective Subjects</h3>
+                        <br />
+                        <br />
+                        <button class="btn btn-primary" type="submit">
+                            Create
+                        </button>
+                    </div><!-- /.box-header -->
+
+
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <span style="color: red;">@Html.ValidationMessage("ElectiveSubjectsC")</span>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Subject Name")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.SubjectName, new { @class = "form-control", placeholder = "Subject Name", @required = "required", @title = "Please Enter Subject Name" })
+                        </div>
+
+                        <div class="col-sm-3">
+                            @Html.ValidationMessageFor(model => model.SubjectName)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Weekly")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.MaxWeeklyClasses, new { @class = "form-control", placeholder = "Weekly", @type = "number", @min = "0", @required = "required", @title = "Please Enter Weekly Class" })
+                        </div>
+
+                        <div class="col-sm-3">
+                            @Html.ValidationMessageFor(model => model.MaxWeeklyClasses)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Code")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.SubjectCode, new { @class = "form-control", placeholder = "Code", @required = "required", @title = "Please Enter Subject Code" })
+                        </div>
+
+                        <div class="col-sm-3">
+                            @Html.ValidationMessageFor(model => model.SubjectCode)
+                        </div>
+                    </div>
+
+                    @*<div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("No Exam")</label>
+
+                            <div class="col-sm-6">
+
+                                @Html.CheckBoxfor("IsNoExam", new { value = Model.IsNoExam., @checked = true })
+                            <input name="IsNoExam" type="hidden" value="false" />
+
+                            </div>
+
+                            <div class="col-sm-3">
+                                @Html.ValidationMessageFor(model => model.IsNoExam)
+                            </div>
+                        </div>*@
+
+
+
+                    <div class="form-group">
+
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Non Existing Students")</label>
+                        <div class="col-sm-3">
+                            <p> @Html.ListBox("StudentsList", (MultiSelectList)ViewBag.StudentsList, new { @style = "width: 270px;", size = 8 }) </p>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+

@@ -1,0 +1,568 @@
+﻿@model AsteriskBrowserAL.Models.ClassShufflingViewModel
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Class Shuffling</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("ClassShuffling", "AStudent", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+           
+
+
+                <p align="center" id="DisplayNew">
+                    <span class="savedinfo">
+
+
+
+                        <span class=" fa fa-check-circle bigger-260" align="center"></span>
+                        <br />
+                        <input type="hidden" id="SaveVal" value="@Model.DataSaved" />
+                        <span style="color:green;font-weight:bold;" id="Save">@Model.DataSaved</span>
+
+
+                        <br />
+
+                        <a href="" class="cls1 btncustom">Close</a>
+                        <script>
+
+                            $(document).ready(function () {
+                                $(".cls1").click(function () {
+
+                                    $(".savedinfo").css("display", "none")
+                                });
+
+
+
+                        </script>
+                    </span>
+                </p>
+                <span style="color:red;font-weight:bold;" id="errorEve">@Html.ValidationMessage("Class")</span>
+                <input type="hidden" id="SelDivisionId" value="@Model.DivisionId" />
+                <input type="hidden" id="SelBranchId" value="@Model.BranchId" />
+                <input type="hidden" id="SelClassId" value="@Model.ClassId" />
+                <input type="hidden" id="Selstudent" value="@Model.Student" />
+                <input type="hidden" id="SelShuffleClassId" value="@Model.ShuffleClassId" />
+                <input type="hidden" id="SelShuffleSectionId" value="@Model.ShuffleSectionId" />
+                <input type="hidden" id="SelStudentId" value="@Model.StudentId" />
+
+
+              
+                    <div class="table-header">
+                       
+                            Class Shuffling
+                      
+                        <div id="DisplaySave" style="display:none">
+
+
+                            <div class="" style="float:right;margin-right:10px;">
+                            
+                                    <input class="btncustom P2" type="submit" value="Shuffle" name="Shuffle" onclick="return submitForm();">
+                            
+                            </div>
+                     
+                        </div>
+                        <div id="DisplayNew" style="display:none">
+                            <div style="float:right;margin-right:10px;">
+                                <a class="btncustom P2" role="button" id="new" name="New">Add</a>
+                            </div>
+                       
+                        </div>
+
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+
+                    <div class="widget-box" style="padding:10px;">
+           
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Division")</label>
+                                    <div class="col-sm-6">
+                                        <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Branch")</label>
+
+                                    <div class="col-sm-6">
+                                        <select id="BranchId" name="BranchId" class="form-control"></select>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Class")</label>
+
+                                    <div class="col-sm-6">
+                                        <select id="ClassId" name="ClassId" class="form-control"></select>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Student")</label>
+                                    <input type="hidden" id="StudentId" name="StudentId" />
+                                    <div class="col-sm-6">
+                                        <input type="text" id="Student" name="Student" class="form-control" />
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Shuffle Class")</label>
+
+                                    <div class="col-sm-6">
+                                        <select id="ShuffleClassId" name="ShuffleClassId" class="form-control" ></select>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Shuffle Section")</label>
+
+                                    <div class="col-sm-6">
+                                        <select id="ShuffleSectionId" name="ShuffleSectionId" class="form-control"></select>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                        
+                          
+
+
+                        
+
+
+                            
+
+                            
+
+                
+                    </div>
+
+                    <div class="overflowscroll">
+                        <div id="FeeDetails">
+                        </div>
+                    </div>
+            }
+        </div>
+    </div>
+
+</section>
+
+<script>
+
+    function onload() {
+        $("#FeeDetails").html("")
+        var IsSaved = $("#SaveVal").val();
+        if (IsSaved != "Student shuffled successfully") {
+            document.getElementById("DisplayNew").style.display = "none"
+   
+          
+            document.getElementById("DivisionId").disabled = false;
+            document.getElementById("BranchId").disabled = false;
+            document.getElementById("ClassId").disabled = false;
+
+            document.getElementById("Student").disabled = false;
+            document.getElementById("ShuffleClassId").disabled = false;
+            document.getElementById("ShuffleSectionId").disabled = false;
+
+
+
+        }
+        else {
+            document.getElementById("DisplayNew").style.display = "inline"
+            document.getElementById("DivisionId").disabled = true;
+            document.getElementById("BranchId").disabled = true;
+            document.getElementById("ClassId").disabled = true;
+
+            document.getElementById("Student").disabled = true;
+            document.getElementById("ShuffleClassId").disabled = true;
+            document.getElementById("ShuffleSectionId").disabled = true;
+        }
+
+
+        LoadDivisionDropdown();
+        document.getElementById("DisplaySave").style.display = "none"
+    }
+
+    $("#new").click(function () {
+        window.location.href = '/AStudent/ClassShuffling'
+    })
+
+    window.onload = onload();
+    function LoadDivisionDropdown() {
+        $("#FeeDetails").html("")
+
+
+        var SelDivisionId = $("#SelDivisionId").val();
+
+
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+                if (SelDivisionId > 0) {
+                    document.getElementById("DivisionId").value = SelDivisionId
+                    LoadBranchDropdown();
+                }
+
+
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        $("#FeeDetails").html("")
+
+        $("#Save").html("")
+
+
+        document.getElementById("DisplaySave").style.display = "none"
+
+        var Division = $("#DivisionId").val();
+        if (Division >= 0) {
+            LoadBranchDropdown();
+        }
+        else {
+            $("#Student").val("");
+            $("#BranchId").html("")
+            $("#ClassId").html("")
+            $("#SectionId").html("")
+            $("#Student").val("")
+            $("#StudentId").val("")
+            $("#ShuffleClassId").html("")
+            $("#ShuffleSectionId").html("")
+        }
+    })
+
+
+    function LoadBranchDropdown() {
+        $("#FeeDetails").html("")
+
+        document.getElementById("DisplaySave").style.display = "none"
+
+        var DivisionId = $("#DivisionId").val()
+        var isall = true;
+        if (DivisionId >= 0) {
+
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+
+                    var SelBranchid = $("#SelBranchId").val();
+
+                    if (SelBranchid > 0) {
+                        document.getElementById("BranchId").value = SelBranchid
+                        LoadClassDropdown()
+                    }
+                },
+                async: false
+            })
+        }
+        else {
+            document.getElementById("BranchId").value = ""
+            $("#BranchId").html("")
+            $("#ClassId").html("")
+            $("#SectionId").html("")
+            $("#Student").val("")
+            $("#StudentId").val("")
+            $("#ShuffleClassId").html("")
+            $("#ShuffleSectionId").html("")
+
+        }
+    }
+
+    $("#BranchId").change(function () {
+        $("#FeeDetails").html("")
+        $("#Save").html("")
+
+
+        document.getElementById("DisplaySave").style.display = "none"
+
+        var BranchId = document.getElementById("BranchId").value;
+        if (BranchId >= 0) {
+            LoadClassDropdown()
+        }
+        else {
+            $("#ClassId").html("")
+            $("#Student").val("")
+            $("#StudentId").val("")
+            $("#ShuffleClassId").html("")
+            $("#ShuffleSectionId").html("")
+        }
+    })
+
+
+
+
+    function LoadClassDropdown() {
+        $("#FeeDetails").html("")
+
+        var SelClassId = $("#SelClassId").val();
+
+
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            data: { SelClassNumber: 0 },
+            success: function (result) {
+                Section = $("#ClassId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(Section)
+                if (SelClassId > 0) {
+                    document.getElementById("ClassId").value = SelClassId
+                    document.getElementById("Student").value = $("#Selstudent").val();
+                    document.getElementById("StudentId").value = $("#SelStudentId").val();
+
+                    var SubscriptionId = $("#BranchId").val()
+                    LoadShuffelClass();
+                    GetFeeDetails($("#SelStudentId").val(), SubscriptionId)
+
+                }
+
+            },
+            async: false
+        })
+    }
+
+
+    $("#ClassId").change(function () {
+        $("#FeeDetails").html("")
+        $("#Save").html("")
+
+
+        document.getElementById("DisplaySave").style.display = "none"
+        var BranchId = document.getElementById("BranchId").value;
+        var ClassId = document.getElementById("ClassId").value;
+        if (BranchId > 0 && ClassId > 0) {
+        }
+        else {
+            $("#Student").val("")
+            $("#StudentId").val("")
+            $("#ShuffleClassId").html("")
+            $("#ShuffleSectionId").html("")
+        }
+    })
+
+    $("#Student").autocomplete({
+        source: function (request, response) {
+            $("#FeeDetails").html("")
+            $("#ShuffleClassId").val("")
+            $("#ShuffleSectionId").val("")
+            $("#Save").html("")
+
+
+            var ClassNumber = $("#ClassId").val();
+            var BranchId = $("#BranchId").val();
+            document.getElementById("DisplaySave").style.display = "none"
+
+            if (ClassNumber > 0 && BranchId > 0 && request.term.length >= 3) {
+                $("#imagemodal").show();
+                $.ajax({
+                    url: "/AStudent/GetStudentsForClassShuffling",
+                    data: { ClassNumber: ClassNumber, BranchId: BranchId, strVal: request.term },
+
+                    success: function (json) {
+                        $("#imagemodal").hide();
+                        response($.map(json, function (data, id) {
+                            return {
+                                label: data.FirstName,
+                                value: data.FirstName,
+                                id: data.StudentId
+                            };
+                           
+                        }));
+                    },
+                });
+            }
+
+        },
+        minLength: 1,
+        select: function (event, ui) {
+            $("#FeeDetails").html("")
+            $("#Save").html("")
+
+
+            document.getElementById('StudentId').value = ui.item.id
+            $('#Student').val(ui.item.label);
+            var SubscriptionId = $("#BranchId").val()
+            var id = ui.item.id
+            if (id > 0) {
+                LoadShuffelClass();
+                GetFeeDetails(id, SubscriptionId)
+
+            }
+        }
+    });
+
+
+    function GetFeeDetails(StudentId, SubscriptionId) {
+        $("#imagemodal").show();
+        $("#FeeDetails").html("")
+        $.ajax({
+            url: '/AStudent/GetStudentFeeDetais',
+            data: { StudentId: StudentId, SubscriptionId: SubscriptionId },
+            success: function (data) {
+                $("#FeeDetails").html(data)
+            }
+
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function LoadShuffelClass() {
+
+        var SelShuffleClass = $("#SelShuffleClassId").val()
+
+        var ClassId = $("#ClassId").val()
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            data: { ClassNumber: ClassId },
+            success: function (result) {
+                Section = $("#ShuffleClassId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ShuffleClassId").append(Section)
+                if (SelShuffleClass > 0) {
+                    document.getElementById("ShuffleClassId").value = SelShuffleClass
+                    GetSectionDropDown();
+                }
+
+            },
+            async: false
+        })
+    }
+
+    $("#ShuffleClassId").change(function () {
+        $("#Save").html("")
+
+        GetSectionDropDown()
+    })
+    function GetSectionDropDown() {
+        var ClassNumber = $("#ShuffleClassId").val();
+        var BranchId = $("#BranchId").val();
+        var SelShuffleSectionId = $("#SelShuffleSectionId").val()
+
+
+        if (ClassNumber > 0) {
+            $.ajax({
+                url: '/AStudent/GetSectionDropDownForClassShuffle',
+                data: { nClassNumber: ClassNumber, BranchId: BranchId },
+                success: function (Data) {
+                    var SectionDRP = $('#ShuffleSectionId')
+                    SectionDRP.children().remove();
+                    SectionDRP.append($("<option>").val("").text("--Select--"))
+                    $.each(Data, function (i, record) {
+                        SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                    });
+                    $('#ShuffleSectionId').append(SectionDRP);
+                    if (SelShuffleSectionId > 0) {
+                        document.getElementById("ShuffleSectionId").value = SelShuffleSectionId
+                    }
+                }
+            })
+        }
+
+    }
+
+    $("#ShuffleSectionId").change(function () {
+        $("#Save").html("")
+
+        var SectionId = $("#ShuffleSectionId").val();
+        document.getElementById("DisplaySave").style.display = "inline"
+        DontAllowEdits()
+    })
+
+
+    $("#DivisionId").click(function () {
+
+        document.getElementById("Save").innerHTML = ""
+
+    })
+
+</script>

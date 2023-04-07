@@ -1,0 +1,172 @@
+﻿@model AsteriskBrowserAL.Models.PendingBooksData
+@{
+    List<IGrouping<string, AsteriskBrowserAL.Models.PendingBooksData>> GroupedData = new List<IGrouping<string, AsteriskBrowserAL.Models.PendingBooksData>>();
+    int sno = 1;
+    if (null != Model)
+    {
+        if (null != Model && Model.PendingBooksDetailsData.Count() > 0)
+        {
+            GroupedData = Model.PendingBooksDetailsData.GroupBy(p => p.BranchName).ToList();
+        }
+    }
+}
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+
+@if (null != Model)
+{
+    if (null != Model.PendingBooksDetailsData && Model.PendingBooksDetailsData.Count() > 0)
+    {
+        <div class="table-header">
+            Records Found (@Model.PendingBooksDetailsData.Count)
+            <div style="float:right">
+
+                <button class="btn btn-info btn-xs P2" id="btnExport">
+                    <i class="ace-icon fa fa-share bigger-180"></i>
+
+                </button>
+
+            </div>
+        </div>
+
+
+    <table id="tbPendingBooksReport" class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th>
+                   S.No.
+                </th>
+                @if (Model.IsCentral)
+                {
+                    <th>
+                        @Html.DisplayName("Branch Name")
+                    </th>
+                }
+
+                <th>
+                    @Html.DisplayName("Student Name")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Pending Quantity")
+                </th>
+                <th>
+                    @Html.DisplayName("Item Name")
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PendingBooksDetailsData)
+            {
+                <tr>
+                    <td>
+                        @(sno++)
+                    </td>
+                    @if (Model.IsCentral)
+                    {
+                        <td>
+                            @item.BranchName
+                        </td>
+                    }
+
+
+                    <td>
+                        @item.StudentName
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.ItemName
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+
+
+
+    }
+    else
+    {
+        <div style="color:red;font-weight:bold">Data not available to display</div>
+    }
+}
+else
+{
+    <div style="color:red;font-weight:bold">Data not available to display</div>
+}
+
+@Html.Action("DataTableScripts", "Base")
+
+<script type="text/javascript">
+
+    $("#btnExport").click(function (e) {
+        ExportToExcel('tbPendingBooksReport');
+    });
+
+    function PrintElem(elem) {
+
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'my div', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+<script type="text/javascript">
+    function PrintElem(elem) {
+        Popup($(elem).html());
+    }
+
+    function Popup(data) {
+        var mywindow = window.open('', 'mydiv', 'height=300,width=600');
+        mywindow.document.write('<p></p>');
+        mywindow.document.write(data);
+        mywindow.document.write('<p></p>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        mywindow.print();
+        mywindow.close();
+        return true;
+    }
+</script>
+
+
+
+
+
+
+
+

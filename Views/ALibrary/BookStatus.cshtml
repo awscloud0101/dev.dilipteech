@@ -1,0 +1,142 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.BookOverallReport>
+@{
+    ViewBag.Title = "Return Book";
+}
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<!-- #section:basics/content.breadcrumbs -->
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Book Status</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+<section class="content">
+  
+    <div class="row">
+        <div class="col-xs-12">
+
+            @using (Html.BeginForm("Bookstatus", "ALibrary", FormMethod.Post))
+            {
+                <div class="table-header">
+                    <span style="font-family:calibri;">Book Status</span>
+
+
+                </div>
+                <div class="widget-box">
+              
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Accession Number</label>
+                                        <div class="col-sm-6">
+                                            @*@Html.DropDownList("MasterBook", null, "--Select --", new { id = "BookCode", @class = "form-control select2" })*@
+                                            <input type="text" name="BookCode" id="BookCode" spellcheck="false" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br><br>
+
+                        </div>
+                    </div>
+                    </div>
+                    <div id="BookDetailsData"></div>
+            }
+                    <div class="hr hr-18 dotted hr-double"></div>
+                </div>
+        </div>
+
+</section>
+<script>
+    
+    function GetBookDetails(Bookcode) {
+        debugger
+        $('#BookDetailsData').hide();
+       
+        if (Bookcode!= "" ) {
+            $.ajax({
+                url: '/ALibrary/GetBooksDetialsBarcode',
+                data: { Bookcode: Bookcode, },
+                success: function (data) {
+                    $('#BookDetailsData').show();
+                    $('#BookDetailsData').html(data);
+                }
+
+            })
+        }
+    }
+   
+
+</script>
+<script type="text/javascript">
+    $("#BookCode").autocomplete(
+       {
+           source: function (request, response) {
+
+          
+
+               if (request.term.length < 0) {
+                   return;
+               }
+               $('#imagemodal').show();
+              
+               $.ajax({
+                   url: "/ALibrary/GetBookCode",
+                   type: "POST",
+                   dataType: "json",
+                   data: {
+                       strVal: request.term
+                   },
+                   success: function (json) {
+                       debugger;
+                       response($.map(json, function (jsondata, id) {
+                           return {
+                               label: jsondata.BookCode,
+                               value: jsondata.BookCode,
+                               id: jsondata.BookDetailsId,
+                           };
+                       }));
+                       $('#imagemodal').hide();
+                   },
+               });
+           },
+           minLength: 1,
+           select: function SelectEvent(event, ui) {
+
+               BookCode = ui.item.value;
+               GetBookDetails(BookCode);
+              // (ui.item.value, "BookCode");
+           }
+       });
+</script>

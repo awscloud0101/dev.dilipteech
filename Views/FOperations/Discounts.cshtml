@@ -1,0 +1,432 @@
+﻿@model AsteriskBrowserAL.Models.DiscountViewModel
+
+@{
+
+    ViewBag.Title = "Student Profile";
+
+}
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="~/script/jquery-2.0.3.js"></script>
+<script src="~/script/jquery-ui.js"></script>
+<script src="~/js/jquery-1.10.2.js"></script>
+<script src="~/js/jquery-ui.js"></script>
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-money"></i>
+            <a href="#">Finance</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Concession</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+   
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Discounts", "FOperations", FormMethod.Post))
+            {
+                <div class="table-header">
+                    <span style="font-family:calibri;">Concession</span>
+                    </div>
+                    <div class="widget-box">
+
+           
+
+
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <input type="hidden" id="IsCentral" value="@Model.IsCentral.ToString()" />
+                                @if (Model.IsCentral == true)
+                                {
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Division</label>
+                                            <div class="col-sm-6">
+                                                <select id="DivisionId" name="DivisionId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Branch</label>
+                                            <div class="col-sm-6">
+                                                <select id="BranchId" name="BranchId" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                         
+                                }
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Class</label>
+                                        <div class="col-sm-6">
+                                            <select id="ClassId" name="ClassId" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Section</label>
+                                        <div class="col-sm-6">
+                                            <select id="SectionId" name="SectionId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                           
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Academic Year</label>
+                                        <div class="col-sm-6">
+                                            <select id="CboAcademicYear" tabindex="0" name="AcademicYearId" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    if (null != Model)
+                    {
+                    <input type="hidden" name="SelClassId" id="SelClassId" value="@Model.CourseId" />
+                    <input type="hidden" name="SelSectionId" id="SelSectionId" value="@Model.SectionId" />
+                    <input type="hidden" name="SelDivisionId" id="SelDivisionId" value="@Model.DivisionId" />
+                    <input type="hidden" name="SelBranchId" id="SelBranchId" value="@Model.BranchId" />
+                    <input type="hidden" name="SelAcademicYearId" id="SelAcademicYearId" value="@Model.AcademicYearId" />
+
+
+                    }
+                    else
+                    {
+                    <input type="hidden" id="SelClassId" />
+                    <input type="hidden" id="SelSectionId" />
+                    <input type="hidden" id="SelDivisionId" />
+                    <input type="hidden" id="SelBranchId" />
+                    <input type="hidden" id="SelAcademicYearId" />
+
+
+                    }
+                    <div id="SearchDiv">
+                    </div>
+                    }
+                </div>
+    </div>
+
+
+    <input type="hidden" id="isCentral" name="isCentral" value="@Model.IsCentral.ToString()" />
+    <div id="imageData" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+
+</section>
+
+
+<script>
+
+    function OnloadData() {
+        var IsCentral = $("#IsCentral").val()
+        if (IsCentral == "True") {
+            LoadDivisionDropdown()
+
+        }
+        else {
+            LoadClassDropdown()
+        }
+    }
+
+    function LoadAcademicYear() {
+        var SelAcademicYearId = $("#SelAcademicYearId")
+        debugger
+        $.ajax({
+            url: '/Common/GetAcademicYears',
+            success: function (result) {
+
+                Obj = $("#CboAcademicYear")
+
+                Obj.children().remove();
+                Obj.append($("<option>").val("0").text("--- Select ---"))
+                $.each(result, function (i, elm) {
+                    Obj.append($("<option>").val(elm.AcademicYearId).text(elm.Name))
+                })
+
+                $("#CboAcademicYear").append(Obj)
+                var SelAcademicYearId = $("#SelAcademicYearId").val();
+
+                if (SelAcademicYearId >= 0) {
+                    document.getElementById("CboAcademicYear").value = SelAcademicYearId;
+                    GetStudentData()
+                }
+            }
+        })
+
+    }
+
+    $("#CboAcademicYear").change(function () {
+        debugger
+        $("#SearchDiv").html("")
+        var ClassId = $("#ClassId").val();
+        var SectionId = $("#SectionId").val();
+        var BranchId = document.getElementById("BranchId").value;
+        var DivisionId = $("#DivisionId").val()
+        var AcademicYear = $("#CboAcademicYear").val();
+        if (AcademicYear != "") {
+            GetStudentData();
+
+        }
+        else {
+
+            $("#SearchDiv").html("")
+        }
+    })
+
+    function LoadDivisionDropdown() {
+        var SelDivisionId = $("#SelDivisionId").val()
+        $.ajax({
+            url: '/Common/GetDivisions',
+            data: { IsAll: true },
+            success: function (result) {
+                Division = $("#DivisionId")
+                Division.children().remove();
+                $.each(result, function (i, elm) {
+                    Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                })
+                $("#DivisionId").append(Division)
+
+                if (SelDivisionId >= 0) {
+                    document.getElementById("DivisionId").value = SelDivisionId
+                    LoadBranchDropdown()
+                }
+
+            }
+        })
+    }
+
+    $("#DivisionId").change(function () {
+        var Division = $("#DivisionId").val();
+        $("#Student").val("");
+        $("#SectionId").html("");
+        $("#SearchDiv").html("")
+        if (Division >= 0) {
+            LoadBranchDropdown();
+
+        }
+    })
+
+    $("#BranchId").change(function () {
+        var BranchId = document.getElementById("BranchId").value;
+        $("#Student").val("");
+        $("#SearchDiv").html("")
+        $("#ClassId").val("");
+        $("#SectionId").val("");
+
+        $("#ClassId").children().remove();
+        $("#SectionId").children().remove();
+
+        if (BranchId >= 0) {
+            LoadClassDropdown()
+        }
+
+    })
+
+
+    function LoadBranchDropdown() {
+        var DivisionId = $("#DivisionId").val()
+        var isall = true;
+        if (DivisionId >= 0) {
+            isall = false
+        }
+
+        $("#BranchId").html("")
+        $("#Student").val("");
+        $("#SectionId").html("");
+        $("#SearchDiv").html("")
+
+
+        if (DivisionId >= 0) {
+            $.ajax({
+                url: '/Common/GetBranchesByDivision',
+                data: { DivisionId: DivisionId, IsAll: false },
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                    if ($("#SelBranchId").val() > 0) {
+                        document.getElementById("BranchId").value = $("#SelBranchId").val()
+                        LoadClassDropdown()
+                    }
+                },
+                async: false
+            })
+        }
+
+    }
+
+
+
+
+
+    function LoadClassDropdown() {
+        var SelClassId = $("#SelClassId").val();
+
+        $.ajax({
+            url: '/AStudent/GetClassDropdown',
+            success: function (result) {
+                Section = $("#ClassId")
+                Section.children().remove();
+                Section.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (e, record) {
+                    Section.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(Section)
+                if (SelClassId > 0) {
+                    document.getElementById("ClassId").value = SelClassId;
+                    GetSectionDropDown();
+                }
+
+            },
+            async: false
+        })
+    }
+
+    //$('#Student').keyup(function (e) {
+    //    var Studentval = $("#Student").val();
+    //    var ClassId = $("#ClassId").val();
+    //    var AdmissionNumber = $("#AdmissionNumber").val();
+    //    var FatherName = $("#FatherName").val();
+
+    //    if (e.keyCode == 8 || e.keyCode == 46) {
+    //        if ((ClassId == null || ClassId == "null" || ClassId == "") && (Studentval == "" || Studentval == null || Studentval == "null") && (AdmissionNumber == "" || AdmissionNumber == null || AdmissionNumber == "null") && (FatherName == "" || FatherName == null || FatherName == "null")) {
+    //            document.getElementById("SearchDivHead").style.display = "none"
+
+    //            $("#SearchDiv").html("");
+    //        }
+    //        else {
+    //            GetStudentData();
+    //        }
+
+    //    }
+    //});
+
+
+
+    //$("#Student").autocomplete({
+    //    source: function (request, response) {
+    //        var ClassId = $("#ClassId").val()
+    //        if (request.term.length >= 3 && ClassId > 0) {
+    //            GetStudentData();
+    //        }
+    //    },
+    //});
+
+
+    $("#ClassId").change(function () {
+        var ClassNumber = $("#ClassId").val();
+        $("#Student").val("");
+        $("#SectionId").html("");
+
+        $("#SearchDiv").html("")
+        if (ClassNumber > 0) {
+            GetSectionDropDown();
+
+
+
+        }
+
+    })
+
+
+
+    function GetSectionDropDown() {
+        var ClassNumber = $("#ClassId").val();
+        var BranchId = $("#BranchId").val();
+        var SelSectionId = $("#SelSectionId").val();
+        var IsCentral = $("#IsCentral").val()
+        if (IsCentral == "False") {
+            BranchId = 0
+        }
+        $.ajax({
+            url: '/AFrontOffice/GetSectionDropDownByClassNumber',
+            data: { nClassNumber: ClassNumber, SubscriptionId: BranchId },
+            success: function (Data) {
+                var SectionDRP = $('#SectionId')
+                SectionDRP.children().remove();
+                SectionDRP.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+                $('#SectionId').append(SectionDRP);
+                if (SelSectionId > 0) {
+                    document.getElementById("SectionId").value = SelSectionId;
+                    // GetStudentData()
+                    LoadAcademicYear()
+                }
+            }
+        })
+    }
+
+
+    $("#SectionId").change(function () {
+        $("#SearchDiv").html("")
+        $("#CboAcademicYear").html("")
+        var SectionId = $("#SectionId").val();
+        $("#Student").val("");
+        if (SectionId > 0){
+            LoadAcademicYear();
+        }
+    })
+
+
+    function GetStudentData() {
+        var ClassId = $("#ClassId").val();
+        var SectionId = $("#SectionId").val();
+        var BranchId = $("#BranchId").val();
+        var AcademicYear = $("#CboAcademicYear").val();
+        var Student = "";
+        var IsCentral = $("#IsCentral").val()
+        if (IsCentral == "False") {
+            BranchId = 0
+        }
+        $("#SearchDiv").html("")
+        if (SectionId > 0 && BranchId >= 0 && AcademicYear > 0) {
+            $("#imageData").show();
+            $.ajax({
+                url: "/FOperations/GetStudentsForDiscounts",
+                data: { StudentName: Student, ClassId: ClassId, SectionId: SectionId, BranchId: BranchId, AcademicYear : AcademicYear },
+                success: function (result) {
+                    $("#imageData").hide();
+                    $("#SearchDiv").html(result)
+                }
+            });
+        }
+
+    }
+    window.onload = OnloadData();
+</script>

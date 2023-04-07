@@ -1,0 +1,268 @@
+﻿@model AsteriskBrowserAL.EmployeeGrade
+
+@{
+    ViewBag.Title = "Create Employee Grade";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Setting
+        </li>
+        <li>
+            <i class=""></i>
+            HR
+        </li>
+        <li class="active">Employee Grade</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<section class="content">
+   
+    <br />
+
+   
+        <div class="col-xs-12">
+            <div class="box">
+    <!-- form start -->
+    @using (Html.BeginForm("EmployeeGradeC", "SeHR", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+
+        @Html.ValidationSummary(true)
+        <span style="color: red;">@Html.ValidationMessage("EmployeeGrade")</span>
+
+
+
+    <div class="page-header">
+        <br />
+        <h1>
+            Employee Grade
+            <small style="float:right;">
+                @Html.ActionLink("Back to details", "EmployeeGrade")
+            </small>
+        </h1>
+    </div><!-- /.page-header -->
+
+
+
+                    <!-- form start -->
+    <form class="form-horizontal" role="form">
+
+
+        <div class="box-body">
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Grade Name")</label>
+
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.GradeName, new { @class = "form-control col-sm-5 textlength", placeholder = "Grade Name", @id = "GradeName", @onchange = "removeError();" })
+                </div>
+
+                <div class="col-sm-3" style="display:none;" id="gradeName">
+                    <label style="color:red;font-weight:bold;"> Please Enter The Grade Name </label>
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Priority")</label>
+
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.Priority, new { @class = "form-control col-sm-5", placeholder = "Priority", @id = "Priority", @type = "number", @min = "0", @maxlength = "7", @onchange = "removeError();" })
+                </div>
+
+                <div class="col-sm-3" style="display:none;" id="priority">
+                    <label style="color:red;font-weight:bold;"> Please Enter The Priority </label>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Periods Per Week")</label>
+
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.PeriodsPerWeek, new { @class = "form-control col-sm-5", placeholder = "Periods Per Week", @id = "PeriodsPerWeek", @type = "number", @min = "0", @maxlength = "7", @onchange = "removeError();" })
+                </div>
+
+                <div class="col-sm-3" style="display:none;" id="periodsPerWeek">
+                    <label style="color:red;font-weight:bold;"> Please Enter The Periods Per Week </label>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Periods Per Day")</label>
+
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.PeriodsPerDay, new { @class = "form-control col-sm-5", @id = "PeriodsPerDay", placeholder = "Periods Per Day", @type = "number", @min = "0", @maxlength = "7", @onchange = "removeError();" })
+                </div>
+
+
+                <div class="col-sm-3" style="display:none;" id="periodsPerDay">
+                    <label style="color:red;font-weight:bold;"> Please Enter The Periods Per Day </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right"></label>
+
+                <div class="col-sm-6">
+                    @Html.CheckBoxFor(model => model.Status)
+                    <span class="lbl bigger-120">Is Active</span>
+                </div>
+
+                <div class="col-sm-3">
+                    @Html.ValidationMessageFor(model => model.Status)
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="hr hr-18 dotted hr-double"></div>
+        <div class="col-md-offset-3 col-md-9">
+            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                <i class="ace-icon fa fa-check bigger-50"></i>
+                Save
+            </button>
+            &nbsp; &nbsp; &nbsp;
+            <button class="btn btn-sm" type="reset">
+                <i class="ace-icon fa fa-undo bigger-50"></i>
+                Reset
+            </button>
+        </div>
+    </form>
+
+                        
+    }
+            </div>
+        </div>
+        <input type="hidden" id="count" name="count" value="0" />
+   
+</section>
+
+<script type="text/javascript">
+    function validateEmployeeGrade() {
+
+        document.getElementById("count").value = "1";
+        var GradeName = document.getElementById("GradeName").value;
+        var Priority = document.getElementById("Priority").value;
+        var PeriodsPerWeek = document.getElementById("PeriodsPerWeek").value;
+        var PeriodsPerDay = document.getElementById("PeriodsPerDay").value;
+
+        validate = true;
+
+        if (GradeName == "") {
+            document.getElementById("gradeName").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("gradeName").style.display = "none";
+        }
+
+        if (Priority == "") {
+            document.getElementById("priority").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("priority").style.display = "none";
+        }
+
+        if (PeriodsPerWeek == "") {
+            document.getElementById("periodsPerWeek").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("periodsPerWeek").style.display = "none";
+        }
+
+        if (PeriodsPerDay == "") {
+            document.getElementById("periodsPerDay").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("periodsPerDay").style.display = "none";
+        }
+
+
+
+        return validate;
+    };
+
+    function submitForm() {
+
+        var validatestatus = validateEmployeeGrade();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var GradeName = document.getElementById("GradeName").value;
+        var Priority = document.getElementById("Priority").value;
+        var PeriodsPerWeek = document.getElementById("PeriodsPerWeek").value;
+        var PeriodsPerDay = document.getElementById("PeriodsPerDay").value;
+
+        if (count != 0) {
+            if (GradeName != "") {
+                document.getElementById("gradeName").style.display = "none";
+            } else {
+                document.getElementById("gradeName").style.display = "inline";
+            }
+
+            if (Priority != "") {
+                document.getElementById("priority").style.display = "none";
+            } else {
+                document.getElementById("priority").style.display = "inline";
+            }
+
+            if (PeriodsPerWeek != "") {
+                document.getElementById("periodsPerWeek").style.display = "none";
+            } else {
+                document.getElementById("periodsPerWeek").style.display = "inline";
+            }
+
+            if (PeriodsPerDay != "") {
+                document.getElementById("periodsPerDay").style.display = "none";
+            } else {
+                document.getElementById("periodsPerDay").style.display = "inline";
+            }
+
+
+        }
+    };
+
+
+    $('#GradeName').click(function () {
+        document.getElementById('gradeName').style.display = "none"
+    })
+
+
+    $('#Priority').click(function () {
+        document.getElementById('priority').style.display = "none"
+    })
+
+    $('#PeriodsPerWeek').click(function () {
+        document.getElementById('periodsPerWeek').style.display = "none"
+    })
+
+
+    $('#PeriodsPerDay').click(function () {
+        document.getElementById('periodsPerDay').style.display = "none"
+    })
+</script>
+
+
+
+
+
+

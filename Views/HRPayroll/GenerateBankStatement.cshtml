@@ -1,0 +1,275 @@
+﻿@model AsteriskBrowserAL.Models.BankStatementModel
+
+@{
+    ViewBag.Title = "Create Bank Statement";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Payroll
+        </li>
+        <li class="active">Bank Statement</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+    <br />
+    <div class="row">
+        @*<div class=col-xs-12>
+                <h3>@Html.ActionLink("<< Holidays Details", "Holidays")</h3>
+            </div>*@
+    </div>
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("GenerateBankStatement", "HRPayroll", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+
+                if (null != Model)
+                {
+                    <input type="hidden" value="@ViewBag.IsFromSalaries" id="bIsFromSalaries" name="bIsFromSalaries" />
+                    <input type="hidden" value="@ViewBag.BranchId" id="nBranchId" name="nBranchId" />
+                    <input type="hidden" id="TotalString" name="TotalString" value="@Model.TotalString" />
+                    <input type="hidden" id="BankStatementId" name="BankStatementId" value="@Model.BankStatementString" />
+                    if (@Model.BankStatementString == "")
+                    {<div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">Bank Statement</h3>
+                            <br />
+                            <br />
+                            <div>
+                                <input class="btn btn-primary" type="submit" name="Generate" value="Generate" style="width:80px;" onclick="return RemoveError()" />
+                            </div>
+
+                        </div><!-- /.box-header -->
+                        <!-- form start -->
+
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  @Html.Label("Bulk Upload Date")</label>
+                                <div class="col-sm-3">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="UploadDate" name="UploadDateVal" value="@Model.UploadDate.ToShortDateString()" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label style="color:red;font-weight:bold;" id="UploadDateVal"> </label>
+                                </div>
+                                @*<div class="col-sm-3">
+                                        <span style="color: red;font-weight: bold;">@Html.ValidationMessage("HolidayDate")</span>
+                                    </div>*@
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Debit Account Number")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.AccountNumber, new { @class = "form-control", placeholder = "Debit Account Number", @type = "number", @min = "0", id = "AccountNumber" })
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label style="color:red;font-weight:bold;" id="AccountNumberVal"> </label>
+                                </div>
+
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Ordering Customer Name")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.CustomerName, new { @class = "form-control", placeholder = "Ordering Customer Name", id = "CustomerName" })
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label style="color:red;font-weight:bold;" id="CustomerNameVal"> </label>
+                                </div>
+
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Address Line 1")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.AddressLineOne, new { @class = "form-control", placeholder = "Address Line 1" })
+                                </div>
+
+
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Address Line 2")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.AddressLineTwo, new { @class = "form-control", placeholder = "Address Line" })
+                                </div>
+
+
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Address Line 3")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.AddressLineThree, new { @class = "form-control", placeholder = "Address Line" })
+                                </div>
+
+
+
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Sender To RCVR Info")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.RecieverInfo, new { @class = "form-control", placeholder = "Sender To RCVR Info", id = "RecieverInfo" })
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label style="color:red;font-weight:bold;" id="RecieverInfoVal"> </label>
+                                </div>
+
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Total Amount")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.Amount, new { @class = "form-control", placeholder = "Total Amount", @disabled = "disabled" })
+                                </div>
+
+
+
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Record Count")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.RecordCount, new { @class = "form-control", placeholder = "Record Count", @disabled = "disabled" })
+                                </div>
+
+
+
+                            </div>
+
+                            @if (null != Model)
+                            {
+                                if (null != Model.PayRollData && Model.PayRollData.Count() > 0)
+                                {
+                                    for (int i = 0; i < Model.PayRollData.Count; i++)
+                                    {
+                                        @Html.Hidden("lstRunPayroll.Index", (@i))
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].PayrollId", Model.PayRollData.ElementAt(i).PayrollId)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].EmployeeId", Model.PayRollData.ElementAt(i).EmployeeId)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].EmployeeName", Model.PayRollData.ElementAt(i).EmployeeName)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].EmployeeNumber", Model.PayRollData.ElementAt(i).EmployeeNumber)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].Month", Model.PayRollData.ElementAt(i).Month)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].Year", Model.PayRollData.ElementAt(i).Year)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].IsTransfered", Model.PayRollData.ElementAt(i).IsTransfered)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].LossOfPay", Model.PayRollData.ElementAt(i).LossOfPay)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].NetAmount", Model.PayRollData.ElementAt(i).NetAmount)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].Priority", Model.PayRollData.ElementAt(i).Priority)
+                                        @Html.Hidden("lstRunPayroll[" + @i + "].IsChecked", Model.PayRollData.ElementAt(i).IsChecked)
+
+
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                    }
+                }
+
+
+
+            }
+        </div>
+
+    </div>
+
+
+</section>
+
+<script>
+    function RemoveError()
+    {
+        var valid = true;
+        var UploadDate = $("#UploadDate").val();
+        var AccountNumber = $("#AccountNumber").val();
+        var CustomerName = $("#CustomerName").val();
+        var RecieverInfo = $("#RecieverInfo").val();
+        if(UploadDate == "" || UploadDate == null || UploadDate == "null")
+        {
+            document.getElementById("UploadDateVal").innerHTML = "Please select upload date"
+            valid =false
+
+        }
+        if (AccountNumber == "" || AccountNumber == null || AccountNumber == "null") {
+            document.getElementById("AccountNumberVal").innerHTML = "Please enter account number"
+            valid = false
+
+        }
+        if (CustomerName == "" || CustomerName == null || CustomerName == "null") {
+            document.getElementById("CustomerNameVal").innerHTML = "Please enter customer name"
+            valid = false
+
+        }
+
+        if (RecieverInfo == "" || RecieverInfo == null || RecieverInfo == "null") {
+            document.getElementById("RecieverInfoVal").innerHTML = "Please enter info"
+            valid = false
+
+        }
+        return valid
+
+    }
+
+    $("#UploadDate").click(function ()
+    {
+        document.getElementById("UploadDateVal").innerHTML = ""
+
+    })
+    $("#AccountNumber").click(function () {
+        document.getElementById("AccountNumberVal").innerHTML = ""
+
+    })
+    $("#CustomerName").click(function () {
+        document.getElementById("CustomerNameVal").innerHTML = ""
+
+    })
+
+    $("#RecieverInfo").click(function () {
+        document.getElementById("RecieverInfoVal").innerHTML = ""
+
+    })
+
+</script>

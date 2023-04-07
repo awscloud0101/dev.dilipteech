@@ -1,0 +1,275 @@
+﻿@model List<AsteriskBrowserAL.Models.PlayersData>
+@{
+
+    ViewBag.Title = "Executives";
+
+}
+
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
+@*<script src="~/script/jquery-2.0.3.js"></script>
+    <script src="~/script/jquery-ui.js"></script>
+    <script src="~/js/jquery-1.10.2.js"></script>
+    <script src="~/js/jquery-ui.js"></script>*@
+<style>
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+<style>
+    dialog {  
+    width: 800px;  
+    height:400px;
+   background-color: #fefefe;
+    border: 1px solid #dadada;
+    font-family:sans-serif;
+    padding: 5px 10px 20px 20px;
+    
+}  
+    </style>
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header" >
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-database"></i>
+            <a href="#">Settings</a>
+        </li>
+        <li>
+            <i class=""></i>
+            Help Desk
+        </li>
+        <li class="active">Executives</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+<br />
+<div class="page-header">
+    <h1>
+
+        <small style="float:right;">
+            @Html.ActionLink("Back to details", "Players")
+        </small>
+    </h1>
+</div>
+
+    <section class="content">
+      
+            <div class="row">
+                <div class="col-xs-12">
+                    <form class="form-horizontal" role="form">
+                        @using (Html.BeginForm("PlayersC", "SeHelpDesk", FormMethod.Post))
+                        {
+                            <span style="color:red;font-weight:bold" id="Validation"></span>
+                            <span style="color:green;font-weight:bold" id="SaveVal"></span>
+
+                            <div class="widget-box">
+                                <div class="widget-header widget-header-flat widget-header-small">
+                                    <h5 class="widget-title">
+                                        Executive Details
+                                    </h5>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6" style="display:none">
+                                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Branch</label>
+                                                    <div class="col-sm-6" style="font:12px arial;">
+                                                        <select id="BranchId" name="BranchId" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Group</label>
+                                                    <div class="col-sm-6" style="font:12px arial;">
+                                                        <select id="GroupId" name="GroupId" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                                @*<div class="col-xs-6">
+                                                    <label class="col-xs-4 control-label no-padding-right" for="form-field-1">Group</label>
+                                                    <div class="col-xs-6" style="font:12px arial;">
+                                                        <select id="GroupId" name="GroupId" class="form-control"></select>
+                                                    </div>
+                                                </div>*@
+
+                                                <div class="col-sm-6">
+                                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Staff</label>
+                                                    <div class="col-sm-6" style="font:12px;">
+                                                        <input type="text" id="StaffSearch" class="form-control" />
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        @*<br />
+                                        <div class="row">
+                                            <div class="col-xs-12">
+
+                                                <div class="col-xs-6">
+                                                    <label class="col-sm-5 control-label no-padding-right" for="form-field-1">Staff</label>
+                                                    <div class="col-sm-6" style="font:12px arial;">
+                                                        <input type="text" id="StaffSearch" class="form-control" />
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>*@
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="SearchDiv">
+
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+   
+
+            <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+                <p style="position:absolute; top: 50%; left:50%;">
+                    <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+                </p>
+            </div>
+
+</section>
+
+
+
+    <script>
+
+        function OnloadData() {
+
+            GetGroupsDropDown();
+           
+           
+           
+        }
+        window.onload = OnloadData();
+        function LoadDivisionDropdown() {
+            $.ajax({
+                url: '/Common/GetDivisions',
+                data: { IsAll: true },
+                success: function (result) {
+                    Division = $("#DivisionId")
+                    Division.children().remove();
+                    $.each(result, function (i, elm) {
+                        alert(elm.DivisionId)
+                        Division.append($("<option>").val(elm.DivisionId).text(elm.DivisionName))
+                    })
+                    $("#DivisionId").append(Division)
+
+                }
+            })
+        }
+
+      
+      
+        $("#DivisionId").change(function () {
+            document.getElementById("Validation").innerHTML = "";
+            LoadBranchDropdown();
+
+        })
+
+        $("#BranchId").change(function () {
+            document.getElementById("Validation").innerHTML = "";
+            var BranchId = $("#BranchId").val()
+            if (BranchId >= 0) {
+                GetGroupsDropDown()
+            }
+            else {
+                $("#SearchDiv").html("")
+                $("#StaffSearch").val("")
+                $('#GroupId').html("");
+            }
+        })
+
+        function GetGroupsDropDown() {
+            var BranchId = $("#BranchId").val()
+
+            if (BranchId >= 0) {
+                $.ajax({
+                    url: '/SeHelpDesk/GetGroupsDropDown',
+                    success: function (Data) {
+                        var Group = $('#GroupId')
+                        Group.children().remove();
+                        Group.append($("<option>").val("").text("--Select--"))
+                        $.each(Data, function (i, record) {
+                            Group.append($("<option>").val(record.HDExecutiveGroupId).text(record.GroupName));
+                        });
+                        $('#GroupId').append(Group);
+                    }
+                })
+            }
+        }
+
+        $("#GroupId").change(function () {
+            GetExecutives()
+        })
+
+        function GetExecutives() {
+            debugger
+            var BranchId = $("#BranchId").val()
+            var GroupId = $("#GroupId").val();
+            var Staff = $("#StaffSearch").val()
+            if (BranchId >= 0 && GroupId >= 0) {
+                $("#imagemodal").show();
+                $.ajax({
+                    url: '/SeHelpDesk/GetPlayersWithoutGroup',
+                    data: { BranchId: BranchId, Staff: Staff },
+                    success: function (Data) {
+                        $("#SearchDiv").html(Data)
+                    }
+                }).done(function () {
+                    $("#imagemodal").hide();
+                })
+            }
+            else {
+                $("#SearchDiv").html("")
+
+            }
+        }
+
+        function LoadBranchDropdown() {
+
+            $.ajax({
+                url: '/SeHelpDesk/GetBranches',
+                success: function (result) {
+                    Branch = $("#BranchId")
+                    Branch.children().remove();
+                    $.each(result, function (i, elm) {
+                        Branch.append($("<option>").val(elm.SubscriptionId).text(elm.Institute))
+                    })
+                    $("#BranchId").append(Branch)
+                }
+            })
+
+        }
+
+        $("#StaffSearch").autocomplete({
+            source: function (request, response) {
+                if (request.term.length >= 3) {
+                    GetExecutives()
+
+                }
+            },
+        });
+
+       
+
+    </script>

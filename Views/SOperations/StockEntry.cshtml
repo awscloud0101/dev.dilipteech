@@ -1,0 +1,569 @@
+﻿@model AsteriskBrowserAL.StockEntry
+@{
+    ViewBag.Title = "StockEntry";
+    DateTime TodayDate = DateTime.Today;
+}
+@*<style>
+        .ui-autocomplete {
+            font-size: 12px;
+            cursor: pointer;
+            width: 120px;
+            height: 120px;
+            overflow-y: scroll;
+        }
+    </style>*@
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+<span style="color:red;display:none;font-weight:bold;" id="Validate"></span>
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-shopping-cart"></i>
+            Inventory&Assests
+        </li>
+        <li>
+            <i class=""></i>
+            Operations
+        </li>
+        <li class="active">Stock Entry</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+
+
+
+@using (Html.BeginForm("StockEntry", "SOperations", FormMethod.Post))
+{
+    <input type="hidden" id="nRequisitionId" name="nRequisitionId" />
+    <input type="hidden" id="nRequestedStaffId" name="nRequestedStaffId" />
+
+
+    if (null != TempData["Message"])
+    {
+        <span style="color:green;font-weight:bold;" id="DataSaved">@Html.Raw(TempData["Message"])</span>
+    }
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="table-header">
+                <span style="font-family:calibri;">Funds Transfer</span>
+               Stock Entry
+                </div>
+
+
+                <div class="widget-box">
+
+               
+
+
+
+
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Order Date")</label>
+                                        <div class="col-sm-3">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    @*<div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                                    <input class="form-control" type="text" id="OrderDate" onchange="removeError();" name="OrderDate" autocomplete="off" placeholder="Select Date" />
+                                                    <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                </div>*@
+
+                                                    <div id="datepicker" class="input-group date">
+                                                        <input class="form-control" type="text" id="OrderDate" name="OrderDate" autocomplete="off" placeholder="Select Date" />
+                                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("*ID", new { @class = "required" })</label>
+
+                                        <div class="col-sm-3">
+                                            @Html.DropDownListFor(model => model.RequestId, new SelectList(ViewBag.StockEntry, "RequisitionId", "RequestId", 0), " ", new { @class = "form-control select2", id = "RequestId" })
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <div class="col-sm-3" style="display:none;margin-left:50%" id="VOrderDate">
+                                            <label style="color:red;font-weight:bold;"> Required </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="col-sm-3" style="display:none;margin-left:50%" id="VRequestId">
+                                            <label style="color:red;font-weight:bold;">  Required</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-box" style="padding:10px;">
+
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Asset Category")</label>
+
+                                <div class="col-sm-6">
+                                    @*@Html.TextBoxFor(model => model.Head, new { @class = "form-control col-sm-5", id = "Head", placeholder = "Head", @onchange = "removeError();", @readonly = true })*@
+                                    @Html.DropDownList("Head", null, "---Select---", new { @class = "form-control" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VHead">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Item")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.RequiredItems, new { @class = "form-control col-sm-5", id = "Item", placeholder = "Item" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VItem">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Quantity")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.Quantity, new { @class = "form-control col-sm-5", id = "Quantity", placeholder = "Quantity" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VQuantity">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Purpose")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.Purpose, new { @class = "form-control col-sm-5", id = "Purpose", placeholder = "Purpose" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VPurpose">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                    <div class="row">
+
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Code")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.Code, new { @class = "form-control col-sm-5", id = "Code", placeholder = "Code" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VCode">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Asset Location")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.DropDownList("AssetLocationId", null, "---Select---", new { @class = "form-control", name = "AssetLocationId" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VLocation">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Purchase Date")</label>
+                                <div class="col-sm-6">
+                                    <div class="row">
+										<div class="col-sm-12">
+											<div id="datepicker" class="input-group date">
+												<input class="form-control" type="text" id="PurchaseDate" name="PurchaseDate" autocomplete="off" placeholder="Select Date"/>
+												<span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+											</div>
+											@*<div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+			<input class="form-control" type="text" id="PurchaseDate" onchange="removeError();" name="PurchaseDate" autocomplete="off" placeholder="Select Date" />
+			<span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+		</div>*@
+										</div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label style="color:red;font-weight:bold;display:none;" id="VPurchageDate"> Required </label>
+                                    <span id="dateRangeMsg" style="display:none;font-weight:bold;color:red"> purchase Date Always  Shoud Be Greater Than Order Date</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Supplier")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.Supplier, new { @class = "form-control col-sm-5", id = "Supplier", placeholder = "Supplier" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VSupplier">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Cost")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-sm-5 txtboxNum", id = "Amount", placeholder = "Cost" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VAmount">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Bill Number")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.BillNumber, new { @class = "form-control col-sm-5", id = "BillNumber", @maxlength = "10", placeholder = "Bill Number" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VBillNumber">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Secretary")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.Secretary, new { @class = "form-control col-sm-5", id = "Secretary", placeholder = "Secretary" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VSecretary">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Remarks")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextAreaFor(model => model.Remarks, new { @class = "form-control col-sm-5", rows = 2, columns = 5, id = "Remarks", placeholder = "Remarks" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VRemarks">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Written down value")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.WriteDownVal, new { @class = "form-control col-sm-5", id = "WriteDownVal", placeholder = "Write Down Value" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VSupplier">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Sale Proceeds")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.SaleProceeds, new { @class = "form-control col-sm-5", id = "SaleProceeds", placeholder = "Sale Proceeds" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VSaleProceeds">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Date of sale / Write off")</label>
+                                <div class="col-sm-6">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="datepicker" class="input-group date">
+                                                <input class="form-control" type="text" id="DateOfSale" name="DateOfSale" autocomplete="off" placeholder="Select Date" />
+                                                <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label style="color:red;font-weight:bold;display:none;" id="VDateOfSale"> Required </label>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="col-sm-6">
+
+
+                            <div class="form-group">
+                                <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Authority (C-7)")</label>
+
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(model => model.Authority, new { @class = "form-control col-sm-5", id = "Authority", placeholder = "Authority" })
+                                </div>
+
+                                <div class="" style="display:none;" id="VAuthority">
+                                    <label style="color:red;font-weight:bold;"> Required</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="hr hr-18 dotted hr-double"></div>
+                            <button class="btn btn-success btn-sm" onclick="return SubmitForm()">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset" onclick="return ResetForm()">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+     
+                
+            </div>
+    </div>
+}
+
+<script>
+
+    $('#RequestId').change(function () {
+        var RequisitionId = $('#RequestId').val();
+        debugger
+        $.ajax({
+            url: '/SOperations/GetStockDetails',
+            data: { nRequisitionId: RequisitionId },
+            success: function (stockdata) {
+                document.getElementById("Head").value = stockdata.AssetCategoryId;
+                document.getElementById('Item').value = stockdata.RequiredItems;
+                document.getElementById('Quantity').value = stockdata.Quantity;
+                document.getElementById('Purpose').value = stockdata.Purpose;
+                document.getElementById('nRequisitionId').value = stockdata.RequisitionId;
+                document.getElementById('nRequestedStaffId').value = stockdata.RequestedStaffId;
+
+            },
+
+        });
+
+    });
+
+    function ResetForm() {
+        debugger
+        $('#VOrderDate').hide();
+        $('#VRequestId').hide();
+        $('#VOrederDate').hide();
+        $('#VPurchageDate').hide();
+        $('#VAmount').hide();
+        $('#VSupplier').hide();
+        $('#VBillNumber').hide();
+    }
+
+    function SubmitForm() {
+        debugger
+        var bIsValid = true;
+        var OrderDate = $('#OrderDate').val();
+        var RequestId = $('#RequestId').val();
+        var Head = $('#Head').val();
+        var Item = $('#Item').val();
+        var Quantity = $('#Quantity').val();
+        // var Date = $('#Date').val();
+        var PurchageDate = $('#PurchaseDate').val();
+        var Purpose = $('#Purpose').val();
+        var Amount = $('#Amount').val();
+        var Supplier = $('#Supplier').val();
+        var BillNumber = $('#BillNumber').val();
+
+
+        if (OrderDate == null || OrderDate == undefined || OrderDate == '') {
+            $('#VOrderDate').show();
+            bIsValid = false;
+        }
+        if (RequestId == 0) {
+            $('#VRequestId').show();
+            bIsValid = false;
+        }
+        if (Head < 0 || Head == undefined || Head == '') {
+            bIsValid = false;
+        }
+        if (Item == "" || Item == undefined) {
+            bIsValid = false;
+        }
+        if (Quantity == "" || Quantity == undefined) {
+            bIsValid = false;
+        }
+        if (Purpose == "" || Purpose == undefined) {
+            bIsValid = false;
+        }
+        if (PurchageDate == "" || PurchageDate == undefined) {
+            $('#VPurchageDate').show();
+            bIsValid = false;
+        }
+        if (Amount == "" || Amount == undefined) {
+            $('#VAmount').show();
+            bIsValid = false;
+        }
+        if (Supplier == "" || Supplier == undefined) {
+            $('#VSupplier').show();
+            bIsValid = false;
+        }
+        if (BillNumber == "" || BillNumber == undefined) {
+            $('#VBillNumber').show();
+            bIsValid = false;
+        }
+
+        return bIsValid;
+    }
+    $('#OrderDate').focus(function () {
+        $('#VOrderDate').hide();
+        $('#DataSaved').hide();
+    })
+    $('#RequestId').change(function () {
+        $('#VRequestId').hide();
+        $('#DataSaved').hide();
+    })
+    $('#OrederDate').focus(function () {
+        $('#VOrederDate').hide();
+        $('#DataSaved').hide();
+    });
+	$('#PurchaseDate').click(function () {
+        $('#VPurchageDate').hide();
+        $('#dateRangeMsg').hide();
+        $('#DataSaved').hide();
+    });
+    $('#Amount').focus(function () {
+        $('#VAmount').hide();
+        $('#DataSaved').hide();
+    });
+    $('#Supplier').focus(function () {
+        $('#VSupplier').hide();
+        $('#DataSaved').hide();
+    });
+    $('#BillNumber').focus(function () {
+        $('#VBillNumber').hide();
+        $('#DataSaved').hide();
+    });
+
+
+
+</script>
+
+<script>
+    $("#OrderDate").datepicker("setDate", new Date());
+</script>

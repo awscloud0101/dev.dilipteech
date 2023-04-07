@@ -1,0 +1,257 @@
+﻿@model AsteriskBrowserAL.Models.ExamShedulesData
+
+@{
+    ViewBag.Title = "Create Exam Schedules";
+}
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Examinations
+        </li>
+        <li class="active">Exam Schedules</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+@Html.Action("DatePickerScripts", "Base")
+
+<section class="content">
+
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <span style="color:red;" id="Validation"></span>
+            @using (Html.BeginForm("OnlineExamSchedulesE", "AOnlineExamination", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                <input type="hidden" id="SelClass" name="ClassNumber" value="@Model.ClassNumber" />
+                <input type="hidden" id="SelSubId" name="Subscription" value="@Model.SubscriptionId" />
+                <input type="hidden" id="ExamId" name="Exam" value="@Model.OnlineQuestionPaper_ExaminerId" />
+                <input type="hidden" id="SubjectId" name="SubjectId" value="@Model.SubjectId" />
+                @Html.HiddenFor(model => model.ClassNumber)
+                @Html.HiddenFor(model => model.OnlineQuestionPaper_ExaminerId)
+
+                <div class="page-header">
+                    <h1>
+                        Examination Schedules
+                        <small style="float:right;">
+                            @Html.ActionLink("Back to details", "OnlineExamSchedules", new { ClassNumber = Model.ClassNumber, SubscriptionId = Model.SubscriptionId })
+                        </small>
+                    </h1>
+                </div><!-- /.page-header -->
+
+
+                <!-- form start -->
+
+                <form class="form-horizontal" role="form">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Exam Name")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.ExamName, new { @class = "form-control textlength", placeholder = "Exam Name", @id = "ExamName" })
+                        </div>
+
+
+                        <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESExamName">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Exam Date")</label>
+
+                        <div class="col-sm-3">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                        @if (Model.ExamDate.HasValue)
+                                        {
+                                            <input class="form-control" value="@Model.ExamDate" type="text" name="ExamDate" id="ExamDate" autocomplete="off" placeholder="Select Exam Date" />
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" type="text" name="ExamDate" id="ExamDate" autocomplete="off" placeholder="Select Exam Date" />
+                                        }
+                                        <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="col-sm-3" id="ESExamDate" style="color:red;font-weight:bold;">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Start Time")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.StartTime, new { @class = "form-control textlength", @type = "time", placeholder = "Start Time", @id = "StartTime" })
+                        </div>
+
+
+                        <span class="col-sm-3" style="color:red;font-weight:bold;" id="EStartTime">
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("End Time")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.EndTime, new { @class = "form-control textlength", @type = "time", placeholder = "End Time", @id = "EndTime" })
+                        </div>
+
+
+                        <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESEndTime">
+                        </span>
+                    </div>
+                    @*<div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Duration Time")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.DurationInMins, new { @class = "form-control textlength", placeholder = "Duration Time", @id = "DurationTime" })
+                            </div>
+
+
+                            <span class="col-sm-3" style="color:red;font-weight:bold;" id="ESDuration">
+                            </span>
+                        </div>*@
+                    <div class="hr hr-18 dotted hr-double"></div>
+
+                    <div class="col-md-offset-3 col-md-9">
+                        <button class="btn btn-success btn-sm" name="Save" onclick="return submitForm();" type="submit">
+                            <i class="ace-icon fa fa-check bigger-50"></i>
+                            Save
+                        </button>
+
+                        &nbsp; &nbsp; &nbsp;
+                        <button class="btn btn-sm" type="reset">
+                            <i class="ace-icon fa fa-undo bigger-50"></i>
+                            Reset
+                        </button>
+                    </div>
+
+                </form>
+            }
+
+        </div>
+    </div>
+</section>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#datepicker').datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+            todayHighlight: false
+        });
+        $('#datepicker').datepicker('setStartDate', '+0d');
+    });
+    function submitForm() {
+        var validatestatus = validateES();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function validateES() {
+        debugger;
+        var validate = true;
+        var ExamName = document.getElementById("ExamName").value
+
+        var ExamDate = document.getElementById("ExamDate").value;
+        var Starttime = document.getElementById("StartTime").value;
+        var EndTime = document.getElementById("EndTime").value;
+
+        if (ExamName == "") {
+            document.getElementById("ESExamName").innerHTML = "Please enter exam name";
+            validate = false;
+        }
+        if (ExamDate == "") {
+            document.getElementById("ESExamDate").innerHTML = "Please select Exam Date";
+            validate = false;
+        }
+
+        if (Starttime == "") {
+            document.getElementById("EStartTime").innerHTML = "Please select Start Time";
+            validate = false;
+        }
+
+        if (EndTime == "") {
+            document.getElementById("ESEndTime").innerHTML = "Please select End Time.";
+            validate = false;
+        }
+        else {
+            debugger;
+            if (EndTime <= Starttime) {
+                document.getElementById("ESEndTime").innerHTML = "End Time should be greater than Start time";
+                validate = false;
+            }
+        }
+
+        if (validate == true) {
+            var status = IsExaminationExisted();
+            validate = status;
+        }
+
+        return validate;
+    };
+
+    function IsExaminationExisted() {
+        debugger;
+        var Status = true;
+        var ExamDate = document.getElementById("ExamDate").value;
+        var ExamId = document.getElementById("ExamId").value;
+        var SubjectId = document.getElementById("SubjectId").value;
+        var EndTime = $('#EndTime').val();
+        $.ajax({
+
+            url: '/AOnlineExamination/IsExamScheduleExisted',
+            data: { ExamDate: ExamDate, type: "Edit", ExamId: ExamId, ExamName: $('#ExamName').val(), SubId: $('#SelSubId').val(), ClassNumber: $('#SelClass').val(), Starttime: $('#Starttime').val(), SubjectId: SubjectId, EndTime: $('#EndTime').val()},
+            success: function (Data) {
+
+                if (Data != "") {
+                    Status = false;
+                    document.getElementById("Validation").innerHTML = Data;
+                }
+
+            },
+            async: false
+        });
+
+        return Status;
+    }
+
+    $('#ExamName').focus(function () {
+        document.getElementById("ESExamName").innerHTML = "";
+        document.getElementById("Validation").innerHTML = "";
+    });
+
+
+    $('#Starttime').focus(function () {
+        document.getElementById("ESStarttime").innerHTML = "";
+    });
+
+    $('#ExamDate').change(function () {
+        document.getElementById("ESExamDate").innerHTML = "";
+    });
+
+    $('#Durationtime').change(function () {
+        document.getElementById("ESEndTime").innerHTML = "";
+    });
+
+</script>
+
+
+

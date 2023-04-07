@@ -1,0 +1,173 @@
+﻿@model IEnumerable<AsteriskBrowserAL.BookLocation>
+
+@{
+    ViewBag.Title = "BookLocation";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+<div id="dialog-confirm" class="hide">
+
+
+
+    @section BreadCrumb{
+        <ul class="breadcrumb">
+            <li>
+                <i class="menu-icon fa fa-graduation-cap"></i>
+                Academics
+            </li>
+            <li>
+                <i class=""></i>
+                Library
+            </li>
+            <li class="active">Book Location</li>
+        </ul><!-- /.breadcrumb -->
+    }
+
+
+
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+<section class="content">
+
+
+
+    @if (null != Model && Model.Count() > 0)
+    {
+        //if (Model.Count() > 0)
+        //{
+        int Sno = 1;
+            <div class="table-header">
+                Book Location
+                <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("BookLocationC", "ALibrary")" role="button" id="New" name="New" style="float:right"><i class="fa fa-plus"> | Add</i></a>
+            </div>
+
+            <div class="box-body table-responsive no-padding">
+                <table id="dynamic-table" class="table table-hover table-bordered table-striped nowrap dynamic-table" style="font-size:14px;">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("Sno")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Book Rack Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Book Shelf Number")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Description")
+                            </th>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@Sno</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BookRackNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BookShelfNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BookLocationDetails)
+                                </td>
+                                @*<td>
+                                         @Html.ActionLink("Edit", "BookLocationE", new { id = item.BookLocationId }) |
+                                         @Html.ActionLink("Delete", "BookLocationD", new { id = item.BookLocationId })
+                                    </td>*@
+
+                                <td>
+                                    <div class="hidden-sm hidden-xs action-buttons">
+                                        <a class="green" href="@Url.Action("BookLocationE", "ALibrary", new { id = item.BookLocationId })">
+                                            <i class="ace-icon fa fa-pencil  bigger-130"></i>
+
+                                        </a>
+                                        @*<a class="red" onclick="btnConfirm(id = item.BookLocationId)">
+                                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+
+                                            </a>*@
+                                        <a class="red" onclick="btnConfirm(@item.BookLocationId)">
+                                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            Sno++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+
+            @*}
+
+                else
+                {
+                    <div class="table-header">
+                        Employee Contribution
+                        <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("BookLocationC", "ALibrary")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-180"></i></a>
+                    </div>
+                    <span style="color: red;"><b>No records found </b></span>
+                }*@
+        }
+        else
+        {
+            <div class="table-header">
+                Book Location
+                <a class="view-header-btn  btn btn-info btn-xs" href="@Url.Action("BookLocationC", "ALibrary")" role="button" id="New" name="New" style="float:right"><i class="fa fa-plus-circle bigger-180"></i></a>
+            </div>
+            <span style="color: red;"><b>No records found </b></span>
+        }
+        </section>
+
+
+        <script>
+            function btnConfirm(Value) {
+                if (Value > 0) {
+                    $.ajax({
+                        url: '/ALibrary/ValidationForBookLocationD',
+                        data: { Id: Value },
+                        success: function (data) {
+
+                            var url = '/ALibrary/BookLocationD?id=' + Value;
+                            var title = "Book Location";
+
+                            OpenDialog(data, url, title);
+                        },
+                        async: false
+                    });
+                }
+            }
+
+        </script>
+        @Html.Action("DataTableScripts", "Base")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,219 @@
+﻿@model AsteriskBrowserAL.BookLocation
+
+@{
+    ViewBag.Title = "Create Book Location";
+}
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Book Location</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+           @using (Html.BeginForm("BookLocationC", "ALibrary", FormMethod.Post, new { @class = "form-horizontal" }))
+           {
+                <div class="box">
+                    <span style="color:red;font-weight:bold;">@Html.ValidationMessage("EmployerContribution")</span>
+
+                    <div class="page-header">
+
+                        <h1>
+                            Book Location
+                            <small style="float:right;">
+                                @Html.ActionLink("Back to details", "BookLocation")
+                            </small>
+                        </h1>
+                    </div><!-- /.page-header -->
+                    <!-- form start -->
+                    <form class="form-horizontal" role="form">
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="box-body">
+
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <span style="color: red;" id="valBookLocation">@Html.ValidationMessage("Book Location")</span>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Rack Number")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.BookRackNumber, new { @class = "form-control txtboxNum", @id = "BookRackNumber", @onchange = "removeError();", placeholder = "Book Rack Number",@maxLength=3 })
+                                </div>
+
+                                <div class="col-sm-5" style="display:none;" id="BookLocationBookRackNumber">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Shelf Number")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.BookShelfNumber, new { @class = "form-control txtboxNum", @id = "BookShelfNumber", @onchange = "removeError();", placeholder = "Book Shelf Number", @maxLength = 3 })
+                                </div>
+
+                                <div class="col-sm-5" style="display:none;" id="BookLocationBookShelfNumber">
+                                    <label style="color:red;font-weight:bold;">Required </label>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Description")</label>
+
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.BookLocationDetails, new { @class = "form-control ", @id = "BookLocationDetails", @onchange = "removeError();", placeholder = "Description",@maxlength=25 })
+                                </div>
+
+                                <div class="col-sm-5" style="display:none;" id="BookLocationBookLocationDetails">
+                                    <label style="color:red;font-weight:bold;">Required</label>
+                                </div>
+                            </div>
+                       
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm();" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset" onclick="return resetBookLocation();">
+                                <i class=" ace-icon fa fa-undo bigger-50">
+                                </i>
+                                Reset
+                            </button>
+
+                        </div>
+
+
+                     </div></form>
+
+
+                </div>
+            }
+        </div>
+
+    </div>
+    <input type="hidden" id="count" name="count" value="0" />
+</section>
+
+
+<script type="text/javascript">
+    function validateBookLocation() {
+
+        var BookRackNumber = document.getElementById("BookRackNumber").value;
+        var BookShelfNumber = document.getElementById("BookShelfNumber").value;
+        var BookLocationDetails = document.getElementById("BookLocationDetails").value;
+        validate = true;
+        $('#BookRackNumber').focus(function () {
+            $('#BookLocationBookRackNumber').hide();
+            $('#valBookLocation').hide();
+        });
+        $('#BookShelfNumber').focus(function () {
+            $('#BookLocationBookShelfNumber').hide();
+            $('#valBookLocation').hide();
+
+        });
+        $('#BookLocationDetails').focus(function () {
+            $('#BookLocationBookLocationDetails').hide();
+            $('#valBookLocation').hide();
+
+        });
+        if (BookRackNumber == "") {
+            document.getElementById("BookLocationBookRackNumber").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("BookLocationBookRackNumber").style.display = "none";
+        }
+
+        if (BookShelfNumber == "") {
+            document.getElementById("BookLocationBookShelfNumber").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("BookLocationBookShelfNumber").style.display = "none";
+        }
+
+        if (BookLocationDetails == "") {
+            document.getElementById("BookLocationBookLocationDetails").style.display = "inline";
+            validate = false;
+        } else {
+            document.getElementById("BookLocationBookLocationDetails").style.display = "none";
+        }
+
+        return validate;
+    };
+
+    function submitForm() {
+        var validatestatus = validateBookLocation();
+        if (validatestatus == false) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    function resetBookLocation() {
+        document.getElementById("count").value = "0";
+        document.getElementById("BookLocationBookRackNumber").style.display = "none";
+        document.getElementById("BookLocationBookShelfNumber").style.display = "none";
+        document.getElementById("BookLocationBookLocationDetails").style.display = "none";
+
+        document.getElementById("BookRackNumber").value = "";
+        document.getElementById("BookShelfNumber").value = "";
+        document.getElementById("BookLocationDetails").value = "";
+
+        return false;
+    };
+
+    function removeError() {
+
+        var count = document.getElementById("count").value;
+
+        var BookRackNumber = document.getElementById("BookRackNumber").value;
+        var BookShelfNumber = document.getElementById("BookShelfNumber").value;
+        var BookLocationDetails = document.getElementById("BookLocationDetails").value;
+
+        if (count != 0) {
+            if (BookRackNumber != "") {
+                document.getElementById("BookLocationBookRackNumber").style.display = "none";
+            } else {
+                document.getElementById("BookLocationBookRackNumber").style.display = "inline";
+            }
+
+            if (BookShelfNumber != "") {
+                document.getElementById("BookLocationBookShelfNumber").style.display = "none";
+            } else {
+                document.getElementById("BookLocationBookShelfNumber").style.display = "inline";
+            }
+
+            if (BookLocationDetails != "") {
+                document.getElementById("BookLocationBookLocationDetails").style.display = "none";
+            } else {
+                document.getElementById("BookLocationBookLocationDetails").style.display = "inline";
+            }
+
+        }
+    };
+
+</script>

@@ -1,0 +1,184 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.ReturnBookViewModel>
+@{
+    ViewBag.Title = "Return Book";
+}
+
+<!-- #section:basics/content.breadcrumbs -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Book Details</li>
+    </ol>
+    <!-- /section:basics/content.breadcrumbs -->
+</section>
+
+
+<section class="content">
+    <br />
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("BookDetails", "ALibrary", FormMethod.Post))
+                {
+
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">
+                        Book Barcode Entry
+                    </h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Barcode</label>
+                                    <div class="col-sm-7">
+                                        @*@Html.TextBox("BarCode", null, "--Select Category--", new { @class = "form-control", onchange = "this.form.submit();" })*@
+                                        <input type="text" id="BarCode" name="BarCode" placeholder="Enter/Read BarCode" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button class="btn btn-success btn-sm" name="IssueBook" id="IssueBook" type="submit">
+                                            <i class="ace-icon fa fa-search bigger-50"></i>
+                                            Search
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+
+        </div>     
+
+    </div>
+    <div class="hr hr-18 dotted hr-double"></div>
+
+
+
+
+    @if ((ViewBag.SelUserCategory > 0) && (ViewBag.SelUser != null) && (null != Model) && (Model.Count() > 0))
+    {
+        @Html.ValidationSummary(true)
+        <span style="color: red;">@Html.ValidationMessage("ReturnBook")</span>
+    }
+    @if (Model != null)
+    {
+
+        if (Model.Count() < 1)
+        {
+            <span style="color:red;font-weight:bold">No Records Found To Display</span>
+        }
+        else
+        {
+            int nsno = 1;
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="table-header">
+                        Records Found (@Model.Count())
+                        <div style="float:right">
+                            <button onclick="PrintElem('#mydiv')" type="button" value="Print " class=" btn btn-info btn-xs">
+                                <i class="ace-icon fa fa-print bigger-180"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+
+                    <div class="widget-box">
+                        <div class="box-body table-responsive no-padding">
+                            <div style="overflow:auto; height:460px;">
+                                <table id="tbBankDepositData" class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                @Html.DisplayName("Book Code")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("User Name")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Book Name")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("ISBN")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Author")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Publication")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Issue Date")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Return Date")
+                                            </th>
+
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.BookCode)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.UserName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.MasterBookName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.ISBN)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Author)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Publication)
+                                            </td>
+                                            <td>
+                                                @item.IssueDate.ToString("dd - MMM - yyyy")
+                                            </td>
+                                            <td>
+                                                @item.ReturnDate.ToString("dd - MMM - yyyy")
+                                            </td>
+
+                                            <td>
+                                                
+                                                <b>@item.BookStatus.ToString()</b>  
+                                            </td>
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+    }
+
+
+
+
+
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

@@ -1,0 +1,822 @@
+﻿@model List<AsteriskBrowserAL.Models.FeePaymentsData>
+@using AsteriskBrowserAL.Models
+@{
+    double dTotAmt = 0;
+    FeePaymentsData feepayment = new FeePaymentsData();
+    int sno = 1;
+    ViewBag.Title = "FeePayment";
+}
+
+
+
+
+
+@if (null != Model)
+{
+    if (Model.Count() > 0)
+    {
+        <div>
+            <div id="paymentDetails"></div>
+
+            <div class="widget-box">
+                <div class="widget-header widget-header-flat widget-header-small">
+                    <h5 class="widget-title">Payment Heads</h5>
+                    <div class="widget-toolbar no-border">
+                        <div title="Save" class="inline action-buttons">
+                            <a name="pay" class="btn btn-info btn-minier" onclick="return submitForm();">
+                                <i class="ace-icon fa fa-floppy-o bigger-160"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div style="overflow:auto; max-height:350px;">
+                            <table class="table table-bordered table-striped table-hover nowrap" style="font-size:14px;">
+                                <thead style="text-align:center;">
+                                    <tr>
+                                        <th>
+                                            SNo
+                                        </th>
+                                        <th>
+                                            Particular Name
+                                        </th>
+                                        <th class="centerAlign">
+                                            Fee Amount
+                                        </th>
+                                        <th class="centerAlign">
+                                            Concession Amount
+                                        </th>
+                                        <th class="centerAlign">
+                                            Net Amount
+                                        </th>
+                                        <th class="centerAlign">
+                                            Credit Amount
+                                        </th>
+                                        <th class="centerAlign">
+                                            Paid Amount
+                                        </th>
+                                        @if (Model.FirstOrDefault().IsRegular == true)
+                                        {
+                                            <th class="centerAlign">
+                                                Due Amount
+                                            </th>
+                                        }
+                                        @if (Model.FirstOrDefault().IsRegular == false)
+                                        {
+                                            <th class="centerAlign">
+                                                <span style="color:blue">Quantity</span> / <span style="color:green"> Amount </span>
+                                            </th>
+                                        }
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @for (int i = 0; i < Model.Count(); i++)
+                                    {
+                                        string color = "";
+                                        if (Model.FirstOrDefault().IsRegular == true)
+                                        {
+                                            color = (Model.ElementAt(i).DueAmount == 0) ? "gray" : string.Empty;
+
+                                            if (Model.ElementAt(i).BackgroundValue < 0)
+                                            {
+                                                color = "lightyellow;";
+                                            }
+                                        }
+
+                                        if (Model.ElementAt(i).BackgroundValue >= 0)
+                                        {
+                                            dTotAmt += Model[i].DueAmount;
+                                        }
+
+                                        int Feeparticular = @Model[i].FeeParticular.HasValue ? @Model[i].FeeParticular.Value : 0;
+                                        double FixedAmount = @Model[i].FeeAmount;
+                                        int IsQuantity = @Model[i].IsQuantiy;
+
+                                        <tr style="background-color:@color">
+                                            <td>
+                                                @(sno++)
+                                            </td>
+                                            <td style="text-align:left;">
+                                                @Html.Hidden("lstFeePaymentsData.Index", (@i))
+                                                @Html.Hidden("lstFeePaymentsData[" + (@i) + "].FeeParticular", Model.ElementAt(i).FeeParticular)
+                                                @Model[i].FeeParticularName
+                                            </td>
+                                            <td style="text-align:right;">
+                                                @Model[i].FeeAmount.ToString()
+                                            </td>
+                                            <td style="text-align:right;">
+                                                @Model[i].DiscountAmount.ToString()
+                                            </td>
+                                            <td style="text-align:right;">
+                                                @Html.Hidden("lstFeePaymentsData[" + (@i) + "].NetAmount", Model.ElementAt(i).NetAmount)
+                                                @Model[i].NetAmount.ToString()
+
+                                            <td style="text-align:right;">
+                                                @Html.Hidden("lstFeePaymentsData[" + (@i) + "].DebitAmount", Model.ElementAt(i).DebitAmount)
+                                                <span id=@Feeparticular>
+                                                    @Model[i].DebitAmount.ToString()
+                                                </span>
+                                            </td>
+                                            <td style="text-align:right;">
+                                                @Html.Hidden("lstFeePaymentsData[" + (@i) + "].PaidAmount", Model.ElementAt(i).PaidAmount)
+                                                @Model[i].PaidAmount.ToString()
+                                            </td>
+
+                                            @if (Model.FirstOrDefault().IsRegular == true)
+                                            {
+                                                <td style="text-align:right;">
+                                                    @Html.Hidden("lstFeePaymentsData[" + (@i) + "].DueAmount", Model.ElementAt(i).DueAmount)
+                                                    @Html.Hidden("lstFeePaymentsData[" + (@i) + "].TransacationType", Model.ElementAt(i).TransacationType)
+                                                    @Model[i].DueAmount.ToString()
+                                                </td>
+                                            }
+
+                                            @if (Model.FirstOrDefault().IsRegular == false)
+                                            {
+
+                                                <td style="text-align:center;">
+
+                                                    @if (IsQuantity == 1)
+                                                    {
+                                                        @Html.TextBox("lstFeePaymentsData[" + (@i) + "].Quantity", @Model.ElementAt(i).Quantity, new { id = "Quantity:" + Feeparticular, @Class = "form-control", Style = "border-color:blue;width:200px", @maxlength = "2", @title = "Enter Quantity", @type = "number", @min = "1", @placeholder = "Quantity", @onKeyUp = "ChangeDebitAmount(" + @Feeparticular + "," + @FixedAmount + "," + @IsQuantity.ToString() + ")" })
+                                                        @Html.Hidden("lstFeePaymentsData[" + (@i) + "].Quantity", Model.ElementAt(i).Quantity)
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.TextBox("lstFeePaymentsData[" + (@i) + "].Quantity", @Model.ElementAt(i).Quantity, new { id = "Quantity:" + Feeparticular, @Class = "form-control", Style = "border-color:green;width:200px", @maxlength = "10", title = "Enter Amount", @type = "number", @placeholder = "Amount", @onKeyUp = "ChangeDebitAmount(" + @Feeparticular + "," + @FixedAmount + "," + @IsQuantity.ToString() + ")" })
+                                                        @Html.Hidden("lstFeePaymentsData[" + (@i) + "].Quantity", Model.ElementAt(i).Quantity)
+                                                    }
+
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <input type="hidden" id="dTotalDueAmount" value="@dTotAmt" />
+                        </div>
+
+
+                        @if (dTotAmt > 0 && Model.FirstOrDefault().IsRegular == true)
+                        {
+
+
+
+                            <div class="row">
+                                <div class="form-search">
+                                    <div class="col-xs-6 col-sm-3" style="float:right; ">
+
+                                        <div class="input-group">
+                                            <input class="form-control search-query" id="DebitAmount" value="@Model.Sum(t => t.DebitAmount)" placeholder="Enter Amount" name="DebitAmount" required="required" />
+                                            <span class="input-group-btn">
+
+                                                <button type="button" id="DebitAmountSetClick" name="DebitAmountSet" value="Set" onclick="SetDebitAmount()" class="btn btn-info btn-sm">
+                                                    Set
+                                                </button>
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" class="form-control" id="DebitAmount" value="0" placeholder="Enter Amount" name="DebitAmount" />
+                        }
+                    </div>
+                </div>
+
+                <br />
+            </div>
+        </div>
+    }
+}
+else
+{
+    <label style="color:red;font-weight:bold;font-size:12px;"> There are no Fee dues</label>
+
+}
+<script>
+
+    function ChangeDebitAmount(ParticularId,Amount,IsQuantity)
+    {
+        debugger
+        document.getElementById('FeePaymentsMsg').innerHTML = "";
+
+
+        var Id = "Quantity:"+ParticularId
+        var searchQuantity =document.getElementById(Id).value
+
+        if(parseInt(IsQuantity) ==1)
+        {
+            document.getElementById(ParticularId).innerHTML = Amount * searchQuantity
+        }
+        else
+        {
+            document.getElementById(ParticularId).innerHTML =  searchQuantity
+        }
+    }
+
+    function GetSpecialFeeAmount() {
+        var Feedata = @Html.Raw(Json.Encode(Model));
+        var DebitAmount =0;
+
+        for (i = 0; i < Feedata.length; i++) {
+
+            var ParticularId =  Feedata[i].FeeParticular;
+            var Id = "Quantity:"+ParticularId
+            var searchQuantity =document.getElementById(Id).value
+
+            var FeeAmount = Feedata[i].FeeAmount;
+
+            if(Feedata[i].IsQuantiy == 1)
+            {
+                DebitAmount += parseInt(searchQuantity * FeeAmount)
+            }
+            else if (Feedata[i].IsQuantiy == 2)
+            {
+                DebitAmount += parseInt(searchQuantity);
+            }
+        }
+
+        return DebitAmount;
+    }
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    $('#Manual').click(function(){
+       // $("#cheque").attr('readonly', false);
+        PerformManualReceiptOperation();
+    });
+
+    function ResetReceiptModeControls()
+    {
+        document.getElementById("FtsTemplateNumberId").value = "";
+        document.getElementById("FtsManualReceiptNoId").value = "";
+        document.getElementById("ManualReceiptDate").value = "";
+        document.getElementById("ManualDescription").value = "";
+        document.getElementById("SelectedManualNo").value = "";
+    }
+
+    $('#Online').click(function(){
+
+        var paymentMode = document.getElementById("PaymentMode").value;
+        var TxnId = document.getElementById("PlutusTransactionReferenceID").value;
+
+        if(paymentMode == 5 && TxnId != "")
+        {
+            $("#cheque").attr('readonly', true);
+        }
+        else
+        {
+            $("#cheque").attr('readonly', false);
+        }
+
+        ResetReceiptModeControls();
+    });
+
+
+    function PerformManualReceiptOperation()
+    {
+        $('#imagemodal').show();
+
+        $.ajax
+         ({
+             error: function (jqXHR, textStatus, errorThrown) {
+                 alert(errorThrown);
+                 $('#imagemodal').hide();
+             },
+
+             url: '/FOperations/ManualReceiptNumber/',
+
+             success: function (data) {
+
+                 debugger
+
+                 $('#divManualReceiptNoTwo').html('');
+                 $('#divManualReceiptNoTwo').html(data);
+                 $('#imagemodal').hide();
+                 ManualDialogue();
+             }
+
+         }).done(function () {
+             $('#imagemodal').hide();
+         });
+    }
+
+    function PerformTemplateOperation()
+    {
+        $('#imagemodal').show();
+
+        $.ajax
+         ({
+             error: function (jqXHR, textStatus, errorThrown) {
+                 alert(errorThrown);
+                 $('#imagemodal').hide();
+             },
+
+             url: '/FOperations/TemplateNumber/',
+
+             success: function (data) {
+
+                 $('#divTemplateTwo').html('');
+                 $('#divTemplateTwo').html(data);
+                 $('#imagemodal').hide();
+                 TemplateDialogue();
+             }
+
+         }).done(function () {
+             $('#imagemodal').hide();
+         });
+    }
+
+    function TemplateDialogue() {
+
+        $('#SwipeValidation').html("");
+
+        var $dialog = $('#divTemplateTwo')
+
+       .dialog({
+           resizable: false,
+           draggable: false,
+           width: '700',
+           modal: true,
+           title: 'Template Number',
+           open: function(event, ui) {
+               $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+           },
+           title_html: true,
+           buttons: [
+               {
+                   html: "OK",
+                   "class": "btn btn-danger btn-minier",
+                   click: function () {
+                       debugger
+
+                       var TemplateNo= $('#RequiredTemplateNum').val();
+                       var Isvalid = $("#IsValidTemplateNumber").val();
+                       if(Isvalid == "false")
+                           return ;
+
+                       if(parseInt(TemplateNo) < 1)
+                       {
+                           document.getElementById("FeePaymentsMsg").innerHTML="Invalid Template Number";
+                           $('#divTemplateTwo').dialog("close");
+                           return;
+                       }
+
+                       $('#FtsTemplateNumberId').val(TemplateNo);
+
+                       document.getElementById("FtsTemplateNumberId").value = TemplateNo;
+
+                       $(this).dialog("close");
+
+                       if(IsSwipeOnlinePayment() == true)
+                       {
+                           var TxnId = $('#PlutusTransactionReferenceID').val();
+                           var ChequeNo = $('#cheque').val();
+
+                           if (TxnId > 0)
+                           {
+                               PaymentDialogue(TxnId);
+                           }
+                           else if (ChequeNo > 0)
+                           {
+                               SaveFeePayment();
+                           }
+                           else
+                           {
+                               document.getElementById("FeePaymentsMsg").innerHTML = "Invoice No should not be empty";
+                           }
+                       }
+                       else
+                       {
+                           SaveFeePayment(); // In Feepayment PartialView
+                       }
+                   }
+               }
+               ,
+               {
+                   html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                   "class": "btn btn-minier",
+                   click: function () {
+                       $(this).dialog("close");
+                   }
+               }
+           ]
+       });
+    }
+
+    function IsSwipeOnlinePayment()
+    {
+        var PaymentMode = document.getElementById("PaymentMode").value;
+
+        var IsOnline = $("#Online").prop('checked');
+
+        if(IsOnline == true && PaymentMode == 5)
+            return true;
+
+        return false;
+    }
+
+    function PaymentDialogue(TxnId)
+    {
+        var $dialog = $('<div></div>')
+                 .html('<br/><p class="bigger-120 bolder center grey">Have you done payment for the Txn Id : '+ TxnId+' ?</p><br/>')
+
+      .dialog({
+          resizable: false,
+          draggable: false,
+          width: '400',
+          modal: true,
+          title: 'Swipe Payment',
+          open: function(event, ui) {
+              $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+          },
+          title_html: true,
+          buttons: [
+              {
+                  html: "Yes",
+                  "class": "btn btn-success btn-minier",
+                  click: function () {
+                      debugger
+                      $('#imagemodal').show();
+                      var status = GetTxnStatus(TxnId, "Payment");
+
+                      $(this).dialog("close");
+
+                      if(status != "")
+                      {
+                          document.getElementById('FeePaymentsMsg').innerHTML = status;
+                      }
+                      else
+                      {
+                          SaveFeePayment(); // In Feepayment PartialView
+                      }
+
+                      $('#imagemodal').hide();
+                  }
+              }
+              ,
+              {
+                  html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; No",
+                  "class": "btn btn-minier",
+                  click: function () {
+                      $(this).dialog("close");
+                  }
+              }
+          ]
+      });
+    }
+
+    function ManualDialogue() {
+
+        var $dialog = $('#divManualReceiptNoTwo')
+
+        .dialog({
+            resizable: false,
+            draggable: false,
+            width: '700',
+            modal: true,
+            title: 'Manual Number',
+            open: function(event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+            title_html: true,
+            buttons: [
+                {
+                    html: "OK",
+                    "class": "btn btn-danger btn-minier",
+                    click: function () {
+                        debugger
+
+                        var  ManualReceiptno= $('#ManualReciptNo').val();
+
+                        if(parseInt(ManualReceiptno) > 0)
+                        {
+                            if(ValidateManualReceiptControls() == false) //validating the message popup
+                                return;
+
+                            var Isvalid = $("#IsValidNumber").val();
+                            if(Isvalid == "false")
+                                return ;
+
+                            dtManualDate= $('#ManualReciptDate').val();
+                            Description = $('#ManualReciptDescription').val();
+                            document.getElementById("FtsManualReceiptNoId").value = ManualReceiptno; // javascript
+                            document.getElementById("ManualReceiptDate").value = dtManualDate;
+                            document.getElementById("ManualDescription").value = Description;
+                            $('#SelectedManualNo').html(ManualReceiptno);
+                            $('#TransactionDate ').val(dtManualDate);
+
+                            $('#Online').prop('checked',false);
+                            $('#Manual').prop('checked',true);
+
+
+                            var PaymentMode = document.getElementById("PaymentMode").value;
+
+                            if(PaymentMode == 5 && PlutusTransactionReferenceID == "")
+                            {
+                                IsReadonly = $("#cheque").prop('readonly');
+
+                                if(IsReadonly)
+                                {
+                                    $("#cheque").attr('readonly', false);
+                                    $("#cheque").val("");
+                                }
+
+                                document.getElementById('InitiatePayment').style.display = 'none';
+                                document.getElementById('CancelTxn').style.display = 'none';
+                                $('#PlutusTransactionReferenceID').val("");
+                            }
+
+                            $(this).dialog("close");
+                        }
+                    }
+                },
+                {
+                    html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Close",
+                    "class": "btn btn-minier",
+                    click: function () {
+                        $('#SelectedManualNo').html("");
+                        $('#Online').prop('checked',true);
+                        $('#Manual').prop('checked',false);
+
+                        if(PaymentMode == 5)
+                        {
+                            $("#cheque").attr('readonly', true);
+                            $("#cheque").val("");
+
+                            document.getElementById('InitiatePayment').style.display = 'inline';
+                            document.getElementById('CancelTxn').style.display = 'inline';
+                            $('#PlutusTransactionReferenceID').val("");
+                        }
+
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+        });
+    }
+
+    function IsAmountSet()
+    {
+        var Feedata = @Html.Raw(Json.Encode(Model));
+        var totalDebitAmount = $('#DebitAmount').val();
+
+        var DebitAmount=0;
+
+        for (i = 0; i < Feedata.length; i++) {
+
+            var Amount=  Feedata[i].DebitAmount;
+
+            if (Amount > 0)
+            {
+                DebitAmount += Amount;
+            }
+        }
+
+        // checking whether the amount is mismatched with the text box amount
+        if(totalDebitAmount !=DebitAmount )
+        {
+            document.getElementById('FeePaymentsMsg').innerHTML = "Please click on set button to adjust the amount";
+            return false;
+        }
+
+        return true;
+    }
+
+    function IsSpecialAmountEntered()
+    {
+        var Feedata = @Html.Raw(Json.Encode(Model));
+        var TotalQuantity=0;
+
+        for (i = 0; i < Feedata.length; i++) {
+
+            var ParticularId =  Feedata[i].FeeParticular;
+            var Id = "Quantity:"+ParticularId
+            var searchQuantity =document.getElementById(Id).value
+            var EnteredQuantity = parseInt(searchQuantity);
+
+            if (EnteredQuantity > 0)
+            {
+                TotalQuantity += EnteredQuantity;
+            }
+        }
+
+        if(parseInt(TotalQuantity) < 1)
+        {
+            document.getElementById('FeePaymentsMsg').innerHTML = "Please enter the quantity or amount";
+            return false;
+        }
+
+        return true;
+    }
+
+    function GetTxnStatus(PlutusTransactionReferenceID, status)
+    {
+        $('#imagemodal').show();
+        debugger
+        var valid = "";
+
+        $('#SwipeValidation').html("");
+
+        var totalDebitAmount = $('#DebitAmount').val();
+        var StudentId = document.getElementById("m_StudentId").value;
+
+        $.ajax({
+            url: "/FOperations/GetStatusByTxnId",
+            data: { PlutusTransactionReferenceID: PlutusTransactionReferenceID, StatusType :status,StudentId : StudentId,DebitAmount : totalDebitAmount  },
+            success: function (data){
+
+                debugger
+                if(data.Error == "")
+                {
+                    if(status == "Upload")
+                    {
+                        if((data.ResponseCode == 1001 || data.ResponseCode == 0) && data.PlutusTransactionReferenceID == PlutusTransactionReferenceID)
+                            valid = "";
+                        else
+                            valid = data.ResponseMessage;
+                    }
+                    else
+                    {
+                        if(data.ResponseCode == 0 && data.PlutusTransactionReferenceID == PlutusTransactionReferenceID)
+                            valid = "";
+                        else
+                            valid = "Please do payment on swipe machine";
+                    }
+                }
+                else
+                {
+                    if(status == "Upload")
+                        valid = "Payment not initiated";
+                    else
+                        valid = "Payment not done";
+                }
+
+                $('#imagemodal').hide();
+            },
+            error: function () {
+                $('#imagemodal').hide();
+                document.body.style.cursor = 'default';
+            },
+            async : false
+        })
+
+        return valid;
+    }
+
+
+    function SaveFeePayment() {
+        debugger
+        var feepayment = @Html.Raw(Json.Encode(feepayment));
+        var Feedata = @Html.Raw(Json.Encode(Model));
+
+
+        $("#Save").attr("disabled", "disabled");
+        var totalDebitAmount = $('#DebitAmount').val();
+
+        feepayment.StudentName = document.getElementById("StudentId").value;
+        feepayment.MobileNumber = document.getElementById("MobileNumber").value;
+        feepayment.StudentId = document.getElementById("m_StudentId").value;
+        feepayment.PaymentMode = document.getElementById("PaymentMode").value;
+
+        feepayment.TransactionDate = document.getElementById("TransactionDate").value;
+        feepayment.ChequeDate = document.getElementById("ChequeDate").value
+        feepayment.ChequeNo = document.getElementById("cheque").value;
+        feepayment.Bank = document.getElementById("bank").value;
+        feepayment.TemplateNumner =   document.getElementById("FtsTemplateNumberId").value;
+
+        feepayment.ManualReceiptNumber =  document.getElementById("FtsManualReceiptNoId").value;
+        feepayment.ManualReceiptDate =  document.getElementById("ManualReceiptDate").value;
+        feepayment.ManualDescription =  document.getElementById("ManualDescription").value;
+
+        var vrRegularValue =  document.getElementById("cntrlIsRegualr").value;
+
+        if (vrRegularValue == 1) {
+            feepayment.IsRegular = true;
+        }
+        else {
+            feepayment.IsRegular = false;
+        }
+
+        var StudentId =0;
+        var QuantityValue = 0;
+
+        if(feepayment.IsRegular == false)
+        {
+            for (i = 0; i < Feedata.length; i++) {
+
+                var ParticularId =  Feedata[i].FeeParticular;
+                var Id = "Quantity:"+ParticularId
+                var searchQuantity =document.getElementById(Id).value
+
+                var FeeAmount = Feedata[i].FeeAmount;
+
+                if(Feedata[i].IsQuantiy == 1)
+                {
+                    Feedata[i].DebitAmount = searchQuantity * FeeAmount
+                }
+                else if (Feedata[i].IsQuantiy == 2)
+                {
+                    Feedata[i].DebitAmount = searchQuantity;
+                }
+            }
+        }
+
+        document.body.style.cursor = 'wait';
+        $('#imagemodal').show();
+
+
+        $.ajax({
+            url: "/FOperations/SaveFeePayment",
+            data: { objFeePayments: feepayment, lstFeePaymentsData: Feedata },
+            type: "POST",
+
+            success: function (data) {
+
+                FeeDetails = data.lstFeePaymentsData;
+                var message = data.uFMessage;
+                StudentId = document.getElementById("m_StudentId").value;
+                $("#Save").removeAttr("disabled");
+
+                if(message =="Success")
+                {
+                    $('#DebitAmount').val(''); // Reseting the amount
+
+                    var Value = $('#cntrlIsRegualr').val();
+
+                    if(Value==1)
+                        GetStudentFeeDetails(StudentId, true, true)
+                    else
+                        GetStudentFeeDetails(StudentId, true, false)
+
+                    document.getElementById("ChequeDate").value = null;
+                    document.getElementById("cheque").value = "";
+                    document.getElementById("bank").value = "";
+
+                    $('#ManualReceiptNo').val('');
+                    $('#imagemodal').hide();
+
+                    debugger
+
+                    var $dialog = $('<div></div>')
+                    .html('Added Payments Successfully  <br />')
+
+                    .dialog({
+                        resizable: false,
+                        draggable: false,
+                        width: '320',
+                        modal: true,
+                        title: 'Fee Payments',
+                        title_html: true,
+                        open: function(event, ui) {
+                            $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        },
+                        buttons: [{
+
+                            html: "OK",
+                            "class": "btn btn-minier",
+                            click: function () {
+                                debugger
+                                $dialog.dialog('close');
+                                OpenPrintDialog(data.Studentid, data.strOnlineReceiptNo); // opening the print dialogue based on the receipt number value
+                            }
+                        }]
+                    });
+                }
+                else
+                {
+                    document.getElementById('FeePaymentsMsg').innerHTML = message;
+                }
+            },
+            error: function () {
+                document.body.style.cursor = 'default';
+                $('#imagemodal').hide();
+            },
+            async : false
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+
+
+        document.body.style.cursor = 'default';
+    };
+
+
+
+</script>

@@ -1,0 +1,174 @@
+﻿@model List<AsteriskBrowserAL.Models.LayoutLOV>
+@{
+    int Sno = 1;
+}
+
+<script src="~/Scripts/jquery.tristate.js"></script>
+
+
+
+<div class="table-header">
+    Records Found (@Model.Count())
+</div>
+
+
+<div class="overflowscroll">
+
+    <table class="table table-striped table-bordered table-hover" id="ContentTable">
+        <tbody>
+            <tr>
+                <th>
+                    @Html.DisplayName("SNO ")
+                </th>
+                <th>
+                    @Html.DisplayName("Content")
+                </th>
+
+                <th>
+                    @Html.DisplayName("Status")
+                </th>
+
+            </tr>
+            @if (null != Model)
+            {
+                if (null != Model && Model.Count() > 0)
+                {
+                    var SubPage = Model.GroupBy(p => p.SubPageId).ToList();
+
+                    foreach (var sp in SubPage)
+                    {
+                        var SelPage = sp.FirstOrDefault();
+
+                        <tr>
+                            <td class="@SelPage.PermissionType">
+                                @Sno
+                            </td>
+                            <td>
+                                @SelPage.SubpageName
+                            </td>
+                            @{
+                                string ContentID = "";
+                                ContentID = @SelPage.SubPageId + "C";
+
+                            }
+                            <td class="@SelPage.SubPageId" id="Helloo">
+
+
+                                <input id="@ContentID" class="Helloo" type="checkbox" onchange="SetCheckeBox(@SelPage.SubPageId,this)" />
+                                <input type="hidden" class="@ContentID" value="@SelPage.PermissionType" />
+
+                            </td>
+
+                        </tr>
+                                            Sno++;
+                                        }
+
+                                    }
+                                }
+
+        </tbody>
+    </table>
+</div>
+
+
+
+<script class="prettyprint">
+
+    $(document).ready(function () {
+
+        $("#ContentTable tr").each(function (index) {
+            if (index != 0) {
+                var id = $(this).find("td:last").attr('class')
+                var idFirst = $(this).find("td:first").attr('class')
+                id = id + "C"
+                if (idFirst == 1) {
+                    $('#' + id).prop('checked', true);
+                }
+
+                if (idFirst == 2) {
+                    $('#' + id).prop('indeterminate', true);
+
+                }
+
+                if (idFirst == 0) {
+                    $('#' + id).prop('checked', false);
+
+                }
+            }
+        });
+
+    })
+    function SetCheckeBox(ChecboxId, cb) {
+        document.getElementById("SaveData").innerHTML = ""
+
+        var checkval = 0;
+        var classval = ChecboxId + "C"
+        if (cb.readOnly) {
+            cb.checked = cb.readOnly = false;
+            checkval = 0;
+        }
+        else if (!cb.checked) {
+            cb.readOnly = cb.indeterminate = true;
+            checkval = 2;
+
+        }
+        else {
+            checkval = 1;
+
+        }
+
+        $("." + classval).val(checkval);
+    }
+
+    $("#Save").click(function () {
+        SaveLovPermisssions()
+    })
+
+
+    function SaveLovPermisssions() {
+        var permission = ""
+        var SelPage = $("#SelPage").val();
+        var RoleId = $("#RoleId").val();
+        $("#ContentTable tr").each(function (index) {
+            if (index != 0) {
+
+                var classval = $(this).find("td:last").attr('class')
+                var SelClass = classval + "C"
+                var SelId = $("." + SelClass).val()
+
+
+                var SelClassId = classval + ":" + SelId;
+                permission += SelClassId + ","
+            }
+
+
+
+        })
+
+
+        if (permission != "" && RoleId > 0 && SelPage != "") {
+            $.ajax({
+                url: '/CUserManagement/SaveLOVPermissions',
+                data: { PageId: SelPage, LOVPermission: permission, TransactionDataId: RoleId },
+                success: function (data) {
+                    document.getElementById("SaveData").innerHTML = "Data Saved"
+                }
+            })
+        }
+        else {
+            if (RoleId < 1) {
+                document.getElementById("Error").innerHTML = "Please select LOV"
+            }
+            else if (SelPage == "") {
+                document.getElementById("Error").innerHTML = "Please select any module"
+
+            }
+        }
+    }
+
+
+
+</script>
+
+
+

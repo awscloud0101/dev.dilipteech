@@ -1,0 +1,401 @@
+﻿@model AsteriskBrowserAL.Models.BookDetailsData
+
+@{
+    ViewBag.Title = "Book Status";
+}
+
+
+<!-- #section:basics/content.breadcrumbs -->
+
+<!-- /section:basics/content.breadcrumbs -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+<section class="content">
+    <br />
+@if (null != Model)
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- form start -->
+                
+                @using (Html.BeginForm("BookStatus", "ALibrary", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+
+                    <div class="page-header">
+                        <h1>
+                           Book Status
+                            @*<small style="float:right;">
+                                @Html.ActionLink("Back To Details", "ManageBooks", new { BookCategoryId = @Model.BookCategoryId, MasterBookDataId = @Model.MasterBookId })
+                            </small>*@
+                        </h1>
+
+                    </div><!-- /.page-header -->
+                    @*<form class="form-horizontal" role="form">*@
+                    <input type="hidden" id="bookcodeinfo" value="@Model.BookCode">
+                    <input type="hidden" id="StatusDate" value="@Model.StatusDate">
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("BookName")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(m => m.BookName, new { @class = "form-control col-sm-5", id = "BookName", @maxLength = "20", placeholder = "InvoiceNumber", disabled = "disabled" })
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="MBVendor">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Author Name")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(m => m.AuthorName, new { @class = "form-control col-sm-5", id = "AuthorName", @maxLength = "20", placeholder = "InvoiceNumber", disabled = "disabled" })
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="MBInvoiceNumber">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Publication Name")</label>
+
+                        <div class="col-sm-3">
+                          @Html.TextBoxFor(m => m.PublicationName, new { @class = "form-control col-sm-5", id = "PublicationName", @maxLength = "20", placeholder = "InvoiceNumber", disabled = "disabled" })  
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="MBAuthor">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Vendor Name")</label>
+
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(m => m.VendorName, new { @class = "form-control col-sm-5", id = "VendorName", @maxLength = "20", placeholder = "InvoiceNumber", disabled = "disabled" })
+                            
+                        </div>
+
+                        <div class="col-sm-3" style="display:none;" id="MBPublication">
+                            <label style="color:red;font-weight:bold;"> Required </label>
+                        </div>
+                    </div>
+                    <br>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Year Of Publication")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        @Html.TextBoxFor(model => model.YearOfPublication, new { @class = "form-control col-sm-5", @maxLength = "4", placeholder = "Year Of Publication", onkeypress = "return isNumberKey(event)", disabled = "disabled" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="MBYearOfPublication">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Number Of Pages")</label>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        @Html.TextBoxFor(model => model.NumberOfPages, new { @class = "form-control col-sm-5", id = "NumberOfPages", @maxLength = "5", placeholder = "Number Of Pages", onkeypress = "return isNumberKey(event)", disabled = "disabled" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3" style="display:none;" id="MBNumberOfPages">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+                    <br>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Edition")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Edition, new { @class = "form-control col-sm-5", id = "Edition", @maxLength = "20", placeholder = "Edition", disabled = "disabled" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBEdition">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Location")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.BookLocation, new { @class = "form-control col-sm-5", id = "BookLocation", min = "1", onblur = " return TotalPriceAmount(this)", onkeypress = "return isNumberKey(event)", disabled = "disabled" })
+                            </div>
+
+
+                        </div>
+                  <br>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Invoice No")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.InvoiceNo, new { @class = "form-control col-sm-5", id = "InvoiceNo", min = "1", placeholder = "Total Copies", onblur = " return TotalPriceAmount(this)", onkeypress = "return isNumberKey(event)", disabled = "disabled" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBNumOfCopies">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Remarks")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(model => model.Remarks, new { @class = "form-control col-sm-5", placeholder = "Remarks", @maxLength = "20", disabled = "disabled" })
+                            </div>
+
+                            <div class="col-sm-3">
+
+                            </div>
+                        </div>
+
+                        <br>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("ISBN No")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(m => m.ISBN, new { @class = "form-control col-sm-5", id = "ISBN", @maxLength = "20", placeholder = "InvoiceNumber", disabled = "disabled" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBVendor">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Price")</label>
+
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(m => m.Price, new { @class = "form-control col-sm-5", id = "AuthorName", @maxLength = "20", placeholder = "InvoiceNumber", disabled = "disabled" })
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBInvoiceNumber">
+                                <label style="color:red;font-weight:bold;"> Required </label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Date Of Purchase")</label>
+                            <div class="col-sm-3">
+                                @*@Html.TextBoxFor(model => model.DateOfPurchase, new { @class = "form-control col-sm-5", id = "DateOfPurchase", disabled = "disabled" })*@
+                               @if (Model.DateOfPurchase.HasValue)
+                               {
+                                    <input type="text" value="@Model.DateOfPurchase.Value.ToShortDateString()"  class = "form-control col-sm-5" id = "DateOfPurchase"  readonly="readonly" />
+                               }
+                               else
+                               {
+                                @Html.TextBoxFor(model => model.DateOfPurchase, new { @class = "form-control col-sm-5", id = "DateOfPurchase", disabled = "disabled" })
+                               }
+                            </div>
+
+                            <div class="col-sm-3" style="display:none;" id="MBPrice">
+
+                            </div>
+                        </div>
+
+
+                }
+               
+            </div>
+        </div>
+    </div>
+    <div class="hr hr-18 dotted hr-double"></div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-sm-6">
+                    <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Book status</label>
+                    <div class="col-sm-6">
+                        @Html.DropDownList("BookStatus", null, "--Select --", new { id = "BookStatus", @class = "form-control select2" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    <br><br>
+    <div id="BookInformation"class="row" style="display:none" >
+        <div class="col-sm-12">
+            <div class="col-sm-6">
+                <label  id="Replaced" style="display:none" class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label(" Replace Date") &nbsp;&nbsp;</label>
+                <label  id="Lostd" style="display:none" class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label(" Lost Date") &nbsp;&nbsp;</label>
+                <label id="Discardd" style="display:none" class="col-sm-4 control-label no-padding-right" for="form-field-1">@Html.Label(" Discard Date") &nbsp;&nbsp;</label>
+                        <div class="col-sm-6">
+                            <div id="datepicker" class="input-group date">
+                                @*@Html.TextBoxFor(model => model.StatusDate, new { @class = "form-control col-sm-6", @id = "Date", @readonly = "true", @value = "@Model.StatusDate.Value.ToShortDateString()" })*@
+                                @if (Model.StatusDate.HasValue)
+                                {
+                                    <input type="text" value="@Model.StatusDate.Value.ToShortDateString()" class="form-control col-sm-6" id="Date" readonly="readonly" />
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(model => model.StatusDate, new { @class = "form-control col-sm-6", id = "Date", @readonly = "true" })
+                                }
+                                <span class="input-group-addon "><i class="ace-icon fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    
+                </div>
+            <div class="col-sm-3">
+                <span style="color:red;font-weight:bold;display:none" id="DateValidation">
+                    *Required
+                </span>
+                <span style="color:red;font-weight:bold;display:none" id="DateRangeValidation">
+                    Date Of Purchase should be Lesser than Status Date
+                </span>
+            </div>
+            <div class="col-sm-6" style="float:right;">
+                <button type="button" style="display:none" id="Save" class="btn btn-info btn-md-8">
+                    Save
+                </button>
+                &nbsp;&nbsp;
+            </div>
+            </div>
+       
+            <div>
+                <span id="VDate" style="font-weight:bold;color:red;display:none">* Required</span>
+            </div>
+        </div>
+    <input type="hidden" id="count" name="count" value="0" />
+}
+else
+{
+    <span style="color: red;"><b>Data is not available</b></span>
+}
+</section>
+<script>
+    $('#BookStatus').change(function () {
+        debugger
+        var bookinformation = $('#BookStatus').val();
+        if (bookinformation == "")
+        {
+            $('#BookInformation').hide();
+        }
+        else if (bookinformation == 1)
+        {
+            $('#BookInformation').hide();
+        }else
+        {
+            $('#BookInformation').show();
+            if(bookinformation==2)
+            {
+                $('#Replaced').show();
+                $('#Lostd').hide();
+                $('#Discardd').hide();
+                $('#Save').show();
+            }else if(bookinformation==3)
+            {
+                $('#Lostd').show();
+                $('#Replaced').hide();
+                $('#Discardd').hide();
+                $('#Save').show();
+            }
+            else if (bookinformation == 4) {
+                $('#Discardd').show();
+                $('#Replaced').hide();
+                $('#Lostd').hide();
+                $('#Save').show();
+            }
+        }
+
+    })
+</script>
+<script type="text/javascript">
+    $('#Save').click(function () {
+        debugger
+        var validation = true;
+        var BookStatus = $('#BookStatus').val();
+        var Dates = $('#Date').val()
+        var Bookcode = $('#bookcodeinfo').val();
+        if (Dates == "" || Dates == null) {
+            $('#DateValidation').show()
+            $('#DateRangeValidation').hide()
+        }
+        else {
+            debugger
+            var startDate = $('#DateOfPurchase').val()
+            var endDate = $('#Date').val()
+            var arr1 = startDate.split("/");
+            var monthNum1 = arr1[0];
+            var DayNum1 = arr1[1];
+            var YearNum1 = arr1[2];
+            var a1 = parseInt(DayNum1)
+            var b1 = parseInt(monthNum1)
+            var c1 = parseInt(YearNum1)
+            var arr = endDate.split("/");
+            var monthNum = arr[0];
+            var DayNum = arr[1];
+            var YearNum = arr[2];
+            var a = parseInt(DayNum)
+            var b = parseInt(monthNum)
+            var c = parseInt(YearNum)
+            var months = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            var month = months[b];
+            var month1 = months[b1];
+            var newEndDate = (a + "-" + month + "-" + c).toString();
+            var newStartDate = (a1 + "-" + month1 + "-" + c1).toString();
+            var DateNew = new Date(newStartDate);
+            var DateEnd = new Date(newEndDate);
+            if (DateNew > DateEnd) {
+                $('#DateRangeValidation').show()
+                $('#DateValidation').hide()
+            }
+            else {
+                window.location.href = "/ALibrary/SaveBookStatus?BookStatus=" + BookStatus + "&Date=" + Dates + "&Bookcode=" + Bookcode;
+            }
+        }
+        })
+    $(document).ready(function () {
+        var bookinformation = $('#BookStatus').val();
+        if (bookinformation == 2 || bookinformation == 3 || bookinformation == 4) {
+            $('#BookInformation').show();
+        }
+        else {
+            $('#BookInformation').hide();
+        }
+    });
+    $(document).ready(function () {
+        debugger
+        var bookinformation = $('#BookStatus').val();
+        if (bookinformation == 2 || bookinformation == 3 || bookinformation == 4) {
+            $('#BookInformation').show();
+            if (bookinformation == 2) {
+                $('#Replaced').show();
+                $('#Lostd').hide();
+                $('#Discardd').hide();
+                $('#Save').show();
+            } else if (bookinformation == 3) {
+                $('#Lostd').show();
+                $('#Replaced').hide();
+                $('#Discardd').hide();
+                $('#Save').show();
+            }
+            else if (bookinformation == 4) {
+                $('#Discardd').show();
+                $('#Replaced').hide();
+                $('#Lostd').hide();
+                $('#Save').show();
+            }
+            else if (bookinformation == 1) {
+                $('#BookInformation').hide();
+            }
+        }
+       var  Date = $('#Discardd').val();
+    });
+
+    $('#Date').focus(function () {
+        debugger
+        $('#DateRangeValidation').hide();
+    })
+</script>
+

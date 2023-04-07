@@ -1,0 +1,567 @@
+﻿@model AsteriskBrowserAL.Models.ManageBooksViewData
+
+@{
+    ViewBag.Title = "ManageBooks";
+}
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+<style type="text/css">
+    .ui-autocomplete {
+        font-size: 12px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        overflow-y: scroll;
+    }
+</style>
+
+
+
+@section BreadCrumb{
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Library
+        </li>
+        <li class="active">Manage Books</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+<div id="dialog-confirm" class="hide">
+
+    <div class="space-6"></div>
+
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+<!-- #section:basics/content.breadcrumbs -->
+
+<!-- /section:basics/content.breadcrumbs -->
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css" />
+
+<!-- CSS to make Select2 fit in with Bootstrap 3.x -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" />
+
+<!-- Include Select2 JS -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+
+
+
+<section class="content">
+    <div class="row">
+        <div class=col-xs-3>
+            @*<h3>@Html.ActionLink("New", "ManageBooksC")</h3>*@
+
+        </div>
+    </div>
+
+    @using (Html.BeginForm("ManageBooks", "ALibrary", FormMethod.Post))
+    {
+
+        <input type="hidden" name="selCategoryId" id="selCategoryId" value="@ViewBag.CategoryId" />
+        <input type="hidden" name="MasterBooKId" id="MasterBooKId" value="@ViewBag.MasterBookDataId" />
+
+        if (null != TempData["ManageBooks"])
+        {
+            <span style="color:red">
+                @TempData["ManageBooks"]
+            </span>
+
+        }
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        <span style="color: red;">@Html.ValidationMessage("Manage Books")</span>
+        <span style="color: red;font-weight:bold;display:none" id="ValidationMsg">Please select The Book Category and Book Name</span>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-header">
+                    <span style="font-family:calibri;">Manage Books</span>
+             
+
+                    <div style="float:right">
+                        <a class="view-header-btn btn btn-info btn-xs" role="button" id="New" name="New"><i class="fa fa-plus"> | Add</i></a>
+                    </div>
+
+
+                </div>
+                <div class="widget-box">
+                   
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  Book category</label>
+                                        <div class="col-sm-6">
+                                            @*@Html.DropDownList("BookCategoryId", null, "--- Select Book Category ---", new { @class = "form-control" })*@
+                                            <input type="text" name="BookCategoryId" id="BookCategoryId" spellcheck="false" class="form-control" />
+
+                                            <input type="hidden" id="hiddenBookCategoryId" name="hiddenBookCategoryId" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    @*<div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  Book Name</label>
+                                            <div class="col-sm-3">
+                                                @*<select class="form-control select2" style="width:210px;" id="BookId" name="BookId"></select>
+                                                <input type="text" name="BookId" id="BookId" spellcheck="false" class="form-control" />
+
+                                            </div>
+                                        </div>*@
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-1">@Html.Label("Book Name")</label>
+
+                                        <div class="col-sm-6">
+                                            <input type="text" name="BookName" id="BookName" spellcheck="false" class="form-control" />
+                                            <input type="hidden" name="hiddenBookId" id="hiddenBookId" />
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                          
+                        </div>
+
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="display_box" style="display:none;">
+                    <div class="table-header">
+                        Manage Books
+                    </div>
+                    <div style="overflow:auto">
+                        <table class="table table-bordered table-striped table-hover nowrap">
+                            <tbody id="tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="display_error" style="display:none;">
+                    <span style="color:red;font-weight:bold">No data to display. Please click on 'New' to create</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+            <p style="position:absolute; top: 50%; left:50%;">
+                <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+            </p>
+        </div>
+
+    }
+    <div id="MangeBook"></div>
+</section>
+
+
+<script>
+    $('#New').click(function () {
+        debugger
+        var value = $('#hiddenBookCategoryId').val();
+        var bname = $('#hiddenBookId').val();
+
+        if (value != "" && bname != "")
+            window.location.href = "/ALibrary/ManageBooksC?BookCategoryId=" + value + "&MasterBookDataId=" + bname;
+        else {
+            $('#ValidationMsg').show();
+            //alert("Please select The Book Category and Book Name");
+        }
+    })
+
+    //$('#BookCategoryId').change(function () {
+    //    debugger
+    //    $('#ValidationMsg').hide();
+    //    $('#MangeBook').hide()
+    //    $('#BookId').val('').trigger('change.select2');
+    //    var BookCategoryId = $('#BookCategoryId').val();
+    //    GetBookListBasedOnCategoryId(BookCategoryId);
+    //})
+
+    //function GetBookListBasedOnCategoryId(BookCategoryId) {
+    //    debugger
+    //    //$('#MangeBook').hide()
+
+    //    if (BookCategoryId > 0) {
+    //        SelMasterBookId = $('#SelMasterBookId').val();
+    //        $('#imagemodal').show();
+    //        $.ajax({
+    //            url: '/ALibrary/GetBookListBasedOnCategoryId',
+    //            data: {
+    //                BookCategoryId: BookCategoryId
+    //            },
+    //            success: function (data) {
+    //                debugger
+    //                var items = "";
+    //                items = "<option value=''>--Select  Book Name--</option>";
+    //                $.each(data, function (i, item) {
+
+    //                    items += "<option value=\"" + item.MasterBookId + "\">" + item.MasterBookName + "</option>";
+    //                    //html(items)
+    //                });
+    //                $("#BookId").append(items);
+    //                if (SelMasterBookId > 0) {
+    //                    $("#BookId").val(SelMasterBookId);
+    //                    //document.getElementById("BookId").value = SelMasterBookId;
+    //                    GetMangeBooks();
+    //                }
+
+    //            }, async: false,
+    //        }).done(function () {
+    //            $('#imagemodal').hide();
+    //        });
+
+    //    }
+    //}
+    function GetBookListBasedOnCategoryId(BookCategoryId) {
+        debugger
+        //  var BookCategoryId = $('#BookCategoryId').val();
+        if (BookCategoryId > 0) {
+            SelMasterBookId = $('#SelMasterBookId').val();
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/GetBookListBasedOnCategoryId?BookCategoryId=' + BookCategoryId,
+                success: function (result) {
+                    debugger
+                    Section = $("#BookId")
+                    Section.children().remove();
+                    Section.append($("<option>").val("").text("--- Select Book Name---"))
+                    $.each(result, function (e, record) {
+                        Section.append($("<option>").val(record.MasterBookId).text(record.MasterBookName))
+                    })
+                    $("#BookId").append(Section)
+                    if (SelMasterBookId > 0) {
+
+                        $('#BookId').val(SelMasterBookId).trigger('change.select2');
+                        GetMangeBooks();
+                    }
+
+                },
+                async: false
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+
+        }
+    }
+    $("#BookId").change(function () {
+        debugger
+        $('#ValidationMsg').hide();
+        $('#MangeBook').hide()
+        GetMangeBooks();
+    })
+
+
+    function GetMangeBooks() {
+        debugger
+        var MasterBookDataId = $('#hiddenBookId').val();
+        if (MasterBookDataId > 0) {
+            $('#imagemodal').show();
+            $.ajax({
+                url: '/ALibrary/ManageBookPartialView',
+                data: { MasterBookId: MasterBookDataId },
+                success: function (Data) {
+                    $('#MangeBook').show();
+                    $("#MangeBook").html(Data)
+
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            $("#MangeBook").hide();
+        }
+    }
+
+
+
+
+
+
+
+
+    //    //function successFunc(data) {
+    //    //    var sno = 1;
+
+    //    //    if (data.length < 1) {
+    //    //        //alert('Data not available to display');
+    //    //        document.getElementById("display_error").style.display = "inline";
+    //    //        document.getElementById("display_box").style.display = "none";
+    //    //    }
+    //    //    else {
+    //    //        document.getElementById("display_box").style.display = "inline";
+    //    //        document.getElementById("display_error").style.display = "none";
+    //    //        var row = "";
+
+    //    //        row += "<tr>" +
+    //    //       "<th>" + "S.No" + "</th>" +
+    //    //     "<th>" + "Book Name" + "</th>" +
+    //    //     "<th>" + "Book Category" + "</th>" +
+    //    //     "<th>" + "Author" + "</th>" +
+    //    //     "<th>" + "Publication" + "</th>" +
+    //    //     "<th>" + "ISBN" + "</th>" +
+    //    //     "<th>" + "Edition" + "</th>" +
+    //    //     "<th>" + "Num Of Copies" + "</th>" +
+    //    //      "<th>" + "Book Location" + "</th>" +
+    //    //      "<th>" + "BarCode OneTime Print" + "</th>" +
+    //    //     "<th>" + " " + "</th>" + "</tr>";
+
+
+    //    //        $.each(data, function (index, item) {
+
+    //    //            var tdvalue="<td></td>";
+    //    //            if (item.BarCodeNoIsPrinted == 1)
+    //    //            {
+    //    //                tdvalue = "<td>" + '<a href="/ALibrary/ManageBooksP?id=' + item.MasterBookId + ' ">' + "Print" + '</a>' + "  ";
+
+    //    //            }
+
+
+    //    //            row += "<tr>" +
+    //    //                 "<td>" + sno++ + "</td>" +
+    //    //            "<td>"+item.MasterBookName+"</td>"+
+    //    //            "<td>"+item.BookCategoryName+"</td>"+
+    //    //            "<td>"+ item.Author+"</td>"+
+    //    //            "<td>"+item.Publication+"</td>"+
+    //    //            "<td>"+item.ISBN+"</td>"+
+    //    //            "<td>"+item.Edition+"</td>"+
+    //    //            "<td>"+item.NumOfCopies+"</td>"+
+    //    //            "<td>" + item.BookLocationName + "</td>" +
+    //    //            tdvalue+
+    //    //            "<td>"+'<a href="/ALibrary/ManageBooksE?id=' + item.MasterBookId +' ">' + "Edit" + '</a>'+" | "+
+    //    //            '<a href="/ALibrary/ManageBooksD?id=' + item.MasterBookId + '&LocationId=' + item.BookLocationId + '" id=booklocationid>' + "Delete" + '</a>' + " | " +
+    //    //            '<a href="/ALibrary/ManageBooksDet?id=' + item.MasterBookId +' ">' + "Details" + '</a>'+"</td>"+
+    //    //            "</tr>";
+    //    //        });
+
+    //    //        $("#tbody").html(row);
+    //    //    }
+    //    //}
+
+    //    function errorFunc() {
+    //        document.getElementById("display_box").style.display = "none";
+    //    }
+
+    //};
+    //window.onload = GetData();
+
+</script>
+<script>
+    window.onload = function GetData() {
+        debugger
+        var sel_MasterBookDataId = $('#MasterBooKId').val();
+        var BookCategoryId = $('#selCategoryId').val();
+        GetBookListBasedOnCategoryId(BookCategoryId)
+        if (sel_MasterBookDataId > 0) {
+            $('#imagemodal').show();
+            $('#BookId').val(sel_MasterBookDataId);
+            $.ajax({
+                url: '/ALibrary/ManageBookPartialView',
+                data:
+                    {
+                        MasterBookId: sel_MasterBookDataId
+                    },
+                success: function (Data) {
+                    $('#MangeBook').show();
+                    $("#MangeBook").html(Data)
+                    if (BookCategoryId > 0) {
+                        $('#BookId').val(sel_MasterBookDataId);
+                        GetMangeBooks()
+                    }
+                }
+            }).done(function () {
+                $('#imagemodal').hide();
+            });
+        }
+        else {
+            $("#MangeBook").hide()
+        }
+    }
+</script>
+<script type="text/javascript">
+    $("#BookCategoryId").autocomplete(
+       {
+           source: function (request, response) {
+
+
+
+               if (request.term.length < 0) {
+                   return;
+               }
+               $('#imagemodal').show();
+
+               $.ajax({
+                   url: "/ALibrary/GetBookCategory",
+                   type: "POST",
+                   dataType: "json",
+                   data: {
+                       strVal: request.term
+                   },
+                   success: function (json) {
+                       debugger;
+                       response($.map(json, function (jsondata, id) {
+
+                           return {
+
+                               label: jsondata.BookCategoryName,
+                               value: jsondata.BookCategoryName,
+                               id: jsondata.BookCategoryId,
+                           };
+                       }));
+                       $('#imagemodal').hide();
+                   },
+               });
+           },
+           minLength: 1,
+           select: function SelectEvent(event, ui) {
+               BookCategoryId = ui.item.id;
+               $('#hiddenBookCategoryId').val(BookCategoryId);
+               GetBookListBasedOnCategoryId(BookCategoryId, 0);
+               // (ui.item.value, "BookCode");
+           }
+       });
+</script>
+@*<script>
+        $("#BookName").autocomplete(
+        {
+            source: function (request, response) {
+
+
+                if (request.term.length < 3) {
+                    return;
+                }
+
+                $('#imagemodal').show();
+                var BookCategoryId = document.getElementById("BookCategoryId").value;
+                $.ajax({
+                    url: "/ALibrary/GetBooksByCategoryName",
+                    data: { BookCategoryId: BookCategoryId, strVal: request.term },
+                    success: function (json) {
+                        response($.map(json, function (data, id) {
+                            return {
+                                label: data.MasterBookName,
+                                value: data.MasterBookName,
+                                id: data.MasterBookId,
+                            };
+                        }));
+
+                        $('#imagemodal').hide();
+                    }
+                });
+            },
+            minLength: 3,
+            select: function SelectEvent(event, ui) {
+                AutoFillBookData(ui.item.id, "StudentName");
+            }
+        });
+        function AutoFillStudentData(strval, type) {
+            debugger
+            $('#imagemodal').show();
+            var BookCategoryId = document.getElementById("BookCategoryId").value;
+            $.ajax({
+                url: '/ALibrary/GetBookDetailsByType',
+                data: {
+                    strVal: strval, type: type,
+                    BookCategoryId: BookCategoryId
+                },
+                success: function (data) {
+                    objStudent = data;
+
+                   ;
+                    $("#BookName").val(data.MasterBookName);
+
+                    Bookid = data.MasterBookId;
+                   // $('#m_StudentId').val(data.StudentId);
+                    // $("#CboClass").val(data.CourseId);
+
+
+                    debugger
+
+                },
+                error: function () {
+                    $('#imagemodal').hide();
+                },
+            }).done(function () {
+                $('#imagemodal').hide();
+                GetMangeBooks(Bookid);
+            });
+        };
+    </script>*@
+<script>
+    $("#BookName").autocomplete(
+       {
+           source: function (request, response) {
+
+               debugger
+
+               var BookCategoryId = $('#hiddenBookCategoryId').val();
+               if (request.term.length < 0) {
+                   return;
+               }
+               $('#imagemodal').show();
+
+               $.ajax({
+                   url: '/ALibrary/GetMasterBook?BookCategoryId=' + BookCategoryId,
+                   type: "POST",
+                   dataType: "json",
+                   data: {
+                       strVal: request.term
+                   },
+                   success: function (json) {
+                       debugger;
+                       response($.map(json, function (jsondata, id) {
+                           return {
+                               label: jsondata.BookName,
+                               value: jsondata.BookName,
+                               id: jsondata.MasterBookId,
+                           };
+                       }));
+                       $('#imagemodal').hide();
+                   },
+               });
+           },
+           minLength: 1,
+           select: function SelectEvent(event, ui) {
+               debugger
+               MasterBookId = ui.item.id;
+               $('#hiddenBookId').val(MasterBookId);
+               ManageBookPartialView(MasterBookId);
+               // (ui.item.value, "BookCode");
+           }
+       });
+    function ManageBookPartialView(MasterBookId) {
+        debugger
+        var MasterBookId1 = MasterBookId;
+        $.ajax({
+
+            url: '/ALibrary/ManageBookPartialView',
+            data: { MasterBookId: MasterBookId },
+            success: function (data) {
+                debugger
+                $('#MangeBook').show();
+                $('#MangeBook').html(data)
+            }
+
+        })
+
+    }
+</script>

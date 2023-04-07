@@ -1,0 +1,124 @@
+﻿@model List<AsteriskBrowserAL.Models.ExaminationResultsData>
+
+
+@{
+    Layout = "";
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> objExamsList = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> objSubjectsList = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+
+    //objExamsList => objSubjectsList
+
+    List<AsteriskBrowserAL.Models.ExaminationResultsData> objFinalList = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+
+
+    foreach (var item in Model.ToList())
+    {
+        objExamsList = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+
+        for (int i = 0; i < item.lstExamResults.FirstOrDefault().lstExamResults.Count; i++)
+        {
+            objSubjectsList = new List<AsteriskBrowserAL.Models.ExaminationResultsData>();
+
+            for (int j = 0; j < item.lstExamResults.Count; j++)
+            {
+                objSubjectsList.Add(new AsteriskBrowserAL.Models.ExaminationResultsData
+                {
+                    Subject = item.lstExamResults.ElementAt(j).Subject,
+                    ExamName = item.lstExamResults.ElementAt(j).lstExamResults.ElementAt(i).ExamName,
+                    DisplayMarksScored = item.lstExamResults.ElementAt(j).lstExamResults.ElementAt(i).DisplayMarksScored,
+                });
+            }
+            objExamsList.Add(new AsteriskBrowserAL.Models.ExaminationResultsData
+            {
+                ExamName = item.lstExamResults.ElementAt(1).lstExamResults.ElementAt(i).ExamName,
+                lstExamResults = objSubjectsList
+            });
+
+        }
+        objFinalList.Add(new AsteriskBrowserAL.Models.ExaminationResultsData
+        {
+            StudentName = item.DisplayName,
+            AdmissionNumber = item.AdmissionNumber,
+            StudentId = item.StudentId,
+            lstExamResults = objExamsList
+        });
+    }
+}
+
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+<div style="float:right">
+    @*<b style="color:blue">@Html.ActionLink("Back To Details", "AcademicsAnalysis")</b>*@
+</div>
+<br />
+<br />
+<br />
+<div class="row" >
+    <div class="col-xs-12">
+        <div id="Main" style="height:1000px;overflow:auto">
+            @foreach (var item in objFinalList)
+            {
+                <br />
+                <div id="@item.StudentId" style="height:400px"> </div>
+                <br /><br />
+            }
+        </div>
+    </div>
+</div>
+<script>
+
+</script>
+<script type="text/javascript">
+    $('html, body').css({
+    overflow: 'hidden',
+    height: '100%'
+});
+    CallGraph()
+    function CallGraph()
+    {
+        debugger
+        var _data = @Html.Raw(Json.Encode(objFinalList));
+        $.each(_data, function (i, _student) {
+            var GraphData = []
+            $.each(_student.lstExamResults, function (i, _Exams) {
+                GraphData.push({
+                    legendText:_Exams.ExamName,
+                    type: "spline",
+                    showInLegend: true,
+                    dataPoints: GetDataPoints(_Exams)
+                })
+
+            })
+            var chart =new CanvasJS.Chart(_student.StudentId.toString(), {
+                animationEnabled: true,
+                animationDuration: 2000,
+                exportEnabled: true,
+                title:{
+                    text: _student.StudentName
+                },
+                data: GraphData})
+            chart.render()
+        })
+    }
+
+    // Getting Data Points for Graph
+    function GetDataPoints(_Exams) {
+        console.log(_Exams.lstExamResults)
+        var dataPoints = [];
+
+        $.each(_Exams.lstExamResults, function (i, _Subjects) {
+            dataPoints.push({
+                label: _Subjects.Subject ,
+                name : _Subjects.ExamName,
+                y: parseInt(_Subjects.DisplayMarksScored,10),
+                toolTipContent: "Subject:{label}<br/>Exam:{name}<br/>Marks: {y}"})
+        })
+        return dataPoints;
+    }
+
+</script>
+

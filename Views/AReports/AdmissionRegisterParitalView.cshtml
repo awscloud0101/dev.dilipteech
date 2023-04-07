@@ -1,0 +1,213 @@
+﻿@model AsteriskBrowserAL.Models.StudentAdmissionRegisterData
+@{
+    List<IGrouping<string, AsteriskBrowserAL.Models.StudentAdmissionRegisterData>> GroupedData = new List<IGrouping<string, AsteriskBrowserAL.Models.StudentAdmissionRegisterData>>();
+    int sno = 1;
+    if (null != Model)
+    {
+
+        GroupedData = Model.StudentAdmissionDetails.GroupBy(p => p.BranchName).ToList();
+    }
+}
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .hideScrolling {
+        overflow: hidden;
+        height: 450px;
+    }
+
+        .hideScrolling:hover {
+            overflow: auto;
+        }
+</style>
+
+<div class="hr hr-18 dotted hr-double"></div>
+
+
+        @if (null != Model)
+        {
+            if (null != Model.StudentAdmissionDetails && Model.StudentAdmissionDetails.Count() > 0)
+            {
+
+                <div class="table-header">
+                    Records Found (@Model.StudentAdmissionDetails.Count())
+                    <div style="float:right">
+
+                        @*<button class="btn btn-info btn-xs" onclick="PrintElem('#mydiv')">
+                            <i class="ace-icon fa fa-print bigger-180"></i>
+                        </button>*@
+
+                        <button class="btn btn-info btn-xs">
+                            <i class="ace-icon fa fa-share bigger-180"></i>
+
+                        </button>
+
+                    </div>
+                </div>
+                <div style="overflow:auto;height:400px">
+                    <table class="table tbhover table-striped table-bordered dynamic-table" style="font-size:14px;">
+                        <thead>
+                            <tr>
+                                <th>
+                                   S.No.
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Admission No")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Student Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Place of Birth")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Date of Birth")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Date of joining")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Joining Photo")
+                                </th>
+                                @*<th>
+                                        @Html.DisplayName("Caste")
+                                    </th>*@
+                                <th>
+                                    @Html.DisplayName("Address")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Father Name /Mobile")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Mother Name")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Religion")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Mother Tongue")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Admitted Class")
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.StudentAdmissionDetails)
+                                    {
+                                    <tr>
+                                        <td>
+                                            @(sno++)
+                                        </td>
+                                        <td>
+                                            @item.AdmissionNumber
+                                        </td>
+                                        <td>
+                                            @item.FirstName
+                                        </td>
+                                        <td>
+                                            @item.BirthPlace
+                                        </td>
+
+                                        <td>
+                                            @if (item.DateofBirth.HasValue)
+                                                {
+                                            @item.DateofBirth.Value.ToString("dd-MMM-yyyy")
+                                                }
+                                        </td>
+                                        <td>
+                                            @if (item.AdmissionDate.HasValue)
+                                                {
+                                            @item.AdmissionDate.Value.ToString("dd-MMM-yyyy")
+                                                }
+                                        </td>
+                                        <td>
+                                            @if (item.JoiningPhoto != null)
+                                                {
+                                            <img width="50" height="43" src="@item.JoiningPhoto" />
+                                                }
+                                                else
+                                                {
+                                            <img width="50" height="43" src="~/Content/images/NoPhoto.jpg" />
+                                                }
+
+                                        </td>
+
+
+                                        @*<td>
+                                                @item.CasteName
+                                            </td>*@
+                                        <td>
+                                            @item.AddressLineOne
+                                        </td>
+                                        <td>
+                                            @item.FatherName
+                                        </td>
+                                        <td>
+                                            @item.MotherName
+                                        </td>
+                                        <td>
+                                            @item.ReligionName
+                                        </td>
+                                        <td>
+                                            @item.MotherTongueName
+                                        </td>
+                                        <td>
+                                            @item.AdmittedClass
+                                        </td>
+                                    </tr>
+                                    }
+
+                        </tbody>
+                    </table>
+                </div>
+
+            }
+            else
+            {
+                <div style="color:red;font-weight:bold">Data not available to display</div>
+            }
+        }
+        else
+        {
+            <div style="color:red;font-weight:bold">Data not available to display</div>
+        }
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false })
+
+<script type="text/javascript">
+    function submitform() {
+        $.ajax({
+            url: '/AReports/AdmissionRegister',
+            data: {},
+            success: function (result) {
+            }
+        })
+    };
+
+
+    //$('#btnExport').click(function () {
+    //    debugger
+    //    window.location.href ="/AReports/ExcelAdmissionRegisterReportDT"
+    //    var Data = $("#AdmissionRegisterData").html();
+    //});
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (charCode == 46 || charCode == 65)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+
+    }
+</script>
+
+
+

@@ -1,0 +1,239 @@
+﻿
+@{
+    ViewBag.Title = "DisciplineViolenceC";
+    int subscriptionId = @ViewBag.SubId;
+}
+
+@model AsteriskBrowserAL.Models.DisciplineViolenceModel
+
+<style>
+    .field-validation-error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Student
+        </li>
+        <li class="active">Discipline Violation</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("DisciplineViolenceC", "AStudent", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                if (Model.Id > 0)
+                {
+                    <input type="hidden" value="@Model.Id" name="Id" />
+                }
+                <div class="page-header">
+                    <br />
+                    <h1>
+                        Discipline Violation
+                        <small style="float:right;">
+                            @Html.ActionLink("Back to Discipline Violation", "DisciplineViolence")
+                        </small>
+                    </h1>
+                </div><!-- /.page-header -->
+                <span style="color:red;font-weight:bold" id="MsgValidation"></span>
+                <form class="form-horizontal" role="form">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">  <span style="color:red;font-weight:bold">*S</span>ent By</label>
+                            <div class="col-sm-3">
+                                <input type="text" id="SentBy" name="SentBy" value="@ViewBag.SentBy" class="form-control" readonly />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*C</span>lass</label>
+                            <div class="col-sm-3">
+                                @if (ViewBag.ClassName != null)
+                                {
+                                    <input type="text" id = "ClassId" value="@ViewBag.ClassName" readonly />
+                                }
+                                else
+                                {
+                                    @Html.DropDownList("ClassId", null, "--Select--", new { @class = "form-control", @id = "ClassId" })
+                                }
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*S</span>ection</label>
+                            <div class="col-sm-3">
+                                @if (ViewBag.SectionName != null)
+                                {
+                                    <input type="text" id="SectionId" value="@ViewBag.SectionName" readonly />
+                                }
+                                else
+                                {
+                                    <select id="SectionId" name="SectionId" class="form-control"></select>
+                                }
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*S</span>tudent</label>
+                            <div class="col-sm-3">
+                                @if (ViewBag.StudentName != null)
+                                {
+                                    <input type="text" id="SentToId" value="@ViewBag.StudentName" readonly />
+                                }
+                                else
+                                {
+                                    <select id="SentToId" name="SentToId" class="form-control"></select>
+                                }
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*S</span>ubject</label>
+                            <div class="col-sm-3">
+                                @if (Model.Subject != "")
+                                {
+                                    <input type="text" id="Subject" name="Subject" value="@Model.Subject" class="form-control" placeholder="Subject" required />
+                                }
+                                else
+                                {
+                                    <input type="text" id="Subject" name="Subject" class="form-control" placeholder="Subject" required />
+                                }
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1"><span style="color:red;font-weight:bold">*C</span>ontent</label>
+                            <div class="col-sm-3">
+                                @if (Model.Content != "")
+                                {
+                                    <textarea name="Content" id="Content" class="form-control" placeholder="Content" required>
+                                        @Model.Content
+                                    </textarea>
+                                }
+                                else
+                                {
+                                    <textarea name="Content" id="Content" class="form-control" placeholder="Content" required></textarea>
+                                }
+                            </div>
+                        </div>
+                        <br />
+                        <div class="hr hr-18 dotted hr-double"></div>
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-success btn-sm" onclick="return submitForm()" type="submit">
+                                <i class="ace-icon fa fa-check bigger-50"></i>
+                                Save
+                            </button>
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-sm" type="reset">
+                                <i class="ace-icon fa fa-undo bigger-50"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+
+            }
+        </div>
+        <input type="hidden" id="count" name="count" value="0" />
+    </div>
+
+</section>
+
+<script type="text/javascript">
+
+    $('#ClassId').change(function () {
+        debugger
+        var classId = $('#ClassId').val()
+        if (classId > 0) {
+            LoadSection(classId)
+        }
+    })
+
+    function LoadSection(classId) {
+        debugger
+        $.ajax({
+            url: '/AReports/GetSections',
+            data: { nClassNumberId: classId, nSubId: @subscriptionId },
+            success: function (result) {
+                SectionId = $("#SectionId")
+                SectionId.children().remove();
+                SectionId.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (i, elm) {
+                    SectionId.append($("<option>").val(elm.SectionId).text(elm.SectionCode))
+                })
+                $("#SectionId").append(SectionId)
+            }
+        })
+    }
+
+    $('#SectionId').change(function () {
+        debugger
+        var sectionId = $('#SectionId').val()
+        if (sectionId > 0) {
+            LoadStudent(sectionId)
+        }
+    })
+
+    function LoadStudent(sectionId) {
+        $.ajax({
+            url: '/AStudent/GetStudentsBySectionId',
+            data: { SectionId: sectionId, nSubId: @subscriptionId },
+            success: function (result) {
+                debugger
+                SentToId = $("#SentToId")
+                SentToId.children().remove();
+                SentToId.append($("<option>").val("").text("--- Select ---"))
+                $.each(result, function (i, elm) {
+                    SentToId.append($("<option>").val(elm.StudentId).text(elm.DisplayName))
+                })
+                $("#SentToId").append(SentToId)
+            }
+        })
+    }
+
+
+    function submitForm() {
+        debugger
+        var validation = true
+        var SectionId = $('#SectionId').val()
+        var SentToId = $('#SentToId').val()
+        var ClassId = $('#ClassId').val()
+        var Content = $('#Content').val()
+        var Subject = $('#Subject').val()
+	debugger
+        if (ClassId == "" || ClassId == null || ClassId == "0"){
+            validation = false
+        }
+        if (SectionId == "" || SectionId == null || SectionId == "0") {
+            validation = false
+        }
+        if (SentToId == "" || SentToId == null || SentToId =="0") {
+            validation = false
+        }
+
+        if (Subject == "" || Subject == null) {
+            validation = false
+        } if (Content == "" || Content == null) {
+            validation = false
+        }
+        if (validation == false) {
+            document.getElementById('MsgValidation').innerHTML = "select all mandatory feilds"
+        }
+        return validation;
+    }
+
+
+</script>

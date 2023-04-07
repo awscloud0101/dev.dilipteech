@@ -1,0 +1,175 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.BookDetailsData>
+
+<link rel="stylesheet" href="~/assets/css/jquery-ui.min.css" />
+<script src="~/assets/js/jquery-ui.min.js"></script>
+<script src="~/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<div id="dialog-confirm" class="hide">
+    <div class="space-6"></div>
+    <p id="dValidation" class="bigger-120 bolder center grey">
+    </p>
+</div><!-- #dialog-confirm -->
+<div class="row">
+    <div class="col-xs-12">
+        @if (Model != null)
+        {
+            if (Model.Count() > 0)
+            {
+
+                <div class="hr hr-18 dotted hr-double"></div>
+                int nsno = 1;
+                <div class="table-header">
+                    Records Found (@Model.Count())
+                </div>
+                <div style="float:right;">
+                   
+                </div>
+                <table class="table table-hover table-bordered table-striped nowrap dynamic-table" style="font-size:12px;">
+                   <thead>
+                       <tr>
+                            <th>
+                                @Html.DisplayName("SNo")
+                            </th>
+                            @*<th>
+                                @Html.DisplayName("Rack Id")
+                            </th>*@
+                            <th>
+                                @Html.DisplayName("Magazine Category")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Magazine Name")
+                            </th>
+                            @*<th>
+                                    @Html.DisplayName("Date")
+                                </th>*@
+                            @*<th>
+                                @Html.DisplayName("Edition")
+                            </th>*@
+                            <th>
+                                @Html.DisplayName("No of Copies")
+                            </th>
+                            @*<th>
+                                @Html.DisplayName("Number Of Pages")
+                            </th>*@
+                            <th>
+                                @Html.DisplayName("RenewalDate")
+                            </th>
+                            <th>
+                                @Html.DisplayName("IssueStartDate")
+                            </th>
+                            <th>
+                                @Html.DisplayName("IssueEndDate")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Periodicity")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Individual Price")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Publication")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Remarks")
+                            </th>
+                           
+                            <th></th>
+                       </tr>
+                        </thead>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div style="display:none">@item.Id</div>
+                                    @(nsno++)
+                                </td>
+                                @*<td>
+                                    @item.RackId
+                                </td>*@
+                                <td>
+                                    @item.MagazineCategoryName
+                                </td>
+                                <td>
+                                    @item.MagazineName
+                                </td>
+                                @*<td>
+                                        @Convert.ToDateTime(item.Date).ToString("dd-MMM-yyyy")
+                                    </td>*@
+                                @*<td>
+                                    @item.Edition
+                                </td>*@
+                                <td>
+                                    @item.NumberOfCopies
+                                </td>
+                                @*<td>
+                                    @item.NumberOfPages
+                                </td>*@
+
+                                <td>
+                                    @Convert.ToDateTime(item.RenewalDate).ToString("dd-MMM-yyyy")
+                                </td>
+                                <td>
+                                    @Convert.ToDateTime(item.IssueStartDate).ToString("dd-MMM-yyyy")
+                                  
+                                </td>
+                                <td>
+                                    @Convert.ToDateTime(item.IssueEndDate).ToString("dd-MMM-yyyy")
+                                   
+                                </td>
+                                <td>
+                                    @item.PeriodicityName
+                                </td>
+                                <td>
+                                    @item.Price
+                                </td>
+                                <td>
+                                    @item.PublisherName
+                                </td>
+                                <td>
+                                    @item.Remarks
+                                </td>
+                                <td>
+                                    <a class="blue" href="@Url.Action("MagazineDet", "ALibrary", new {  id = item.Id })">
+                                        <i class="ace-icon fa fa-info-circle bigger-130"></i>
+                                    </a>
+
+                                    <a class="green" href="@Url.Action("MagazineDetailsDataE", "ALibrary", new { id = item.Id })">
+                                        <i class="ace-icon fa fa-pencil  bigger-130"></i>
+                                    </a>
+
+                                    <a class="red" onclick="btnConfirm(@item.Id)">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                  
+                </table>
+            }else
+            {
+                
+                <span style="color:red">Data not available to display</span>
+            }
+        }
+        </div>
+    </div>
+        <script>
+            function btnConfirm(Value) {
+                debugger
+                if (Value > 0) {
+                    $.ajax({
+                        url: '/ALibrary/ValidationForMagazineDetailsDataD',
+                        data: { Id: Value},
+                        success: function (data) {
+
+                            var url = '/ALibrary/MagazineDetailsDataD?id=' + Value;
+                            var title = "Magazine Category";
+
+                            OpenDialog(data, url, title);
+                        },
+                        async: false
+                    });
+                }
+            }
+        </script>
+        @Html.Action("DataTableScripts", "Base")

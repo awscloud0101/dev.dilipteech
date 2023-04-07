@@ -1,0 +1,265 @@
+﻿@model AsteriskBrowserAL.Models.BiometricStaffAttendance
+@{
+    ViewBag.Title = "AttendanceModification";
+}
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-list"></i>
+            HR
+        </li>
+        <li>
+            <i class=""></i>
+            Biometric
+        </li>
+        <li class="active">Attendance Modification</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+
+
+
+
+
+<section class="content">
+
+    <br />
+    @using (Html.BeginForm())
+    {
+        if (null != TempData["SaveMessage"])
+        {
+            <span style="color:red;font-weight:bold;" id="saveMsg">@TempData["SaveMessage"]</span>
+        }
+        <div class="box">
+            <div class="row">
+                <div class="box-body">
+                    <div class="form-group">
+                       @if (ViewBag.IsCentral == true)
+                       {
+                           
+                       
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Branch</label>
+                                <div class="col-sm-4">
+                                    @Html.DropDownList("Branch", null, "--- Select ---", new { @class = "form-control", @onchange = "GetShiftsDropdown();" })
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Shift</label>
+                                <div class="col-sm-4">
+                                    <select id="ShiftId" name="ShiftId" class="form-control" title="--Select--" onchange="ddShiftSelectionChanged();"><option value=0>--- Select ---</option></select>
+                                    @*@Html.DropDownList("Shift", null, "--- Select ---", new { @class = "form-control" })*@
+                                </div>
+                            </div>
+                        </div>
+                       }
+                       else
+                       {
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Shift</label>
+                                <div class="col-sm-4">
+                                    @Html.DropDownList("ShiftId", null, "--- Select ---", new { @class = "form-control", @onchange = "ddShiftSelectionChanged();" })
+                                </div>
+                            </div>
+                        </div>
+                       }
+                        <br />
+                           
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Select Date Range</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        @if (null != Model)
+                                        {
+                                            <input type="text" class="form-control pull-right" id="daterange" name="Dates" autocomplete="off" value="@Model.AttendanceDateDisplay" />
+                                        }
+                                        else
+                                        {
+                                            <input type="text" class="form-control pull-right" id="daterange" name="Dates" autocomplete="off" />
+                                        }
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="col-sm-3">
+                            <input type="submit" name="viewData" style="width:90px;" class="btn btn-primary" onclick="return btn_ViewDataClick();" id="viewData" value=" View Data" />
+                        </div>
+
+                        <div id="shiftIn" style="display:none;">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Shift In-Time : <b id="sIn"></b></label>
+                        </div>
+                        <div id="shiftOut" style="display:none;">
+                            <label class="col-sm-3 control-label no-padding-right" for="form-field-1">Shift Out-Time : <b id="sOut"></b></label>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div id="AttendanceModification"></div>
+      
+
+    }
+    <input type="hidden" id="count" name="count" value="0" />
+
+    <div id="imagemodal" style="margin: 0px; padding: 0px; position: fixed; right: 0px;
+    top: 0px; width: 100%; height: 100%; background-color: #666666; z-index: 30001;
+    opacity: .8; filter: alpha(opacity=70);display:none">
+        <p style="position:absolute; top: 50%; left:50%;">
+            <img height="50" width="50" src="~/LoaderImages/ajax-loader.gif" />
+        </p>
+    </div>
+</section>
+
+<script type="text/javascript">
+    var shiftData;
+    $('#Branch').focus(function () {
+        $('#saveMsg').hide();
+        $('#Msg').hide();
+    });
+    $('#ShiftId').focus(function () {
+        $('#Msg').hide(); $('#saveMsg').hide();
+    });
+    $('#daterange').focus(function () {
+        $('#Msg').hide(); $('#saveMsg').hide();
+    });
+
+
+    function GetShiftsDropdown() {
+        $('#AttendanceModification').hide();
+        GetAttendanceShift();
+    };
+
+    function GetAttendanceShift() {
+        var branchName = $("#Branch").val();
+        if (branchName == "" || branchName == null || branchName == undefined)
+            return;
+
+        $.ajax({
+            url: '/HRBiometric/GetInstituteShifts',
+            data: { branchName: branchName },
+            success: function (data) {
+                items = "<option value='" + 0 + "'>--- Select ---</option>";
+                $.each(data, function (i, data) {
+                    items += "<option value='" + data.StaffShiftId + "'>" + data.StaffShiftName + "</option>";
+                });
+                $("#ShiftId").html(items);
+                shiftData = data;
+            }
+        });
+    }
+
+    function GetInstituteShifts() {
+        var branchName = $("#Branch").val();
+        if (branchName == "" || branchName == null || branchName == undefined)
+            branchName = "";
+
+        $.ajax({
+            url: '/HRBiometric/GetInstituteShifts',
+            data: { branchName: branchName },
+            success: function (data) {
+                shiftData = data;
+            },
+            async:false,
+        });
+    }
+
+    function ddShiftSelectionChanged() {
+        GetInstituteShifts();
+        $('#saveMsg').hide();
+        $('#AttendanceModification').hide();
+
+        var shftNo = document.getElementById("ShiftId").value;
+        var result = $.grep(shiftData, function (e) { return e.StaffShiftId == shftNo; });
+
+        if (shftNo == "" || shftNo < 1) {
+            document.getElementById("shiftIn").style.display = "none";
+            document.getElementById("shiftOut").style.display = "none";
+        } else {
+            var shftIn = result[0].InTime;
+            var shftOut = result[0].OutTime;
+            document.getElementById("shiftIn").style.display = "inline";
+            document.getElementById("shiftOut").style.display = "inline";
+            document.getElementById("sIn").innerHTML = shftIn;
+            document.getElementById("sOut").innerHTML = shftOut;
+
+        };
+
+    };
+
+
+    function btn_ViewDataClick() {
+        GetBiometricData();
+        return false;
+    };
+
+    $(document).ready(function () {
+        var dateRangeval = $('#daterange').val();
+        if (null != dateRangeval && dateRangeval != "") {
+            GetBiometricData();
+        }
+        var branchName = $("#Branch").val();
+        if (branchName != "" && branchName != null && branchName != undefined) {
+            GetAttendanceShift();
+        }
+    })
+
+    function GetBiometricData() {
+        var shiftId = document.getElementById("ShiftId").value;
+        var dateRange = document.getElementById("daterange").value;
+        var branchName = $("#Branch").val();
+        if (branchName == "" || branchName == 0 || branchName == null)
+            branchName == "";
+
+        document.body.style.cursor = 'wait';
+        $.ajax({
+            url: '/HRBiometric/GetStaffByUsingShift',
+            data: { branchName: branchName, shiftId: shiftId, dateRange: dateRange },
+            beforeSend: function () {
+                $('#imagemodal').show();
+            },
+            success: function (data) {
+                $('#AttendanceModification').show();
+
+                $('#AttendanceModification').html(data);
+                document.body.style.cursor = 'default';
+            },
+            error: function () {
+                document.body.style.cursor = 'default';
+                $('#imagemodal').hide();
+            }
+
+        }).done(function () {
+            $('#imagemodal').hide();
+        });
+    }
+
+    function getFormattedDate(input) {
+        var pattern = /(.*?)\/(.*?)\/(.*?)$/;
+        var result = input.replace(pattern, function (match, p1, p2, p3) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return (p2 < 10 ? "0" + p2 : p2) + " - " + months[(p1 - 1)] + " - " + p3;
+        });
+        return result;
+    }
+
+
+  
+</script>

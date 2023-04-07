@@ -1,0 +1,581 @@
+﻿@model AsteriskBrowserAL.Models.SubscriptionsData
+
+@{
+    ViewBag.Title = "_ParentDashBoardPartialView";
+
+}
+
+<div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Student Information</h3>
+                </div><!-- /.box-header -->
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label" for="form-field-1">
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @if (null != Model)
+    {
+        if (null != Model.StudentId)
+        {
+            <input type="hidden" id="StudentVal" value="@Model.StudentId" />
+            <input type="hidden" id="ExamVal" value="@Model.ExamId" />
+
+        }
+
+        if (null != Model.ParentDashboard)
+        {
+
+
+                <!--Student Details-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="box box-primary  box-solid">
+                        <div class="box-body">
+
+                            @if (null != Model.ParentDashboard.StudentData)
+                            {
+                                <div class="col-sm-4">
+                                    <span class="profile-picture">
+
+                                        @if (ViewBag.IsPhotoAvailable)
+                                        {
+                                            <img id="avatar" class="editable img-responsive" width="120" height="170" src="@Model.ParentDashboard.StudentData.StudentPic" />
+                                        }
+                                        else
+                                        {
+                                            <img class="editable img-responsive" width="120" height="170" src="~/Content/images/NoPhoto.jpg" />
+                                        }
+                                    </span>
+
+                                </div>
+
+                                <div class="col-sm-8">
+                                    <div class="box-body table-responsive no-padding" style="height: 200px;overflow:auto">
+                                        <table id="dynamic-table" class="table table-hover">
+                                            <tbody>
+                                                @*
+                                                    <div class="col-sm-8">
+                                                        <div class="row" style="border-style:solid;border-width:thin;border-color:lightblue">
+                                                            <div class="space space-2"></div>
+                                                            <table>
+                                                *@
+                                                <tr>
+                                                    <td style="color:#0174DF" class="col-sm-3"><b>Name </b></td>
+                                                    <td class="col-sm-5"><b>@Model.ParentDashboard.StudentData.FirstName</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="color:#0174DF" class="col-sm-3"><b>Admission No</b></td>
+                                                    <td class="col-sm-5"><b>@Model.ParentDashboard.StudentData.AdmissionNumber</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="color:#0174DF" class="col-sm-3"><b>Class</b></td>
+                                                    <td class="col-sm-5"><b>@Model.ParentDashboard.StudentData.CourseName</b></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="color:#0174DF" class="col-sm-3"><b>Roll Number </b></td>
+                                                    <td class="col-sm-5"><b>@Model.ParentDashboard.StudentData.RollNumber</b></td>
+                                                </tr>
+
+
+                                                <tr>
+                                                    <td style="color:#0174DF" class="col-sm-3"><b>Father Name </b></td>
+                                                    <td class="col-sm-5"><b>@Model.ParentDashboard.StudentData.FatherName</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="color:#0174DF" class="col-sm-3"><b>Mother Name</b></td>
+                                                    <td class="col-sm-5"><b>@Model.ParentDashboard.StudentData.MotherName</b></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="color:#0174DF" class="col-sm-3"><b>Father Mobile No. </b></td>
+                                                    <td class="col-sm-5" id="father">
+                                                        <b id='fatherNo' value="@Model.ParentDashboard.StudentData.MobileNumber">@Model.ParentDashboard.StudentData.MobileNumber</b>
+                                                        <a onclick="Edit('f');"><i class="glyphicon glyphicon-pencil  pull-right"></i></a>
+
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td style="color:#0174DF" class="col-sm-3"><b>Mother Mobile No</b></td>
+                                                    <td class="col-sm-5" id="mother">
+                                                        <b id='motherNo' value="@Model.ParentDashboard.StudentData.MotherMobileNo">@Model.ParentDashboard.StudentData.MotherMobileNo</b>
+                                                        <a onclick="Edit('m');"><i class="glyphicon glyphicon-pencil  pull-right"></i></a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            }
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <!--Notifications-->
+                @if (null != Model.ParentDashboard.Notifications)
+                {
+                    <div class="col-sm-6">
+                        <div class="box" style="height:200px">
+                            <div class="box box-primary box-solid">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Notifications</h3>
+
+                                </div><!-- /.box-header -->
+                                <div class="box-body">
+                                    <div class="row" style="height:160px; overflow:auto">
+                                        <marquee style="color: green;">
+                                            @if (null != Model.ParentDashboard.Notifications.Examinations)
+                                            {
+                                                if (Model.ParentDashboard.Notifications.Examinations.Count() > 0)
+                                                {
+                                                    foreach (var n in Model.ParentDashboard.Notifications.Examinations)
+                                                    {
+                                                        <b>@n.StartDate.Value.ToString("dd - MMM - yyyy") : <i>@n.ExamName</i></b>
+                                                        <br />
+                                                    }
+                                                }
+
+                                            }
+                                        </marquee>
+                                    </div>
+
+                                    <marquee>
+                                        @if (null != Model.ParentDashboard.Notifications.holidays)
+                                        {
+
+                                            foreach (var n in Model.ParentDashboard.Notifications.holidays)
+                                            {
+                                                <span style="color:red;">
+                                                    <b>@n.HolidayDate.Value.ToString("dd - MMM - yyyy") : <i>@n.Description</i></b>
+                                                </span>
+                                                <br />
+                                            }
+
+
+                                        }
+                                    </marquee>
+                                    <br />
+                                </div><!-- /.box-body -->
+                            </div>
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+                <!--Home work-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="box" style="height:240px">
+                        <div class="box box-primary box-solid">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Home Work</h3>
+                            </div><!-- /.box-header -->
+                            <div class="box-body">
+                                <div class="box-body table-responsive no-padding" style="height:180px;overflow:auto">
+                                    <table id="dynamic-table" class="table table-hover">
+                                        <tbody>
+                                            <!-- width="50" style="overflow-y:hidden;overflow-x:auto">-->
+                                            <tr>
+                                                <th>Subject</th>
+                                                <th>Home Work</th>
+                                            </tr>
+
+                                            <tr>
+                                                <td>Maths</td>
+                                                <td>Addition and Substraction</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>Science</td>
+                                                <td>Assignment - 1 Textbook page no: 10</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>English</td>
+                                                <td>Fill in the blanks in Textbook page no: 19</td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div><!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="box" style="height:240px">
+                        <div class="box box-primary box-solid">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Fee Dues</h3>
+                            </div><!-- /.box-header -->
+
+                            <div class="box-body">
+                                @if (null != Model.ParentDashboard.FeeDueData)
+                                {<div class="box-body table-responsive no-padding" style="height: 180px;overflow:auto">
+                                    <table id="dynamic-table" class="table table-hover">
+                                        <tbody>
+                                            <!-- width="50" style="overflow-y:hidden;overflow-x:auto">-->
+                                            <tr>
+                                                <th>Total Amount(Rs.)</th>
+                                                <th>Discount(Rs.)</th>
+                                                <th>Paid Amount</th>
+                                                <th>Total Payable</th>
+                                                <th>Due Amount(Rs.)</th>
+                                            </tr>
+                                            @foreach (var d in Model.ParentDashboard.FeeDueData)
+                                            {
+                                                <tr>
+                                                    <td>@d.FeeAmount</td>
+                                                    <td>@d.DiscountAmount</td>
+                                                    <td>@d.PaidAmount</td>
+                                                    <td>@d.TotalPayable</td>
+                                                    <td>@d.DueAmount</td>
+                                                </tr>
+                                            }
+
+
+                                        </tbody>
+                                    </table>
+                                </div> }
+
+
+
+                            </div><!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <!--Exam Results-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="box">
+                        <div class="box box-primary box-solid" style="height:320px">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Examination Results</h3>
+                            </div><!-- /.box-header -->
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <div class="col-sm-3 control-label" for="form-field-1">
+                                        <select id="ExamID" class="form-control" onchange="GetExamResults();"></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12" style="height:210px;">
+                                    <div class="col-sm-12" style="height:200px;overflow:auto;">
+                                        <div class="row">
+
+                                            <div class="col-sm-6" id="chartMarks" style="height: 200px;">
+                                                <script type="text/javascript">
+                                                    function GetExamResults() {
+                                                        ExaninationCharsdata()
+
+                                                    }
+                                                </script>
+
+                                            </div>
+
+                                            <div class="col-sm-6 box-body table-responsive no-padding" style="height: 200px;overflow:auto">
+                                                <table class="table table-hover">
+                                                    <!--width="50" style="overflow-y:auto;overflow-x:auto">-->
+                                                    <tr>
+                                                        <th>Subject</th>
+                                                        <th>Max. Marks</th>
+                                                        <th>Scored</th>
+                                                        <!-- <th>Highest</th>-->
+                                                    </tr>
+                                                    <tbody id="tbody"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div><!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+                <!--Attendance-->
+            if (null != Model.StudentId)
+            {
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="box" style="height:240px">
+                            <div class="box box-primary box-solid">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Attendance</h3>
+                                </div><!-- /.box-header -->
+                                <div class="box-body">
+                                    <div class="col-sm-12" style="height:190px">
+                                        <div class="col-sm-12" style="height:190px;overflow:auto">
+                                            <div class="row">
+                                                <div class="col-sm-6" id="chartAttendance" style="height: 180px;">
+                                                    <script type="text/javascript">
+                                                        $(function () {
+
+                                                            var Id = $("#StudentVal").val();
+                                                            $.ajax({
+                                                                type: 'POST',
+                                                                data: { StudentId: Id },
+                                                                url: '@Url.Action("GetAttendanceForChart")',
+                                                                success: function (chartsdata) {
+                                                                    var data = new google.visualization.DataTable();
+
+                                                                    data.addColumn('string', 'Month');
+                                                                    data.addColumn('number', 'Days Present');
+
+                                                                    for (var i = 0; i < chartsdata.length; i++) {
+                                                                        data.addRow([chartsdata[i].Month, chartsdata[i].DaysPresent]);
+                                                                    }
+                                                                    var chart = new google.visualization.LineChart(document.getElementById('chartAttendance'));
+
+                                                                    chart.draw(data,
+                                                                      {
+                                                                          title: "Attendance Report",
+                                                                          position: "top",
+                                                                          fontsize: "14px",
+                                                                          chartArea: { width: '50%' },
+                                                                      });
+                                                                },
+
+                                                            });
+                                                        })
+
+                                                    </script>
+                                                </div>
+                                                @if (null != Model.ParentDashboard.AttndRprtList)
+                                                {
+                                                    <div class="col-sm-6 box-body table-responsive no-padding" style="height: 180px;">
+                                                        <table id="dynamic-table" class="table table-hover">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th>Month</th>
+                                                                    <th>Working Days</th>
+                                                                    <th>Present</th>
+                                                                    <th>Absent</th>
+                                                                    <th>Leave</th>
+                                                                </tr>
+
+
+                                                                @foreach (var a in Model.ParentDashboard.AttndRprtList)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@a.Month</td>
+                                                                        <td>@a.TotalWorkingDays </td>
+                                                                        <td>@a.strDaysPresent</td>
+                                                                        <td>@a.strDaysAbsent</td>
+                                                                        <td>@a.strDaysLeave</td>
+                                                                    </tr>
+                                                                }
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div><!-- /.box-body -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        }
+
+
+    }
+
+
+
+</div>
+<script>
+    var valueM = "'m'";
+    var valueF = "'f'";
+    function Edit(val) {
+        var numberfather = $('#fatherNo').text();
+        var numberMother = $('#motherNo').text();
+        if (val == "f") {
+            document.getElementById("mother").innerHTML = '<b id="motherNo" value=' + numberMother + '>' + numberMother + '</b>' + '<a onclick="Edit(' + valueM + ')">' + "<i class='glyphicon glyphicon-pencil  pull-right'></i>" + '</a>'
+            document.getElementById("father").innerHTML = "<input type='number' id='fatherNo' style='border:none' value=" + numberfather + ">" + '<a onclick="Save(' + valueF + ')">' + "<i class='glyphicon glyphicon-ok  pull-right'></i></a>"
+        }
+        if (val == "m") {
+            document.getElementById("father").innerHTML = '<b id="fatherNo" value=' + numberfather + '>' + numberfather + '</b>' + '<a onclick="Edit(' + valueF + ')">' + "<i class='glyphicon glyphicon-pencil  pull-right'></i>" + '</a>'
+            document.getElementById("mother").innerHTML = "<input type='number' id='motherNo' style='border:none' value=" + numberMother + ">" + '<a onclick="Save(' + valueM + ')">' + "<i class='glyphicon glyphicon-ok  pull-right'></i></a>"
+        }
+    }
+
+    function Save(val) {
+
+        var StudentId = $("#StudentVal").val();
+        var FatherMobileNo = ""
+        var MotherMobileNo = ""
+        if (val == "m") {
+            FatherMobileNo = $('#fatherNo').text();
+            MotherMobileNo = $('#motherNo').val();
+        }
+        if (val == "f") {
+            FatherMobileNo = $('#fatherNo').val();
+            MotherMobileNo = $('#motherNo').text();
+        }
+
+        $.ajax({
+            url: '/Dashboard/SaveStudent',
+            data: { StudentId: StudentId, fatherMobileNo: FatherMobileNo, MotherMobileNo: MotherMobileNo },
+            success: function (data) {
+                document.getElementById("mother").innerHTML = '<b id="motherNo" value=' + MotherMobileNo + '>' + MotherMobileNo + '</b>' + '<a onclick="Edit(' + valueM + ')">' + "<i class='glyphicon glyphicon-pencil  pull-right'></i>" + '</a>'
+                document.getElementById("father").innerHTML = '<b id="fatherNo" value=' + FatherMobileNo + '>' + FatherMobileNo + '</b>' + '<a onclick="Edit(' + valueF + ')">' + "<i class='glyphicon glyphicon-pencil  pull-right'></i>" + '</a>'
+
+
+            }
+        });
+    }
+
+    function GetExaminationsDropdown() {
+        var StudentId = $("#StudentVal").val();
+        if (StudentId > 0) {
+            $.ajax({
+                url: "/Dashboard/ExaminationDropDown",
+                data: { StudentId: StudentId },
+                success: function (data) {
+                    var ExamItems = $('#ExamID')
+                    ExamItems.children().remove();
+                    $.each(data, function (i, record) {
+                        ExamItems.append($("<option>").val(record.ExamId).text(record.ExamName));
+                    });
+                    $('#ExamID').append(ExamItems);
+                    var e = $('#ExamID').val();
+                    document.getElementById('ExamID').value = e
+                    if (e > 0) {
+                        ExaninationChartOnloaddata(e);
+                    }
+                }
+            })
+        }
+
+    }
+    window.onload = GetExaminationsDropdown();
+
+    function ExaninationChartOnloaddata(ExamIdval) {
+        var StudentId = $("#StudentVal").val();
+
+        $.ajax({
+            url: '/Dashboard/GetMarksForBarChart',
+            data: { StudentId: StudentId, ExamID: ExamIdval },
+            success: function (chartsdata) {
+
+                // Callback that creates and populates a data table,
+                // instantiates the pie chart, passes in the data and
+                // draws it.
+
+                var data = new google.visualization.DataTable();
+
+
+                data.addColumn('string', 'Subject');
+                data.addColumn('number', 'MarksScored');
+                var row = "";
+                for (var i = 0; i < chartsdata.length; i++) {
+
+                    data.addRow([chartsdata[i].Subject, chartsdata[i].MarksScored]);
+                    row += "<tr>" +
+                          "<td>" + chartsdata[i].Subject + "</td>" +
+                          "<td>" + chartsdata[i].MaxMarks + "</td>" +
+                          "<td>" + chartsdata[i].MarksScored + "</td>" +
+                          "</tr>";
+
+
+                }
+                $("#tbody").html(row);
+                // Instantiate and draw our chart, passing in some options
+                var chart = new google.visualization.BarChart(document.getElementById('chartMarks'));
+                chart.draw(data,
+                  {
+                      title: "Marks Scored",
+                      fontsize: "14px",
+                      position: "absolute",
+                      chartArea: { left: '15%', width: '50%', height: '75%' },
+                      height: 180,
+                  });
+            },
+
+        });
+    }
+
+    function ExaninationCharsdata() {
+        var StudentId = $("#StudentVal").val();
+        var ExamIdval = $('#ExamID').val()
+
+        $.ajax({
+            url: '/Dashboard/GetMarksForBarChart',
+            data: { StudentId: StudentId, ExamID: ExamIdval },
+            success: function (chartsdata) {
+
+                // Callback that creates and populates a data table,
+                // instantiates the pie chart, passes in the data and
+                // draws it.
+
+                var data = new google.visualization.DataTable();
+
+
+                data.addColumn('string', 'Subject');
+                data.addColumn('number', 'MarksScored');
+                var row = "";
+                for (var i = 0; i < chartsdata.length; i++) {
+
+                    data.addRow([chartsdata[i].Subject, chartsdata[i].MarksScored]);
+                    row += "<tr>" +
+                          "<td>" + chartsdata[i].Subject + "</td>" +
+                          "<td>" + chartsdata[i].MaxMarks + "</td>" +
+                          "<td>" + chartsdata[i].MarksScored + "</td>" +
+                          "</tr>";
+
+
+                }
+                $("#tbody").html(row);
+                // Instantiate and draw our chart, passing in some options
+                var chart = new google.visualization.BarChart(document.getElementById('chartMarks'));
+                chart.draw(data,
+                  {
+                      title: "Marks Scored",
+                      fontsize: "14px",
+                      position: "absolute",
+                      chartArea: { left: '15%', width: '50%', height: '75%' },
+                      height: 180,
+                  });
+            },
+
+        });
+    }
+</script>
+
+
+
+

@@ -1,0 +1,222 @@
+﻿@model AsteriskBrowserAL.Models.DivisionViewModel
+@{
+    
+    int sno = 1;
+
+    int Asno = 1;
+}
+<br />
+@*<div class="hr hr-18 dotted hr-double"></div>*@
+
+
+
+<div class="row overflowscroll" >
+
+
+    <div class="col-sm-12">
+        <hr />
+        <div class="col-sm-6">
+
+            <div class="table-header">
+                Unassigned Branches
+
+                <div style="float:right;margin-right:10px;">
+                    <button id="Assign" class="btncustom P2" value="Assign" onclick="return false;">
+                     <i class=" fa fa-plus bigger-15"></i>
+                    </button>
+                    @*<input type="button" id="Assign" class="btn btn-primary pull-right" value="Assign" />*@
+                    @*<button type="button" disabled="disabled" id="Assign" name="Assign" class="btn btn-info btn-xs">
+                        <i class="ace-icon fa fa-plus-square bigger-160"></i>
+                    </button>*@
+                </div>
+                @*<button class="btn btn-sm btn-primary pull-right" type="button" disabled="disabled" name="Assign" value="+" id="btnAssign"><i class="fa fa-plus-square bigger-200"></i></button>*@
+                @*<input type="button" id="Assign" class="btn btn-primary pull-right" value="Assign" />*@
+                @*<a class="view-header-btn" href="@Url.Action("HousesC", "SeAcademics")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+            </div><!-- /.box-header -->
+
+
+
+            <div id="AllBranchesSearch" style="overflow:auto;height:200px">
+                <table class="table table-hover table-striped table-bordered" id="div_func">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("Select")
+                            </th>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch Name")
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @if (null != Model)
+                        {
+                            if (null != Model.AllBranches && Model.AllBranches.Count() > 0)
+                            {
+                                for (int i = 0; i < Model.AllBranches.Count(); i++)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.Hidden("AllBranches.Index", (@i + 10))
+                                            @Html.Hidden("AllBranches[" + (@i + 10) + "].SubscriptionId", Model.AllBranches.ElementAt(i).SubscriptionId)
+                                            @Html.Hidden("AllBranches[" + (@i + 10) + "].Institute", Model.AllBranches.ElementAt(i).Institute)
+                                            @Html.CheckBox("AllBranches[" + (@i + 10) + "].IsChecked", Model.AllBranches.ElementAt(i).IsChecked, new { @id = "AssignCheck", @value = Model.AllBranches.ElementAt(i).SubscriptionId, @name = "Check" })
+                                            @Html.Hidden("AllBranches[" + (@i + 10) + "].IsChecked", Model.AllBranches.ElementAt(i).IsChecked)
+                                        </td>
+                                        <td>
+                                            @sno
+                                        </td>
+
+                                        <td>
+                                            @Model.AllBranches.ElementAt(i).Institute
+                                        </td>
+
+                                    </tr>
+                                    sno++;
+                                }
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
+        <div class="col-sm-6">
+            <div class="table-header">
+                <span id="AssignedDivisionName"></span>Assigned Branches
+                <div style="float:right;margin-right:10px;">
+                    <button id="Remove" class="btncustom" value="Remove" onclick="return false;">
+                        <i class=" fa fa-minus bigger-15"></i>
+                    </button>
+                    @*<input type="button" name="button" class="btn btn-primary pull-right" id="Remove" value="Remove" />*@
+                    @*<button type="button" disabled="disabled" name="Remove" id="Remove" class="btn btn-info btn-xs">
+                        <i class="ace-icon fa fa-minus-square bigger-160"></i>
+                    </button>*@
+                </div>
+
+                @*<button class="btn btn-sm btn-primary pull-right" type="button" disabled="disabled" onclick="RemoveItems()" name="Remove" value="-" id="btnRemove"><i class="fa fa-plus-circle bigger-200"></i></a>-</button>*@
+                @*<input type="button" name="button" class="btn btn-primary pull-right" id="Remove" value="Remove" />*@
+                @*<a class="view-header-btn" href="@Url.Action("HousesC", "SeAcademics")" role="button" id="New" name="New"><i class="fa fa-plus-circle bigger-200"></i></a>*@
+            </div><!-- /.box-header -->
+            <div id="AssignedBranch" style="overflow:auto;height:200px">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("Select")
+                            </th>
+                            <th>
+                               S.No.
+                            </th>
+                            <th>
+                                @Html.DisplayName("Branch Name")
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @if (null != Model)
+                        {
+                            if (null != Model.AssignedAllBranches && Model.AssignedAllBranches.Count() > 0)
+                            {
+                                for (int i = 0; i < Model.AssignedAllBranches.Count(); i++)
+                                {
+
+                                    <tr>
+                                        <td>
+                                            @Html.Hidden("AssignedAllBranches.Index", (@i + 10))
+                                            @Html.Hidden("AssignedAllBranches[" + (@i + 10) + "].SubscriptionId", Model.AssignedAllBranches.ElementAt(i).SubscriptionId)
+                                            @Html.Hidden("AssignedAllBranches[" + (@i + 10) + "].Institute", Model.AssignedAllBranches.ElementAt(i).Institute)
+                                            @Html.CheckBox("AssignedAllBranches[" + (@i + 10) + "].IsChecked", Model.AssignedAllBranches.ElementAt(i).IsChecked, new { @id = "RemoveCheck", @name = "Check", @value = Model.AssignedAllBranches.ElementAt(i).SubscriptionId })
+                                            @Html.Hidden("AssignedAllBranches[" + (@i + 10) + "].IsChecked", Model.AssignedAllBranches.ElementAt(i).IsChecked)
+                                        </td>
+                                        <td>
+                                            @Asno
+                                        </td>
+
+                                        <td>
+                                            @Model.AssignedAllBranches.ElementAt(i).Institute
+                                        </td>
+
+                                    </tr>
+                                    Asno++;
+                                }
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $("#Assign").click(function () {
+        debugger
+        var AssignedBranches = $("#AssignedBranches").val();
+        var RemovedBranches = $("#RemovedBranches").val();
+        var Ids = " ";
+        var result = $('#AssignCheck:checked');
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+        });
+
+        AssignedBranches += Ids;
+        document.getElementById("AssignedBranches").value = AssignedBranches
+
+
+        if (Ids != "") {
+            ModifyData();
+        }
+        return false;
+    })
+
+
+    $("#Remove").click(function () {
+        debugger
+        var RemovedBranches = $("#RemovedBranches").val();
+        var AssignedBranches = $("#AssignedBranches").val();
+
+        var Ids = " ";
+        var result = $('#RemoveCheck:checked');
+        $.each(result, function (i, result) {
+            Ids += result.value + ",";
+        });
+        RemovedBranches += Ids;
+        document.getElementById("RemovedBranches").value = RemovedBranches
+        if (Ids != "") {
+            ModifyData()
+        }
+        return false;
+    })
+
+    function ModifyData() {
+        debugger
+        var RemovedBranches = $("#RemovedBranches").val();
+        var AssignedBranches = $("#AssignedBranches").val();
+        DivisionId = $("#DivisionId").val();
+        if (DivisionId > 0) {
+            $.ajax({
+                url: '/SeGeneral/ModifieDivisionCollections',
+                data: { RemovedBranches: RemovedBranches, AssignedBranches: AssignedBranches, DivisionId: DivisionId },
+                success: function (result) {
+                    $("#SearchDiv").html(result);
+
+                }
+            })
+        }
+        else {
+            document.getElementById("ErrorId").innerHTML = "Please select division"
+        }
+
+    }
+
+</script>

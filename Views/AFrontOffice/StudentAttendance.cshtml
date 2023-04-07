@@ -1,0 +1,292 @@
+﻿@model AsteriskBrowserAL.Models.AttendanceData
+
+@{
+    ViewBag.Title = "AttendanceRegister";
+    var hours = DateTime.Now.Hour;
+}
+
+
+@section BreadCrumb{
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="menu-icon fa fa-graduation-cap"></i>
+            Academics
+        </li>
+        <li>
+            <i class=""></i>
+            Front Office
+        </li>
+        <li class="active">Student Attendance</li>
+    </ul><!-- /.breadcrumb -->
+}
+
+@Html.Action("DatePickerScripts", "Base", new { IsPaging = false, AllowScroll = true })
+
+@if (TempData["DataSave"] != null)
+{
+    <span style="color:green;font-weight:bold">@TempData["DataSave"]</span><br />
+}
+
+                                                                           <section class="content">
+
+                                                                               <div class="row">
+                                                                                   <div class="col-xs-12">
+                                                                                       @using (Html.BeginForm("StudentAttendance", "AFrontOffice", FormMethod.Post))
+                                                                                       {
+                                                                                           <input type="hidden" id="SelStudent" />
+                                                                                           <div class="table-header">
+                                                                                               <span style="font-family:calibri;">Student Attendance</span>
+                                                                                               <div class="inline dropdown-hover" style="float:right;">
+                                                                                                   <div class="inline action-buttons">
+                                                                                                       <a class="btn btn-info btn-minier P2" href="/AFrontOffice/SendAttendanceSMS">Send SMS</a>
+                                                                                                   </div>
+                                                                                               </div>
+
+
+
+                                                                                           </div>
+                                                                                           <div class="widget-box">
+
+                                                                                               <div class="widget-body">
+                                                                                                   <div class="widget-main">
+                                                                                                       <div class="row">
+                                                                                                           <div class="col-sm-12">
+                                                                                                               <div class="col-sm-6">
+                                                                                                                   <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Class</label>
+                                                                                                                   <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                                                                                       <select id="ClassId" name="ClassNumber" class="form-control"></select>
+                                                                                                                   </div>
+                                                                                                               </div>
+                                                                                                               <div class="col-sm-6">
+                                                                                                                   <label class="col-sm-6 control-label no-padding-right" for="form-field-1">Section</label>
+                                                                                                                   <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                                                                                       <select id="SectionId" name="SectionId" class="form-control"></select>
+                                                                                                                   </div>
+                                                                                                               </div>
+                                                                                                           </div>
+
+                                                                                                           <input type="hidden" id="Attendance" name="Attendance" />
+                                                                                                           <br />
+                                                                                                           <br />
+                                                                                                           <br />
+                                                                                                           <div class="col-sm-12">
+                                                                                                               <div class="col-sm-6">
+                                                                                                                   <label class="col-sm-6 control-label no-padding-right" for="form-field-1">@Html.Label("Date")</label>
+                                                                                                                   <div class="col-sm-6 control-label no-padding-right" for="form-field-1">
+                                                                                                                       <div id="datepicker" class="input-group date">
+                                                                                                                           <input class="form-control" type="text" id="SelectDate" name="SelectDate" autocomplete="off" value="@DateTime.Today.ToShortDateString()" placeholder="Select Date" />
+                                                                                                                           <span class="input-group-addon"><i class="ace-icon fa fa-calendar"></i></span>
+                                                                                                                       </div>
+
+                                                                                                                   </div>
+                                                                                                               </div>
+                                                                                                               @*<div class="col-xs-6 pull-right" align="right">
+                                            <label class="col-sm-4 control-label no-padding-right" for="form-field-1"></label>
+                                            <div class="col-xs-6" align="right">
+                                                @if (hours < 12)
+                                                {
+                                                    <input type="radio" id="StatusM" name="Attendance" value="1" checked="checked"><b> &nbsp; Morning  &nbsp;</b>
+                                                    <input type="radio" id="StatusE" name="Attendance" value="2"><b> &nbsp; Evening&nbsp;</b>
+
+                                                }
+                                                else
+                                                {
+                                                    <input type="radio" id="StatusM" name="Attendance" value="1"><b> &nbsp; Morning  &nbsp;</b>
+                                                    <input type="radio" id="StatusE" name="Attendance" value="2" checked="checked"><b> &nbsp; Evening&nbsp;</b>
+                                                }
+
+                                            </div>
+                                        </div>*@
+                                                                                                           </div>
+
+                                                                                                       </div>
+
+
+                                                                                                   </div>
+                                                                                               </div>
+
+
+                                                                                           </div>
+                                                                                           <div id="SearchViewDiv">
+                                                                                           </div>
+                                                                                       }
+                                                                                   </div>
+                                                                               </div>
+
+                                                                               @if (null != Model)
+                                                                               {
+                                                                                   <input type="hidden" id="SelClassId" value="@Model.ClassNumber" />
+                                                                                   <input type="hidden" id="SelSectionId" value="@Model.SectionId" />
+                                                                                   <input type="hidden" id="SelAttendance" value="@Model.Attendance" />
+                                                                                   <input type="hidden" id="Seldate" value="@Model.AttendanceDate" />
+                                                                               }
+                                                                               else
+                                                                               {
+                                                                                   <input type="hidden" id="Seldate" value="@DateTime.Today.ToShortDateString()" />
+                                                                               }
+                                                                               @*else
+        {
+            <input type="hidden" id="SelClassId" />
+            <input type="hidden" id="SelSectionId" />
+            <input type="hidden" id="SelAttendance" />
+            <input type="hidden" id="Seldate" />
+        }*@
+                                                                           </section>
+<script>
+
+    function Onloadata() {
+   
+        LoadClassDropdown()
+
+        var Selclass = $("#SelClassId").val();
+        var Selsec = $("#SelSectionId").val();
+        var SelAttendance = $("#SelAttendance").val();
+        var Seldate = $("#Seldate").val();
+
+        document.getElementById("ClassId").value = Selclass;
+        document.getElementById("SectionId").value = Selsec;
+        document.getElementById("Attendance").value = SelAttendance;
+        document.getElementById("SelectDate").value = Seldate;
+
+        if ((Selclass == "" || Selclass == null || Selclass == "null") &&
+            (Selsec == "" || Selsec == null || Selsec == "null") &&
+            (SelAttendance == "" || SelAttendance == null || SelAttendance == "null") &&
+            (Seldate == "" || Seldate == null || Seldate == "null")) {
+            GetAttendanceData();
+        }
+
+
+    }
+
+    function LoadClassDropdown() {
+        debugger
+        var SelClassNumber = $("#ClassId").val();
+        $.ajax({
+            url: '/AFrontOffice/GetClassData',
+            success: function (result) {
+                CourseList = $("#ClassId")
+                CourseList.children().remove();
+                CourseList.append($("<option>").val("").text("--Select--"))
+                $.each(result, function (e, record) {
+                    CourseList.append($("<option>").val(record.ClassNumber).text(record.ClassNumberDisplay))
+                })
+                $("#ClassId").append(CourseList)
+                var SelCourseId = $("#SelClassId").val();
+                if (SelCourseId >= 0) {
+                    document.getElementById("ClassId").value = SelCourseId;
+                    GetSectionDropDown();
+                }
+            }
+        })
+    }
+    $("#ClassId").change(function () {
+        $("#SearchViewDiv").html("")
+        var ClassId = $("#ClassId").val();
+        if (ClassId > 0) {
+            GetSectionDropDown();
+        }
+        else {
+            $("#SelStudent").val("");
+            $("#SectionId").val("")
+            $("#SectionId").html("")
+        }
+    })
+
+    function GetSectionDropDown() {
+
+        var ClassNumber = $("#ClassId").val();
+        $.ajax({
+            url: '/AFrontOffice/GetSectionDropDown',
+            data: { nClassNumber: ClassNumber },
+            success: function (Data) {
+                var SectionDRP = $('#SectionId')
+                SectionDRP.children().remove();
+                SectionDRP.append($("<option>").val("").text("--Select--"))
+                $.each(Data, function (i, record) {
+                    SectionDRP.append($("<option>").val(record.SectionId).text(record.SectionCode));
+                });
+                $('#SectionId').append(SectionDRP);
+                var SelSectionId = $("#SelSectionId").val();
+                if (SelSectionId >= 0) {
+                    $('#Attendance').val(1);
+                    document.getElementById("SectionId").value = SelSectionId;
+                    GetAttendanceData();
+                }
+            }
+        })
+    }
+
+
+    $('#SectionId').change(function () {
+        $("#SearchViewDiv").html("")
+
+        debugger
+        var SectionId = $("#SectionId").val();
+        if (SectionId > 0) {
+            $('#Attendance').val(1);
+            GetAttendanceData();
+
+        }
+        else {
+            $("#SelStudent").val("");
+        }
+
+    });
+
+    $('#SelectDate').change(function () {
+        var send = true;
+        if (typeof (event) == 'object') {
+
+            if (event.timeStamp - lastJQueryTS < 300) {
+                send = false;
+            }
+
+            lastJQueryTS = event.timeStamp;
+        }
+
+        if (send) {
+            GetAttendanceData();
+        }
+    });
+
+    $("#StatusM").change(function () {
+        GetAttendanceData();
+    })
+
+    $("#StatusE").change(function () {
+        GetAttendanceData();
+    })
+
+    function GetAttendanceData() {
+
+        $("#SearchViewDiv").html("")
+        var dateval = $("#SelectDate").val();
+        var SectionId = $("#SectionId").val();
+     //   var Attendance = $("input[name=Attendance]:checked").val();
+        var Attendance = $('#Attendance').val();
+        var ClassId = $('#ClassId').val();
+        $.ajax({
+            url: "/AFrontOffice/GetStudentsForAttendance",
+            data: { ClassId: ClassId, SectionId: SectionId, Date: dateval, Attendance: Attendance },
+            success: function (Data) {
+                $("#SearchViewDiv").html(Data);
+            }
+        })
+
+    }
+
+    function getFormattedDate(input) {
+        var pattern = /(.*?)\/(.*?)\/(.*?)$/;
+        var result = input.replace(pattern, function (match, p1, p2, p3) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return (p2 < 10 ? "0" + p2 : p2) + " - " + months[(p1 - 1)] + " - " + p3;
+        });
+        return result;
+    }
+    window.onload = Onloadata();
+</script>
+
+
+
+

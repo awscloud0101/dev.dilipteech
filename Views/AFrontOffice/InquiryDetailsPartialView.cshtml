@@ -1,0 +1,113 @@
+﻿@model IEnumerable<AsteriskBrowserAL.Models.StudentAdmissionData>
+@{
+    ViewBag.Title = "Inquiry Details";
+}
+
+
+@Html.Action("DataTableScripts", "Base", new { IsPaging = false, AllowScroll = true })
+@if (Model != null && Model.Count() > 0)
+{
+    int nsno = 1;
+    <div class="table-header">
+        Records Found (@Model.Count())
+
+    </div>
+    <div class="overflowscroll">
+        <table class="table tbhover table-striped table-bordered dynamic-table">
+            <thead>
+                <tr>
+                    <th>
+                       S.No.
+                    </th>
+                    <th>
+                        @Html.DisplayName("Academic Year")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Student")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Inquiry Date")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Inquiry Number")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Father Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Mobile Number")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Branch")
+                    </th>
+                    <th></th>
+                </tr>
+
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @(nsno++)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DisplayAcademicYear)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FirstName)
+                        </td>
+                        <td>
+                            @if (item.InquiryDate.HasValue)
+                            {
+                                @item.InquiryDate.Value.ToString("dd - MMM - yyyy")
+
+                            }
+                        </td>
+
+                        <td>
+
+                            @Html.DisplayFor(modelItem => item.InquiryNumber)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FatherName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FatherMobileNumber)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Institute)
+                        </td>
+
+                        <td>
+
+                            @if (item.DispalyApplicationNumber == "" || item.DispalyApplicationNumber == null)
+                    {
+                        if (item.IsCentral == false)
+                        {
+                                    @Html.ActionLink("Application", "Application", new {StudentId = @item.StudentId },new { @Class = "P2"})
+                                }
+                            }
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+     </div> 
+
+        }
+        else
+        {
+        <span style="color: red;"><b>Data not available</b></span>
+        }
+
+
+       
+

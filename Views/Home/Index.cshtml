@@ -1,0 +1,873 @@
+﻿@model AsteriskBrowserAL.Models.HomeViewModel
+@using AsteriskBrowserAL.Helpers
+@{
+    var Userdata = Utility.GetUserDetails();
+
+    if (ViewBag.Userrole.ToUpper() == "PT")
+    {
+        Layout = "~/Views/Shared/Parent_Layout.cshtml";
+    }
+}
+@{
+    ViewBag.Title = "Asterisk - ERP Software";
+
+}
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+<script src="~/Scripts/canvasjs.min.js"></script>
+<style>
+
+	#grad1 {
+		background: rgba(19,41,130,1);
+		background: -moz-linear-gradient(top, rgba(19,41,130,1) 0%, rgba(32,124,229,1) 100%);
+		background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(19,41,130,1)), color-stop(100%, rgba(32,124,229,1)));
+		background: -webkit-linear-gradient(top, rgba(19,41,130,1) 0%, rgba(32,124,229,1) 100%);
+		background: -o-linear-gradient(top, rgba(19,41,130,1) 0%, rgba(32,124,229,1) 100%);
+		background: -ms-linear-gradient(top, rgba(19,41,130,1) 0%, rgba(32,124,229,1) 100%);
+		background: linear-gradient(to bottom, rgba(19,41,130,1) 0%, rgba(32,124,229,1) 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#132982', endColorstr='#207ce5', GradientType=0 );
+		color: #fff
+	}
+
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+            @if (ViewBag.Userrole == "PT")
+            {
+
+                <div class="box">
+                    @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    if (ViewBag.Userrole.ToUpper() == "PT")
+                    {
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <!-- PAGE CONTENT BEGINS -->
+                                    <div class="main-widget-container" id="main-widget-container">
+                                        <div class="row">
+                                            <div class="col-sm-12 col-sm-6 widget-container-col" id="widget-container-col-1">
+                                                <div class="widget-box" id="widget-box-1">
+                                                    <div class="widget-header">
+                                                        <h5 class="widget-title">Notices Details</h5>
+                                                    </div>
+                                                    <div class="widget-body" style="background:url(/Content/ParentLoginIcons/Dashboard_icon_1.png);background-size:33%;background-repeat:no-repeat;background-position:right;margin-right:3em">
+                                                        <div style="height:200px">
+                                                            <div class="widget-main padding-4 scrollable">
+                                                                @if (null != Model.lstNotice && Model.lstNotice.Count() > 0)
+                                                                {
+                                                                    <marquee direction="Up" onMouseOver="stop()" onMouseOut="start()" scrolldelay="180" style="height:170px;">
+                                                                        @foreach (var item in Model.lstNotice)
+                                                                        {
+                                                                            <p style="color:darkolivegreen;font-size:15px;font-weight:bold">&nbsp; &#8226; &nbsp; @item.Name.ToString()</p>
+                                                                        }
+                                                                    </marquee>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <p>
+                                                                        <marquee style="color: red;height:170px"><b>There is no Notices to display</b></marquee>
+                                                                    </p>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-sm-6 widget-container-col" id="widget-container-col-3">
+                                                <div class="widget-box" id="widget-box-3">
+                                                    <div class="widget-header">
+                                                        <h5 class="widget-title">
+                                                            Events Details
+                                                        </h5>
+                                                    </div>
+                                                    <div class="widget-body" style="background-image:url(/Content/ParentLoginIcons/Dashboard_icon_2.png);background-size:45%;background-repeat:no-repeat;background-position:right;margin-right:3em">
+                                                        <div style="height:200px">
+                                                            <div class="widget-main padding-4 scrollable">
+                                                                @if (null != Model.lstEvents && Model.lstEvents.Count() > 0)
+                                                                {
+                                                                    <marquee direction="Up" onMouseOver="stop()" onMouseOut="start()" scrolldelay="180" style="height:170px">
+                                                                        @foreach (var item in Model.lstEvents)
+                                                                        {
+                                                                            <p style="color:darkolivegreen;font-size:15px;font-weight:bold">&nbsp; &#8226; &nbsp; @item.Event</p>
+                                                                        }
+                                                                    </marquee>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <p>
+                                                                        <marquee style="color: red;height:170px"><b>There is no Events to display</b></marquee>
+                                                                    </p>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!-- /.row -->
+                                        <div class="row">
+                                            <div class="col-sm-12 col-sm-6 widget-container-col" id="widget-container-col-1">
+                                                <div class="widget-box" id="widget-box-1">
+                                                    <div class="widget-header">
+                                                        <h5 class="widget-title">Home Work Details</h5>
+                                                    </div>
+                                                    <div class="widget-body" style="background-image:url(/Content/ParentLoginIcons/Dashboard_Icon_3.png);background-size:40%;background-repeat:no-repeat;background-position:right;margin-right:4em">
+                                                        <div style="height:200px">
+                                                            <div class="widget-main padding-4 scrollable">
+                                                                @if (null != Model.lstOfHomeWork && Model.lstOfHomeWork.Count() > 0)
+                                                                {
+                                                                    <marquee direction="Up" onMouseOver="stop()" onMouseOut="start()" scrolldelay="180" style="height:170px">
+                                                                        @foreach (var item in Model.lstOfHomeWork)
+                                                                        {
+                                                                            <p style="color:darkolivegreen;font-size:15px;font-weight:bold">&nbsp; &#8226; &nbsp; @item.Title</p>
+                                                                        }
+                                                                    </marquee>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <p>
+                                                                        <marquee style="color: red;height:170px"><b>There is no Home Work to display</b></marquee>
+                                                                    </p>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-sm-6 widget-container-col" id="widget-container-col-3">
+                                                <div class="widget-box" id="widget-box-3">
+                                                    <div class="widget-header">
+                                                        <h5 class="widget-title">
+                                                            Student Attendance
+                                                        </h5>
+                                                    </div>
+                                                    <div class="widget-body">
+                                                        <div style="height:200px">
+                                                            <div class="widget-main padding-4 scrollable">
+                                                                <div class="col-sm-12">
+                                                                    <div class="scrollable-horizontal">
+                                                                        <div id="GraphDiv" style="height: 180px;overflow:auto ">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else if (null != Model && Utility.GetUserDetails().DesignationName == "Teacher")
+                        {
+                            <div class="box-header">
+                                <h3 class="box-title"></h3>
+                            </div>
+                            <div class="box-body">
+
+                                @*<img src=@url style="height:50%;width:100%" />*@
+                                @*<img src="~/Content/images/CampusWhiz.jpg" style="height:30%;width:70%;margin-left:210px;margin-bottom:500px" />
+
+                                    <span style="height:150px; width:200px" >Teacher</span>*@
+                                <table style="width:90%;margin-left:55px;">
+                                    <tr>
+                                        <td style="border:solid 1px gray; width:50%"><img src="~/DashBoad Images/Teacher performance.png" style="height:250px;width:100%;" />  </td>
+                                        <td style="border:solid 1px gray;width:50%"><img src="~/DashBoad Images/test performance.png" style="height:250px;width:100%;" /> </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border:solid 1px gray;width:50%"><img src="~/DashBoad Images/student performance2.JPG" style="height:250px;width:100%;" /> </td>
+                                        <td style="border:solid 1px gray;width:50%"><img src="~/DashBoad Images/Teacher Attendance.JPG" style="height:250px;width:100%;" />   </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="box-header">
+                                <h3 class="box-title"></h3>
+                            </div>
+                            <div class="box-body">
+
+                                @*<img src=@url style="height:50%;width:100%" />*@
+                                @*<img src="~/Content/images/CampusWhiz.jpg" style="height:30%;width:70%;margin-left:210px;margin-bottom:500px" />
+
+                                    <span style="height:150px; width:200px" >Teacher</span>*@
+                                <table style="width:90%;margin-left:55px;">
+                                    <tr>
+                                        <td style="border:solid 1px gray; width:50%"><img src="~/DashBoad Images/Teacher performance.png" style="height:250px;width:100%;" />  </td>
+                                        <td style="border:solid 1px gray;width:50%"><img src="~/DashBoad Images/test performance.png" style="height:250px;width:100%;" /> </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="border:solid 1px gray;width:50%"><img src="~/DashBoad Images/student performance2.JPG" style="height:250px;width:100%;" /> </td>
+                                        <td style="border:solid 1px gray;width:50%"><img src="~/DashBoad Images/Teacher Attendance.JPG" style="height:250px;width:100%;" />   </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+            else
+            {
+                @section BreadCrumb{
+
+                    <ul class="breadcrumb">
+                        <li>
+                            <i class="menu-icon glyphicon glyphicon-home"></i>
+
+                            <b>Home</b>
+                        </li>
+                        <li>
+                            <i class=""></i>
+                            Index
+                        </li>
+                        <li class="active">Holidays</li>
+                    </ul><!-- /.breadcrumb -->
+                }
+
+                <div class="row">
+                    <div class="col-sm-12" style="width:100%;">
+                        <div class="col-sm-6">
+                            <div class="blockprogress" id="widget-box-4">
+
+                                <h3 class="bghead">
+                                    <span class="ace-icon fa fa-bell-o">
+                                        <span class="bghead">
+                                            Notices/Circular Details
+                                        </span>
+                                    </span>
+                                </h3>
+
+
+
+
+                                <div class="widget-body">
+                                    <div class="alert" style="height:200px">
+                                        <div class="widget-main padding-4 scrollable">
+                                            @if (null != Model.lstNotice && Model.lstNotice.Count() > 0)
+                                            {
+                                                <marquee class="alert" direction="Up" onMouseOver="stop()" onMouseOut="start()" scrolldelay="180" style="height:170px;">
+                                                    @foreach (var item in Model.lstNotice)
+                                                    {
+                                                        <p class="marqueetext">
+                                                            <span class="fa fa-bell-o" style="color:#069;padding:5px;border-right:1px solid #CCC;"></span>
+                                                            <a href="/ACalendar/NoticeDet?id=@item.NoticeId&Status=1">
+                                                                <b> @Html.Raw(item.Name.ToString())</b>
+
+                                                            </a>
+                                                        </p>
+
+                                                    }
+                                                </marquee>
+                                            }
+                                            else
+                                            {
+                                                <p class="alert alert-info">
+                                                    <marquee ><b>There is no Notices to display</b></marquee>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <div class="blockprogress" id="widget-box-4">
+
+                                <h3 class="bghead">
+                                    <span class="ace-icon fa fa-calendar">
+                                        <span class="bghead">   Event Details</span>
+                                    </span>
+                                </h3>
+
+
+
+
+                                <div class="widget-body">
+                                    <div class="alert" style="height:200px">
+                                        <div class="widget-main padding-4 scrollable">
+                                            @if (null != Model.lstEvents && Model.lstEvents.Count() > 0)
+                                            {
+                                                <marquee class="alert" direction="Up" onMouseOver="stop()" onMouseOut="start()" scrolldelay="180" style="height:170px;">
+                                                    @foreach (var item in Model.lstEvents)
+                                                    {
+                                                        <p class="marqueetext">
+                                                            <span class="fa fa-calendar" style="color:#069;padding:5px;border-right:1px solid #CCC;"></span>
+
+                                                            @*<a href="/ACalendar/EventsDet?id=@item.EventId&Status=1">*@
+                                                          <b>  @Html.Raw(item.Subject.ToString())</b>
+                                                            @*</a>*@
+                                                        </p>
+
+                                                     
+                                                    }
+                                                </marquee>
+                                            }
+                                            else
+                                            {
+                                                <p class="alert alert-info ">
+                                                    <marquee><b>There is no Events to display</b></marquee>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+<br/>
+                if (ViewBag.Userrole == "FH")
+                {
+
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6 ">
+
+                                <div class="blockprogress"  id="widget-box-4">
+
+                                    <h3 class="bghead">
+
+                                        <i class="ace-icon fa fa-money"></i>
+                                        Fee Collection
+
+                                        <div class="widget-toolbar no-border" style="margin-top:-12px;">
+                                            <div class="inline dropdown-hover">
+                                                <button class="btn btn-minier btn-primary">
+                                                    <span id="SelType"></span>
+                                                    <i class="ace-icon fa fa-angle-down icon-on-right bigger-110"></i>
+                                                </button>
+
+                                                <ul class="dropdown-menu dropdown-menu-right dropdown-125 dropdown-lighter dropdown-close dropdown-caret">
+                                                    <li id="activeThisYear">
+                                                        <a role="button" id="ThisYear">
+                                                            <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                            This Year
+                                                        </a>
+                                                    </li>
+                                                    <li id="activeThisMonth">
+                                                        <a role="button" id="ThisMonth">
+                                                            <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                            This Month
+                                                        </a>
+                                                    </li>
+                                                    <li id="activeLastMonth">
+                                                        <a role="button" id="LastMonth">
+                                                            <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                            Last Month
+                                                        </a>
+                                                    </li>
+                                                    <li id="activeThisWeek">
+                                                        <a role="button" id="ThisWeek">
+                                                            <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                            This Week
+                                                        </a>
+                                                    </li>
+                                                    <li id="activeLastWeek">
+                                                        <a id="LastWeek">
+                                                            <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+                                                            Last Week
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+
+
+
+                                    </h3>
+
+
+
+
+                                    <hr style="margin:5px">
+
+                                    <div class="widget-body">
+
+                                        <div class="widget-main">
+                                            <table>
+                                                <tr>
+                                                    <td width="70%">
+                                                        <div id="TotalFeeCollectionBranchWise" style="height:180px;width:200px"></div>
+
+                                                    </td>
+                                                    <td style="font-size:12px;">
+                                                        <br /><br /><br />
+
+                                                        <hr style="margin:2px;" />
+                                                        <span><span class="glyphicon glyphicon-stop" style="color:#0B30B3;font-weight:bold;"><strong style="font-family:Calibri;"> ASRAONAGAR</strong></span></span>
+                                                        <span><span class="glyphicon glyphicon-stop" style="color:#00A235;font-weight:bold;"><strong style="font-family:Calibri;"> BEGUMPET</strong></span></span>
+
+
+                                                    </td>
+
+                                                </tr>
+
+
+                                            </table>
+
+
+
+
+                                        </div><!-- /.widget-main -->
+                                    </div><!-- /.widget-body -->
+
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6 ">
+
+                                <div class="blockprogress"  id="widget-box-4">
+
+                                    <h3 class="bghead">Ticket Status</h3>
+
+                                    <div class="widget-body ">
+                                        <div class="alert" style="height:210px;padding:0px;">
+                                            <div>
+
+                                                <table border="0" width="100%">
+                                                    <tr>
+                                                        <td width="70%">  <div id="chartContainer" style="height:180px;"></td>
+
+                                                        <td style="font-size:12px;font-weight:bold;padding:2px;line-height:20px;">
+                                                            <br />
+                                                            <div style="background:#fcfcfc;padding-left:10px;">
+                                                                <hr style="margin:2px" />
+                                                                <span><span class="glyphicon glyphicon-stop" style="color:#9585BF;font-weight:bold;"><strong style="font-family:Calibri;"> New</strong></span> -@Model.NewTicketsCount</span><br />
+                                                                <span><span class="glyphicon glyphicon-stop" style="color:#f39c12;font-weight:bold;"><strong style="font-family:Calibri;"> InProcess</strong></span> -@Model.ProcessTicketsCount</span><br />
+                                                                <span><span class="glyphicon glyphicon-stop" style="color:#00a65a;font-weight:bold;"><strong style="font-family:Calibri;"> Resolved</strong></span> -@Model.SolvedTicketsCount</span><br />
+                                                                <span><span class="glyphicon glyphicon-stop" style="color:#dd4b39;font-weight:bold;"><strong style="font-family:Calibri;"> Rejected</strong></span> -@Model.RejectedTicketsCount</span><br />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>  
+
+
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="blockprogress" id="widget-box-4">
+
+                                    <h3 class="bghead"><span class="fa fa-birthday-cake"><span class="bghead"> BirthDay Details</span></span></h3>
+
+
+                                    <div class="widget-body">
+                                        <div class="alert" style="height:200px">
+                                            <div class="widget-main padding-4 scrollable">
+                                                @if (null != Model.lstBirthday && Model.lstBirthday.Count() > 0)
+                                                {
+                                                    <marquee direction="Up" onMouseOver="stop()" onMouseOut="start()" scrolldelay="180" class="alert" style="height:170px;">
+                                                        @foreach (var item in Model.lstBirthday)
+                                                        {
+                                                            @*<marquee class="alert alert-info">@Html.Raw(item.StudentName.ToString())</marquee>*@
+
+         
+
+
+                                                            <p class="marqueetext">
+                                                                <span class="fa fa-birthday-cake" style="color:#069;padding:5px;border-right:1px solid #CCC;"></span>
+
+                                                                @*<a href="/AStudent/StudentDetailsD/@item.StudentId?ClassId=@item.ClassNumber&DatabasePath=@item.DataBasePath&DivisionId=-1&BranchId=-1&Status=1&SectionId=@item.SectionId&DashBoardStatus=1">*@
+                                                                <b> @Html.Raw(item.StudentName.ToString())</b>
+
+                                                                @*</a>*@
+                                                            </p>
+                                                        }
+                                                    </marquee>
+                                                }
+                                                else
+                                                {
+                                                    <p class="alert alert-info ">
+                                                        <marquee><b>There is no BirthDays to display</b></marquee>
+                                                    </p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <div class="blockprogress" id="widget-box-4">
+
+                                    <h3 class="bghead">
+                                        <span class="fa fa-user">
+                                            <span class="bghead"> Attendance</span>
+                                        </span>
+                                    </h3>
+                                    <div class="widget-body">
+                                        <div class="alert" style="height:200px">
+                                            <div class="widget-main padding-4 scrollable">
+
+                                                <div class="scrollable-horizontal" >
+                                                    @*<div id="GraphDiv1" style="height: 180px;width:100px;"></div>*@
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                }
+
+
+            }
+
+            <input type="hidden" value="@ViewBag.Userrole.ToUpper()" id="Roles" />
+
+
+
+
+
+
+
+
+
+
+<script>
+
+    function SchoolStrengthForAdmin() {
+        $.getJSON("/AFrontOffice/SchoolStrengthChart/", function (data) {
+            var ChartData = []
+            for (var i = 0; i <= data.length - 1; i++) {
+                ChartData.push({
+                    y: parseInt(data[i].value),
+                    label: data[i].Label,
+                    indexLabel: data[i].LabelHover
+                });
+            }
+            var chart = new CanvasJS.Chart("SchoolStrength", {
+                title: {
+                    text: "SCHOOL STRENGTH"
+                },
+                width: 475,
+                legend: {
+                    maxWidth: 350,
+                    itemWidth: 120
+                },
+                data: [{
+                    type: "pie",
+                    showInLegend: true,
+                    legendText: "{indexLabel}",
+                    dataPoints: ChartData
+                }]
+            });
+            chart.render();
+        });
+    }
+
+
+
+    window.onload = function () {
+        var Role = $('#Roles').val()
+        if (Role == "PT") {
+            StudentAttendanceGraph()
+        }
+        else if (Role == "FH") {
+            ChartData();
+            TaskStatusGraph();
+            FeeCollectionForAdmin(); // Fee Collection for Admin
+        }
+        else {
+            //SchoolStrengthForAdmin();  // School Strength for Admin
+            ClassAttendanceGraph();
+        }
+    }
+    function StudentAttendanceGraph() {
+
+        var Absent = [];
+        var Present = [];
+        var Working = [];
+        var Percentage = [];
+
+        CanvasJS.addColorSet("Colors", ["firebrick", "dodgerblue", "olivedrab"]);
+
+        $.getJSON("/Parent/StudentAttendanceGraph/", function (data) {
+
+            for (var i = 0; i <= data.AbsentList.length - 1; i++) {
+                Absent.push({ label: data.AbsentList[i].MonthName, y: parseInt(data.AbsentList[i].AbsentDays), toolTipContent: "AbsentDays: {y}<br/>Month:{label}" });
+            }
+            for (var i = 0; i <= data.presentList.length - 1; i++) {
+                Present.push({ label: data.presentList[i].MonthName, y: parseInt(data.presentList[i].PresentDays), toolTipContent: "PresentDays: {y}<br/>Month:{label}" });
+            }
+            for (var i = 0; i <= data.WorkingDayList.length - 1; i++) {
+                Working.push({ label: data.WorkingDayList[i].MonthName, y: parseInt(data.WorkingDayList[i].WorkingDays), toolTipContent: "WorkingDays: {y}<br/>Month:{label}" });
+            }
+            var chart = new CanvasJS.Chart("GraphDiv", {
+                colorSet: "Colors",
+                width: 460,
+                axisX: {
+                    labelFontColor: "black",
+                    labelFontWeight: "bold",
+
+                }, axisY: {
+                    labelFontColor: "black",
+                    labelFontWeight: "bold",
+                },
+                data: [{
+                    type: "column",
+                    dataPoints: Absent
+                }, {
+                    type: "column",
+                    dataPoints: Present
+                }, {
+                    type: "column",
+                    dataPoints: Working
+                }]
+            });
+            chart.render();
+        });
+    }
+    function ClassAttendanceGraph() {
+        var Absent = [];
+        var Present = [];
+        var Working = [];
+        var Percentage = [];
+		CanvasJS.addColorSet("Colors", ['#F13B5C', '#3170D6', '#36BB8F']);
+        var SectionId = $('#SelSectionId').val();
+        $.getJSON("/Home/StudentAttendanceChart?SectionId=" + SectionId, function (data) {
+
+
+
+            for (var i = 0; i <= data.length - 1; i++) {
+
+                Absent.push({ label: data[i].MonthName, y: parseInt(data[i].DaysPresent), toolTipContent: "Attendance Percent: {y}<br/>Month:{label}" });
+
+            }
+
+            var chart = new CanvasJS.Chart("GraphDiv1", {
+
+                colorSet: "Colors",
+                axisX: {
+                    labelFontColor: "black",
+                    labelFontWeight: "bold",
+
+                }, axisY: {
+                    labelFontColor: "black",
+                    labelFontWeight: "bold",
+                },
+                width: 400,
+
+                data: [{
+
+                    type: "column",
+
+                    dataPoints: Absent
+
+                }]
+
+            });
+
+            chart.render();
+
+        });
+    }
+</script>
+
+
+<script type="text/javascript">
+    //Finance Head Graphs
+    function ChartData() {
+        // GetOverViews();
+        SchoolStrengthForAdmin();
+        $('#ThisYear').addClass("blue");
+        $('#activeThisYear').addClass("active");
+        document.getElementById('SelType').innerHTML = "This Year";
+        DonutData("ThisYear");
+    }
+    function DonutData(type) {
+
+        var Color = ['#1424b8', '#0aa623', '#940f3f', '#148585', '#098215', '#b86c14', '#b83214']
+
+        $.ajax({
+            url: '/Dashboard/GetFeeCollectionDeatils',
+            data: { Type: type },
+            success: function (Data) {
+
+                var Collection = [];
+
+                $.each(Data, function (i, record) {
+
+                    Collection.push({
+                        label: record.Institute,
+                        value: parseInt(record.DebitAmount)
+                    })
+
+                });
+                $('#TotalFeeCollectionBranchWise').html('')
+                Morris.Donut({
+                    element: 'TotalFeeCollectionBranchWise',
+                    resize: true,
+                    colors: Color,
+                    data: Collection,
+                });
+
+            },
+            async: false
+        });
+    };
+    function TaskStatusGraph() {
+        var NewCount = $('#NewCount').val();
+        var InProcessCount = $('#InProcessCount').val();
+        var ResolvedCount = $('#ResolvedCount').val();
+        var RejectedCount = $('#RejectedCount').val();
+        var chart = new CanvasJS.Chart("chartContainer", {
+            colorSet: "greenShades",
+            axisY: {
+                suffix: " "
+            },
+            legend: {
+                verticalAlign: 'bottom',
+                horizontalAlign: "center"
+            },
+            data: [
+                {
+                    type: "column",
+                    bevelEnabled: false,
+                    indexLabel: "{y}",
+                    dataPoints: [
+                        { label: "New", y: parseInt(NewCount, 10), color: "#9585BF" },
+                        { label: "In-Process", y: parseInt(InProcessCount, 10), color: "#f39c12" },
+                        { label: "Resolved", y: parseInt(ResolvedCount, 10), color: "#00a65a" },
+                        { label: "Rejected", y: parseInt(RejectedCount, 10), color: "#dd4b39" }
+                    ]
+                }
+            ]
+        });
+
+        chart.render();
+    }
+    function FeeCollectionForAdmin() {
+        $.getJSON("/AFrontOffice/FeeCollectionChart/", function (data) {
+            var ChartData = []
+            for (var i = 0; i <= data.length - 1; i++) {
+                ChartData.push({
+                    x: new Date(parseInt(data[i].Year), parseInt(data[i].Month)),
+                    y: parseFloat(data[i].Amount),
+                });
+            }
+            var chart = new CanvasJS.Chart("FeeCoolectionChart", {
+                title: {
+                    text: "FEE COLLECTION"
+                },
+                width: 475,
+                data: [{
+                    type: "splineArea",
+                    dataPoints: ChartData
+                }]
+            });
+            chart.render();
+        });
+    }
+    function RemoveActiveClass() {
+        $('#activeThisYear').removeClass("active");
+        $('#activeThisMonth').removeClass("active");
+        $('#activeLastMonth').removeClass("active");
+        $('#activeThisWeek').removeClass("active");
+        $('#activeLastWeek').removeClass("active");
+        $('#ThisYear').removeClass("blue");
+        $('#ThisMonth').removeClass("blue");
+        $('#LastMonth').removeClass("blue");
+        $('#ThisWeek').removeClass("blue");
+        $('#LastWeek').removeClass("blue");
+    }
+    function RemoveActiveAttClass() {
+        $('#activeTodayAtt').removeClass("active");
+        $('#activeThisMonthAtt').removeClass("active");
+        $('#activeThisWeekAtt').removeClass("active");
+        $('#TodayAtt').removeClass("blue");
+        $('#ThisMonthAtt').removeClass("blue");
+        $('#ThisWeekAtt').removeClass("blue");
+    }
+    $('#ThisYear').click(function () {
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeThisYear').addClass("active");
+        document.getElementById('SelType').innerHTML = "This Year";
+        DonutData("ThisYear");
+    });
+
+    $('#ThisMonth').click(function () {
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeThisMonth').addClass("active");
+        document.getElementById('SelType').innerHTML = "This Month";
+        DonutData("ThisMonth");
+    });
+
+    $('#LastMonth').click(function () {
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeLastMonth').addClass("active");
+        document.getElementById('SelType').innerHTML = "Last Month";
+        DonutData("LastMonth");
+    });
+
+    $('#ThisWeek').click(function () {
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeThisWeek').addClass("active");
+        document.getElementById('SelType').innerHTML = "This Week";
+        DonutData("ThisWeek");
+    });
+
+    $('#LastWeek').click(function () {
+        RemoveActiveClass()
+        $(this).addClass("blue");
+        $('#activeLastWeek').addClass("active");
+        document.getElementById('SelType').innerHTML = "Last Week";
+        DonutData("LastWeek");
+    });
+</script>

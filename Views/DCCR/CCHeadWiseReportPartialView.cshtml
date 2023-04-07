@@ -1,0 +1,114 @@
+﻿@model List<AsteriskBrowserAL.Models.CCReport>
+@{
+}
+
+
+<section>
+
+    @if (null != Model)
+    {
+
+
+        int nsno = 1;
+
+        using (Html.BeginForm("ExportCCData", "DCCR", FormMethod.Post, new { id = "FrmCCReport" }))
+        {
+            <input type="hidden" id="rdCount" value="@Model.Count()" />
+
+
+            <div class="table-header">
+
+                Records Found (@Model.Count())
+
+                <div style="float:right;margin-right:10px;">
+                    <div class="">
+                        <button class="btncustom"  onclick="return SubmitForm();">
+                           Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            if (Model.Count() > 0)
+            {
+                <div class="overflowscroll">
+
+                    <table class="table tbhover table-striped table-bordered dynamic-table">
+
+                        <thead>
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+
+                                <th style="min-width:160px">
+                                    @Html.DisplayName("Branch Name")
+                                </th>
+
+                                @foreach (var HeadItem in Model.ElementAt(0).lstHeadwise)
+                                {
+                                    <th>
+                                        @Html.DisplayName(HeadItem.GroupName)
+
+                                    </th>
+                                }
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                        {
+                                <tr>
+                                    <td>
+                                        @(nsno++)
+                                    </td>
+
+                                    <td style="min-width:160px">
+                                        @Html.DisplayFor(modelItem => item.DisplayBranchName)
+                                    </td>
+
+                                    @foreach (var HeadItem in item.lstHeadwise)
+                            {
+                                        <td>
+                                            @Html.DisplayFor(modelItem => HeadItem.Amount)
+                                        </td>
+                                    }
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+            else
+            {  <span style="color:red;font-weight:bold;">Data is not available</span>
+            }
+        }
+
+    }
+    else
+    {
+        <span style="color:red;font-weight:bold;">Data is not available</span>
+    }
+
+</section>
+
+@Html.Action("DataTableScripts", "Base")
+
+
+
+
+
+<script>
+    function SubmitForm() {
+
+        if ($('#rdCount').val() > 0) {
+
+            $('#FrmCCReport').submit();
+        }
+    }
+</script>
